@@ -29,6 +29,8 @@ reqwest = { version = "0.13.5", features = ["rustls-no-provider", "blocking", "j
 rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
 rusqlite = { version = "0.40", features = ["bundled"] }
 tempfile = "3.27.0"
+dirs = { workspace = true }
+toml = { workspace = true, features = ["parse", "serde"] }
 
 [target.'cfg(windows)'.dependencies]
 ort = { version = "=2.0.0-rc.12", default-features = false, features = [
@@ -39,10 +41,13 @@ ort = { version = "=2.0.0-rc.12", default-features = false, features = [
   "load-dynamic",
 ] }
 pollster = "1.0.1"
+libloading = "0.8"
 uiautomation = { version = "0.25.1", default-features = false, features = ["input"] }
 vigem-rust = { version = "0.2.0", default-features = false, features = ["x360"] }
 windows = { version = "0.62.2", features = [
   "Foundation",
+  "Management_Deployment",
+  "ApplicationModel",
   "Globalization",
   "Graphics_Imaging",
   "Media_Ocr",
@@ -66,6 +71,7 @@ windows = { version = "0.62.2", features = [
   "Win32_System_LibraryLoader",
   "Win32_System_Ole",
   "Win32_System_Registry",
+  "Win32_System_Restore",
   "Win32_System_SystemInformation",
   "Win32_System_Services",
   "Win32_System_Variant",

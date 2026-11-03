@@ -74,6 +74,18 @@ pub fn control_service(action: &str, name: &str) -> io::Result<String> {
     Ok(format!("{verb} service '{service}'."))
 }
 
+/// Start type code of one service, `None` when it does not exist.
+#[cfg(windows)]
+pub(crate) fn start_type_code(name: &str) -> io::Result<Option<u32>> {
+    imp::start_type_code(name)
+}
+
+/// Change the start type of one service.
+#[cfg(windows)]
+pub(crate) fn set_start_type(name: &str, code: u32) -> io::Result<()> {
+    imp::set_start_type(name, code)
+}
+
 /// Current state name of one service (`Running`, `Stopped`, …).
 #[cfg(windows)]
 pub(crate) fn service_status(name: &str) -> io::Result<String> {
@@ -240,6 +252,55 @@ mod imp {
                 buffer.resize((needed as usize).div_ceil(8).max(buffer.len() * 2), 0);
             }
         }
+    }
+
+    /// Start type code of one service (`SERVICE_START_TYPE`), `None` when the service does not exist.
+    pub(super) fn start_type_code(name: &str) -> io::Result<Option<u32>> {
+        let service = match open(name, SERVICE_QUERY_CONFIG) {
+            Ok(service) => service,
+            Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
+            Err(error) => return Err(error),
+        };
+        let mut needed = 0u32;
+        // SAFETY: size probe with no buffer.
+        let probe = unsafe { QueryServiceConfigW(service.0, None, 0, &mut needed) };
+        if probe.as_ref().err().and_then(win32_code) != Some(ERROR_INSUFFICIENT_BUFFER) {
+            return Err(io::Error::other(format!("query service {name} configuration")));
+        }
+        let mut buffer = vec![0u64; (needed as usize).div_ceil(8)];
+        let size = u32::try_from(buffer.len() * 8).unwrap_or(u32::MAX);
+        let config = buffer.as_mut_ptr().cast::<QUERY_SERVICE_CONFIGW>();
+        // SAFETY: `buffer` is 8-byte aligned and holds `size` bytes.
+        unsafe { QueryServiceConfigW(service.0, Some(config), size, &mut needed) }
+            .map_err(|error| hresult_error(&error, &format!("query service {name} configuration")))?;
+        // SAFETY: the API filled a QUERY_SERVICE_CONFIGW at the start of the buffer.
+        Ok(Some(unsafe { (*config).dwStartType.0 }))
+    }
+
+    /// Change the start type of one service (`ChangeServiceConfigW`, nothing else is altered).
+    pub(super) fn set_start_type(name: &str, code: u32) -> io::Result<()> {
+        use windows::Win32::System::Services::{
+            ChangeServiceConfigW, ENUM_SERVICE_TYPE, SERVICE_CHANGE_CONFIG, SERVICE_ERROR, SERVICE_START_TYPE,
+        };
+        const SERVICE_NO_CHANGE: u32 = 0xFFFF_FFFF;
+        let service = open(name, SERVICE_CHANGE_CONFIG)?;
+        // SAFETY: `service` is open with SERVICE_CHANGE_CONFIG; every other field is SERVICE_NO_CHANGE / null.
+        unsafe {
+            ChangeServiceConfigW(
+                service.0,
+                ENUM_SERVICE_TYPE(SERVICE_NO_CHANGE),
+                SERVICE_START_TYPE(code),
+                SERVICE_ERROR(SERVICE_NO_CHANGE),
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+                None,
+            )
+        }
+        .map_err(|error| hresult_error(&error, &format!("change service {name} start type")))
     }
 
     /// Start type of one service; `Unknown` when its configuration is not readable.

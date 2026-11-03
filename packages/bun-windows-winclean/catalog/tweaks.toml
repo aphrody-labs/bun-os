@@ -1,0 +1,607 @@
+# SPDX-License-Identifier: Apache-2.0
+# Bun OS Windows tweak catalog: the single source of truth for `bunos-win11` (live and ISO), Bun OS Tweaks and the
+# WinClean `tweak_*` tools. Every tweak is data; the engine (src/tweaks) detects, plans, applies, verifies and undoes it.
+#
+# Removal and policy lists were derived from public behaviour of ntdevlabs/tiny11builder (credited in
+# vendor/tiny11builder and docs/WINDOWS-DESKTOP.md), Raphire/Win11Debloat (MIT), ChrisTitusTech/winutil (MIT) and
+# Microsoft Learn policy CSP documentation. No code from those projects is copied here.
+#
+# level: conservative (allowed live by default), standard, aggressive (opt-in).
+# targets: live (running Windows), offline (mounted install.wim). Default: both.
+# hive: machine (HKLM: SOFTWARE\... or SYSTEM\CurrentControlSet\...) or user (HKCU; offline: Users\Default\NTUSER.DAT).
+
+schema = 1
+
+[[module]]
+id = "privacy"
+title = "Privacy and telemetry"
+description = "Diagnostic data, advertising ID, tailored experiences, activity history, feedback prompts."
+
+[[module]]
+id = "ai"
+title = "Copilot, Recall and AI features"
+description = "Policies that turn off Copilot, Recall snapshots and Click to Do, and remove the Copilot app."
+
+[[module]]
+id = "suggestions"
+title = "Ads and suggestions"
+description = "Start, Settings, lock screen and notification suggestions, silent app installs, web results in search."
+
+[[module]]
+id = "appx"
+title = "Consumer app bloat"
+description = "Inbox consumer apps removed for the current user (live) or deprovisioned from the image (offline)."
+
+[[module]]
+id = "edge-onedrive"
+title = "Edge and OneDrive"
+description = "Edge background/sidebar/shopping policies, OneDrive sync client. WebView2 is never touched."
+
+[[module]]
+id = "services"
+title = "Services and scheduled tasks"
+description = "Telemetry services and CEIP/appraiser/feedback scheduled tasks."
+
+[[module]]
+id = "performance"
+title = "Performance and power"
+description = "Power plan, startup delay, menu delay, Game DVR."
+
+[[module]]
+id = "shell"
+title = "Shell and desktop"
+description = "Start and taskbar declutter, Explorer defaults."
+
+[[module]]
+id = "devtools"
+title = "Developer tools"
+description = "Long paths, Developer Mode, sudo."
+
+[[module]]
+id = "setup"
+title = "Setup (image only)"
+description = "Hardware-requirement bypass, offline account, device encryption, inbox installers; offline targets only."
+
+[[module]]
+id = "android"
+title = "Android apps"
+description = "Virtual Machine Platform state for Waydroid on WSL (detect; enabling is opt-in and needs a reboot)."
+
+[[module]]
+id = "wsl"
+title = "WSL and Bun OS"
+description = "Windows Subsystem for Linux state for the Bun OS WSL bundle (detect; enabling is opt-in)."
+
+# ---------------------------------------------------------------------------------------------------------- privacy
+
+[[tweak]]
+id = "privacy.telemetry"
+module = "privacy"
+title = "Diagnostic data to the minimum, no feedback notifications"
+level = "conservative"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\DataCollection', name = "AllowTelemetry", type = "dword", value = 0 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\DataCollection', name = "DoNotShowFeedbackNotifications", type = "dword", value = 1 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\DataCollection', name = "LimitDiagnosticLogCollection", type = "dword", value = 1 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\DataCollection', name = "DisableOneSettingsDownloads", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\Siuf\Rules', name = "NumberOfSIUFInPeriod", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "privacy.advertising-id"
+module = "privacy"
+title = "Advertising ID off"
+level = "conservative"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo', name = "DisabledByGroupPolicy", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo', name = "Enabled", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "privacy.tailored-experiences"
+module = "privacy"
+title = "No tailored experiences from diagnostic data"
+level = "conservative"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Privacy', name = "TailoredExperiencesWithDiagnosticDataEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Policies\Microsoft\Windows\CloudContent', name = "DisableTailoredExperiencesWithDiagnosticData", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "privacy.activity-history"
+module = "privacy"
+title = "Activity history not collected or uploaded"
+level = "conservative"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\System', name = "EnableActivityFeed", type = "dword", value = 0 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\System', name = "PublishUserActivities", type = "dword", value = 0 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\System', name = "UploadUserActivities", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "privacy.inking-typing"
+module = "privacy"
+title = "No inking and typing personalisation"
+level = "conservative"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\InputPersonalization', name = "RestrictImplicitInkCollection", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\InputPersonalization', name = "RestrictImplicitTextCollection", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\InputPersonalization\TrainedDataStore', name = "HarvestContacts", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Personalization\Settings', name = "AcceptedPrivacyPolicy", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Input\TIPC', name = "Enabled", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "privacy.online-speech"
+module = "privacy"
+title = "Online speech recognition off"
+level = "standard"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy', name = "HasAccepted", type = "dword", value = 0 },
+]
+
+# --------------------------------------------------------------------------------------------------------------- ai
+
+[[tweak]]
+id = "ai.copilot"
+module = "ai"
+title = "Windows Copilot off and its taskbar button hidden"
+level = "conservative"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot', name = "TurnOffWindowsCopilot", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Policies\Microsoft\Windows\WindowsCopilot', name = "TurnOffWindowsCopilot", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "ShowCopilotButton", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "ai.recall"
+module = "ai"
+title = "Recall snapshots and Click to Do off"
+level = "conservative"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\WindowsAI', name = "AllowRecallEnablement", type = "dword", value = 0 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\WindowsAI', name = "DisableAIDataAnalysis", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Policies\Microsoft\Windows\WindowsAI', name = "DisableAIDataAnalysis", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Policies\Microsoft\Windows\WindowsAI', name = "DisableClickToDo", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "ai.copilot-app"
+module = "ai"
+title = "Copilot app removed"
+level = "conservative"
+appx = ["Microsoft.Copilot"]
+
+# ------------------------------------------------------------------------------------------------------ suggestions
+
+[[tweak]]
+id = "suggestions.content-delivery"
+module = "suggestions"
+title = "No suggested apps, silent installs or Start/Settings/lock-screen suggestions"
+level = "conservative"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "ContentDeliveryAllowed", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "FeatureManagementEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "OemPreInstalledAppsEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "PreInstalledAppsEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "PreInstalledAppsEverEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "SilentInstalledAppsEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "SoftLandingEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "SubscribedContentEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "SubscribedContent-310093Enabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "SubscribedContent-338388Enabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "SubscribedContent-338389Enabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "SubscribedContent-338393Enabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "SubscribedContent-353694Enabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "SubscribedContent-353696Enabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "SystemPaneSuggestionsEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager', name = "RotatingLockScreenOverlayEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement', name = "ScoobeSystemSettingEnabled", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.Suggested', name = "Enabled", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "suggestions.consumer-features"
+module = "suggestions"
+title = "Consumer experiences, cloud-optimised content and push-to-install off"
+level = "conservative"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\CloudContent', name = "DisableWindowsConsumerFeatures", type = "dword", value = 1 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\CloudContent', name = "DisableConsumerAccountStateContent", type = "dword", value = 1 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\CloudContent', name = "DisableCloudOptimizedContent", type = "dword", value = 1 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\PushToInstall', name = "DisablePushToInstall", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "suggestions.web-search"
+module = "suggestions"
+title = "No Bing web results or search highlights in Start search"
+level = "conservative"
+registry = [
+  { hive = "user", key = 'Software\Policies\Microsoft\Windows\Explorer', name = "DisableSearchBoxSuggestions", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\SearchSettings', name = "IsDynamicSearchBoxEnabled", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "suggestions.spotlight"
+module = "suggestions"
+title = "Windows Spotlight off (lock screen and desktop)"
+level = "standard"
+registry = [
+  { hive = "user", key = 'Software\Policies\Microsoft\Windows\CloudContent', name = "DisableWindowsSpotlightFeatures", type = "dword", value = 1 },
+]
+
+# ------------------------------------------------------------------------------------------------------------- appx
+
+[[tweak]]
+id = "appx.consumer"
+module = "appx"
+title = "Consumer inbox apps (Clipchamp, News, Get Help, Tips, Solitaire, To Do, Feedback Hub, Maps, Office hub, Teams, new Outlook, Dev Home, Family, Power Automate, Cortana)"
+level = "conservative"
+appx = [
+  "Clipchamp.Clipchamp",
+  "Microsoft.BingNews",
+  "Microsoft.BingSearch",
+  "Microsoft.GetHelp",
+  "Microsoft.Getstarted",
+  "Microsoft.MicrosoftOfficeHub",
+  "Microsoft.MicrosoftSolitaireCollection",
+  "Microsoft.People",
+  "Microsoft.PowerAutomateDesktop",
+  "Microsoft.Todos",
+  "Microsoft.WindowsFeedbackHub",
+  "Microsoft.WindowsMaps",
+  "Microsoft.Windows.DevHome",
+  "Microsoft.549981C3F5F10",
+  "MicrosoftCorporationII.MicrosoftFamily",
+  "MicrosoftTeams",
+  "MSTeams",
+  "Microsoft.OutlookForWindows",
+  "Microsoft.Office.OneNote",
+  "Microsoft.MixedReality.Portal",
+  "Microsoft.SkypeApp",
+  "Microsoft.Wallet",
+  "Microsoft.Messaging",
+  "Microsoft.YourPhone.Promo",
+  "AppUp.IntelManagementandSecurityStatus",
+]
+
+[[tweak]]
+id = "appx.media-weather"
+module = "appx"
+title = "Weather, Movies & TV, legacy Groove"
+level = "standard"
+appx = ["Microsoft.BingWeather", "Microsoft.ZuneVideo"]
+
+[[tweak]]
+id = "appx.widgets"
+module = "appx"
+title = "Widgets board (Web Experience Pack) removed"
+level = "standard"
+appx = ["MicrosoftWindows.Client.WebExperience"]
+
+[[tweak]]
+id = "appx.extras"
+module = "appx"
+title = "Phone Link, Quick Assist, Sticky Notes, Alarms, Sound Recorder, Media Player, Cross Device"
+level = "aggressive"
+appx = [
+  "Microsoft.YourPhone",
+  "MicrosoftCorporationII.QuickAssist",
+  "Microsoft.MicrosoftStickyNotes",
+  "Microsoft.WindowsAlarms",
+  "Microsoft.WindowsSoundRecorder",
+  "Microsoft.ZuneMusic",
+  "MicrosoftWindows.CrossDevice",
+]
+
+[[tweak]]
+id = "appx.xbox"
+module = "appx"
+title = "Xbox apps (keep for Game Pass and Game Bar)"
+level = "aggressive"
+appx = [
+  "Microsoft.GamingApp",
+  "Microsoft.Xbox.TCUI",
+  "Microsoft.XboxApp",
+  "Microsoft.XboxGameOverlay",
+  "Microsoft.XboxGamingOverlay",
+  "Microsoft.XboxIdentityProvider",
+  "Microsoft.XboxSpeechToTextOverlay",
+]
+
+# ---------------------------------------------------------------------------------------------------- edge-onedrive
+
+[[tweak]]
+id = "edge-onedrive.edge-policies"
+module = "edge-onedrive"
+title = "Edge: no sidebar/Copilot hub, startup boost, background mode, shopping assistant or recommendations"
+level = "conservative"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Edge', name = "HubsSidebarEnabled", type = "dword", value = 0 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Edge', name = "StartupBoostEnabled", type = "dword", value = 0 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Edge', name = "BackgroundModeEnabled", type = "dword", value = 0 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Edge', name = "EdgeShoppingAssistantEnabled", type = "dword", value = 0 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Edge', name = "ShowRecommendationsEnabled", type = "dword", value = 0 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Edge', name = "PersonalizationReportingEnabled", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "edge-onedrive.onedrive-policy"
+module = "edge-onedrive"
+title = "OneDrive file sync disabled by policy"
+level = "standard"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\OneDrive', name = "DisableFileSyncNGSC", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "edge-onedrive.onedrive-setup"
+module = "edge-onedrive"
+title = "OneDrive installer removed from the image"
+level = "standard"
+targets = ["offline"]
+files = ['Windows\System32\OneDriveSetup.exe']
+
+[[tweak]]
+id = "edge-onedrive.edge-files"
+module = "edge-onedrive"
+title = "Edge browser removed from the image (WebView2 kept)"
+level = "aggressive"
+targets = ["offline"]
+files = ['Program Files (x86)\Microsoft\Edge', 'Program Files (x86)\Microsoft\EdgeUpdate', 'Program Files (x86)\Microsoft\EdgeCore']
+registry = [
+  { hive = "machine", key = 'SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft Edge', action = "delete_key" },
+  { hive = "machine", key = 'SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Microsoft Edge Update', action = "delete_key" },
+]
+
+[[tweak]]
+id = "edge-onedrive.teams-mail"
+module = "edge-onedrive"
+title = "Teams and Mail auto-install blocked"
+level = "conservative"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Teams', name = "DisableInstallation", type = "dword", value = 1 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\Windows Mail', name = "PreventRun", type = "dword", value = 1 },
+  { hive = "machine", key = 'SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Orchestrator\UScheduler\OutlookUpdate', name = "workCompleted", type = "dword", value = 1 },
+  { hive = "machine", key = 'SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\Orchestrator\UScheduler\DevHomeUpdate', name = "workCompleted", type = "dword", value = 1 },
+]
+
+# --------------------------------------------------------------------------------------------------------- services
+
+[[tweak]]
+id = "services.telemetry"
+module = "services"
+title = "Connected User Experiences and Telemetry and WAP push services disabled"
+level = "conservative"
+services = [
+  { name = "DiagTrack", start = "disabled" },
+  { name = "dmwappushservice", start = "disabled" },
+]
+
+[[tweak]]
+id = "services.retail-demo"
+module = "services"
+title = "Retail demo service disabled"
+level = "conservative"
+services = [{ name = "RetailDemo", start = "disabled" }]
+
+[[tweak]]
+id = "services.telemetry-tasks"
+module = "services"
+title = "CEIP, compatibility appraiser and feedback scheduled tasks disabled"
+level = "conservative"
+tasks = [
+  '\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser',
+  '\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser Exp',
+  '\Microsoft\Windows\Application Experience\ProgramDataUpdater',
+  '\Microsoft\Windows\Customer Experience Improvement Program\Consolidator',
+  '\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip',
+  '\Microsoft\Windows\Feedback\Siuf\DmClient',
+  '\Microsoft\Windows\Feedback\Siuf\DmClientOnScenarioDownload',
+]
+
+[[tweak]]
+id = "services.error-reporting-task"
+module = "services"
+title = "Windows Error Reporting queue task disabled"
+level = "standard"
+tasks = ['\Microsoft\Windows\Windows Error Reporting\QueueReporting']
+
+# ------------------------------------------------------------------------------------------------------ performance
+
+[[tweak]]
+id = "performance.power-plan"
+module = "performance"
+title = "High performance power plan active"
+level = "conservative"
+targets = ["live"]
+power = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c"
+
+[[tweak]]
+id = "performance.startup-delay"
+module = "performance"
+title = "No artificial startup-app delay, faster menus"
+level = "conservative"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Serialize', name = "StartupDelayInMSec", type = "dword", value = 0 },
+  { hive = "user", key = 'Control Panel\Desktop', name = "MenuShowDelay", type = "sz", value = "100" },
+]
+
+[[tweak]]
+id = "performance.game-dvr"
+module = "performance"
+title = "Game DVR background recording off (Game Bar capture)"
+level = "standard"
+registry = [
+  { hive = "user", key = 'System\GameConfigStore', name = "GameDVR_Enabled", type = "dword", value = 0 },
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Windows\GameDVR', name = "AllowGameDVR", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "performance.reserved-storage"
+module = "performance"
+title = "Reserved storage off on a fresh install"
+level = "standard"
+targets = ["offline"]
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Microsoft\Windows\CurrentVersion\ReserveManager', name = "ShippedWithReserves", type = "dword", value = 0 },
+]
+
+# ------------------------------------------------------------------------------------------------------------ shell
+
+[[tweak]]
+id = "shell.taskbar-declutter"
+module = "shell"
+title = "Taskbar: no Widgets, Task View, Chat; search as an icon"
+level = "conservative"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Policies\Microsoft\Dsh', name = "AllowNewsAndInterests", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "ShowTaskViewButton", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "TaskbarMn", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Search', name = "SearchboxTaskbarMode", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "shell.start-declutter"
+module = "shell"
+title = "Start: no recommendations, account nags or pinned promotions"
+level = "conservative"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "Start_IrisRecommendations", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "Start_AccountNotifications", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "shell.start-pins-image"
+module = "shell"
+title = "Empty Start pins for new users"
+level = "standard"
+targets = ["offline"]
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Microsoft\PolicyManager\current\device\Start', name = "ConfigureStartPins", type = "sz", value = '{"pinnedList": [{}]}' },
+]
+
+[[tweak]]
+id = "shell.explorer-defaults"
+module = "shell"
+title = "Explorer: show file extensions, open on This PC"
+level = "conservative"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "HideFileExt", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "LaunchTo", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "shell.taskbar-left"
+module = "shell"
+title = "Taskbar aligned left (windows-mac profile moves it under the dock instead)"
+level = "standard"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "TaskbarAl", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "shell.dark-mode"
+module = "shell"
+title = "Dark mode for apps and system"
+level = "standard"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', name = "AppsUseLightTheme", type = "dword", value = 0 },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Themes\Personalize', name = "SystemUsesLightTheme", type = "dword", value = 0 },
+]
+
+# --------------------------------------------------------------------------------------------------------- devtools
+
+[[tweak]]
+id = "devtools.long-paths"
+module = "devtools"
+title = "Win32 long paths enabled"
+level = "conservative"
+registry = [
+  { hive = "machine", key = 'SYSTEM\CurrentControlSet\Control\FileSystem', name = "LongPathsEnabled", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "devtools.developer-mode"
+module = "devtools"
+title = "Developer Mode (sideloading, symlinks without elevation)"
+level = "standard"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Microsoft\Windows\CurrentVersion\AppModelUnlock', name = "AllowDevelopmentWithoutDevLicense", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "devtools.sudo"
+module = "devtools"
+title = "Windows sudo enabled inline"
+level = "standard"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Microsoft\Windows\CurrentVersion\Sudo', name = "Enabled", type = "dword", value = 3 },
+]
+
+# ------------------------------------------------------------------------------------------------------------ setup
+
+[[tweak]]
+id = "setup.hardware-bypass"
+module = "setup"
+title = "Install on unsupported hardware (TPM, Secure Boot, CPU, RAM, storage checks)"
+level = "standard"
+targets = ["offline"]
+registry = [
+  { hive = "machine", key = 'SYSTEM\Setup\LabConfig', name = "BypassCPUCheck", type = "dword", value = 1 },
+  { hive = "machine", key = 'SYSTEM\Setup\LabConfig', name = "BypassRAMCheck", type = "dword", value = 1 },
+  { hive = "machine", key = 'SYSTEM\Setup\LabConfig', name = "BypassSecureBootCheck", type = "dword", value = 1 },
+  { hive = "machine", key = 'SYSTEM\Setup\LabConfig', name = "BypassStorageCheck", type = "dword", value = 1 },
+  { hive = "machine", key = 'SYSTEM\Setup\LabConfig', name = "BypassTPMCheck", type = "dword", value = 1 },
+  { hive = "machine", key = 'SYSTEM\Setup\MoSetup', name = "AllowUpgradesWithUnsupportedTPMOrCPU", type = "dword", value = 1 },
+  { hive = "user", key = 'Control Panel\UnsupportedHardwareNotificationCache', name = "SV1", type = "dword", value = 0 },
+  { hive = "user", key = 'Control Panel\UnsupportedHardwareNotificationCache', name = "SV2", type = "dword", value = 0 },
+]
+
+[[tweak]]
+id = "setup.local-account"
+module = "setup"
+title = "OOBE allows a local account (BypassNRO)"
+level = "standard"
+targets = ["offline"]
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Microsoft\Windows\CurrentVersion\OOBE', name = "BypassNRO", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "setup.no-device-encryption"
+module = "setup"
+title = "No automatic BitLocker device encryption"
+level = "standard"
+targets = ["offline"]
+registry = [
+  { hive = "machine", key = 'SYSTEM\CurrentControlSet\Control\BitLocker', name = "PreventDeviceEncryption", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "setup.suggested-apps-keys"
+module = "setup"
+title = "Content Delivery Manager subscriptions and suggested apps cleared for new users"
+level = "standard"
+targets = ["offline"]
+registry = [
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\Subscriptions', action = "delete_key" },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager\SuggestedApps', action = "delete_key" },
+]
+
+# ---------------------------------------------------------------------------------------------------- android / wsl
+
+[[tweak]]
+id = "android.vm-platform"
+module = "android"
+title = "Virtual Machine Platform enabled (Waydroid on WSL, WSABuilds)"
+level = "aggressive"
+features = [{ name = "VirtualMachinePlatform", state = "enabled" }]
+
+[[tweak]]
+id = "wsl.subsystem"
+module = "wsl"
+title = "Windows Subsystem for Linux enabled (Bun OS WSL bundle, WSLg desktops)"
+level = "aggressive"
+features = [{ name = "Microsoft-Windows-Subsystem-Linux", state = "enabled" }]
