@@ -93,3 +93,17 @@ Priorities from the read-only comparison of upstream iced/libcosmic with our for
 11. vendor/cosmic-epoch/libcosmic is stale (de9353ab, iced submodule not checked out); cosmic-calculator cannot
     build from it: repin to the fork rev used elsewhere.
 12. Dev tools: forward iced tester/hot/time-travel through libcosmic; add iced_test snapshot tests.
+
+## auto → Neon: done (2026-11-03 22:32 UTC cutover)
+
+- Neon project `auto` (small-forest-38471112, aws-eu-central-1, PG 18); branches `main` (prod) and snapshot
+  `avant-bascule-20261103t223215z`; roles auto (owner), auto_app, auto_worker (RLS). 73 tables, row counts and
+  RLS/policies/grants/sequences verified identical before the switch. auto-pg-prod untouched (rollback: restore
+  ~/auto/prod.env.avant-neon-20261103T223215Z then `release-vps.ts 20261025T023530Z-20eda31f relancer`).
+- auto commits e4d5539, 814e66d, 9f2810c, 2b116f9, 227a509: npm @aphrody/* 1.4.7, packages/ui on m3-tokens,
+  scripts/neon.ts, Cloud Run removed, CI ephemeral Neon branch per run, backups from Neon, /health {ok,version,commit}.
+- Lane spec for the peer: env file ~/auto/prod.env (DATABASE_URL pooled, DATABASE_URL_DIRECT, AUTO_*, S3_*);
+  ~/auto/neon.env release-only; health https://auto.aphrody.com/health field `commit`.
+- Open: next auto release blocked until the crates.io agent's Cargo changes land (pdfcraft-create not found);
+  bun-os bug: vendor/bun-ui/packages/bun-plugin-tailwind/package.json requires m3-tailwind/m3-tokens ^3.3.7 →
+  fix range and republish 1.4.8; auto CI rust job still fails at setup.
