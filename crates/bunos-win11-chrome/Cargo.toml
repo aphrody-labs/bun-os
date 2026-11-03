@@ -1,0 +1,32 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "bunos-win11-chrome"
+version = "1.4.7"
+edition = "2024"
+authors = ["aphrody-dev <contact@aphrody.com>"]
+homepage = "https://aphrody.app"
+repository = "https://github.com/aphrody-labs/bun-os"
+license = "Apache-2.0"
+description = "macOS-style window chrome for the Bun OS Windows desktop: DWM rounded corners, Mica backdrop, unified dark caption, coloured borders, and a dock descriptor. Applies documented DwmSetWindowAttribute attributes to any HWND; patches no shell."
+
+[lib]
+name = "bunos_win11_chrome"
+
+[[bin]]
+name = "bunos-win11-chrome"
+path = "src/main.rs"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+windows = { workspace = true, features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Dwm",
+  "Win32_Graphics_Gdi",
+  "Win32_UI_WindowsAndMessaging",
+] }
+
+[lints]
+workspace = true

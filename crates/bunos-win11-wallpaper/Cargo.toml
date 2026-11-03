@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "bunos-win11-wallpaper"
+version = "1.4.7"
+edition = "2024"
+authors = ["aphrody-dev <contact@aphrody.com>"]
+homepage = "https://aphrody.app"
+repository = "https://github.com/aphrody-labs/bun-os"
+license = "Apache-2.0"
+description = "Rust wallpaper engine for the Bun OS Windows desktop: acquires the WorkerW layer behind the desktop icons (the Progman 0x052C technique) and renders an animated wgpu scene into it. Pure Rust on the shared Bun OS wgpu stack."
+
+[lib]
+name = "bunos_win11_wallpaper"
+
+[[bin]]
+name = "bunos-win11-wallpaper"
+path = "src/main.rs"
+
+[dependencies]
+
+[target.'cfg(windows)'.dependencies]
+aphrody-gpu-backend = { workspace = true }
+raw-window-handle = { workspace = true }
+pollster = "1"
+windows = { workspace = true, features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Dwm",
+  "Win32_Graphics_Gdi",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_System_LibraryLoader",
+] }
+
+[lints]
+workspace = true
