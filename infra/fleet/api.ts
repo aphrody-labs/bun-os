@@ -360,8 +360,14 @@ ${dry ? "exit 0" : swap(`$rel/${bin}`)}`;
   } else {
     const command = d.command ?? die(`${name}: deploy.command missing`);
     build = `
-git merge-base --is-ancestor "$(git rev-parse origin/main)" HEAD ||
-  { echo "the build checkout does not contain origin/main yet (sync pending)" >&2; exit 1; }
+# The checkout builds HEAD (the sync may still be rebasing other agents' commits): it must contain the latest
+# origin/main change of the service's own sources and of the contract helpers, and carry no edit to them.
+for p in ${sq(s.source ?? ".")} packages/bun-os-platform/src/api crates/aphrody-http-error; do
+  last=$(git log -1 --format=%H origin/main -- "$p")
+  [ -z "$last" ] || git merge-base --is-ancestor "$last" HEAD ||
+    { echo "the build checkout lacks $last ($p); sync pending" >&2; exit 1; }
+  git diff --quiet HEAD -- "$p" || { echo "$p has uncommitted edits in the build checkout" >&2; exit 1; }
+done
 want=$(git rev-parse HEAD)
 rel="$HOME/apps/api-releases/${name}/$want-$(date +%s%3N)"
 mkdir -p "$(dirname "$rel")"
@@ -379,7 +385,8 @@ echo "${name}: live at $want"`;
 async function deploy(name: string, dry: boolean): Promise<void> {
   const s = api.services[name] ?? die(`unknown service ${name}`);
   console.log(`deploy ${name} on ${s.host}${dry ? " (dry run)" : ""}`);
-  const { code } = await ssh(s.host, deployScript(name, s, dry));
+  const { code, out } = await ssh(s.host, deployScript(name, s, dry));
+  process.stdout.write(out);
   if (code !== 0) die(`deploy ${name} failed`);
 }
 
