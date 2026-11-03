@@ -1,0 +1,37 @@
+# Bun OS release policy (docs/ops/RELEASES.md). Read by the release tooling; change both together.
+schema = 1
+
+[image]
+scheme = "YY.MM"
+release_months = [4, 10]
+freeze_weeks = 4
+point_release_weeks = 4
+# Even-year April releases are LTS (Ubuntu/Pop!_OS LTS alignment).
+lts = "even-year-april"
+lts_support_years = 5
+lts_hwe_years = 2
+stable_overlap_months = 1
+first_lts = "26.04"
+
+[channels]
+edge = { source = "main", gate = "presubmit" }
+beta = { source = "main", tag = "vYY.MM-rcN", cadence_weeks = 1 }
+stable = { branch = "stable/YY.MM", tag = "vYY.MM.P" }
+lts = { branch = "lts/YY.MM", tag = "vYY.MM.P" }
+
+[backports]
+upstream_first = true
+trailer = "commit <sha> upstream."
+allowed = ["security", "data-loss", "crash", "regression", "hardware-id", "build-fix"]
+
+[kernel]
+lts_series = "kernel.org longterm"
+stable_series = "kernel.org stable"
+patches = "series on top of the upstream tag"
+
+[packages]
+scheme = "semver-2.0"
+workspace_version = "1.4.7"
+fork_suffix = "+bunos.N"
+semver_check = "cargo semver-checks"
+registries = ["crates.io", "npmjs.com"]
