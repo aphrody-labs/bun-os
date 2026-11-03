@@ -74,6 +74,16 @@
    eng wird.
    ────────────────────────────────────────────────────────────────────── */
 @import "tailwindcss" source(none);
+/* Bun OS design system: every colour, shape, type, elevation and motion
+   token comes from the generated Material 3 sheets. tokens.css switches the
+   scheme with the .light / .dark class the app puts on <html> (and follows
+   prefers-color-scheme without one); tailwind.css maps every role to a
+   utility (bg-surface-container, text-on-surface-variant, border-outline-variant,
+   bg-on-surface/8 as the hover state layer). This file declares no colour of
+   its own. */
+@import "@aphrody/m3-tokens/m3-tokens.css";
+@import "@aphrody/m3-theme/tokens.css";
+@import "@aphrody/m3-theme/tailwind.css";
 @source "../index.html";
 @source "./";
 @source not "./**/__tests__/**";
@@ -93,67 +103,7 @@
    a pointer, so a plain `:hover` is the honest rule here. */
 @custom-variant hover (&:hover);
 
-/* ─────────────────────────────────────────────────────────────────────
-   Visual layer aligned with the web companion (DD 2026-06-05)
-   The previous build collapsed the whole cool-accent family
-   (blue/indigo/violet/purple/sky/cyan) onto ONE muted-violet ramp via a
-   @theme override, which tinted the entire app lilac. The web companion
-   keeps Tailwind's DEFAULT palette + neutral greys and only uses a few
-   deliberate purple accents. To match it we drop the colour-family override
-   entirely (Tailwind defaults return: blue is blue, green is green, the
-   sparse purple accents render as real purple, same classes the web uses)
-   and keep only the neutral ramp + structural radius/shadow tokens, which
-   carry no colour identity.
-   ───────────────────────────────────────────────────────────────────── */
 @theme {
-  /* ── Neutral ramp — spread for depth (the web app base, widened) ──────────
-     D-T06, am 01.09.2026 nachgezaehlt. Der Kommentar, der hier stand, war
-     an einer Stelle schlicht falsch: `--color-lu-base` hiess „app canvas",
-     aber die Leinwand der App ist #141414, nicht #202020. Gemessen im
-     laufenden Fenster (getComputedStyle auf der AppShell-Wurzel):
-
-       Leinwand + Titelleiste + Header   #141414   9 Fundstellen  KEIN Token
-       Pane + Sidebar + Create-Panel     #1e1e1e   5 Fundstellen  KEIN Token
-       --color-lu-base   #202020   2 Fundstellen (zwei Modale)
-       --color-lu-panel  #262626   4 Fundstellen
-       --color-lu-raised #2d2d2d   0 Fundstellen — im Browser als LEERE
-                                   Variable gemessen: Tailwind gibt ein
-                                   Farbtoken nur aus, wenn es jemand
-                                   aufruft. Das Token existiert nur hier.
-       --color-lu-overlay #363636  6 Fundstellen
-
-     Neu war deshalb nur EINE Stufe, und zwar die meistbenutzte Flaeche der
-     App, die als einzige gar keinen Namen hatte.
-
-     ── Zweiter Durchgang, 01.09.2026 abends ──
-
-     `--color-lu-raised` ist jetzt GELOESCHT. Es stand hier mit dem
-     Vermerk „TOT: 0 Call-Sites", und ein Token, dessen einzige Aufgabe
-     es ist, sein eigenes Totsein zu dokumentieren, ist genau die Sorte
-     Stufe, die der Audit unter „16 Graustufen" zaehlt. Die Leiter hat
-     jetzt vier Stufen, und JEDE hat mindestens eine Call-Site — das
-     rechnet zwei-akzente-und-eine-leinwand.test.ts nach, in beide
-     Richtungen: keine Stufe ohne Aufruf, kein Aufruf ohne Stufe.
-
-     Nachgezaehlt am selben Tag, nachdem die Schwebeblaetter der App auf
-     `.lu-elevated` gezogen waren (siehe dort): im CODE — also mit
-     abgeschnittenen Kommentaren, sonst zaehlt man Prosa mit — standen
-     davor 15 dunkle Graustufen als Literal, danach 11. Verschwunden sind
-     #161719, #17171c, #1f1f1f und #262626 (dazu #2d2d2d hier oben): fuenf
-     Namen fuer EINE Rolle, naemlich „dieses Blatt schwebt".
-
-     Diese Leiter ist DUNKEL. Es gibt bewusst kein `.light`-Gegenstueck:
-     im Hellmodus zerfaellt #141414 in ZWEI Rollen, die dieselbe dunkle
-     Zahl teilen — Fensterrahmen (`bg-gray-200`: Titlebar, Header,
-     AppShell) und Vollflaeche (`bg-white`: ViewSkeletons,
-     Create-Wurzel). Eine gespiegelte Leiter muesste sich fuer eine der
-     beiden entscheiden und faerbte die andere falsch. Deshalb tragen alle
-     Call-Sites weiterhin `dark:` und ihr eigenes Hell-Pendant. ── */
-  --color-lu-canvas: #141414;   /* Leinwand, Titelleiste, Header */
-  --color-lu-base: #202020;     /* zwei Modalflaechen, NICHT die Leinwand */
-  --color-lu-panel: #262626;    /* sidebar, panels */
-  --color-lu-overlay: #363636;  /* raised side panels (documents panel, tool card) */
-  --color-lu-sheet: #151515;    /* floating sheet: menus, popovers, tooltips, see .lu-elevated */
 
   /* ── Form: EINE Radiusleiter ────────────────────────────────────────
      D-T08. Vorher liefen zwei Systeme nebeneinander: die rem-abgeleitete
@@ -236,8 +186,7 @@
      Am 01.09.2026 im CODE nachgezaehlt (Kommentare abgeschnitten, sonst
      zaehlt man Prosa mit):
 
-       shadow-sm   12x  WERK — und im Dunkeln per Hausregel abgeschaltet,
-                        siehe `.dark .shadow-sm` weiter unten
+       shadow-sm   12x  WERK
        shadow-lg    3x  Haus
        shadow-xl    6x  Haus
        shadow-2xl   6x  Haus
@@ -256,111 +205,11 @@
      sites were floating sheets and dialogs, which now take `.lu-elevated`
      or `.lu-dialog`.
      Bewacht von radius-schatten-hoehe-und-bewegung.test.ts. ── */
-  --shadow-lg: 0 8px 24px -6px rgba(0, 0, 0, 0.6), 0 2px 6px -2px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 16px 48px -12px rgba(0, 0, 0, 0.7), 0 4px 12px -4px rgba(0, 0, 0, 0.5);
+  /* The two house steps are the M3 elevation levels 3 and 4: the shadow
+     role with the key (0.30) and ambient (0.15) alphas, both schemes. */
+  --shadow-lg: var(--md-sys-elevation-level3);
+  --shadow-xl: var(--md-sys-elevation-level4);
 
-  /* ── Create surface accent — the disciplined violet promoted from the
-     progress-bar rgb(160,148,248). Ported from the lu-labs create tokens
-     (the web app). The desktop Create port referenced
-     `bg-lu-accent` / `text-lu-accent` but never defined the colour, so the
-     progress fill and accents resolved to nothing. ── */
-  --color-lu-accent: #a094f8;
-  --color-lu-accent-hover: #b1a6ff;
-  --color-lu-accent-soft: rgba(160, 148, 248, 0.14);
-  --color-lu-accent-ring: rgba(160, 148, 248, 0.55);
-
-  /* ── Primaeraktion: Text auf der Akzentflaeche ──
-     Gemessen (WCAG 2.1 relative Luminanz):
-       #a094f8 (Ruhe)  gegen #111827 → 6.83:1   (AA Fliesstext, AAA gross)
-       #b1a6ff (Hover) gegen #111827 → 8.25:1
-       #a094f8          gegen #ffffff → 2.60:1  ← weisser Text faellt durch,
-     deshalb traegt die Akzentflaeche DUNKLEN Text, in beiden Modi gleich.
-     --color-lu-accent-edge ist die Kante fuer den Hellmodus: die Flaeche
-     selbst steht nur 2.60:1 gegen Weiss, die Kante schafft 3.37:1 und
-     erfuellt damit 1.4.11 (Nicht-Text-Kontrast) fuer die Buttongrenze. */
-  --color-lu-on-accent: #111827;
-  --color-lu-accent-edge: #8b7cf0;
-
-  /* ── Accent as TEXT on a light surface (Model Manager, 08.10.2026) ──
-     In the dark the accent carries a word by itself: #a094f8 stands 6.42:1
-     on the pane (#1e1e1e) and 5.83:1 on a tile. On white it reaches 2.60:1,
-     and the light-mode edge #8b7cf0 reaches 3.37:1, which is enough for a
-     border (1.4.11) and not for a word. So the light mode gets an ink of
-     its own, the same hue taken down until it reads:
-
-       #5746d9 on #ffffff                6.40:1
-               on #f9fafb, a tile        6.12:1
-               on the tonal fill         5.56:1   (accent at 12 % over a tile)
-
-     Callers pair the two, as the edge is paired above:
-     `text-lu-accent-ink dark:text-lu-accent`. The numbers are computed, not
-     copied, in models/__tests__/the-accent-leads-to-the-action.test.ts. */
-  --color-lu-accent-ink: #5746d9;
-
-  /* ── Die ruhige Fokus-Haarlinie an Texteingaben (21.09.2026) ────────
-     Der Inhaber, am Windows-Bau, zuerst fuer das Nachrichtenfeld und dann fuer
-     die Preset-Werkstatt, auf Nachfrage fuer die ganze App: „der lila
-     balken um das prompt fenster geht garnicht ... nirgends."
-
-     Der Akzentring bleibt, wo er hingehoert: an Knoepfen, Links, Reglern,
-     Kaestchen und Menueausloesern, also ueberall, wo die Tastatur sonst
-     nicht zu sehen waere. In ein Textfeld schreibt man dagegen, und dass
-     man das tut, sagt schon der Schreibzeiger. Dort reicht eine Haarlinie
-     in demselben Grau, das `lib/hinweis.ts` dem ruhigen Ton gibt.
-
-     Ruhig heisst nicht unsichtbar: beide Werte halten 1.4.11 (3:1 gegen
-     die Flaeche) auf JEDER Flaeche, auf der ein Feld sitzt. Gerechnet:
-
-       dunkel  #9ca3af  gegen #1e1e1e  8.57:1   #363636  4.38:1
-       hell    #6b7280  gegen #ffffff  4.89:1   #f3f4f6  4.44:1
-
-     Die schwaechste Paarung ist Grau auf dem Schwebeblatt #363636 mit
-     4.38:1, also mit Abstand ueber der Schwelle. Nachgerechnet wird das
-     in fokusring-und-press.test.ts, Flaeche fuer Flaeche. */
-  --color-lu-focus-quiet: #9ca3af;
-  --color-lu-focus-quiet-edge: #6b7280;
-
-  /* ── Der Cloud-Akzent (D-T05) ───────────────────────────────────────
-     Der Audit las die Lage als „zwei Akzente nebeneinander": #a094f8
-     steht hier als Token, #7c3aed stand an 20 Stellen als Literal, und
-     das Brand-Kit-Violett #8b5cf6 kommt in src/ ueberhaupt nicht vor
-     (nachgezaehlt: 0 Fundstellen). Der naheliegende Schluss waere, auf
-     EINEN Hex zusammenzufallen. Nachgerechnet ist dieser Schluss falsch,
-     und zwar deutlich.
-
-     Es sind keine zwei Marken, es sind zwei ROLLEN. #7c3aed steht
-     ausschliesslich an der Cloud: der getoente Composer-Rahmen im
-     Cloud-Modus, das „Cloud"-Abzeichen ueber dem Eingabefeld, der
-     Cloud-Schalter, der Cloud-Gate-Dialog. Cloud ist in dieser App ein
-     GELDZUSTAND — die Nachricht laeuft auf gemieteten GPUs und wird
-     abgerechnet. Dass dieser Zustand nicht dieselbe Farbe traegt wie die
-     Hausmarke, ist die Aussage, nicht der Fehler.
-
-     Die Rechnung (WCAG 2.1, relative Luminanz, alle Halbtransparenzen
-     ueber ihren echten Grund gedeckt — #ffffff hell, #1e1e1e dunkel;
-     Minimum ueber die sechs Cloud-Textstellen):
-
-       heute   #7c3aed hell / #a78bfa dunkel      4,53:1   ✓ AA
-       nur     #a094f8 (Haus-Akzent)              2,29:1   ✗
-       nur     #8b5cf6 (Brand-Kit)                3,36:1   ✗
-       Paar    #8b7cf0 hell / #a094f8 dunkel      2,87:1   ✗
-
-     Das heutige Paar ist das einzige der vier, das AA haelt. Ein Wechsel
-     KOSTET also zwischen 1,2 und 2,2 Kontraststufen und wirft jede
-     Cloud-Beschriftung unter die Grenze. Die gefuellte Cloud-Flaeche
-     (`bg-lu-cloud text-white`) traegt in beiden Modi dieselbe Farbe und
-     kommt auf 5,70:1; unter #a094f8 waere sie 2,60:1.
-
-     Was hier also passiert, ist NICHT „ein Akzent statt zwei", sondern
-     „eine Definition statt zwanzig Literalen". Dieselbe Aufteilung wie
-     beim Haus-Akzent oben: eine Farbe fuers Helle, eine angehobene
-     fuers Dunkle.
-
-       hell   #7c3aed auf #ffffff  5,70:1   (und als Flaeche, beide Modi)
-       dunkel #a78bfa auf #1e1e1e  6,13:1
-     ── */
-  --color-lu-cloud: #7c3aed;
-  --color-lu-cloud-lift: #a78bfa;
 
   /* ── Motion — eine benannte Leiter statt verstreuter Zahlen ──
      Dauer und Kurve standen bisher als Literale in den Komponenten. Erhoben
@@ -583,19 +432,10 @@ body > :not(#root) {
 /* Glass card — aligned with the web companion: near-invisible (a single
    hairline divider, no filled surface) so panels read as light structure
    instead of stacked cards. */
-.light .glass-card {
+.glass-card {
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  border-radius: 0;
-  padding-bottom: 0.75rem;
-  margin-bottom: 0.25rem;
-}
-
-.dark .glass-card {
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 0;
   padding-bottom: 0.75rem;
   margin-bottom: 0.25rem;
@@ -611,13 +451,9 @@ body > :not(#root) {
   background: transparent;
 }
 
-.dark .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 3px;
-}
-
-.light .scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
+/* Scrollbars are outline-variant hairlines, outline on hover. */
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--md-sys-color-outline-variant);
   border-radius: 3px;
 }
 
@@ -656,17 +492,11 @@ button:not(:disabled) {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.18);
+  background: var(--md-sys-color-outline-variant);
   border-radius: 5px;
 }
-.dark ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.12);
-}
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.30);
-}
-.dark ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.22);
+  background: var(--md-sys-color-outline);
 }
 ::-webkit-scrollbar-button,
 ::-webkit-scrollbar-button:start,
@@ -687,20 +517,11 @@ button:not(:disabled) {
    to `scrollbar-color: auto`, i.e. the bare grey/white Windows scrollbar.
    Setting `scrollbar-color` explicitly is the ONLY thing that themes it here.
    `scrollbar-color` inherits, so the theme-root rules cover every pane. */
-.dark {
-  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
-}
-.light {
-  scrollbar-color: rgba(0, 0, 0, 0.24) transparent;
+:root {
+  scrollbar-color: var(--md-sys-color-outline-variant) transparent;
 }
 .scrollbar-thin {
   scrollbar-width: thin;
-}
-.dark .scrollbar-thin {
-  scrollbar-color: rgba(255, 255, 255, 0.24) transparent;
-}
-.light .scrollbar-thin {
-  scrollbar-color: rgba(0, 0, 0, 0.28) transparent;
 }
 
 /* Range slider */
@@ -712,12 +533,8 @@ input[type="range"] {
   outline: none;
 }
 
-.dark input[type="range"] {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.light input[type="range"] {
-  background: rgba(0, 0, 0, 0.1);
+input[type="range"] {
+  background: var(--md-sys-color-surface-container-highest);
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -729,12 +546,8 @@ input[type="range"]::-webkit-slider-thumb {
   cursor: pointer;
 }
 
-.dark input[type="range"]::-webkit-slider-thumb {
-  background: #ffffff;
-}
-
-.light input[type="range"]::-webkit-slider-thumb {
-  background: #333333;
+input[type="range"]::-webkit-slider-thumb {
+  background: var(--md-sys-color-primary);
 }
 
 /* Markdown content */
@@ -752,86 +565,28 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-app-region: no-drag;
 }
 
-/* Selection — neutral grey (web companion), no accent tint */
+/* Selection: the M3 text-selection colour, primary at 40 %. */
 ::selection {
-  background: rgba(100, 100, 100, 0.3);
+  background: color-mix(in oklab, var(--md-sys-color-primary) 40%, transparent);
 }
 
 /* ─────────────────────────────────────────────────────────────────────
-   HUD layer — kept from the web companion. Gives the desktop the same
-   "alive / tech instrument" character and keeps the two visually consistent.
    ───────────────────────────────────────────────────────────────────── */
 
-/* Faint vertical scan-grid over the app canvas — barely-there texture so
-   the large empty dark areas stop reading as a flat void. */
-.dark #root {
-  background-image: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.012) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  background-size: 100% 3px;
-  background-repeat: repeat-y;
-}
-.light #root {
-  background-image: linear-gradient(
-    180deg,
-    rgba(0, 0, 0, 0) 0%,
-    rgba(0, 0, 0, 0.01) 50%,
-    rgba(0, 0, 0, 0) 100%
-  );
-  background-size: 100% 3px;
-  background-repeat: repeat-y;
-}
 
 /* ─────────────────────────────────────────────────────────────────────
    DER Fokusring. Eine Regel, 2px, Akzentfarbe, auf allem, was Fokus
    bekommen kann — Eingabefelder ausdruecklich eingeschlossen.
 
-   Vorher standen hier drei Aussagen nebeneinander, und alle drei waren
-   falsch (Audit §5, Token-Diff „Fokusring"):
-     • `1px solid rgba(96,165,250,.6)` — zu duenn fuer WCAG 2.2 SC 2.4.13
-       (mindestens 2 CSS-Pixel Staerke) und in einer Fremdfarbe, die die
-       App sonst nur als Think-Pill kennt.
-     • nur `button, a` — role-basierte Controls (Create, Workflows) blieben
-       aussen vor und mussten `.lu-focus-ring` von Hand dazuschreiben.
-     • `:is(input, textarea, select) { outline: none }` — der Fokus im
-       Eingabefeld haing allein an einer Randfarbe, die 67 Call-Sites mit
-       `focus:outline-none` ohnehin selbst gesetzt haben.
+   The ring is the M3 focus indicator: 2px of the secondary role at a 2px
+   offset, so it lies on the surface BEHIND the control. Secondary reaches
+   3:1 against every surface container of both generated schemes (checked
+   for every scheme by aphrody_m3_tokens::contrast). Under forced colours it
+   becomes Highlight.
 
-   Gerechnet (WCAG 2.1, 1.4.11 verlangt 3:1 gegen die UMGEBUNG; der Ring
-   liegt wegen `outline-offset: 2px` auf der Flaeche HINTER dem Control,
-   also gegen diese gerechnet). Vorher → nachher, Flaeche fuer Flaeche:
-
-     Flaeche                        alt(1px,#60a5fa/.6)   neu
-     dunkel #1e1e1e  App-Grund            3.22:1        6.42:1  (#a094f8)
-     dunkel #141414  Fenster/Titlebar     3.36:1        7.09:1
-     dunkel #252525  Composer-Leiste      3.08:1        5.90:1
-     dunkel #262626  Panel                3.05:1        5.83:1
-     dunkel #2d2d2d  Karte/Hover          2.90:1  ✗     5.30:1
-     dunkel #363636  Overlay/Dropdown     2.68:1  ✗     4.65:1
-     hell   #ffffff  Blatt/Overlay        1.71:1  ✗     3.37:1  (#8b7cf0)
-     hell   #f9fafb  Composer-Leiste      1.68:1  ✗     3.22:1
-     hell   #f3f4f6  Fenstergrund         1.63:1  ✗     3.06:1
-
-   Der ALTE Ring fiel im gesamten Hellmodus durch (1.63–1.71:1) und auf den
-   beiden obersten dunklen Flaechen ebenfalls. Das war kein Schoenheits-,
-   sondern ein Barrierefreiheitsfehler.
-
-   Warum im Hellmodus die KANTE und nicht der Akzent: die Akzentflaeche
-   selbst steht gegen Weiss nur 2.60:1 (gegen den Fenstergrund #f3f4f6 sogar
-   2.36:1) und faellt damit durch 1.4.11. `--color-lu-accent-edge` ist genau
-   dafuer da und schafft 3.06–3.37:1. Dieselbe Aufteilung wie beim
-   Primaer-Rezept und beim Aufnahme-Puls: Akzent im Dunkeln, Kante im Hellen.
-
-   Warum `:not(.lu-primary)`: DAS ist die Spezifitaetsfalle dieses Hauses.
-   `.light :focus-visible:not([tabindex='-1'])` waere 0,3,0 und wuerde
-   `.lu-primary:focus-visible` (0,2,0) schlagen — der Senden-Knopf haette
-   im Hellmodus still seinen invertierten Ring verloren. Der Akzentring auf
-   der Akzentflaeche kommt auf 1.00:1, deshalb traegt `.lu-primary` unten
-   den umgekehrten Ring (17.74:1 hell / 16.67:1 dunkel). Die Ausnahme steht
-   deshalb AN der Regel, nicht als Gegengewicht mit mehr Spezifitaet.
+   Why `:not(.lu-primary)`: the primary recipe sets its own ring below; the
+   exception stands AT the rule instead of being fought out with more
+   specificity.
 
    Warum `:not([tabindex='-1'])`: der Dialog-Rahmen (`ui/Modal.tsx`) ist
    `tabIndex={-1}` und bekommt beim Oeffnen programmatisch Fokus. Chromium
@@ -849,8 +604,8 @@ input[type="range"]::-webkit-slider-thumb {
 
    05.09.2026, am Windows-Bau: „wenn man in das nachrichten feld
    klickt kommt eine starke lila umrandung, die soll komplett weg." Gemessen
-   an der fokussierten Textarea des Chat-Composers: `outline: solid 1,739px
-   rgb(160,148,248)` mit 1,739px Abstand, also diese Hausregel; das
+   an der fokussierten Textarea des Chat-Composers: der 1,739px-Akzentumriss
+   mit 1,739px Abstand, also diese Hausregel; das
    `focus:outline-none` der Textarea (0,2,0) verliert gegen sie (0,3,0).
    Am 21.09.2026 hat er denselben Satz fuer die Preset-Werkstatt wiederholt
    und auf Nachfrage auf die ganze App ausgeweitet: „nirgends."
@@ -870,14 +625,13 @@ input[type="range"]::-webkit-slider-thumb {
    Tastaturbedienung blind. Deshalb behalten die den 2px-Akzentring, und nur
    Texteingaben bekommen die Haarlinie.
 
-   Die Haarlinie ist ruhig, nicht unsichtbar: 1px in demselben Grau, das
-   `lib/hinweis.ts` dem ruhigen Ton gibt, ohne Abstand, damit sie dem Radius
-   des Feldes folgt statt einen zweiten Rahmen daneben zu setzen. Die
-   Kontrastrechnung steht am Token oben (4.38:1 im schlechtesten Fall, also
-   ueber der 3:1 von 1.4.11). Was sie NICHT erfuellt, ist die 2px-Staerke aus
+   Die Haarlinie ist ruhig, nicht unsichtbar: 1px outline, ohne Abstand,
+   damit sie dem Radius des Feldes folgt statt einen zweiten Rahmen daneben
+   zu setzen. Was sie NICHT erfuellt, ist die 2px-Staerke aus
    WCAG 2.2 SC 2.4.13. Das ist die Entscheidung des Eigners, hier benannt
    und nicht weggeschwiegen, und sie betrifft nur Felder, in denen ohnehin
-   ein Schreibzeiger steht.
+   ein Schreibzeiger steht. Ihre Farbe ist die outline-Rolle, die in beiden
+   Schemata 3:1 gegen die Flaeche haelt.
 
    `:not(input)` waere zu grob: `checkbox`, `radio`, `range`, `file`,
    `color`, `button` und `submit` sind Eingabefelder im Sinne des Elements
@@ -886,11 +640,13 @@ input[type="range"]::-webkit-slider-thumb {
    Vorgabefall `text`, und daran haengen 35 der Felder).
    ───────────────────────────────────────────────────────────────────── */
 :focus-visible:not([tabindex='-1']):not(.lu-primary) {
-  outline: var(--lu-focus-w, 2px) solid var(--lu-focus-c, var(--color-lu-accent));
+  outline: var(--lu-focus-w, 2px) solid var(--lu-focus-c, var(--md-sys-color-secondary));
   outline-offset: var(--lu-focus-o, 2px);
 }
-.light :focus-visible:not([tabindex='-1']):not(.lu-primary) {
-  outline-color: var(--lu-focus-c, var(--color-lu-accent-edge));
+@media (forced-colors: active) {
+  :focus-visible:not([tabindex='-1']) {
+    outline-color: Highlight;
+  }
 }
 
 /* Die eine Ausnahme von der Ausnahme: ein Feld, dessen KASTEN den Fokus
@@ -921,16 +677,7 @@ input:is(
 ) {
   --lu-focus-w: 1px;
   --lu-focus-o: 0px;
-  --lu-focus-c: var(--color-lu-focus-quiet);
-}
-.light textarea,
-.light input:is(
-  [type='text'], [type='search'], [type='url'], [type='email'],
-  [type='password'], [type='tel'], [type='number'], [type='date'],
-  [type='time'], [type='datetime-local'], [type='month'], [type='week'],
-  :not([type])
-) {
-  --lu-focus-c: var(--color-lu-focus-quiet-edge);
+  --lu-focus-c: var(--md-sys-color-outline);
 }
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -990,125 +737,43 @@ input:is(
 
 /* ─────────────────────────────────────────────────────────────────────
    `.lu-elevated` — DAS Schwebeblatt. Flaeche, Kante und Schatten aus einer
-   Quelle, hell wie dunkel (D-T06 + D-T09).
-
-   Der Befund war nicht „die Dropdowns sehen verschieden aus", sondern:
-   jedes Schwebeblatt schrieb sich seine eigene Kette. Am 01.09.2026 in
-   chat/ models/ ui/ agents/ nachgezaehlt — zehn Blaetter, und darin
-
-     sechs Flaechen    #161719 (Dialog) · #17171c (Menue) · #1a1a1a (2x
-                       Aufklapper) · #1f1f1f (Aufklapper) · #262626 (3x) ·
-                       #363636 (Aufklapper)
-     drei Schatten     shadow-lg · shadow-xl (5x) · shadow-2xl (2x)
-     zwei Kanten       border-gray-200/white-10 · black-10/white-[0.08]
-
-   Keine dieser Zahlen war eine Entscheidung; sie sind zu verschiedenen
-   Zeiten abgeschrieben worden. Das Kontextmenue stand sogar auf
-   `--color-lu-canvas`, also in der Farbe der LEINWAND — ein Blatt, das
-   ueber der Flaeche schwebt, in der Farbe der Flaeche darunter.
-
-   Jetzt tragen alle zehn diese eine Klasse. Warum die Flaeche HELLER wird
-   statt dunkler: im Dunkelmodus kommt Erhebung aus der Flaeche, nicht aus
-   dem Schatten — die Rechnung dazu steht unten bei `.dark .shadow-sm`
-   (ein Schatten schafft auf #141414 hoechstens 1,14:1, und das ist keine
-   Einstellungs-, sondern eine Arithmetikgrenze).
+   Quelle fuer alle Menues, Aufklapper und Tooltips.
 
    Was die Klasse NICHT setzt: den Radius. Der gehoert der Call-Site, weil
    ein Dialog (`rounded-2xl`) und ein Menue (`rounded-md`) verschieden
-   gross sind. Und sie ist ungeschichtet — wer daneben `bg-white` oder
-   `shadow-xl` stehen laesst, schreibt eine Klasse ohne Wirkung; die
-   Sperrklinke in zwei-akzente-und-eine-leinwand.test.ts sucht genau das.
-
-   EINE dokumentierte Ausnahme in diesem Durchgang: der Warn-Aufklapper in
-   chat/ContextDropdown.tsx traegt `border-red-500/25` als Aussage („dieser
-   Kontext ist voll"). Diese Regel wuerde die Kante ueberschreiben, also
-   nimmt die Stelle nur das Flaechentoken und behaelt ihre eigene Kante.
+   gross sind. Und sie ist ungeschichtet: wer daneben eine Flaechen- oder
+   Schatten-Utility stehen laesst, schreibt eine Klasse ohne Wirkung.
    ───────────────────────────────────────────────────────────────────── */
-/* Since the pop-up redesign the sheet is dark glass, the small sibling of
-   `.lu-dialog` below: near black instead of the grey overlay tone, denser
-   than the dialog because a menu lies right on top of text. Opaque where
-   `backdrop-filter` is missing. */
+/* The sheet is the M3 menu surface: surface-container, an outline-variant
+   hairline and elevation level 3, identical in both schemes because the roles
+   switch. Menus are transient surfaces and stay opaque (no blur): a menu lies
+   right on top of text. */
 .lu-elevated {
-  background: var(--color-lu-sheet);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), var(--shadow-xl);
-}
-.light .lu-elevated {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
   box-shadow: var(--shadow-lg);
 }
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .lu-elevated {
-    background: rgba(18, 18, 18, 0.94);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    backdrop-filter: blur(20px) saturate(150%);
-  }
-  .light .lu-elevated {
-    background: rgba(255, 255, 255, 0.96);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    backdrop-filter: blur(20px) saturate(160%);
-  }
-}
 
-/* `.lu-dialog`: the dialog sheet. Dark glass instead of the flat grey
-   overlay tone: a near black, slightly see-through surface that blurs what
-   lies behind it, a hairline edge, a soft light from the top and a deep
-   shadow. Where `backdrop-filter` is missing or switched off (older
-   WebKitGTK), the surface is simply opaque. The glass itself is dense
-   (94 percent): a WebKit that claims support and then does not blur, as
-   the Playwright WebKit build does, must not let the page read through. `.lu-dialog-scrim` is the dimmed app
-   behind it. */
+/* `.lu-dialog`: the M3 dialog surface, surface-container-high with an
+   outline-variant hairline and elevation level 4. Opaque: a dialog carries
+   reading content, and glass is never placed under content.
+   `.lu-dialog-scrim` is the scrim role at the M3 32 % behind it. */
 .lu-dialog {
-  background: #121212;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.07),
-    0 32px 80px -20px rgba(0, 0, 0, 0.85),
-    0 8px 24px -8px rgba(0, 0, 0, 0.6);
-}
-.light .lu-dialog {
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 32px 80px -24px rgba(0, 0, 0, 0.35),
-    0 8px 24px -8px rgba(0, 0, 0, 0.12);
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: var(--shadow-xl);
 }
 .lu-dialog-scrim {
-  background: rgba(0, 0, 0, 0.55);
-}
-.light .lu-dialog-scrim {
-  background: rgba(20, 20, 20, 0.28);
-}
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .lu-dialog {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0) 140px),
-      rgba(14, 14, 14, 0.94);
-    -webkit-backdrop-filter: blur(28px) saturate(150%);
-    backdrop-filter: blur(28px) saturate(150%);
-  }
-  .light .lu-dialog {
-    background: rgba(255, 255, 255, 0.95);
-    -webkit-backdrop-filter: blur(28px) saturate(160%);
-    backdrop-filter: blur(28px) saturate(160%);
-  }
+  background: color-mix(in oklab, var(--md-sys-color-scrim) 32%, transparent);
 }
 
-/* The dialog button bar (components/ui/ModalActions). The colours are set
-   here for both themes and not through utilities, because the light rescue
-   layer below turns a bare `text-white` dark, which would break a solid red
-   button. */
+/* The dialog button bar (components/ui/ModalActions): an outline-variant
+   divider over the surface-container step below the dialog surface. */
 .lu-dialog-actions {
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(0, 0, 0, 0.22);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container);
   border-bottom-left-radius: inherit;
   border-bottom-right-radius: inherit;
-}
-.light .lu-dialog-actions {
-  border-top-color: rgba(0, 0, 0, 0.07);
-  background: rgba(0, 0, 0, 0.025);
 }
 .lu-dialog-btn {
   display: inline-flex;
@@ -1126,16 +791,14 @@ input:is(
   transition: background-color var(--motion-fast), border-color var(--motion-fast), color var(--motion-fast);
 }
 .lu-dialog-btn:disabled { cursor: not-allowed; opacity: 0.45; }
-.lu-dialog-btn-secondary { border-color: rgba(255, 255, 255, 0.14); color: #e5e7eb; background: rgba(255, 255, 255, 0.04); }
-.lu-dialog-btn-secondary:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
-.lu-dialog-btn-quiet { color: #9ca3af; }
-.lu-dialog-btn-quiet:hover:not(:disabled) { color: #ffffff; background: rgba(255, 255, 255, 0.08); }
-.lu-dialog-btn-danger { background: #dc2626; border-color: #dc2626; color: #ffffff; }
-.lu-dialog-btn-danger:hover:not(:disabled) { background: #ef4444; border-color: #ef4444; }
-.light .lu-dialog-btn-secondary { border-color: rgba(0, 0, 0, 0.16); color: #1f2937; background: transparent; }
-.light .lu-dialog-btn-secondary:hover:not(:disabled) { background: rgba(0, 0, 0, 0.05); }
-.light .lu-dialog-btn-quiet { color: #4b5563; }
-.light .lu-dialog-btn-quiet:hover:not(:disabled) { color: #111827; background: rgba(0, 0, 0, 0.05); }
+/* Outlined, text and error-filled buttons; hover is the 8 % state layer of
+   the content role. */
+.lu-dialog-btn-secondary { border-color: var(--md-sys-color-outline); color: var(--md-sys-color-on-surface); background: transparent; }
+.lu-dialog-btn-secondary:hover:not(:disabled) { background: color-mix(in oklab, var(--md-sys-color-on-surface) 8%, transparent); }
+.lu-dialog-btn-quiet { color: var(--md-sys-color-on-surface-variant); }
+.lu-dialog-btn-quiet:hover:not(:disabled) { color: var(--md-sys-color-on-surface); background: color-mix(in oklab, var(--md-sys-color-on-surface) 8%, transparent); }
+.lu-dialog-btn-danger { background: var(--md-sys-color-error); border-color: var(--md-sys-color-error); color: var(--md-sys-color-on-error); }
+.lu-dialog-btn-danger:hover:not(:disabled) { background: color-mix(in srgb, var(--md-sys-color-error), var(--md-sys-color-on-error) 8%); }
 
 /* Model pickers: one row grammar.
    The chat model picker in Cloud mode (components/models/CloudModelPicker)
@@ -1143,45 +806,13 @@ input:is(
    one look: the elevated sheet, a hairline, one-line sticky group heads, a
    24 px row with the accent bar on the selected one, hairline tags. Greys
    plus the one accent, state dots in green, grey and red, no yellow. Both
-   themes are set here through variables, so neither component names a colour
-   of its own. Same classes and values as the web app (globals.css). */
-/* The service line stands in the local list and the rate popover is lifted
-   out to the body, so each brings the palette along. So does a tag. */
-.lu-picker,
-.lu-picker-tag,
-.lu-picker-service,
-.lu-picker-rate {
-  --pk-sheet: var(--color-lu-sheet);
-  --pk-edge: rgba(255, 255, 255, 0.08);
-  --pk-hair: rgba(255, 255, 255, 0.07);
-  --pk-hover: rgba(255, 255, 255, 0.07);
-  --pk-t1: #f3f4f6;
-  --pk-t2: #d1d5db;
-  --pk-t3: #9ca3af;
-  --pk-accent: var(--color-lu-accent);
-  --pk-ok: #34d399;
-  --pk-err: #f87171;
-  --pk-off: #6b7280;
-}
+   themes come from the M3 roles, so neither component names a colour of its
+   own: on-surface and on-surface-variant for text, outline-variant for
+   hairlines, the 8 % on-surface state layer for hover, primary for the
+   accent bar, the extended success role and error for the state dots. */
 .lu-picker {
   border-radius: 10px;
-  color: var(--pk-t2);
-}
-.light .lu-picker,
-.light .lu-picker-tag,
-.light .lu-picker-service,
-.light .lu-picker-rate {
-  --pk-sheet: #ffffff;
-  --pk-edge: rgba(0, 0, 0, 0.1);
-  --pk-hair: rgba(0, 0, 0, 0.08);
-  --pk-hover: rgba(0, 0, 0, 0.05);
-  --pk-t1: #111827;
-  --pk-t2: #374151;
-  --pk-t3: #6b7280;
-  --pk-accent: var(--color-lu-cloud);
-  --pk-ok: #059669;
-  --pk-err: #dc2626;
-  --pk-off: #9ca3af;
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 .lu-picker-search {
@@ -1191,8 +822,8 @@ input:is(
   align-items: center;
   gap: 8px;
   padding: 0 10px 0 12px;
-  border-bottom: 1px solid var(--pk-hair);
-  color: var(--pk-t3);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .lu-picker-search input {
   flex: 1;
@@ -1201,24 +832,24 @@ input:is(
   background: none;
   border: 0;
   box-shadow: none;
-  color: var(--pk-t1);
+  color: var(--md-sys-color-on-surface);
   font-size: var(--text-control);
   /* The field has the keyboard for as long as the menu is open, so a ring
      around it says nothing. The house focus rule reads its width here; the
      lens lights up instead, and the cursor row shows where Enter goes. */
   --lu-focus-w: 0px;
 }
-.lu-picker-search:focus-within { color: var(--pk-t2); }
-.lu-picker-search input::placeholder { color: var(--pk-t3); }
+.lu-picker-search:focus-within { color: var(--md-sys-color-on-surface-variant); }
+.lu-picker-search input::placeholder { color: var(--md-sys-color-on-surface-variant); }
 .lu-picker-text-btn {
   flex: none;
   padding: 2px 5px;
   border-radius: 4px;
   font-size: var(--text-label);
   font-weight: 600;
-  color: var(--pk-t2);
+  color: var(--md-sys-color-on-surface-variant);
 }
-.lu-picker-text-btn:hover:not(:disabled) { color: var(--pk-t1); background: var(--pk-hover); }
+.lu-picker-text-btn:hover:not(:disabled) { color: var(--md-sys-color-on-surface); background: color-mix(in oklab, var(--md-sys-color-on-surface) 8%, transparent); }
 .lu-picker-text-btn:disabled { opacity: 0.6; }
 
 /* The one line for what needs attention now. No box: a dot and a sentence. */
@@ -1229,18 +860,18 @@ input:is(
   align-items: center;
   gap: 7px;
   padding: 3px 10px 3px 12px;
-  border-bottom: 1px solid var(--pk-hair);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
   font-size: var(--text-mono);
   line-height: 1.35;
-  color: var(--pk-t2);
+  color: var(--md-sys-color-on-surface-variant);
 }
-.lu-picker-note.is-err { color: var(--pk-err); }
+.lu-picker-note.is-err { color: var(--md-sys-color-error); }
 .lu-picker-note > span:not(.lu-picker-dot) { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 
-.lu-picker-dot { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--pk-off); }
-.lu-picker-dot.is-accent { background: var(--pk-accent); }
-.lu-picker-dot.is-ok { background: var(--pk-ok); }
-.lu-picker-dot.is-err { background: var(--pk-err); }
+.lu-picker-dot { flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--md-sys-color-outline); }
+.lu-picker-dot.is-accent { background: var(--md-sys-color-primary); }
+.lu-picker-dot.is-ok { background: var(--md-ext-color-success); }
+.lu-picker-dot.is-err { background: var(--md-sys-color-error); }
 
 .lu-picker-chips {
   flex: none;
@@ -1258,18 +889,18 @@ input:is(
   height: 20px;
   padding: 0 5px;
   border-radius: var(--radius-pill);
-  border: 1px solid var(--pk-hair);
+  border: 1px solid var(--md-sys-color-outline-variant);
   display: inline-flex;
   align-items: center;
   gap: 4px;
   font-size: var(--text-label);
   font-weight: 500;
-  color: var(--pk-t3);
+  color: var(--md-sys-color-on-surface-variant);
   white-space: nowrap;
   transition: background-color 120ms, color 120ms, border-color 120ms;
 }
-.lu-picker-chip:hover { color: var(--pk-t1); }
-.lu-picker-chip[aria-pressed='true'] { background: var(--pk-hover); color: var(--pk-t1); border-color: var(--pk-edge); }
+.lu-picker-chip:hover { color: var(--md-sys-color-on-surface); }
+.lu-picker-chip[aria-pressed='true'] { background: color-mix(in oklab, var(--md-sys-color-on-surface) 8%, transparent); color: var(--md-sys-color-on-surface); border-color: var(--md-sys-color-outline-variant); }
 .lu-picker-chip i { font-style: normal; font-variant-numeric: tabular-nums; opacity: 0.7; }
 
 .lu-picker-cap {
@@ -1279,10 +910,10 @@ input:is(
   align-items: center;
   justify-content: space-between;
   padding: 0 40px 0 16px;
-  border-bottom: 1px solid var(--pk-hair);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
   font-size: var(--text-label);
   font-weight: 500;
-  color: var(--pk-t3);
+  color: var(--md-sys-color-on-surface-variant);
   opacity: 0.8;
 }
 
@@ -1296,9 +927,9 @@ input:is(
   overscroll-behavior: contain;
   padding-bottom: 4px;
   scrollbar-width: thin;
-  scrollbar-color: var(--pk-edge) transparent;
+  scrollbar-color: var(--md-sys-color-outline-variant) transparent;
 }
-.lu-picker-empty { padding: 18px 16px; font-size: var(--text-mono); color: var(--pk-t3); text-align: center; }
+.lu-picker-empty { padding: 18px 16px; font-size: var(--text-mono); color: var(--md-sys-color-on-surface-variant); text-align: center; }
 
 /* Group head: one line of 22 px that sticks to the top while its rows scroll. */
 .lu-picker-head {
@@ -1310,9 +941,9 @@ input:is(
   align-items: center;
   gap: 7px;
   padding: 0 14px 0 16px;
-  background: var(--pk-sheet);
+  background: var(--md-sys-color-surface-container);
   font-size: var(--text-label);
-  color: var(--pk-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .lu-picker-head b { font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
 .lu-picker-head .n { margin-left: auto; font-variant-numeric: tabular-nums; opacity: 0.8; }
@@ -1327,13 +958,13 @@ div + div > .lu-picker-head { margin-top: 2px; }
   align-items: center;
   gap: 7px;
   padding: 0 8px 0 12px;
-  border-bottom: 1px solid var(--pk-hair);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
   font-size: var(--text-label);
-  color: var(--pk-t2);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .lu-picker-service .st { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lu-picker-service.is-err .st { color: var(--pk-err); }
-.lu-picker-service .lu-picker-text-btn { border: 1px solid var(--pk-edge); color: var(--pk-t1); }
+.lu-picker-service.is-err .st { color: var(--md-sys-color-error); }
+.lu-picker-service .lu-picker-text-btn { border: 1px solid var(--md-sys-color-outline-variant); color: var(--md-sys-color-on-surface); }
 
 .lu-picker-row {
   position: relative;
@@ -1346,14 +977,14 @@ div + div > .lu-picker-head { margin-top: 2px; }
   border-radius: 6px;
   font-size: var(--text-control);
   line-height: 1.2;
-  color: var(--pk-t2);
+  color: var(--md-sys-color-on-surface-variant);
   /* The sticky head above must not cover a row the keyboard scrolls to. */
   scroll-margin-top: 24px;
 }
 .lu-picker-row:hover,
-.lu-picker-row[data-cursor='true'] { background: var(--pk-hover); color: var(--pk-t1); }
+.lu-picker-row[data-cursor='true'] { background: color-mix(in oklab, var(--md-sys-color-on-surface) 8%, transparent); color: var(--md-sys-color-on-surface); }
 /* Selected: an option of either picker. */
-.lu-picker-row[aria-selected='true'] { color: var(--pk-t1); }
+.lu-picker-row[aria-selected='true'] { color: var(--md-sys-color-on-surface); }
 .lu-picker-row[aria-selected='true'] .lu-picker-name { font-weight: 500; }
 .lu-picker-row[aria-selected='true']::before {
   content: '';
@@ -1363,7 +994,7 @@ div + div > .lu-picker-head { margin-top: 2px; }
   bottom: 6px;
   width: 2px;
   border-radius: 2px;
-  background: var(--pk-accent);
+  background: var(--md-sys-color-primary);
 }
 /* The part of a row that picks the model. A button of its own, because the
    row also carries the rate control, and a button cannot hold another one. */
@@ -1382,10 +1013,10 @@ div + div > .lu-picker-head { margin-top: 2px; }
 .lu-picker-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .lu-picker-name mark {
   background: none;
-  color: var(--pk-t1);
+  color: var(--md-sys-color-on-surface);
   font-weight: 600;
   text-decoration: underline;
-  text-decoration-color: var(--pk-accent);
+  text-decoration-color: var(--md-sys-color-primary);
   text-underline-offset: 2px;
 }
 /* Name, marks and the quiet note as one part of the row: the note stands
@@ -1405,10 +1036,10 @@ div + div > .lu-picker-head { margin-top: 2px; }
   flex: none;
   font-size: var(--text-micro);
   line-height: 1.2;
-  color: var(--pk-t3);
+  color: var(--md-sys-color-on-surface-variant);
   white-space: nowrap;
 }
-.lu-picker-sub { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--pk-t3); }
+.lu-picker-sub { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--md-sys-color-on-surface-variant); }
 .lu-picker-fill { flex: 1; min-width: 0; }
 
 .lu-picker-tag {
@@ -1418,29 +1049,26 @@ div + div > .lu-picker-head { margin-top: 2px; }
   height: 14px;
   padding: 0 5px;
   border-radius: 4px;
-  border: 1px solid var(--pk-hair);
+  border: 1px solid var(--md-sys-color-outline-variant);
   font-weight: 500;
   line-height: 1;
-  color: var(--pk-t3);
+  color: var(--md-sys-color-on-surface-variant);
   white-space: nowrap;
 }
-.lu-picker-tag.is-accent { color: var(--pk-accent); }
-.lu-picker-tag.is-bright { color: var(--pk-t1); }
+.lu-picker-tag.is-accent { color: var(--md-sys-color-primary); }
+.lu-picker-tag.is-bright { color: var(--md-sys-color-on-surface); }
 .lu-picker-tag.is-quiet { opacity: 0.7; }
 /* The statement: the one tag that carries the accent as text, edge and tint.
    The measured mark next to it in the catalogue is the plain grey tag, so the
    colour alone tells the two apart. */
 .lu-picker-tag.is-statement {
-  color: var(--pk-accent);
-  border-color: color-mix(in srgb, var(--pk-accent) 55%, transparent);
-  background: color-mix(in srgb, var(--pk-accent) 9%, transparent);
+  color: var(--md-sys-color-primary);
+  border-color: color-mix(in srgb, var(--md-sys-color-primary) 55%, transparent);
+  background: color-mix(in srgb, var(--md-sys-color-primary) 9%, transparent);
   font-weight: 600;
 }
 /* On white the tint eats into the contrast of the word, so it is thinner
    there (measured in e2e/uncensored-mark.spec.ts: at least 4.5 to 1). */
-.light .lu-picker-tag.is-statement {
-  background: color-mix(in srgb, var(--pk-accent) 5%, transparent);
-}
 
 /* The Beta mark (components/ui/BetaMark, the list in lib/beta.ts). One look
    wherever it stands: the word in a full hairline frame, brighter than a
@@ -1454,20 +1082,19 @@ div + div > .lu-picker-head { margin-top: 2px; }
   height: 14px;
   padding: 0 5px;
   border-radius: 4px;
-  border: 1px solid rgba(255, 255, 255, 0.34);
+  border: 1px solid var(--md-sys-color-outline);
   font-size: var(--text-micro);
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0.02em;
   text-transform: none;
-  color: #e5e7eb;
+  color: var(--md-sys-color-on-surface);
   white-space: nowrap;
   vertical-align: middle;
   cursor: help;
 }
-.light .lu-beta { border-color: rgba(0, 0, 0, 0.36); color: #1f2937; }
 
-.lu-picker-icons { flex: none; display: grid; grid-template-columns: 14px 14px; column-gap: 4px; color: var(--pk-t3); }
+.lu-picker-icons { flex: none; display: grid; grid-template-columns: 14px 14px; column-gap: 4px; color: var(--md-sys-color-on-surface-variant); }
 .lu-picker-icons svg { display: block; opacity: 0.85; }
 .lu-picker-num {
   flex: none;
@@ -1475,12 +1102,12 @@ div + div > .lu-picker-head { margin-top: 2px; }
   text-align: right;
   font-size: var(--text-mono);
   font-variant-numeric: tabular-nums;
-  color: var(--pk-t3);
+  color: var(--md-sys-color-on-surface-variant);
   white-space: nowrap;
 }
 .lu-picker-row:hover .lu-picker-num,
 .lu-picker-row[data-cursor='true'] .lu-picker-num,
-.lu-picker-row[aria-selected='true'] .lu-picker-num { color: var(--pk-t2); }
+.lu-picker-row[aria-selected='true'] .lu-picker-num { color: var(--md-sys-color-on-surface-variant); }
 
 /* The tiny question mark at the end of a row: what the model draws. */
 /* The slot keeps its width on a row without one, so the context column
@@ -1490,16 +1117,16 @@ div + div > .lu-picker-head { margin-top: 2px; }
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  border: 1px solid var(--pk-edge);
+  border: 1px solid var(--md-sys-color-outline-variant);
   display: inline-grid;
   place-items: center;
   font-size: 9px;
   font-weight: 600;
   line-height: 1;
-  color: var(--pk-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .lu-picker-rate-btn:hover,
-.lu-picker-rate-btn[aria-expanded='true'] { color: var(--pk-t1); border-color: var(--pk-t3); }
+.lu-picker-rate-btn[aria-expanded='true'] { color: var(--md-sys-color-on-surface); border-color: var(--md-sys-color-on-surface-variant); }
 /* Lifted out to the body and placed by hooks/usePopoverPlatz, which sets the
    coordinates, the width and the height it may take. */
 .lu-picker-rate {
@@ -1508,20 +1135,20 @@ div + div > .lu-picker-head { margin-top: 2px; }
   overflow-y: auto;
   padding: 7px 10px 8px;
   border-radius: 8px;
-  background: var(--pk-sheet);
-  border: 1px solid var(--pk-edge);
-  box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.45);
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: var(--shadow-lg);
   font-size: var(--text-mono);
   font-weight: 400;
   line-height: 1.4;
-  color: var(--pk-t2);
+  color: var(--md-sys-color-on-surface-variant);
   white-space: normal;
   text-align: left;
 }
-.lu-picker-rate h4 { margin: 0 0 3px; font-size: var(--text-label); font-weight: 500; color: var(--pk-t3); }
+.lu-picker-rate h4 { margin: 0 0 3px; font-size: var(--text-label); font-weight: 500; color: var(--md-sys-color-on-surface-variant); }
 .lu-picker-rate dl { margin: 0; min-width: 146px; display: grid; grid-template-columns: 1fr auto; column-gap: 16px; }
 .lu-picker-rate > span { display: block; max-width: 220px; }
-.lu-picker-rate dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; color: var(--pk-t1); }
+.lu-picker-rate dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; color: var(--md-sys-color-on-surface); }
 
 .lu-picker-foot {
   flex: none;
@@ -1530,9 +1157,9 @@ div + div > .lu-picker-head { margin-top: 2px; }
   align-items: center;
   gap: 10px;
   padding: 0 10px 0 16px;
-  border-top: 1px solid var(--pk-hair);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
   font-size: var(--text-label);
-  color: var(--pk-t3);
+  color: var(--md-sys-color-on-surface-variant);
   white-space: nowrap;
 }
 .lu-picker-foot > span:not(.lu-picker-keys) { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
@@ -1544,199 +1171,15 @@ div + div > .lu-picker-head { margin-top: 2px; }
   height: 14px;
   padding: 0 3px;
   border-radius: 3px;
-  border: 1px solid var(--pk-hair);
+  border: 1px solid var(--md-sys-color-outline-variant);
   display: inline-grid;
   place-items: center;
 }
 
-/* ─────────────────────────────────────────────────────────────────────
-   `shadow-sm` ist ein Hellmodus-Rezept — eine Regel statt zwoelf
-   Call-Sites (D-T09).
-
-   `--shadow-lg/xl/2xl` hat dieses Haus fuer dunkle Flaechen nachgezogen
-   (0,6–0,8 Alpha, grosse Weichzeichnung). `shadow-sm` NICHT: es steht
-   weiterhin auf Tailwinds Werkseinstellung, `0 1px 3px rgb(0 0 0/.1)`
-   plus `0 1px 2px -1px rgb(0 0 0/.1)`. An zwoelf Stellen der App.
-
-   Nachgerechnet (WCAG 2.1, dunkelster Schattenpixel gegen seinen Grund;
-   wo beide Lagen uebereinanderliegen, deckt der Schatten 19 % Schwarz):
-
-     hell   #ffffff Blatt        1,248 … 1,558:1
-     hell   #e5e7eb Leinwand     1,247 … 1,554:1
-     dunkel #141414 Leinwand     1,017 … 1,033:1
-     dunkel #1e1e1e Pane         1,033 … 1,065:1
-     dunkel #262626 Panel        1,051 … 1,089:1
-     dunkel #363636 Overlay      1,077 … 1,156:1
-
-   Zum Vergleich: die Pane-Kante im Hellmodus stand vor D-S42 bei 1,008:1
-   und wurde dort als „keine Kante, das ist Rauschen" verworfen. Die
-   dunklen Werte hier liegen in derselben Klasse.
-
-   Und es hilft NICHT, den Schatten dunkler zu stellen. Ein Schatten kann
-   eine Flaeche nur abdunkeln, also ist er nach unten durch Schwarz
-   begrenzt. Selbst 100 % Schwarz schafft:
-
-     auf #141414   1,140:1        auf #ffffff   21,000:1
-     auf #1e1e1e   1,260:1        auf #e5e7eb   16,962:1
-
-   Auf der Leinwand dieser App ist die theoretische Obergrenze eines
-   Schattens also 1,14:1. Das ist keine Frage der Einstellung, das ist
-   Arithmetik — Erhebung im Dunkeln kommt aus einer Kante, nicht aus
-   einem Schatten (so hat es D-S24 an den 53 Modellkacheln schon
-   entschieden).
-
-   Im HELLMODUS bleibt er, und dort traegt er wirklich: der weisse
-   Schaltknopf der Toggles steht auf seiner hellen Spur
-   (`bg-gray-300/30` ueber Weiss = #f1f2f4) bei 1,120:1 — ohne den
-   Schatten waere er dort fast unsichtbar.
-
-   Warum `--tw-shadow` und nicht `box-shadow: none`: Tailwind 4 setzt
-   `box-shadow` als EINE Liste aus fuenf Variablen zusammen (inset-shadow,
-   inset-ring, ring-offset, ring, shadow). `box-shadow: none` haette auch
-   jeden `ring-*` auf demselben Element geloescht. Ueberschrieben wird
-   deshalb genau die eine Variable, die dem Schatten gehoert — dasselbe,
-   was Tailwinds eigenes `shadow-none` tut.
-   ───────────────────────────────────────────────────────────────────── */
-.dark .shadow-sm {
-  --tw-shadow: 0 0 #0000;
-}
-
-/* ─────────────────────────────────────────────────────────────────────
-   Theme-contrast rescue layer — ported from the web companion.
-   Many components were authored dark-first and use raw `text-gray-300/400`,
-   `text-white`, `bg-white/N`, `border-white/N` without a `dark:` variant.
-   On the darker #1a1a1a base those dim greys nearly vanish; in light mode the
-   dark-first whites/white-tints disappear on white. We remap them theme-
-   conditionally so the 300+ component call-sites don't each need touching.
-   Specificity: `.light .x` / `.dark .x` (0,2,0) beats the plain utility (0,1,0).
-   (The web scopes these to `.lu-app-scaled`; the desktop has no landing page,
-   so a plain theme-root scope is equivalent and simpler.)
-   ───────────────────────────────────────────────────────────────────── */
-
-/* Light mode: too-dim greys turn invisible on white. Darken them. */
-.light .text-gray-100 { color: rgb(31 41 55); }   /* → gray-800 (primary/heading text — the Create surface, ported dark-first, uses bare gray-100/200 for its t-title/body) */
-.light .text-gray-200 { color: rgb(31 41 55); }   /* → gray-800 */
-.light .text-gray-300 { color: rgb(75 85 99); }   /* → gray-600 */
-.light .text-gray-400 { color: rgb(55 65 81); }   /* → gray-700 */
-.light .text-gray-500 { color: rgb(55 65 81); }   /* → gray-700 — same so 500 isn't dimmer than 400 */
-.light .text-gray-600 { color: rgb(31 41 55); }   /* → gray-800 */
-
-/* Dark mode (#1a1a1a bg): too-dim greys turn invisible. Bump them up. */
-.dark .text-gray-700 { color: rgb(107 114 128); } /* → gray-500 */
-.dark .text-gray-600 { color: rgb(156 163 175); } /* → gray-400 */
-.dark .text-gray-500 { color: rgb(156 163 175); } /* → gray-400 — same as 600 so weight is consistent */
-
-/* Placeholders — Tailwind doesn't add a `dark:` for these, also dropped the
-   restlichen `placeholder-*`-Klassen der Komponenten: die beiden Regeln hier
-   sind ungeschichtet und schlagen damit jede Utility aus @layer, egal ob in
-   der v3- (`placeholder-gray-600`) oder v4-Schreibweise
-   (`placeholder:text-gray-600`). Sie sind der EINZIGE Platzhalterwert der App.
-
-   Bis 2.6.7 standen hier gray-800 / gray-200 — also praktisch die Textfarbe
-   selbst. Die Grundrelation eines Eingabefeldes stand damit verkehrt herum:
-   der Platzhalter war so auffaellig wie der Wert oder auffaelliger, ein leeres
-   Feld las sich staerker als ein ausgefuelltes. Nachgerechnet am 01.09.2026
-   im laufenden Fenster (Chromium 149, WCAG 2.1, Farben aus getComputedStyle,
-   nicht aus den Klassennamen):
-
-     hell   Feldtext gray-800 auf #ffffff        14,68:1
-            Platzhalter ALT gray-800             14,68:1  ← derselbe Wert
-            Platzhalter NEU gray-600              7,56:1  (auf #f5f5f5: 6,93:1)
-     dunkel Feldtext gray-100 auf #1b1b1b        15,65:1
-            Platzhalter ALT gray-200             13,91:1  ← 89 % des Textes
-            Platzhalter NEU gray-400              6,78:1  (auf #292929: 5,73:1)
-
-   Die beiden neuen Werte sind keine neu erfundenen Zahlen: gray-600 ist genau
-   das, was die `.light .placeholder-gray-*`-Regel weiter unten fuer die
-   v3-Schreibweise ohnehin setzt, und gray-400 ist der Wert, auf den der
-   Rescue-Layer drei Zeilen weiter oben `.dark .text-gray-500/600` hebt.
-   Untergrenze: kein Platzhalter faellt unter 4,5:1 — auf dem hellsten dunklen
-   Feldgrund der App (#1e1e1e + white/5 = #292929) bleiben 5,73:1, auf dem
-   dunkelsten hellen (#f5f5f5) 6,93:1. */
-.light ::placeholder { color: rgb(75 85 99); }     /* gray-600 */
-.dark ::placeholder { color: rgb(156 163 175); }   /* gray-400 */
-
-/* Light-mode rescue for legacy dark-first components that bake in
-   `text-white` / `bg-white/N` / `border-white/N` without a `dark:` variant.
-   Re-map them to dark-on-light equivalents so modals/tutorials stay legible.
-   Tailwind escapes the slash ("/" → "\/") and brackets ("[" → "\["), so the
-   selectors below need backslashes to match. */
-.light .text-white { color: rgb(17 24 39); }                /* gray-900 */
-.light .hover\:text-white:hover { color: rgb(17 24 39); }
-
-.light .bg-white\/5  { background-color: rgba(0, 0, 0, 0.04); }
-.light .bg-white\/8  { background-color: rgba(0, 0, 0, 0.05); }
-.light .bg-white\/10 { background-color: rgba(0, 0, 0, 0.06); }
-.light .bg-white\/12 { background-color: rgba(0, 0, 0, 0.07); }
-.light .bg-white\/15 { background-color: rgba(0, 0, 0, 0.08); }
-.light .bg-white\/20 { background-color: rgba(0, 0, 0, 0.10); }
-.light .bg-white\/\[0\.03\] { background-color: rgba(0, 0, 0, 0.03); }
-.light .bg-white\/\[0\.05\] { background-color: rgba(0, 0, 0, 0.04); }
-.light .bg-white\/\[0\.06\] { background-color: rgba(0, 0, 0, 0.05); }
-.light .bg-white\/\[0\.08\] { background-color: rgba(0, 0, 0, 0.06); }
-
-.light .hover\:bg-white\/5:hover  { background-color: rgba(0, 0, 0, 0.04); }
-.light .hover\:bg-white\/8:hover  { background-color: rgba(0, 0, 0, 0.06); }
-.light .hover\:bg-white\/10:hover { background-color: rgba(0, 0, 0, 0.07); }
-.light .hover\:bg-white\/12:hover { background-color: rgba(0, 0, 0, 0.08); }
-.light .hover\:bg-white\/15:hover { background-color: rgba(0, 0, 0, 0.09); }
-.light .hover\:bg-white\/20:hover { background-color: rgba(0, 0, 0, 0.10); }
-
-.light .border-white\/5  { border-color: rgba(0, 0, 0, 0.06); }
-.light .border-white\/8  { border-color: rgba(0, 0, 0, 0.08); }
-.light .border-white\/10 { border-color: rgba(0, 0, 0, 0.10); }
-.light .border-white\/15 { border-color: rgba(0, 0, 0, 0.12); }
-.light .border-white\/20 { border-color: rgba(0, 0, 0, 0.15); }
-.light .border-white\/25 { border-color: rgba(0, 0, 0, 0.18); }
-.light .border-white\/\[0\.04\] { border-color: rgba(0, 0, 0, 0.06); }
-.light .border-white\/\[0\.06\] { border-color: rgba(0, 0, 0, 0.08); }
-.light .border-white\/\[0\.08\] { border-color: rgba(0, 0, 0, 0.10); }
-.light .border-white\/\[0\.1\] { border-color: rgba(0, 0, 0, 0.12); }
-
-.light .hover\:border-white\/15:hover { border-color: rgba(0, 0, 0, 0.12); }
-.light .hover\:border-white\/20:hover { border-color: rgba(0, 0, 0, 0.15); }
-.light .hover\:border-white\/25:hover { border-color: rgba(0, 0, 0, 0.18); }
-
-.light .focus\:border-white\/20:focus { border-color: rgba(0, 0, 0, 0.20); }
-.light .focus\:border-white\/25:focus { border-color: rgba(0, 0, 0, 0.22); }
-
-.light .placeholder-gray-500::placeholder,
-.light .placeholder-gray-600::placeholder { color: rgb(75 85 99); }
-
-/* Hover-Gegenstueck zur Rettung oben (Discord-Meldung 20.10.2026: Symbole im
-   Hellmodus unsichtbar). `.light .hover\:text-white:hover` stand schon hier,
-   die grauen Hover-Farben fehlten. Ein Knopf mit `text-gray-500
-   hover:text-gray-300` wurde im Hellmodus beim Ueberfahren hellgrau auf
-   Weiss, das Symbol verschwand genau in dem Moment, in dem man es treffen
-   will. Gut hundert Stellen tragen das Muster ohne `dark:`. Ziel ist
-   gray-900 wie bei `hover:text-white`: im Hellen heisst Hervorheben dunkler. */
-.light .hover\:text-gray-100:hover,
-.light .hover\:text-gray-200:hover,
-.light .hover\:text-gray-300:hover,
-.light .group:hover .group-hover\:text-gray-300 { color: rgb(17 24 39); }
-
-/* Flaechen, die in BEIDEN Modi dunkel sind: Bedienknoepfe ueber einem Bild
-   oder Video (`bg-black/55` auf der Kachel), die schwarze Lightbox. Die
-   Rettung oben dreht dort `text-gray-100` und `text-white` auf Dunkelgrau,
-   und das Symbol steht dunkel auf Schwarz (gemessen 1,06:1 bis 1,41:1).
-   `lu-on-dark` am Element oder an der dunklen Flaeche nimmt die Rettung
-   zurueck und setzt genau die Werte, die der Dunkelmodus dort zeigt. Der
-   Dunkelmodus selbst bleibt unberuehrt, jede Regel haengt an `.light`. */
-.light .lu-on-dark.text-white, .light .lu-on-dark .text-white { color: #fff; }
-.light .lu-on-dark.text-gray-100, .light .lu-on-dark .text-gray-100 { color: var(--color-gray-100); }
-.light .lu-on-dark.text-gray-200, .light .lu-on-dark .text-gray-200 { color: var(--color-gray-200); }
-.light .lu-on-dark.text-gray-300, .light .lu-on-dark .text-gray-300 { color: var(--color-gray-300); }
-.light .lu-on-dark.text-gray-400, .light .lu-on-dark .text-gray-400 { color: var(--color-gray-400); }
-.light .lu-on-dark:is(.text-gray-500, .text-gray-600),
-.light .lu-on-dark :is(.text-gray-500, .text-gray-600) { color: rgb(156 163 175); }
-.light .lu-on-dark.hover\:text-white:hover, .light .lu-on-dark .hover\:text-white:hover { color: #fff; }
-.light .lu-on-dark.hover\:text-gray-100:hover, .light .lu-on-dark .hover\:text-gray-100:hover { color: var(--color-gray-100); }
-.light .lu-on-dark.hover\:text-gray-200:hover, .light .lu-on-dark .hover\:text-gray-200:hover { color: var(--color-gray-200); }
-.light .lu-on-dark.hover\:text-gray-300:hover, .light .lu-on-dark .hover\:text-gray-300:hover { color: var(--color-gray-300); }
-.light .lu-on-dark .hover\:text-gray-900:hover { color: var(--color-gray-100); }
-.light .lu-on-dark.bg-white\/10, .light .lu-on-dark .bg-white\/10 { background-color: rgb(255 255 255 / 0.10); }
-.light .lu-on-dark.hover\:bg-white\/20:hover, .light .lu-on-dark .hover\:bg-white\/20:hover { background-color: rgb(255 255 255 / 0.20); }
-.light .lu-on-dark .border-white\/\[0\.08\] { border-color: rgb(255 255 255 / 0.08); }
+/* Placeholders: on-surface-variant, the one placeholder colour of the app.
+   Unlayered, so it beats every `placeholder:` utility. It stays at least
+   4.5:1 on every surface container of both schemes. */
+::placeholder { color: var(--md-sys-color-on-surface-variant); }
 
 /* ─────────────────────────────────────────────────────────────────────
    Create typography + surface helpers — the classes the Create components
@@ -1908,12 +1351,8 @@ div + div > .lu-picker-head { margin-top: 2px; }
    Send-Slot schon hatten), Radius --radius-control (8px, die Stufe aus
    dem Token-Diff), Uebergang --motion-fast/--motion-ease.
 
-   Farbe: gerechnet, nicht geschaetzt (WCAG 2.1, 11,04px = Fliesstext,
-   AA = 4.5:1). Dunkelmodus #9ca3af auf #1e1e1e = 6.57:1, aktiv #f3f4f6
-   = 15.15:1. Hellmodus #4b5563 auf #ffffff = 7.56:1, aktiv #111827
-   = 17.74:1. composer-grammar.test.ts rechnet diese vier Werte nach UND
-   prueft, dass genau sie hier stehen — der Kommentar kann also nicht
-   veralten, ohne rot zu werden.
+   Farbe: on-surface-variant in Ruhe, on-surface aktiv, beide Rollen
+   halten 4.5:1 auf jeder Flaeche beider Schemata.
    ───────────────────────────────────────────────────────────────── */
 .lu-control {
   display: inline-flex;
@@ -1933,7 +1372,7 @@ div + div > .lu-picker-head { margin-top: 2px; }
      nicht darin — sie bekommen davon nichts ab. */
   position: relative;
   background-color: transparent;
-  color: rgb(156 163 175);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: 0.6rem;
   font-weight: 500;
   line-height: 1;
@@ -1959,7 +1398,6 @@ div + div > .lu-picker-head { margin-top: 2px; }
    deshalb an der Regel, nicht als Gegengewicht mit noch mehr Spezifitaet.
    Geometrie (Hoehe, Radius, Polsterung, Rand-PLATZ) gilt weiterhin fuer
    beide — sie ist ja gerade der gemeinsame Teil. */
-.light .lu-control:not(.lu-primary) { color: rgb(75 85 99); }
 
 /* Die quadratische Variante fuer nackte Icons. Gleiche Hoehe, gleicher
    Radius, gleiche Zustaende — nur ohne waagerechtes Padding, damit das
@@ -1976,8 +1414,7 @@ div + div > .lu-picker-head { margin-top: 2px; }
    without an edge reads as a label, and that was the Model Manager's
    complaint on 08.10.2026: nobody could tell what was there to be pressed.
    The edge is the one the pressed state draws anyway, so no new value. */
-.lu-control--outline { border-color: rgba(255, 255, 255, 0.14); }
-.light .lu-control--outline { border-color: rgba(0, 0, 0, 0.14); }
+.lu-control--outline { border-color: var(--md-sys-color-outline-variant); }
 
 /* The light switch of the Voice surface: a wall rocker that stands in the
    "on" position for as long as the voice engine is in memory. Same height,
@@ -1990,28 +1427,22 @@ div + div > .lu-picker-head { margin-top: 2px; }
   flex: 0 0 auto;
   height: var(--control-h-sm);
   padding: 0 8px 0 5px;
-  border: 1px solid rgb(255 255 255 / 0.12);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--radius-control);
   background-color: transparent;
   transition:
     background-color var(--motion-fast) var(--motion-ease),
     border-color var(--motion-fast) var(--motion-ease);
 }
-.light .lu-light-switch { border-color: rgb(0 0 0 / 0.14); }
-.lu-light-switch:hover:not(:disabled) { background-color: rgb(255 255 255 / 0.06); }
-.light .lu-light-switch:hover:not(:disabled) { background-color: rgb(0 0 0 / 0.05); }
+.lu-light-switch:hover:not(:disabled) { background-color: color-mix(in oklab, var(--md-sys-color-on-surface) 8%, transparent); }
 .lu-light-switch:disabled { opacity: 0.6; cursor: default; }
 .lu-light-switch__rocker {
   position: relative;
   width: 10px;
   height: 16px;
   border-radius: 3px;
-  border: 1px solid rgb(255 255 255 / 0.28);
-  background-color: rgb(255 255 255 / 0.06);
-}
-.light .lu-light-switch__rocker {
-  border-color: rgb(0 0 0 / 0.3);
-  background-color: rgb(0 0 0 / 0.04);
+  border: 1px solid var(--md-sys-color-outline);
+  background-color: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
 }
 /* The pressed half of the rocker: up means on. */
 .lu-light-switch__rocker::after {
@@ -2022,12 +1453,12 @@ div + div > .lu-picker-head { margin-top: 2px; }
   top: 1px;
   height: 6px;
   border-radius: 2px;
-  background-color: var(--color-lu-accent);
+  background-color: var(--md-sys-color-primary);
   transition: top var(--motion-fast) var(--motion-ease), background-color var(--motion-fast) var(--motion-ease);
 }
 .lu-light-switch:disabled .lu-light-switch__rocker::after {
   top: 7px;
-  background-color: rgb(156 163 175);
+  background-color: var(--md-sys-color-outline);
 }
 
 /* Der Aufnahme-Puls. Ein Control, das gerade zuhoert, sagt das lauter als
@@ -2038,21 +1469,9 @@ div + div > .lu-picker-head { margin-top: 2px; }
    `aria-pressed` setzt den Behaelter, das aria-label wechselt auf „Stop
    recording", und der Platzhalter im Eingabefeld schreibt „Recording..."
    aus. Trotzdem ist Aufnahme ein Zustand, den man auf einen Blick sehen
-   koennen muss — deshalb die VOLLE Akzentkante und nicht der halb
-   durchsichtige --color-lu-accent-ring, der hier auf 2.78:1 (dunkel) und
-   1.60:1 (hell) gekommen waere. Die Aufteilung ist die des
-   Primaer-Rezepts weiter unten: Akzent im Dunkelmodus, --accent-edge im
-   Hellmodus, wo die Flaeche selbst zu hell steht.
-   Gerechnet auf der Composer-Flaeche (`bg-white/[0.03]` ueber #1e1e1e =
-   #252525 / `bg-gray-50` = #f9fafb) und auf dem aktiven Behaelter, den
-   `aria-pressed` darunterlegt (#343434 / #edeeee):
-     dunkel  #a094f8  5.90:1 auf der Flaeche, 4.79:1 auf dem Behaelter
-     hell    #8b7cf0  3.22:1 auf der Flaeche, 2.90:1 auf dem Behaelter
-   Der letzte Wert liegt knapp unter den 3:1 aus 1.4.11 — hinnehmbar aus
-   demselben Grund, aus dem es der aria-pressed-Rand daneben ist: der Ring
-   ist Zugabe, nie das einzige Signal. Vorher lag hier ein 2px-Ring in
-   Rot mit 5.54:1 (dunkel) / 3.60:1 (hell); lauter, aber mit der falschen
-   Aussage.
+   koennen muss — deshalb die volle primary-Kante, die in beiden Schemata
+   3:1 gegen die Composer-Flaeche haelt. Der Ring ist Zugabe, nie das
+   einzige Signal.
    Takt 1200 ms = --motion-slow x 4, genau die Dauer, die vorher als
    framer-motion-Literal im Knopf stand; jetzt CSS, damit
    „Bewegung reduzieren" ihn ueberhaupt erreichen kann. */
@@ -2063,20 +1482,15 @@ div + div > .lu-picker-head { margin-top: 2px; }
 .lu-control__pulse {
   position: absolute;
   inset: 0;
-  border: 1px solid var(--color-lu-accent);
+  border: 1px solid var(--md-sys-color-primary);
   border-radius: inherit;
   pointer-events: none;
   animation: lu-control-pulse calc(var(--motion-slow) * 4) var(--motion-ease) infinite;
 }
-.light .lu-control__pulse { border-color: var(--color-lu-accent-edge); }
 
 .lu-control:not(.lu-primary):hover:not(:disabled) {
-  background-color: rgba(255, 255, 255, 0.07);
-  color: rgb(243 244 246);
-}
-.light .lu-control:not(.lu-primary):hover:not(:disabled) {
-  background-color: rgba(0, 0, 0, 0.05);
-  color: rgb(17 24 39);
+  background-color: color-mix(in oklab, var(--md-sys-color-on-surface) 8%, transparent);
+  color: var(--md-sys-color-on-surface);
 }
 
 /* Aktiv / offen — der Behaelter erscheint erst hier. Traeger der Aussage
@@ -2086,31 +1500,18 @@ div + div > .lu-picker-head { margin-top: 2px; }
 .lu-control:not(.lu-primary)[aria-pressed='true'],
 .lu-control:not(.lu-primary)[aria-expanded='true'],
 .lu-control:not(.lu-primary)[data-active='true'] {
-  background-color: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.14);
-  color: rgb(243 244 246);
-}
-.light .lu-control:not(.lu-primary)[aria-pressed='true'],
-.light .lu-control:not(.lu-primary)[aria-expanded='true'],
-.light .lu-control:not(.lu-primary)[data-active='true'] {
-  background-color: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.14);
-  color: rgb(17 24 39);
+  background-color: color-mix(in oklab, var(--md-sys-color-on-surface) 10%, transparent);
+  border-color: var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface);
 }
 
 /* Beschaeftigt — der Modellwaehler waehrend ein Modell laedt. Akzentkante
    statt eines eigenen blauen Rezepts mit Leuchtschatten. */
 .lu-control:not(.lu-primary)[aria-busy='true'] {
-  border-color: var(--color-lu-accent-ring);
+  border-color: var(--md-sys-color-primary);
 }
 
-/* Der eigene Fokusring dieses Rezepts ist gestrichen. Er trug
-   `--color-lu-accent-ring`, also den halbdurchsichtigen Akzent bei 55 %,
-   und der kommt ueber der Composer-Leiste auf 2.78:1 (dunkel) und 1.60:1
-   (hell) — beides unter den 3:1 aus WCAG 1.4.11. Dieselbe Rechnung, aus der
-   weiter oben der Aufnahme-Puls die VOLLE Kante bekommen hat, gilt hier:
-   das Rezept nimmt jetzt den Ring des Hauses (6.42:1 / 3.37:1) statt einen
-   eigenen, schwaecheren. Ohne Regel greift die globale von oben. */
+/* Das Rezept hat keinen eigenen Fokusring: es nimmt den des Hauses. */
 
 /* Deaktiviert heisst gedimmt, nicht defekt: Paperclip und Mikrofon standen
    auf `opacity-20` und lasen sich als kaputt (Audit §4, Chat streamend). */
@@ -2126,40 +1527,33 @@ div + div > .lu-picker-head { margin-top: 2px; }
      • auth/AccountPanel.tsx     (Sign in / Create account)
      • chat/ChatInput.tsx        (Send)
    Vorher waren das drei getrennte Graustufen-Rezepte (`bg-gray-900`,
-   `dark:bg-white/10`, `bg-white/8`) — die wichtigste Aktion des Bildschirms
+   eine helle Tonung, eine Glasstufe) — die wichtigste Aktion des Bildschirms
    sah aus wie eine beliebige Nebenaktion.
 
-   Farbe kommt ausschliesslich aus dem @theme-Block, kein Literal hier.
+   Farbe: primary mit on-primary, aus dem generierten M3-Schema; Hover ist
+   die 8-%-Zustandsschicht von on-primary ueber primary.
    Der Zustand `disabled` entsaettigt die Flaeche zusaetzlich zum Dimmen,
    damit er nicht als die aktive Variante durchgeht; die Call-Sites bringen
    ihr eigenes `disabled:opacity-*` mit, das sich damit addiert.
-   Fokus: 2px Ring mit 2px Abstand, damit er auf dem HINTERGRUND liegt und
-   nicht auf der Akzentflaeche — dunkel im Hellmodus, weiss im Dunkelmodus.
-   Das ist die EINE dokumentierte Ausnahme vom Hausring: der Akzentring auf
-   der Akzentflaeche kaeme auf 1.00:1. Die Ausnahme wird nicht durch mehr
-   Spezifitaet erkaempft, sondern steht als `:not(.lu-primary)` an der
-   Hausregel selbst (siehe dort) — sonst haette der Hellmodus-Zweig mit
-   0,3,0 diese Regel mit 0,2,0 still geschlagen.
-   Gemessen: #111827 auf Weiss = 17.74:1, Weiss auf #1e1e1e = 16.67:1.
+   Fokus: der M3-Ring (secondary, 2px, 2px Abstand), der auf dem
+   HINTERGRUND liegt und nicht auf der primary-Flaeche.
    ───────────────────────────────────────────────────────────────── */
 .lu-primary {
-  background-color: var(--color-lu-accent);
-  color: var(--color-lu-on-accent);
-  border: 1px solid var(--color-lu-accent);
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border: 1px solid var(--md-sys-color-primary);
   font-weight: 500;
 }
-.light .lu-primary { border-color: var(--color-lu-accent-edge); }
 
 .lu-primary:hover:not(:disabled) {
-  background-color: var(--color-lu-accent-hover);
-  border-color: var(--color-lu-accent-hover);
+  background-color: color-mix(in srgb, var(--md-sys-color-primary), var(--md-sys-color-on-primary) 8%);
+  border-color: color-mix(in srgb, var(--md-sys-color-primary), var(--md-sys-color-on-primary) 8%);
 }
 
 .lu-primary:focus-visible {
-  outline: 2px solid var(--color-lu-on-accent);
+  outline: 2px solid var(--md-sys-color-secondary);
   outline-offset: 2px;
 }
-.dark .lu-primary:focus-visible { outline-color: white; }
 
 .lu-primary:disabled {
   filter: grayscale(1);
@@ -2186,14 +1580,8 @@ div + div > .lu-picker-head { margin-top: 2px; }
    Geometry is the neutral recipe's own (height, radius, type size), so a Get
    stands in one line with the Stop or the picker next to it.
 
-   Contrast of the word on its own fill, computed in
-   models/__tests__/the-accent-leads-to-the-action.test.ts. The fill is 12 %
-   and not the 14 % of `--color-lu-accent-soft`: at 14 % the word drops to
-   4.48:1 the moment the tile under it is hovered and lightens.
-     dark   accent on the fill over a tile    4.84:1   tile hovered 4.64:1
-            hover, 20 % and the lifted accent 4.81:1
-     light  ink on the fill over a tile       5.56:1   tile hovered 5.28:1
-            hover, 20 %                       4.98:1
+   The fill is primary-container with on-primary-container on it, the M3
+   tonal pairing (4.5:1 in both schemes); hover is the 8 % state layer.
    Focus is the ring of the house, which lies on the tile and not on the
    fill. Disabled loses its colour like `.lu-primary` does: a Get that waits
    for another download must not look like the one that can be pressed.
@@ -2206,10 +1594,10 @@ div + div > .lu-picker-head { margin-top: 2px; }
   flex: 0 0 auto;
   height: var(--control-h-sm);
   padding: 0 10px;
-  border: 1px solid color-mix(in srgb, var(--color-lu-accent) 30%, transparent);
+  border: 1px solid transparent;
   border-radius: var(--radius-control);
-  background-color: color-mix(in srgb, var(--color-lu-accent) 12%, transparent);
-  color: var(--color-lu-accent);
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
   font-size: 0.6rem;
   font-weight: 600;
   line-height: 1;
@@ -2220,18 +1608,8 @@ div + div > .lu-picker-head { margin-top: 2px; }
     color var(--motion-fast) var(--motion-ease),
     scale var(--motion-fast) var(--motion-ease);
 }
-.light .lu-tonal {
-  border-color: color-mix(in srgb, var(--color-lu-accent-ink) 30%, transparent);
-  color: var(--color-lu-accent-ink);
-}
 .lu-tonal:hover:not(:disabled) {
-  border-color: var(--color-lu-accent-ring);
-  background-color: color-mix(in srgb, var(--color-lu-accent) 20%, transparent);
-  color: var(--color-lu-accent-hover);
-}
-.light .lu-tonal:hover:not(:disabled) {
-  border-color: var(--color-lu-accent-ink);
-  color: var(--color-lu-accent-ink);
+  background-color: color-mix(in srgb, var(--md-sys-color-primary-container), var(--md-sys-color-on-primary-container) 8%);
 }
 .lu-tonal:disabled {
   filter: grayscale(1);
@@ -2248,10 +1626,9 @@ div + div > .lu-picker-head { margin-top: 2px; }
    corner and the hover that says the card is alive.
 
    Depth comes from the edge and not from a shadow. On the dark pane a shadow
-   tops out at 1.26:1 (the arithmetic stands at `.dark .shadow-sm` above), so
-   a raised card is a brighter edge. `--lead` is that brighter edge at rest,
+   adds almost no contrast, so a raised card is a stronger edge. `--lead` is that brighter edge at rest,
    for the cards a page puts first. `--active` is the one that is in use: the
-   soft accent ground and the accent edge, the same pair the Settings
+   primary-container ground and the primary edge, the same pair the Settings
    navigation and the Models rail mark their selection with, and it holds
    while the pointer is over it.
 
@@ -2259,46 +1636,32 @@ div + div > .lu-picker-head { margin-top: 2px; }
    not the measure.
    ───────────────────────────────────────────────────────────────── */
 .lu-tile {
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--radius-xl);
-  background-color: rgba(255, 255, 255, 0.03);
+  background-color: var(--md-sys-color-surface-container-low);
   transition:
     background-color var(--motion-fast) var(--motion-ease),
     border-color var(--motion-fast) var(--motion-ease);
 }
 .lu-tile:hover {
-  border-color: rgba(255, 255, 255, 0.14);
-  background-color: rgba(255, 255, 255, 0.045);
+  border-color: var(--md-sys-color-outline);
+  background-color: var(--md-sys-color-surface-container);
 }
-.lu-tile--lead { border-color: rgba(255, 255, 255, 0.14); }
-.light .lu-tile {
-  border-color: rgba(0, 0, 0, 0.09);
-  background-color: rgb(249 250 251);
-}
-.light .lu-tile:hover {
-  border-color: rgba(0, 0, 0, 0.16);
-  background-color: rgb(243 244 246);
-}
-.light .lu-tile--lead { border-color: rgba(0, 0, 0, 0.16); }
+.lu-tile--lead { border-color: var(--md-sys-color-outline); }
 .lu-tile--active,
 .lu-tile--active:hover {
-  border-color: var(--color-lu-accent-ring);
-  background-color: var(--color-lu-accent-soft);
-}
-.light .lu-tile--active,
-.light .lu-tile--active:hover {
-  border-color: var(--color-lu-accent-edge);
-  background-color: var(--color-lu-accent-soft);
+  border-color: var(--md-sys-color-primary);
+  background-color: var(--md-sys-color-primary-container);
 }
 
 /* Checkerboard backing so transparent (background-removed) PNGs don't read
    as solid black in the Stage / gallery. */
 .lu-checker {
   background-image:
-    linear-gradient(45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%),
-    linear-gradient(-45deg, rgba(255, 255, 255, 0.06) 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.06) 75%),
-    linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.06) 75%);
+    linear-gradient(45deg, color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent) 25%, transparent 25%),
+    linear-gradient(-45deg, color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent) 75%),
+    linear-gradient(-45deg, transparent 75%, color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent) 75%);
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
 }
@@ -2312,15 +1675,12 @@ div + div > .lu-picker-head { margin-top: 2px; }
   100% { background-position: -200% 0; }
 }
 .lu-tool-shimmer {
-  background: linear-gradient(90deg, #4b5563 30%, #a78bfa 50%, #4b5563 70%);
+  background: linear-gradient(90deg, var(--md-sys-color-on-surface-variant) 30%, var(--md-sys-color-primary) 50%, var(--md-sys-color-on-surface-variant) 70%);
   background-size: 200% 100%;
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
   animation: lu-tool-shimmer 1.6s linear infinite;
-}
-.dark .lu-tool-shimmer {
-  background-image: linear-gradient(90deg, #9ca3af 30%, #c4b5fd 50%, #9ca3af 70%);
 }
 @keyframes lu-band-dot {
   0%, 80%, 100% { opacity: 0.25; }
@@ -2359,9 +1719,8 @@ div + div > .lu-picker-head { margin-top: 2px; }
 
    Farbe: `currentColor`, also die Textfarbe des Absatzes, an dem er
    haengt. Damit fuehrt dieser Balken KEINE neue Farbe ein — er erbt die,
-   die dort schon gemessen ist: #e5e7eb auf #1e1e1e = 13.47:1 (dunkel),
-   #1f2937 auf #ffffff = 14.68:1 (hell). Beides weit ueber den 3:1, die
-   1.4.11 fuer ein Nicht-Text-Signal dieser Groesse verlangt.
+   die dort schon gemessen ist (on-surface, weit ueber den 3:1, die 1.4.11
+   fuer ein Nicht-Text-Signal dieser Groesse verlangt).
 
    Takt: aus der vorhandenen Motion-Leiter gerechnet, nicht als fuenfte
    Zahl danebengeschrieben — `--motion-slow` an und `--motion-slow` aus,
@@ -2465,23 +1824,28 @@ div + div > .lu-picker-head { margin-top: 2px; }
    Sie ist ungeschichtet und schlaegt damit die Tailwind-Utilities aus
    `baseFieldClass` (`@layer utilities`), ohne dass dort etwas entfernt
    werden muss. Der Pfeil ist derselbe Winkel wie der `ChevronDown` von
-   lucide daneben, in `text-gray-400` (#9ca3af, 6,42:1 auf der Mulde).
+   lucide daneben, in on-surface-variant.
    ───────────────────────────────────────────────────────────────────── */
 .lu-field-dark {
-  background-color: rgba(0, 0, 0, 0.25);
-  border-color: rgba(255, 255, 255, 0.08);
+  background-color: var(--md-sys-color-surface-container-lowest);
+  border-color: var(--md-sys-color-outline-variant);
 }
 select.lu-field-dark {
   -webkit-appearance: none;
   appearance: none;
   padding-right: 1.75rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%239ca3af' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6.5l4 4 4-4'/%3E%3C/svg%3E");
+  /* The chevron drawn from two half-filled squares in on-surface-variant,
+     so it follows the scheme like the ChevronDown next to it. */
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--md-sys-color-on-surface-variant) 50%, var(--md-sys-color-on-surface-variant) calc(50% + 1.5px), transparent calc(50% + 1.5px)),
+    linear-gradient(135deg, transparent 50%, var(--md-sys-color-on-surface-variant) 50%, var(--md-sys-color-on-surface-variant) calc(50% + 1.5px), transparent calc(50% + 1.5px));
   background-repeat: no-repeat;
-  background-position: right 0.55rem center;
-  background-size: 13px 13px;
+  background-position: right calc(0.55rem + 5px) center, right 0.55rem center;
+  background-size: 5px 10px, 5px 10px;
 }
 select.lu-field-dark option {
-  background-color: var(--color-lu-base);
+  background-color: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface);
 }
 
 /* Computer control has LU's window while it works on the screen: the small
@@ -2502,17 +1866,13 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
    the panel is drawn by its surface and its hairline alone. An opaque
    window (macOS) has square corners, and the panel fills it to the edge. */
 .lu-computer-panel {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
   transition: border-color var(--motion-slow) var(--motion-ease);
-}
-.light .lu-computer-panel {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 .lu-computer-panel--flush {
   border: 0;
 }
 .lu-computer-head {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
 }
 /* Pause and Stop stand next to the line that says what LU does: small
    enough to leave that line its room, the same height as each other. */
@@ -2528,9 +1888,6 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
   font-size: 12px;
   line-height: 20px;
   font-weight: 500;
-}
-.light .lu-computer-head {
-  border-bottom-color: rgba(0, 0, 0, 0.07);
 }
 
 /* The grip: a short bar in the padding at the top edge of the panel. It
@@ -2561,19 +1918,12 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
   width: 28px;
   height: 3px;
   border-radius: 2px;
-  background: rgba(255, 255, 255, 0.16);
+  background: var(--md-sys-color-outline-variant);
   transition: background-color var(--motion-base) var(--motion-ease);
 }
 .lu-computer-grip:hover::before,
 .lu-computer-grip:focus-visible::before {
-  background: rgba(255, 255, 255, 0.5);
-}
-.light .lu-computer-grip::before {
-  background: rgba(0, 0, 0, 0.14);
-}
-.light .lu-computer-grip:hover::before,
-.light .lu-computer-grip:focus-visible::before {
-  background: rgba(0, 0, 0, 0.45);
+  background: var(--md-sys-color-on-surface-variant);
 }
 .lu-computer-grip:focus-visible {
   outline: none;
@@ -2586,18 +1936,15 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
 
 /* LU waits for the user: a question is open, or the session is paused.
    Nothing runs until the user answers, so the panel says so in the one
-   accent: its edge takes the colour and breathes slowly, and the line in
-   the head takes it too. #b1a6ff on the panel is 9.5:1, #7c3aed on white
-   5.7:1. */
+   accent: its edge takes the primary role and breathes slowly, and the
+   line in the head takes it too (primary on a surface container holds
+   4.5:1 in both schemes). */
 .lu-computer-surface[data-waiting] .lu-computer-panel {
-  border-color: var(--color-lu-accent);
+  border-color: var(--md-sys-color-primary);
   animation: lu-computer-wait 2.4s ease-in-out infinite;
 }
 .lu-computer-surface[data-waiting] .lu-computer-word {
-  color: var(--color-lu-accent-hover);
-}
-.light .lu-computer-surface[data-waiting] .lu-computer-word {
-  color: var(--color-lu-cloud);
+  color: var(--md-sys-color-primary);
 }
 @keyframes lu-computer-wait {
   0%,
@@ -2605,7 +1952,7 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
     box-shadow: inset 0 0 0 1px transparent;
   }
   50% {
-    box-shadow: inset 0 0 0 1px var(--color-lu-accent), inset 0 0 18px var(--color-lu-accent-soft);
+    box-shadow: inset 0 0 0 1px var(--md-sys-color-primary), inset 0 0 18px var(--md-sys-color-primary-container);
   }
 }
 
@@ -2627,13 +1974,9 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
   padding: 12px 14px;
 }
 .lu-computer-question--panel {
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(0, 0, 0, 0.22);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container);
   animation: lu-computer-enter var(--motion-slow) var(--motion-ease) both;
-}
-.light .lu-computer-question--panel {
-  border-top-color: rgba(0, 0, 0, 0.07);
-  background: rgba(0, 0, 0, 0.025);
 }
 /* The answers: two to a row, each as wide as its half and high enough to
    hit without aiming. The main one stands last. */
@@ -2666,8 +2009,8 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
   transition: border-color var(--motion-base) var(--motion-ease), background-color var(--motion-base) var(--motion-ease);
 }
 .lu-computer-autonomy[data-on='true'] {
-  border-color: rgba(34, 197, 94, 0.4);
-  background: rgba(34, 197, 94, 0.06);
+  border-color: var(--md-ext-color-success);
+  background: color-mix(in oklab, var(--md-ext-color-success) 8%, transparent);
 }
 /* The two shortcuts, at the foot of the panel while no question stands there. */
 /* The note of computer control above the input field: one small line in
@@ -2688,17 +2031,11 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
   font-size: 11px;
   line-height: 16px;
   white-space: nowrap;
-  color: #e5e7eb;
-  background: rgba(24, 24, 27, 0.92);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  color: var(--md-sys-color-inverse-on-surface);
+  background: var(--md-sys-color-inverse-surface);
+  border: 1px solid transparent;
+  box-shadow: var(--md-sys-elevation-level2);
   animation: lu-computer-note-in var(--motion-base, 180ms) ease-out both;
-}
-.light .lu-computer-note {
-  color: #1f2937;
-  background: rgba(255, 255, 255, 0.96);
-  border-color: rgba(0, 0, 0, 0.1);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
 }
 /* A stop with its reason can be long: it may wrap, the passing note never does. */
 .lu-computer-note[data-kind='stopped'] {
@@ -2713,14 +2050,14 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
   height: 6px;
   flex: none;
   border-radius: 9999px;
-  background: var(--color-lu-accent);
+  background: var(--md-sys-color-inverse-primary);
 }
 .lu-computer-note-close {
   flex: none;
   display: inline-flex;
   padding: 2px;
   border-radius: 9999px;
-  color: #9ca3af;
+  color: color-mix(in oklab, var(--md-sys-color-inverse-on-surface) 72%, transparent);
 }
 .lu-computer-note-close:hover {
   color: inherit;
@@ -2757,23 +2094,15 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
   }
 }
 .lu-computer-keys {
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-}
-.light .lu-computer-keys {
-  border-top-color: rgba(0, 0, 0, 0.07);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 .lu-computer-keys kbd {
   font: inherit;
   padding: 1px 5px;
   border-radius: 5px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.05);
-  color: #d1d5db;
-}
-.light .lu-computer-keys kbd {
-  border-color: rgba(0, 0, 0, 0.14);
-  background: rgba(0, 0, 0, 0.03);
-  color: #374151;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
 }
 @media (prefers-reduced-motion: reduce) {
   .lu-computer-surface[data-waiting] .lu-computer-panel,
@@ -2812,20 +2141,12 @@ html[data-computer-surface]:not([data-computer-surface='window']) #root {
   100% { background-position: 0% 0%, 0% 50%; }
 }
 .lu-develop {
-  background-color: #1b1b1b;
+  background-color: var(--md-sys-color-surface-container-high);
   background-image:
-    radial-gradient(120% 90% at 20% 110%, rgba(160, 148, 248, 0.16), transparent 60%),
-    linear-gradient(110deg, rgba(255, 255, 255, 0.015) 30%, rgba(255, 255, 255, 0.07) 50%, rgba(255, 255, 255, 0.015) 70%);
+    radial-gradient(120% 90% at 20% 110%, color-mix(in oklab, var(--md-sys-color-primary) 16%, transparent), transparent 60%),
+    linear-gradient(110deg, color-mix(in oklab, var(--md-sys-color-on-surface) 2%, transparent) 30%, color-mix(in oklab, var(--md-sys-color-on-surface) 8%, transparent) 50%, color-mix(in oklab, var(--md-sys-color-on-surface) 2%, transparent) 70%);
   background-size: 100% 100%, 200% 100%;
   animation: lu-develop 2.4s linear infinite;
-}
-/* Light mode: the same placeholder on a light ground, so the line inside it
-   (dark type in light mode) stays readable. */
-.light .lu-develop {
-  background-color: #ececec;
-  background-image:
-    radial-gradient(120% 90% at 20% 110%, rgba(160, 148, 248, 0.24), transparent 60%),
-    linear-gradient(110deg, rgba(0, 0, 0, 0.01) 30%, rgba(0, 0, 0, 0.06) 50%, rgba(0, 0, 0, 0.01) 70%);
 }
 @media (prefers-reduced-motion: reduce) {
   .lu-develop { animation: none; }

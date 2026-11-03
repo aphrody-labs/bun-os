@@ -7,6 +7,8 @@
  * where the desktop puts it; the reused renderers (MarkdownRenderer,
  * CodeBlock) read their `dark:` variants from there.
  */
+import { SHEET } from '../styles/sheet/colours.g'
+
 export type ThemePref = 'system' | 'dark' | 'light'
 export type ResolvedTheme = 'dark' | 'light'
 
@@ -53,9 +55,11 @@ function paint(): void {
   // The mark of the first frame (public/first-paint.js) keeps the page behind the shell light. It follows the theme from here on.
   root.classList.toggle('lu-first-light', resolved === 'light')
   root.classList.toggle('lu-first-dark', resolved === 'dark')
-  root.style.background = resolved === 'dark' ? '#141414' : '#f3f4f6'
+  // The surface role of the generated sheet, the same value public/first-paint.css and the native layers paint.
+  const surface = SHEET[resolved].surface
+  root.style.background = surface
   const meta = document.querySelector('meta[name="theme-color"]')
-  if (meta) meta.setAttribute('content', resolved === 'dark' ? '#141414' : '#f3f4f6')
+  if (meta) meta.setAttribute('content', surface)
   for (const fn of listeners) fn(getThemePref(), resolved)
 }
 

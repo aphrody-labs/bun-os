@@ -11,7 +11,7 @@ html[data-shell='mobile'] {
   font-size: calc(100% * var(--m-font-scale));
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  background: var(--m-canvas);
+  background: var(--md-sys-color-surface);
   color-scheme: dark;
 }
 html[data-shell='mobile'].light {
@@ -46,8 +46,8 @@ html[data-shell='mobile'] body {
 
 html[data-shell='mobile'] body {
   margin: 0;
-  background: var(--m-canvas);
-  color: var(--m-t1);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
   font-family: var(--m-font);
   font-size: var(--m-text-body);
   line-height: 1.45;
@@ -116,7 +116,7 @@ html[data-shell='mobile'] body {
   outline: none;
 }
 .m-app :focus-visible {
-  outline: 2px solid var(--m-accent);
+  outline: 2px solid var(--md-sys-color-primary);
   outline-offset: 2px;
 }
 /* A page or sheet title takes focus when it opens, for screen readers. It is

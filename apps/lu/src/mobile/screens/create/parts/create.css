@@ -36,8 +36,8 @@
   margin: 0 var(--m-gutter);
   border-radius: var(--m-r-xl);
   overflow: hidden;
-  background: var(--m-surface);
-  border: 1px solid var(--m-hair);
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
 .m-k-box--pad {
   padding: var(--m-s5) var(--m-s4);
@@ -45,7 +45,7 @@
 .m-app .m-k-media {
   display: block;
   width: 100%;
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
   position: relative;
 }
 .m-k-media img,
@@ -55,7 +55,7 @@
   height: auto;
   max-height: 70vh;
   object-fit: contain;
-  background: #000000;
+  background: var(--md-sys-color-scrim);
 }
 .m-k-media audio {
   display: block;
@@ -71,13 +71,13 @@
   gap: var(--m-s2);
   padding: var(--m-s4);
   text-align: center;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-caption);
 }
 .m-k-racts {
   display: flex;
   flex-wrap: wrap;
-  border-top: 1px solid var(--m-hair);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 .m-app .m-k-racts > button {
   flex: 1 1 var(--m-touch);
@@ -89,7 +89,7 @@
   justify-content: center;
   gap: 2px;
   padding: var(--m-s1) 2px;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: min(0.6875rem, calc(15px / var(--m-zoom)));
   line-height: 1.2;
   text-align: center;
@@ -115,17 +115,17 @@
   height: 64px;
   border-radius: var(--m-r-md);
   overflow: hidden;
-  background: var(--m-fill);
-  border: 1px solid var(--m-hair);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
+  border: 1px solid var(--md-sys-color-outline-variant);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-app .m-k-thumb[aria-pressed='true'],
 .m-app .m-k-thumb[aria-current='true'] {
-  border-color: var(--m-accent);
-  box-shadow: inset 0 0 0 1px var(--m-accent);
+  border-color: var(--md-sys-color-primary);
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
 }
 .m-k-thumb img {
   width: 100%;
@@ -143,7 +143,7 @@
 .m-k-run-line {
   font-family: var(--m-font-mono);
   font-size: var(--m-text-mono);
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   overflow-wrap: anywhere;
 }
 .m-k-run .m-btn {
@@ -159,8 +159,8 @@
   margin: 0 var(--m-gutter);
   /* Round 57: less room above and below; the controls inside bring their own 44 px. */
   padding: var(--m-s2) var(--m-s3);
-  background: var(--m-surface);
-  border: 1px solid var(--m-card-edge);
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-lg);
   display: flex;
   flex-direction: column;
@@ -195,7 +195,7 @@
 .m-app .m-k-addcard > .m-k-thumb {
   width: 48px;
   height: 48px;
-  color: var(--m-accent);
+  color: var(--md-sys-color-primary);
 }
 .m-k-addcard-go {
   flex: none;
@@ -205,8 +205,8 @@
   width: 32px;
   height: 32px;
   border-radius: 999px;
-  background: var(--m-fill-2);
-  color: var(--m-t1);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 10%, transparent);
+  color: var(--md-sys-color-on-surface);
 }
 .m-app .m-k-addcard:disabled {
   opacity: 0.5;
@@ -247,12 +247,12 @@
   justify-content: center;
   gap: var(--m-s2);
   text-align: center;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-body);
   line-height: 1.4;
 }
 .m-k-hint > svg {
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 .m-k-card-head {
@@ -280,7 +280,7 @@
 .m-k-card-sub {
   font-size: var(--m-text-caption);
   line-height: 1.4;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   overflow-wrap: anywhere;
 }
 .m-k-card-actions {
@@ -328,8 +328,8 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--m-t1);
-  color: var(--m-canvas);
+  background: var(--md-sys-color-on-surface);
+  color: var(--md-sys-color-surface);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -342,11 +342,11 @@
   width: 64px;
   height: 64px;
   border-radius: var(--m-r-md);
-  border: 1px dashed var(--m-edge);
+  border: 1px dashed var(--md-sys-color-outline);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 /* ---------- composer of Create ---------- */
@@ -361,7 +361,7 @@
   align-items: center;
   gap: 2px var(--m-s3);
   padding: var(--m-s1) 14px;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   font-family: var(--m-font-mono);
   font-size: var(--m-text-mono);
   line-height: 1.3;
@@ -376,16 +376,16 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--m-cloud);
+  color: var(--md-sys-color-tertiary);
 }
 .m-k-summary-price[data-short] {
-  color: var(--m-err);
+  color: var(--md-sys-color-error);
 }
 .m-k-blocked {
   padding: 0 14px var(--m-s1);
   font-size: var(--m-text-caption);
   line-height: 1.4;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-k-composer-row {
   display: flex;
@@ -405,7 +405,7 @@
   gap: 6px;
   min-height: var(--m-touch);
   padding: 0 var(--m-s2);
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-caption);
 }
 .m-app .m-k-composer-row > .m-btn {
@@ -428,7 +428,7 @@
   max-width: calc(14 * var(--m-u));
   padding: var(--m-s2) var(--m-s3);
   border-radius: var(--m-r-md);
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -442,7 +442,7 @@
 }
 .m-k-style span {
   font-size: var(--m-text-caption);
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -459,30 +459,30 @@
 .m-app .m-k-tools > button {
   min-height: 76px;
   border-radius: var(--m-r-lg);
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 6px;
   padding: var(--m-s2);
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-caption);
   line-height: 1.25;
   text-align: center;
   overflow-wrap: anywhere;
 }
 .m-app .m-k-tools > button[aria-checked='true'] {
-  background: var(--m-accent-soft);
-  color: var(--m-t1);
-  box-shadow: inset 0 0 0 1px var(--m-accent);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
 }
 
 /* ---------- model rows (K3) ---------- */
 .m-k-price {
   font-family: var(--m-font-mono);
   font-size: var(--m-text-mono);
-  color: var(--m-cloud);
+  color: var(--md-sys-color-tertiary);
   white-space: nowrap;
 }
 .m-k-rowtags {
@@ -507,10 +507,10 @@
   font-family: var(--m-font-mono);
   font-size: var(--m-text-control);
   font-weight: 600;
-  color: var(--m-cloud);
+  color: var(--md-sys-color-tertiary);
 }
 .m-k-foot-price[data-short] > b {
-  color: var(--m-err);
+  color: var(--md-sys-color-error);
 }
 .m-k-sec {
   padding: 0 var(--m-gutter) var(--m-s4);
@@ -542,7 +542,7 @@
   aspect-ratio: 1 / 1;
   border-radius: var(--m-r-md);
   overflow: hidden;
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
   /* Tiles far from the screen are not laid out or painted: 200 entries scroll like 20. */
   content-visibility: auto;
   contain-intrinsic-size: 110px 110px;
@@ -557,7 +557,7 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-label);
   text-align: center;
 }
@@ -575,8 +575,8 @@
   bottom: 4px;
   padding: 2px 6px;
   border-radius: 5px;
-  background: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
+  background: color-mix(in oklab, var(--md-sys-color-inverse-surface) 90%, transparent);
+  color: var(--md-sys-color-inverse-on-surface);
   font-size: var(--m-text-label);
   line-height: 1.3;
   display: inline-flex;
@@ -595,24 +595,24 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 2px solid #ffffff;
-  background: rgba(0, 0, 0, 0.35);
-  color: #111827;
+  border: 2px solid var(--md-sys-color-inverse-on-surface);
+  background: color-mix(in oklab, var(--md-sys-color-inverse-surface) 60%, transparent);
+  color: var(--md-sys-color-on-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
 }
 .m-k-tile[data-selected] .m-k-tile-check {
-  background: var(--m-accent);
-  border-color: var(--m-accent);
+  background: var(--md-sys-color-primary);
+  border-color: var(--md-sys-color-primary);
 }
 .m-k-tile-check svg {
   width: 14px;
   height: 14px;
 }
 .m-k-tile[data-selected] {
-  outline: 2px solid var(--m-accent);
+  outline: 2px solid var(--md-sys-color-primary);
   outline-offset: -2px;
 }
 .m-app .m-k-tile-remove {
@@ -621,8 +621,8 @@
   right: 0;
   bottom: 0;
   min-height: var(--m-touch);
-  background: rgba(0, 0, 0, 0.6);
-  color: #ffffff;
+  background: color-mix(in oklab, var(--md-sys-color-inverse-surface) 90%, transparent);
+  color: var(--md-sys-color-inverse-on-surface);
   font-size: var(--m-text-caption);
   text-align: center;
 }
@@ -664,7 +664,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--m-s2);
-  color: #d1d5db;
+  color: var(--md-sys-color-on-surface-variant);
   font-family: var(--m-font-mono);
   font-size: var(--m-text-mono);
 }
@@ -681,17 +681,17 @@
   flex: 1 1 calc(7 * var(--m-u));
 }
 .m-viewer .m-btn {
-  color: #f3f4f6;
-  border-color: rgba(255, 255, 255, 0.25);
+  color: var(--md-sys-color-on-surface);
+  border-color: var(--md-sys-color-outline);
 }
 .m-viewer .m-btn.m-btn--cloud {
-  border-color: var(--m-cloud-edge);
+  border-color: var(--md-sys-color-tertiary);
 }
 .m-k-viewer-prompt {
   padding: var(--m-s3);
   border-radius: var(--m-r-md);
-  background: rgba(255, 255, 255, 0.08);
-  color: #e5e7eb;
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 8%, transparent);
+  color: var(--md-sys-color-on-surface);
   font-size: var(--m-text-caption);
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -709,7 +709,7 @@
   gap: var(--m-s3);
   padding: var(--m-s5);
   text-align: center;
-  color: #d1d5db;
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-k-zoomable {
   max-width: 100%;
@@ -728,7 +728,7 @@
   z-index: 60;
   display: flex;
   flex-direction: column;
-  background: var(--m-canvas);
+  background: var(--md-sys-color-surface);
   padding: var(--m-safe-top) var(--m-safe-right) var(--m-safe-bottom) var(--m-safe-left);
 }
 .m-k-mask-bar {
@@ -754,7 +754,7 @@
   min-height: 0;
   position: relative;
   overflow: hidden;
-  background: #0b0b0b;
+  background: var(--md-sys-color-scrim);
   touch-action: none;
   user-select: none;
   -webkit-user-select: none;
@@ -787,8 +787,8 @@
   overflow: hidden;
   padding: 4px 10px;
   border-radius: var(--m-u);
-  background: rgba(0, 0, 0, 0.6);
-  color: #f3f4f6;
+  background: color-mix(in oklab, var(--md-sys-color-inverse-surface) 90%, transparent);
+  color: var(--md-sys-color-inverse-on-surface);
   font-size: var(--m-text-caption);
   text-align: center;
   pointer-events: none;
@@ -799,7 +799,7 @@
   flex-direction: column;
   gap: var(--m-s2);
   padding: var(--m-s2) var(--m-s3) var(--m-s3);
-  border-top: 1px solid var(--m-hair);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
   max-height: 55%;
   overflow-y: auto;
 }
@@ -826,7 +826,7 @@
   width: min(46%, calc(22 * var(--m-u)));
   max-height: none;
   border-top: 0;
-  border-left: 1px solid var(--m-hair);
+  border-left: 1px solid var(--md-sys-color-outline-variant);
 }
 /* Low screen (small phone with large text): the image keeps more than half the height, the tools scroll. */
 .m-k-mask[data-shape='low'] .m-k-mask-tools {
@@ -856,19 +856,19 @@
   object-fit: cover;
   border-radius: var(--m-r-md);
   display: block;
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
 }
 .m-app .m-k-photo-add {
   aspect-ratio: 1 / 1;
   min-height: var(--m-touch);
   border-radius: var(--m-r-md);
-  border: 1px dashed var(--m-edge);
+  border: 1px dashed var(--md-sys-color-outline);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-label);
   text-align: center;
 }
@@ -878,26 +878,28 @@
   margin: 0 var(--m-gutter) var(--m-s3);
   border-radius: var(--m-r-lg);
   overflow: hidden;
-  background: var(--m-surface);
-  border: 1px solid var(--m-card-edge);
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
+/* design:content: the four tones are the artwork of the showcase cards
+   (picture placeholders until the real image loads), not chrome. */
 .m-k-show-art {
   aspect-ratio: 16 / 9;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  background: linear-gradient(140deg, #1c2340, #4a3b6b 55%, #c9705a);
+  color: #ffffff; /* design:content */
+  background: linear-gradient(140deg, #1c2340, #4a3b6b 55%, #c9705a); /* design:content */
 }
 .m-k-show-art[data-tone='b'] {
-  background: linear-gradient(160deg, #0f3d3e, #2e8b6f 55%, #e2c26a);
+  background: linear-gradient(160deg, #0f3d3e, #2e8b6f 55%, #e2c26a); /* design:content */
 }
 .m-k-show-art[data-tone='c'] {
-  background: linear-gradient(200deg, #3b1d5e, #c2416b 60%, #f6a45c);
+  background: linear-gradient(200deg, #3b1d5e, #c2416b 60%, #f6a45c); /* design:content */
 }
 .m-k-show-art[data-tone='d'] {
-  background: linear-gradient(140deg, #0b1e3f, #2f6fb5 55%, #d7e9f7);
+  background: linear-gradient(140deg, #0b1e3f, #2f6fb5 55%, #d7e9f7); /* design:content */
 }
 .m-k-show-art img {
   width: 100%;
@@ -920,7 +922,7 @@
 }
 .m-k-show-text p {
   margin: 0;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-control);
   line-height: 1.45;
 }
@@ -950,7 +952,7 @@
   width: 100%;
   max-height: 40vh;
   border-radius: var(--m-r-md);
-  background: #000000;
+  background: var(--md-sys-color-scrim);
   display: block;
 }
 .m-k-batch-thumb {
@@ -959,7 +961,7 @@
   height: 44px;
   border-radius: var(--m-r-sm);
   object-fit: cover;
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
 }
 
 /* A chip with a very short label ("1:1") is still a full target. */
@@ -1041,8 +1043,8 @@
   height: 36px;
   border-radius: var(--m-r-sm);
   overflow: hidden;
-  background: var(--m-fill);
-  border: 1px solid var(--m-hair);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
 .m-k-face-thumb img {
   width: 100%;
@@ -1065,14 +1067,14 @@
   gap: 4px;
   padding: 4px;
   border-radius: var(--m-r-md);
-  background: var(--m-surface);
-  border: 1px solid var(--m-hair);
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
   text-align: left;
 }
 .m-app .m-k-face[aria-checked='true'] {
-  border-color: var(--m-cloud);
-  box-shadow: inset 0 0 0 1px var(--m-cloud);
-  background: var(--m-cloud-soft);
+  border-color: var(--md-sys-color-tertiary);
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-tertiary);
+  background: var(--md-sys-color-tertiary-container);
 }
 .m-k-face-img {
   display: flex;
@@ -1081,7 +1083,7 @@
   aspect-ratio: 16 / 9;
   border-radius: var(--m-r-sm);
   overflow: hidden;
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
 }
 .m-k-face-img img {
   width: 100%;
@@ -1091,7 +1093,7 @@
 }
 .m-k-face-name {
   font-size: var(--m-text-caption);
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   overflow-wrap: anywhere;
   padding: 0 2px 2px;
 }
@@ -1120,13 +1122,13 @@
   text-align: left;
   border-radius: var(--m-r-lg);
   overflow: hidden;
-  background: var(--m-surface);
-  border: 1px solid var(--m-card-edge);
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
 .m-k-preset-art {
   display: block;
   aspect-ratio: 16 / 9;
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
 }
 .m-k-preset-art img {
   width: 100%;
@@ -1142,7 +1144,7 @@
 }
 .m-k-preset-facts {
   font-size: var(--m-text-caption);
-  color: var(--m-cloud);
+  color: var(--md-sys-color-tertiary);
   overflow-wrap: anywhere;
 }
 .m-k-steps {
@@ -1159,11 +1161,11 @@
   gap: var(--m-s2);
   font-size: var(--m-text-caption);
   line-height: 1.4;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   overflow-wrap: anywhere;
 }
 .m-k-steps > li[data-state='now'] {
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   font-weight: 600;
 }
 .m-k-steps-n {
@@ -1176,20 +1178,20 @@
   justify-content: center;
   font-family: var(--m-font-mono);
   font-size: var(--m-text-caption);
-  background: var(--m-fill);
-  border: 1px solid var(--m-hair);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
 .m-k-steps-n > svg {
   width: calc(0.875 * var(--m-u));
   height: calc(0.875 * var(--m-u));
 }
 .m-k-steps > li[data-state='now'] > .m-k-steps-n {
-  border-color: var(--m-cloud);
-  color: var(--m-cloud);
+  border-color: var(--md-sys-color-tertiary);
+  color: var(--md-sys-color-tertiary);
 }
 .m-k-steps > li[data-state='done'] > .m-k-steps-n {
-  background: var(--m-cloud-soft);
-  color: var(--m-cloud);
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-tertiary);
 }
 .m-k-guided {
   padding-top: var(--m-s3);
@@ -1204,7 +1206,7 @@
 }
 .m-k-trouble {
   margin: 0;
-  color: var(--m-err);
+  color: var(--md-sys-color-error);
 }
 .m-k-result-note {
   padding-top: var(--m-s2);
@@ -1221,12 +1223,14 @@
 .m-app .m-viewer-stage {
   position: relative;
 }
+/* design:content: the white and grey checkerboard is the convention that
+   shows transparent pixels of a picture, the same in both schemes. */
 .m-app .m-k-checker {
   position: absolute;
   pointer-events: none;
   transform-origin: center;
-  background-color: #ffffff;
-  background-image: conic-gradient(#cccccc 25%, transparent 0 50%, #cccccc 0 75%, transparent 0);
+  background-color: #ffffff; /* design:content */
+  background-image: conic-gradient(#cccccc 25%, transparent 0 50%, #cccccc 0 75%, transparent 0); /* design:content */
   background-size: 16px 16px;
 }
 .m-app .m-k-media img.m-k-see-through,

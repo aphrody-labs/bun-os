@@ -1,7 +1,12 @@
 /* LU Mobile: one stylesheet for the whole shell.
    Loaded only from src/mobile/boot, so it lands in the lazy mobile chunk and
    never in the desktop bundle. Plain CSS with classes m-* and variables --m-*,
-   no Tailwind utilities (mobile-docs/design/ARCHITEKTUR.md 2.4). */
+   no Tailwind utilities (mobile-docs/design/ARCHITEKTUR.md 2.4). Colour comes
+   from the generated Material 3 sheets: the roles (light, and dark under
+   .dark), the extended success and warning roles, and elevation and state. */
+@import '@aphrody/m3-tokens/m3-tokens.css';
+@import '@aphrody/m3-theme/tokens.css';
+@import '@aphrody/m3-theme/tailwind.css';
 @import './tokens.css';
 @import './reset.css';
 @import './base.css';

@@ -1,9 +1,9 @@
 /**
- * The colour tokens: dark and light define the same set of keys, and the
- * values are the ones in the table of mobile-docs/design/DESIGN.md 7.1.
+ * The token layer of the mobile shell: sizes, type and motion are --m-*
+ * tokens, every colour is a Material 3 role of the generated sheet.
  *
- * A key that exists in one theme only shows up as a missing colour on a
- * phone in the other theme, usually on a screen nobody looked at twice.
+ * A colour written by hand into the shell would be a second palette next to
+ * the sheet, and it would not follow the scheme the user picked.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -12,15 +12,16 @@ import { describe, expect, it } from 'vitest'
 
 const HERE = path.dirname(fileURLToPath(import.meta.url))
 const STYLES = path.resolve(HERE, '..')
-const css = fs.readFileSync(path.join(STYLES, 'tokens.css'), 'utf8')
-const DESIGN = path.resolve(STYLES, '../../../mobile-docs/design/DESIGN.md')
+const read = (name: string): string => fs.readFileSync(path.join(STYLES, name), 'utf8')
+const css = read('tokens.css')
+const code = (text: string): string => text.replace(/\/\*[\s\S]*?\*\//g, '')
 
 function block(marker: string): Map<string, string> {
   const start = css.indexOf(`/* tokens:${marker} */`)
   if (start === -1) throw new Error(`marker tokens:${marker} is missing in tokens.css`)
   const open = css.indexOf('{', start)
   const close = css.indexOf('\n}', open)
-  const body = css.slice(open + 1, close).replace(/\/\*[\s\S]*?\*\//g, '')
+  const body = code(css.slice(open + 1, close))
   const out = new Map<string, string>()
   for (const m of body.matchAll(/(--m-[a-z0-9-]+)\s*:\s*([^;]+);/g)) {
     if (out.has(m[1])) throw new Error(`${m[1]} is declared twice in tokens:${marker}`)
@@ -29,41 +30,31 @@ function block(marker: string): Map<string, string> {
   return out
 }
 
-/** "rgba(0,0,0,.55)" and "rgba(0, 0, 0, 0.55)" are the same colour. */
-function norm(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/\s+/g, '')
-    .replace(/(^|[^0-9])\.(\d)/g, '$10.$2')
-    .replace(/(\.\d*?)0+(?=[,)])/g, '$1')
-}
-
 const shared = block('shared')
-const dark = block('dark')
-const light = block('light')
+const codeTokens = block('code')
 
 describe('tokens.css', () => {
-  it('has the three blocks with content', () => {
+  it('has the shared block with content', () => {
     expect(shared.size).toBeGreaterThan(30)
-    expect(dark.size).toBeGreaterThan(20)
   })
 
-  it('dark and light define the same keys', () => {
-    expect([...light.keys()].sort()).toEqual([...dark.keys()].sort())
+  it('declares no colour: no hex, no rgb() and no light or dark palette block', () => {
+    expect(code(css)).not.toMatch(/#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/)
+    expect(css).not.toContain('tokens:dark')
+    expect(css).not.toContain('tokens:light')
+    expect(css).not.toMatch(/\.light\s*\{/)
   })
 
-  it('no theme key is also a shared key', () => {
-    expect([...dark.keys()].filter((k) => shared.has(k))).toEqual([])
-  })
-
-  it('light is scoped to the light class, dark is the default', () => {
-    expect(css).toMatch(/\/\* tokens:dark \*\/\s*html\[data-shell='mobile'\]\s*\{/)
-    expect(css).toMatch(/\/\* tokens:light \*\/\s*html\[data-shell='mobile'\]\.light\s*\{/)
+  it('the colours of a code block are roles of the sheet', () => {
+    expect([...codeTokens.keys()].sort()).toEqual(
+      ['comment', 'deleted', 'function', 'keyword', 'number', 'punct', 'string'].map((k) => `--m-code-${k}`),
+    )
+    for (const [key, value] of codeTokens) expect(value, key).toMatch(/^var\(--md-(sys|ext)-color-[a-z-]+\)$/)
   })
 
   it('every token carries the prefix --m- and nothing leaks to :root', () => {
     expect(css).not.toMatch(/:root/)
-    const names = [...css.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1])
+    const names = [...code(css).matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1])
     expect(names.filter((n) => !n.startsWith('--m-'))).toEqual([])
   })
 
@@ -76,45 +67,35 @@ describe('tokens.css', () => {
   })
 })
 
-/**
- * Where tokens.css leaves the table on purpose. Nowhere at the moment: the
- * one deviation, --m-warn as a calm grey instead of a yellow, was decided on
- * 08.10.2026 and written into the table (the app has a rule against yellow
- * notes, src/lib/hinweis.ts, and it holds on the phone too).
- */
-const DEVIATIONS: Record<string, { dark: string; light: string }> = {}
+describe('the stylesheet of the shell', () => {
+  const index = read('index.css')
 
-describe('tokens against DESIGN.md 7.1', () => {
-  const design = fs.readFileSync(DESIGN, 'utf8')
-  const rows = [...design.matchAll(/^\|\s*`(--m-[a-z0-9-]+)`\s*\|\s*`([^`]+)`\s*\|\s*`([^`]+)`\s*\|/gm)]
-
-  it('finds the colour table', () => {
-    expect(rows.length).toBeGreaterThanOrEqual(20)
+  it('loads the generated sheets before its own files', () => {
+    const order = [
+      '@aphrody/m3-tokens/m3-tokens.css',
+      '@aphrody/m3-theme/tokens.css',
+      '@aphrody/m3-theme/tailwind.css',
+      './tokens.css',
+    ].map((name) => index.indexOf(`@import '${name}'`))
+    expect(order.every((at) => at >= 0)).toBe(true)
+    expect([...order].sort((a, b) => a - b)).toEqual(order)
   })
 
-  it('every colour of the table has exactly its value in both themes', () => {
-    const wrong: string[] = []
-    for (const [, key, tableDark, tableLight] of rows) {
-      const darkValue = DEVIATIONS[key]?.dark ?? tableDark
-      const lightValue = DEVIATIONS[key]?.light ?? tableLight
-      if (!dark.has(key)) {
-        wrong.push(`${key} is missing`)
-        continue
-      }
-      if (norm(dark.get(key) ?? '') !== norm(darkValue)) wrong.push(`${key} dark: ${dark.get(key)} instead of ${darkValue}`)
-      if (norm(light.get(key) ?? '') !== norm(lightValue)) wrong.push(`${key} light: ${light.get(key)} instead of ${lightValue}`)
+  it('uses no colour palette of its own: no --m-* colour token is read anywhere', () => {
+    const legacy =
+      /var\(--m-(canvas|surface|sheet|overlay|fill|fill-2|hair|edge|t1|t2|t3|accent[a-z-]*|on-accent|cloud[a-z-]*|ok|tight|warn[a-z-]*|err[a-z-]*|scrim|scroll-hint|card-edge|segment|shadow-[a-z]+)\)/
+    for (const name of ['reset.css', 'base.css', 'components.css', '../screens/create/parts/create.css']) {
+      expect(read(name), name).not.toMatch(legacy)
     }
-    expect(wrong).toEqual([])
   })
 
-  it('the note colour is the calm grey of the table, never a yellow', () => {
-    const warn = rows.find((r) => r[1] === '--m-warn')
-    expect(warn?.[2]).toBe('#9ca3af')
-    expect(warn?.[3]).toBe('#4b5563')
-  })
-
-  it('leaves the table only where it says so', () => {
-    expect(Object.keys(DEVIATIONS)).toEqual([])
-    for (const key of Object.keys(DEVIATIONS)) expect(rows.some((r) => r[1] === key), key).toBe(true)
+  it('every colour literal left in the shell is marked as content', () => {
+    for (const name of ['reset.css', 'base.css', 'components.css', '../screens/create/parts/create.css']) {
+      const lines = read(name).split('\n')
+      const unmarked = lines.filter(
+        (line) => /#[0-9a-fA-F]{3,8}\b|rgba?\(|hsla?\(/.test(code(line)) && !line.includes('design:content'),
+      )
+      expect(unmarked, name).toEqual([])
+    }
   })
 })

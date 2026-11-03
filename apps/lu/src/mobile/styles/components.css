@@ -12,7 +12,7 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--m-r-md);
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   position: relative;
 }
 .m-ib:disabled {
@@ -26,8 +26,8 @@
   height: 16px;
   padding: 0 4px;
   border-radius: 8px;
-  background: var(--m-accent);
-  color: var(--m-on-accent);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
   font-family: var(--m-font);
   font-size: 10px;
   font-weight: 600;
@@ -44,59 +44,61 @@
   justify-content: center;
   gap: var(--m-s2);
   padding: var(--m-s2) var(--m-s4);
-  border: 1px solid var(--m-edge);
+  border: 1px solid var(--md-sys-color-outline);
   border-radius: var(--m-r-lg);
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   font-size: var(--m-text-control);
   font-weight: 500;
   line-height: 1.2;
   overflow-wrap: anywhere;
 }
 .m-app .m-btn {
-  border: 1px solid var(--m-edge);
+  border: 1px solid var(--md-sys-color-outline);
   padding: var(--m-s2) var(--m-s4);
   text-align: center;
 }
 .m-app .m-btn--primary {
-  background: var(--m-accent);
-  color: var(--m-on-accent);
-  border-color: var(--m-accent-edge);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  border-color: var(--md-sys-color-primary);
   font-weight: 600;
 }
 .m-app .m-btn--cloud {
-  background: var(--m-cloud-edge);
-  color: #ffffff;
-  border-color: var(--m-cloud-edge);
+  background: var(--md-sys-color-tertiary);
+  color: var(--md-sys-color-on-tertiary);
+  border-color: var(--md-sys-color-tertiary);
   font-weight: 600;
 }
 .m-app .m-btn--quiet {
   border-color: transparent;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-app .m-btn--link {
   border-color: transparent;
   background: none;
-  color: var(--m-accent-text);
+  color: var(--md-sys-color-primary);
   font-weight: 500;
 }
 .m-app .m-btn--danger {
-  color: var(--m-err);
-  border-color: var(--m-err);
+  color: var(--md-sys-color-error);
+  border-color: var(--md-sys-color-error);
 }
 /* "Sign in with Apple", after Apple's rules for this button: white on a dark
    page, black on a light one, the logo in front of the prescribed words, the
-   font of the system. The two colours are Apple's and no token of the shell. */
+   font of the system.
+   design:content: the two colours are Apple's brand artwork for this button,
+   prescribed by its guidelines, and no role of the scheme. */
 .m-app .m-btn--apple {
-  background: #ffffff;
-  color: #000000;
-  border-color: #ffffff;
+  background: #ffffff; /* design:content */
+  color: #000000; /* design:content */
+  border-color: #ffffff; /* design:content */
   font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
   font-weight: 600;
 }
 html[data-shell='mobile'].light .m-app .m-btn--apple {
-  background: #000000;
-  color: #ffffff;
-  border-color: #000000;
+  background: #000000; /* design:content */
+  color: #ffffff; /* design:content */
+  border-color: #000000; /* design:content */
 }
 /* U+F8FF is the Apple logo in the system font of an Apple device, the only place this button exists. */
 .m-apple-logo {
@@ -149,7 +151,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   width: 28px;
   height: 28px;
   border-width: 3px;
-  color: var(--m-accent);
+  color: var(--md-sys-color-primary);
 }
 
 /* ---------- Progress bar ---------- */
@@ -164,29 +166,29 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   flex-wrap: wrap;
   justify-content: space-between;
   gap: var(--m-s1) var(--m-s3);
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-bar {
   height: 6px;
   border-radius: 3px;
-  background: var(--m-fill-2);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 10%, transparent);
   overflow: hidden;
 }
 .m-bar > i {
   display: block;
   height: 100%;
   border-radius: 3px;
-  background: var(--m-accent);
+  background: var(--md-sys-color-primary);
   transition: width var(--m-slow) linear;
 }
 .m-bar--cloud > i {
-  background: var(--m-cloud-edge);
+  background: var(--md-sys-color-tertiary);
 }
 .m-bar--paused > i {
-  background: var(--m-t3);
+  background: var(--md-sys-color-on-surface-variant);
 }
 .m-bar--error > i {
-  background: var(--m-err);
+  background: var(--md-sys-color-error);
 }
 
 /* ---------- Segmented ---------- */
@@ -195,7 +197,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   flex-wrap: wrap;
   padding: 2px;
   gap: 2px;
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
   border-radius: var(--m-r-lg);
 }
 .m-seg-opt {
@@ -204,7 +206,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   min-width: var(--m-touch);
   padding: var(--m-s1) var(--m-s2);
   border-radius: 11px;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-control);
   font-weight: 500;
   line-height: 1.2;
@@ -232,9 +234,9 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   white-space: nowrap;
 }
 .m-seg-opt[aria-checked='true'] {
-  background: var(--m-segment);
-  color: var(--m-t1);
-  box-shadow: 0 0 0 1px var(--m-hair);
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-surface);
+  box-shadow: 0 0 0 1px var(--md-sys-color-outline-variant);
   transition: background var(--m-fast) var(--m-ease);
 }
 .m-seg-opt:disabled {
@@ -248,7 +250,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   gap: 0;
   background: none;
   border-radius: 0;
-  box-shadow: inset 0 -1px 0 var(--m-hair);
+  box-shadow: inset 0 -1px 0 var(--md-sys-color-outline-variant);
 }
 .m-seg--tabs .m-seg-opt {
   flex: 1 1 0;
@@ -256,16 +258,16 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 }
 .m-seg--tabs .m-seg-opt[aria-checked='true'] {
   background: none;
-  color: var(--m-accent-text);
+  color: var(--md-sys-color-primary);
   font-weight: 600;
-  box-shadow: inset 0 -2px 0 var(--m-accent-text);
+  box-shadow: inset 0 -2px 0 var(--md-sys-color-primary);
 }
 /* Under each other (large text): the line stands at the side of the chosen one. */
 .m-seg--tabs[data-stacked] {
-  box-shadow: inset 1px 0 0 var(--m-hair);
+  box-shadow: inset 1px 0 0 var(--md-sys-color-outline-variant);
 }
 .m-seg--tabs[data-stacked] .m-seg-opt[aria-checked='true'] {
-  box-shadow: inset 2px 0 0 var(--m-accent-text);
+  box-shadow: inset 2px 0 0 var(--md-sys-color-primary);
 }
 
 /* ---------- Chip ---------- */
@@ -290,7 +292,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   justify-content: center;
   gap: 6px;
   border-radius: var(--m-r-pill);
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-control);
   font-weight: 500;
   line-height: 1.2;
@@ -298,13 +300,13 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 }
 .m-app .m-chip {
   padding: 0 var(--m-s3);
-  border: 1px solid var(--m-hair);
+  border: 1px solid var(--md-sys-color-outline-variant);
 }
 .m-app .m-chip[aria-pressed='true'],
 .m-app .m-chip[aria-checked='true'] {
-  background: var(--m-fill-2);
-  border-color: var(--m-edge);
-  color: var(--m-t1);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 10%, transparent);
+  border-color: var(--md-sys-color-outline);
+  color: var(--md-sys-color-on-surface);
 }
 /* Status chip in the composer: looks 28 px high, its target is 44 px. */
 .m-app .m-chip--mini {
@@ -320,26 +322,26 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   gap: 6px;
   min-height: 28px;
   padding: 2px 10px;
-  border: 1px solid var(--m-hair);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-pill);
 }
 .m-chip--ok {
-  color: var(--m-ok);
+  color: var(--md-ext-color-success);
 }
 .m-app .m-chip--ok:not(.m-chip--mini),
 .m-chip--ok.m-chip--mini > span {
-  border-color: color-mix(in srgb, var(--m-ok) 45%, transparent);
+  border-color: color-mix(in srgb, var(--md-ext-color-success) 45%, transparent);
 }
 .m-chip--cloud {
-  color: var(--m-cloud);
+  color: var(--md-sys-color-tertiary);
 }
 .m-app .m-chip--cloud:not(.m-chip--mini),
 .m-chip--cloud.m-chip--mini > span {
-  border-color: color-mix(in srgb, var(--m-cloud-edge) 55%, transparent);
-  background: var(--m-cloud-soft);
+  border-color: color-mix(in srgb, var(--md-sys-color-tertiary) 55%, transparent);
+  background: var(--md-sys-color-tertiary-container);
 }
 .m-chip--warn {
-  color: var(--m-warn);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-chip:disabled {
   opacity: 0.4;
@@ -355,7 +357,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 .m-field-label {
   font-size: var(--m-text-caption);
   font-weight: 500;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-field {
   display: flex;
@@ -363,16 +365,16 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   gap: var(--m-s2);
   min-height: var(--m-touch);
   padding: 0 var(--m-s1) 0 var(--m-s3);
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
   border: 1px solid transparent;
   border-radius: var(--m-r-lg);
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-field:focus-within {
-  border-color: var(--m-accent);
+  border-color: var(--md-sys-color-primary);
 }
 .m-field[data-invalid] {
-  border-color: var(--m-err);
+  border-color: var(--md-sys-color-error);
 }
 .m-field input {
   flex: 1;
@@ -382,7 +384,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   border: 0;
   outline: 0;
   background: none;
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   /* At least 16 px, or iOS zooms on focus (DESIGN.md 7.2). */
   font-size: max(var(--m-text-body), 16px);
   /* An example that is longer than the field ends in an ellipsis, not in half a letter. */
@@ -395,7 +397,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 .m-field input::placeholder,
 .m-textarea textarea::placeholder,
 .m-composer textarea::placeholder {
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   opacity: 1;
 }
 .m-field-pad {
@@ -405,15 +407,15 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 .m-textarea {
   display: flex;
   padding: var(--m-s3);
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
   border: 1px solid transparent;
   border-radius: var(--m-r-lg);
 }
 .m-textarea:focus-within {
-  border-color: var(--m-accent);
+  border-color: var(--md-sys-color-primary);
 }
 .m-textarea[data-invalid] {
-  border-color: var(--m-err);
+  border-color: var(--md-sys-color-error);
 }
 .m-textarea textarea {
   flex: 1;
@@ -424,7 +426,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   outline: 0;
   resize: none;
   background: none;
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   font-size: max(var(--m-text-body), 16px);
   line-height: 1.45;
 }
@@ -438,11 +440,11 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 }
 .m-field-error {
   font-size: var(--m-text-caption);
-  color: var(--m-err);
+  color: var(--md-sys-color-error);
 }
 .m-field-hint {
   font-size: var(--m-text-caption);
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 /* ---------- Switch ---------- */
@@ -451,7 +453,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   width: 51px;
   height: 31px;
   border-radius: 16px;
-  background: var(--m-fill-2);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 10%, transparent);
   position: relative;
   transition: background var(--m-fast) var(--m-ease);
 }
@@ -463,21 +465,26 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   width: 27px;
   height: 27px;
   border-radius: 50%;
-  background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  background: var(--md-sys-color-outline);
+  box-shadow: var(--md-sys-elevation-level1);
   transition: left var(--m-fast) var(--m-ease);
 }
 [aria-checked='true'] > .m-sw,
 [aria-checked='true'] .m-row-end > .m-sw {
-  background: var(--m-accent);
+  background: var(--md-sys-color-primary);
 }
 [aria-checked='true'] > .m-sw::after,
 [aria-checked='true'] .m-row-end > .m-sw::after {
   left: 22px;
+  background: var(--md-sys-color-on-primary);
+}
+[aria-checked='true'] > .m-sw--cloud::after,
+[aria-checked='true'] .m-row-end > .m-sw--cloud::after {
+  background: var(--md-sys-color-on-tertiary);
 }
 [aria-checked='true'] > .m-sw--cloud,
 [aria-checked='true'] .m-row-end > .m-sw--cloud {
-  background: var(--m-cloud-edge);
+  background: var(--md-sys-color-tertiary);
 }
 /* A switch that stands alone (not inside a Row) still gets a 44 px target. */
 .m-switch {
@@ -488,7 +495,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   gap: var(--m-s2);
   font-size: var(--m-text-control);
   font-weight: 500;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-switch:disabled,
 .m-switch[aria-disabled='true'] {
@@ -496,7 +503,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 }
 .m-app .m-switch--pill {
   padding: 0 6px 0 var(--m-s3);
-  border: 1px solid var(--m-hair);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-pill);
 }
 .m-switch--pill .m-sw {
@@ -505,9 +512,9 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   margin-left: -6px;
 }
 .m-app .m-switch--pill.m-switch--cloud[aria-checked='true'] {
-  border-color: var(--m-cloud-edge);
-  background: var(--m-cloud-soft);
-  color: var(--m-cloud);
+  border-color: var(--md-sys-color-tertiary);
+  background: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-tertiary);
 }
 
 /* ---------- List, ListGroup, Row ---------- */
@@ -516,13 +523,13 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 }
 .m-group {
   margin: 0 var(--m-gutter) var(--m-s4);
-  background: var(--m-surface);
-  border: 1px solid var(--m-card-edge);
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-lg);
   overflow: hidden;
 }
 .m-sheet .m-group {
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
   border-color: transparent;
 }
 /* A flat list (ListGroup flat, round 57): no card, the rows run from edge to edge, a hairline between two rows
@@ -567,7 +574,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   top: 0;
   left: var(--m-s4);
   right: 0;
-  border-top: 1px solid var(--m-hair);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 .m-rowwrap {
   position: relative;
@@ -590,7 +597,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   margin-right: var(--m-s1);
 }
 .m-row > svg:first-child {
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-row-text {
   flex: 1 1 calc(5 * var(--m-u));
@@ -609,7 +616,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   display: block;
   font-size: var(--m-text-caption);
   line-height: 1.4;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   overflow-wrap: break-word;
 }
 .m-row-end {
@@ -623,21 +630,21 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 .m-row-val {
   min-width: 0;
   font-size: var(--m-text-control);
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   text-align: right;
   overflow-wrap: break-word;
 }
 .m-row-chev {
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   opacity: 0.7;
 }
 .m-row[aria-disabled='true'] .m-row-title,
 .m-row:disabled .m-row-title {
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-row--danger .m-row-title,
 .m-row--danger > svg:first-child {
-  color: var(--m-err);
+  color: var(--md-sys-color-error);
 }
 .m-radio {
   width: 22px;
@@ -645,12 +652,12 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   flex: none;
   display: grid;
   place-items: center;
-  border: 2px solid var(--m-edge);
+  border: 2px solid var(--md-sys-color-outline);
   border-radius: 50%;
 }
 [aria-checked='true'] > .m-radio,
 [aria-checked='true'] .m-row-end > .m-radio {
-  border-color: var(--m-accent);
+  border-color: var(--md-sys-color-primary);
 }
 [aria-checked='true'] > .m-radio::after,
 [aria-checked='true'] .m-row-end > .m-radio::after {
@@ -658,7 +665,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  background: var(--m-accent);
+  background: var(--md-sys-color-primary);
 }
 
 /* ---------- Card ---------- */
@@ -666,8 +673,8 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   margin: 0 var(--m-gutter) var(--m-s3);
   /* 12 px, as the cards of Create and the notes: a card holds its content, it does not pad it out (round 57). */
   padding: var(--m-s3);
-  background: var(--m-surface);
-  border: 1px solid var(--m-card-edge);
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-lg);
 }
 .m-card-title {
@@ -686,15 +693,15 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 .m-tag {
   padding: 2px 7px;
   border-radius: 5px;
-  background: var(--m-fill-2);
-  color: var(--m-t2);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 10%, transparent);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-label);
   font-weight: 600;
   line-height: 1.3;
 }
 .m-tag--accent {
-  background: var(--m-accent-soft);
-  color: var(--m-accent-text);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-primary);
 }
 /* The mark "Direct" (policy/DirectMark.tsx): a tag one can tap, with a target of its own. */
 .m-direct {
@@ -712,9 +719,9 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 .m-beta {
   display: inline-block;
   padding: 1px 6px;
-  border: 1px solid var(--m-card-edge);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: 5px;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-label);
   font-weight: 600;
   line-height: 1.3;
@@ -733,7 +740,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   font-size: var(--m-text-caption);
   font-weight: 500;
   line-height: 1.4;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-fit > i {
   width: 8px;
@@ -743,13 +750,13 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   background: currentColor;
 }
 .m-fit--fits {
-  color: var(--m-ok);
+  color: var(--md-ext-color-success);
 }
 .m-fit--tight {
-  color: var(--m-tight);
+  color: var(--md-sys-color-secondary);
 }
 .m-fit--too-large {
-  color: var(--m-err);
+  color: var(--md-sys-color-error);
 }
 
 /* ---------- Notice ---------- */
@@ -760,8 +767,8 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   margin: 0 var(--m-gutter) var(--m-s3);
   padding: var(--m-s2) var(--m-s3);
   border-radius: var(--m-r-lg);
-  background: var(--m-fill);
-  color: var(--m-t2);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-caption);
   line-height: 1.4;
   /* A title or a sentence may carry an address or a file name, one word without a place to break
@@ -769,24 +776,24 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   overflow-wrap: anywhere;
 }
 .m-note > svg {
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   margin-top: 1px;
 }
 .m-note--error {
-  background: var(--m-err-soft);
+  background: var(--md-sys-color-error-container);
 }
 .m-note--error > svg {
-  color: var(--m-err);
+  color: var(--md-sys-color-error);
 }
 .m-note--warn {
-  background: var(--m-warn-soft);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
 }
 .m-note--warn > svg {
-  color: var(--m-warn);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-note-title {
   display: block;
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   font-size: var(--m-text-control);
   font-weight: 600;
   line-height: 1.3;
@@ -807,13 +814,13 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   align-items: center;
   gap: 0 var(--m-s2);
   padding: var(--m-s2) var(--m-gutter);
-  background: var(--m-fill);
-  color: var(--m-t1);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
+  color: var(--md-sys-color-on-surface);
   font-size: var(--m-text-caption);
   line-height: 1.4;
 }
 .m-banner > svg {
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 /* The sentence keeps most of the line. With large text the buttons go under it instead of pressing
    it into a column of two words a line (acceptance on the small iPhone, round 5, N3). */
@@ -821,16 +828,16 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   flex-basis: 60%;
 }
 .m-banner--warn {
-  background: var(--m-warn-soft);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
 }
 .m-banner--warn > svg {
-  color: var(--m-warn);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-banner--error {
-  background: var(--m-err-soft);
+  background: var(--md-sys-color-error-container);
 }
 .m-banner--error > svg {
-  color: var(--m-err);
+  color: var(--md-sys-color-error);
 }
 /* One or two buttons at the end. They go under the text together when the line is full. */
 .m-banner-actions {
@@ -849,7 +856,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   min-height: var(--m-touch);
   min-width: var(--m-touch);
   font-weight: 600;
-  color: var(--m-accent-text);
+  color: var(--md-sys-color-primary);
 }
 .m-app .m-banner-action {
   padding: 0 var(--m-s2);
@@ -862,7 +869,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   align-items: center;
   gap: var(--m-s3);
   padding: var(--m-s8) var(--m-s6);
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   text-align: center;
 }
 .m-empty-title {
@@ -870,13 +877,13 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   font-size: var(--m-text-display);
   font-weight: 500;
   line-height: 1.2;
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   overflow-wrap: break-word;
   -webkit-hyphens: manual;
   hyphens: manual;
 }
 .m-empty-mark {
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   opacity: 0.9;
 }
 .m-empty-actions {
@@ -939,7 +946,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 .m-skel {
   display: block;
   border-radius: var(--m-r-sm);
-  background: var(--m-fill-2);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 10%, transparent);
   animation: m-skel 1200ms ease-in-out infinite;
 }
 @keyframes m-skel {
@@ -979,7 +986,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  background: var(--m-scrim);
+  background: color-mix(in oklab, var(--md-sys-color-scrim) 32%, transparent);
   pointer-events: auto;
   animation: m-fade var(--m-base) var(--m-ease);
 }
@@ -994,10 +1001,10 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   max-height: 88%;
   margin-top: var(--m-safe-top);
   padding-bottom: var(--m-bottom);
-  background: var(--m-sheet);
-  border-top: 1px solid var(--m-hair);
+  background: var(--md-sys-color-surface-container);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-xl) var(--m-r-xl) 0 0;
-  box-shadow: var(--m-shadow-sheet);
+  box-shadow: 0 -8px 32px color-mix(in oklab, var(--md-sys-color-shadow) 30%, transparent);
   animation: m-sheet-up var(--m-slow) var(--m-ease);
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1028,7 +1035,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   width: 36px;
   height: 5px;
   border-radius: 3px;
-  background: var(--m-fill-2);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 10%, transparent);
 }
 .m-sheet-hdr {
   flex: none;
@@ -1067,7 +1074,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   flex-direction: column;
   gap: var(--m-s2);
   padding: var(--m-s2) var(--m-s4) var(--m-s3);
-  border-top: 1px solid var(--m-hair);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 .m-scrim--center {
   justify-content: center;
@@ -1081,10 +1088,10 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   max-height: 100%;
   overflow-y: auto;
   padding: var(--m-s5);
-  background: var(--m-sheet);
-  border: 1px solid var(--m-hair);
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-xl);
-  box-shadow: var(--m-shadow-dialog);
+  box-shadow: var(--md-sys-elevation-level3);
   animation: m-up var(--m-base) var(--m-ease);
 }
 .m-dlg-title {
@@ -1100,7 +1107,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   margin-bottom: var(--m-s2);
 }
 .m-dlg-text {
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-control);
   overflow-wrap: anywhere;
 }
@@ -1160,11 +1167,11 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   max-width: calc(30 * var(--m-u));
   padding: var(--m-s2) var(--m-s2) var(--m-s2) var(--m-s4);
   min-height: var(--m-row);
-  background: var(--m-overlay);
-  color: var(--m-t1);
-  border: 1px solid var(--m-hair);
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-lg);
-  box-shadow: var(--m-shadow-toast);
+  box-shadow: var(--md-sys-elevation-level3);
   font-size: var(--m-text-control);
   line-height: 1.3;
   pointer-events: auto;
@@ -1192,7 +1199,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   overflow-wrap: anywhere;
 }
 .m-toast--error > svg {
-  color: var(--m-err);
+  color: var(--md-sys-color-error);
 }
 .m-toast-action {
   flex: 0 1 auto;
@@ -1202,7 +1209,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   min-height: var(--m-touch);
   min-width: var(--m-touch);
   font-weight: 600;
-  color: var(--m-accent-text);
+  color: var(--md-sys-color-primary);
 }
 .m-app .m-toast-action {
   padding: 0 var(--m-s2);
@@ -1248,10 +1255,10 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   /* The track is drawn here, 4 px high in the middle of a 44 px target. */
   background: linear-gradient(
       to right,
-      var(--m-accent) 0,
-      var(--m-accent) var(--m-slider-at, 0%),
-      var(--m-edge) var(--m-slider-at, 0%),
-      var(--m-edge) 100%
+      var(--md-sys-color-primary) 0,
+      var(--md-sys-color-primary) var(--m-slider-at, 0%),
+      var(--md-sys-color-outline) var(--m-slider-at, 0%),
+      var(--md-sys-color-outline) 100%
     )
     center / 100% 4px no-repeat;
 }
@@ -1268,23 +1275,23 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   width: 24px;
   height: 24px;
   margin-top: 10px;
-  border: 2px solid var(--m-accent);
+  border: 2px solid var(--md-sys-color-primary);
   border-radius: 50%;
-  background: var(--m-t1);
+  background: var(--md-sys-color-on-surface);
   box-shadow: none;
 }
 .m-slider input[type='range']::-moz-range-thumb {
   width: 20px;
   height: 20px;
-  border: 2px solid var(--m-accent);
+  border: 2px solid var(--md-sys-color-primary);
   border-radius: 50%;
-  background: var(--m-t1);
+  background: var(--md-sys-color-on-surface);
 }
 .m-app .m-slider input[type='range']:focus-visible {
   outline: none;
 }
 .m-slider input[type='range']:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid var(--m-accent);
+  outline: 2px solid var(--md-sys-color-primary);
   outline-offset: 2px;
 }
 .m-slider input[type='range']:disabled {
@@ -1302,8 +1309,8 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   padding: 0 var(--m-s2);
   border: 1px solid transparent;
   border-radius: var(--m-r-md);
-  background: var(--m-fill);
-  color: var(--m-t1);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
+  color: var(--md-sys-color-on-surface);
   text-align: center;
   font-family: var(--m-font-mono);
   font-size: max(var(--m-text-body), 16px);
@@ -1318,10 +1325,10 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 }
 .m-app .m-num input:focus-visible {
   outline: none;
-  border-color: var(--m-accent);
+  border-color: var(--md-sys-color-primary);
 }
 .m-ib--edge {
-  border: 1px solid var(--m-edge);
+  border: 1px solid var(--md-sys-color-outline);
 }
 /* NumberField with its visible title: title left, control right, the control under the title when both do not fit. */
 .m-numrow {
@@ -1348,7 +1355,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 .m-numrow-hint {
   font-size: var(--m-text-caption);
   line-height: 1.4;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   overflow-wrap: break-word;
 }
 .m-numrow > .m-num {
@@ -1364,7 +1371,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   align-items: center;
   gap: 6px;
   border-radius: var(--m-r-md);
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-control);
   line-height: 1.2;
 }
@@ -1376,13 +1383,13 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   height: 8px;
   flex: none;
   border-radius: 50%;
-  background: var(--m-ok);
+  background: var(--md-ext-color-success);
 }
 .m-mchip--cloud > i {
-  background: var(--m-cloud);
+  background: var(--md-sys-color-tertiary);
 }
 .m-mchip--none > i {
-  background: var(--m-t3);
+  background: var(--md-sys-color-on-surface-variant);
 }
 .m-mchip-name {
   flex: 0 1 auto;
@@ -1392,7 +1399,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   white-space: nowrap;
 }
 .m-mchip > svg {
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 
 /* ---------- Composer ---------- */
@@ -1402,12 +1409,12 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
 }
 .m-composer {
   container-type: inline-size;
-  background: var(--m-surface);
-  border: 1px solid var(--m-hair);
+  background: var(--md-sys-color-surface-container-low);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-xl);
 }
 .m-composer--cloud {
-  border-color: color-mix(in srgb, var(--m-cloud-edge) 55%, transparent);
+  border-color: color-mix(in srgb, var(--md-sys-color-tertiary) 55%, transparent);
 }
 /* The chips wrap. In one scrolling line the last one was cut at the edge ("Persona: Code E",
    acceptance on the small iPhone, N10) and nothing said that there was more.
@@ -1435,7 +1442,7 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   outline: 0;
   resize: none;
   background: none;
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   font-size: max(var(--m-text-body), 16px);
   line-height: 1.45;
 }
@@ -1461,16 +1468,16 @@ html[data-shell='mobile'].light .m-app .m-btn--apple {
   justify-content: center;
   margin-left: auto;
   border-radius: 50%;
-  background: var(--m-accent);
-  color: var(--m-on-accent);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
 }
 .m-send--stop {
-  background: var(--m-t1);
-  color: var(--m-canvas);
+  background: var(--md-sys-color-on-surface);
+  color: var(--md-sys-color-surface);
 }
 .m-send--mic {
   background: none;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-send:disabled {
   opacity: 0.4;
@@ -1568,7 +1575,7 @@ html[data-m-room] .m-app:not([data-orient='land']) .m-composer textarea {
 /* A line under the notices: without it the transcript, cut at this edge while it scrolls, looked
    as if it shone through them (acceptance on the small iPhone, N17). */
 .m-banners:not(:empty) {
-  border-bottom: 1px solid var(--m-edge);
+  border-bottom: 1px solid var(--md-sys-color-outline);
 }
 html[data-m-room] .m-banners {
   max-height: 26%;
@@ -1831,12 +1838,12 @@ html.m-kb-open[data-m-room='cramped'] .m-app .m-composer-wrap {
   z-index: 60;
   display: flex;
   flex-direction: column;
-  background: #000000;
-  color: #f3f4f6;
+  background: var(--md-sys-color-surface-container-lowest);
+  color: var(--md-sys-color-on-surface);
   padding: var(--m-safe-top) var(--m-safe-right) var(--m-safe-bottom) var(--m-safe-left);
 }
 .m-viewer .m-ib {
-  color: #f3f4f6;
+  color: var(--md-sys-color-on-surface);
 }
 .m-viewer-bar {
   flex: none;
@@ -1890,8 +1897,8 @@ html.m-kb-open[data-m-room='cramped'] .m-app .m-composer-wrap {
   align-self: flex-start;
   padding: 2px 8px;
   border-radius: var(--m-r-sm);
-  background: var(--m-accent-soft);
-  color: var(--m-accent-text);
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-primary);
 }
 .m-ph-list {
   display: flex;
@@ -1917,9 +1924,9 @@ html.m-kb-open[data-m-room='cramped'] .m-app .m-composer-wrap {
   padding: var(--m-s3);
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
   border-radius: var(--m-r-md);
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   user-select: text;
   -webkit-user-select: text;
 }
@@ -1931,7 +1938,7 @@ html.m-kb-open[data-m-room='cramped'] .m-app .m-composer-wrap {
   gap: var(--m-s3);
   padding-top: var(--m-s2);
   padding-bottom: var(--m-s3);
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   overflow-wrap: anywhere;
 }
 .m-policy-actions {
@@ -1989,11 +1996,11 @@ html.m-kb-open[data-m-room='cramped'] .m-app .m-composer-wrap {
    the two shadows, which stay at the edges (scroll). No script. */
 [data-m-scroll-hint] {
   background:
-    linear-gradient(var(--m-canvas) 40%, transparent) center top / 100% 28px no-repeat local,
-    linear-gradient(transparent, var(--m-canvas) 60%) center bottom / 100% 28px no-repeat local,
-    linear-gradient(var(--m-scroll-hint), transparent) center top / 100% 14px no-repeat scroll,
-    linear-gradient(transparent, var(--m-scroll-hint)) center bottom / 100% 14px no-repeat scroll,
-    var(--m-canvas);
+    linear-gradient(var(--md-sys-color-surface) 40%, transparent) center top / 100% 28px no-repeat local,
+    linear-gradient(transparent, var(--md-sys-color-surface) 60%) center bottom / 100% 28px no-repeat local,
+    linear-gradient(color-mix(in oklab, var(--md-sys-color-shadow) 30%, transparent), transparent) center top / 100% 14px no-repeat scroll,
+    linear-gradient(transparent, color-mix(in oklab, var(--md-sys-color-shadow) 30%, transparent)) center bottom / 100% 14px no-repeat scroll,
+    var(--md-sys-color-surface);
 }
 
 /* ---------- footer at the end of the content ---------- */
@@ -2032,9 +2039,9 @@ html.m-kb-open[data-m-room='cramped'] .m-app .m-composer-wrap {
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  color: var(--m-on-accent);
-  background: var(--m-accent);
-  box-shadow: var(--m-shadow-sheet);
+  color: var(--md-sys-color-on-primary);
+  background: var(--md-sys-color-primary);
+  box-shadow: 0 -8px 32px color-mix(in oklab, var(--md-sys-color-shadow) 30%, transparent);
 }
 /* With the keyboard open every line counts and the field with the focus has the room: there the
    button hangs over the corner as before and takes none. */
@@ -2164,19 +2171,19 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
 .m-hint {
   font-size: var(--m-text-caption);
   line-height: 1.4;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   overflow-wrap: break-word;
 }
 .m-hint--strong {
   font-size: inherit;
   line-height: inherit;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-heading {
   font-size: var(--m-text-title);
   font-weight: 600;
   line-height: 1.3;
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   overflow-wrap: break-word;
   -webkit-hyphens: manual;
   hyphens: manual;
@@ -2216,7 +2223,7 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
   display: flex;
   align-items: center;
   gap: var(--m-s2);
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-control);
   line-height: 1.3;
 }
@@ -2229,7 +2236,7 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
 }
 .m-fold-head > svg {
   flex: none;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-fold-title {
   flex: 1 1 auto;
@@ -2239,13 +2246,13 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
 .m-fold-title small {
   display: block;
   font-size: var(--m-text-caption);
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-fold-meta {
   flex: none;
   font-family: var(--m-font-mono);
   font-size: var(--m-text-mono);
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-fold-chev {
   flex: none;
@@ -2261,14 +2268,14 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
   min-width: 0;
   margin-left: 9px;
   padding: var(--m-s1) 0 var(--m-s3) var(--m-s3);
-  border-left: 2px solid var(--m-hair);
+  border-left: 2px solid var(--md-sys-color-outline-variant);
 }
 .m-fold[data-state='failed'] .m-fold-head > svg:first-child,
 .m-fold[data-state='denied'] .m-fold-head > svg:first-child {
-  color: var(--m-err);
+  color: var(--md-sys-color-error);
 }
 .m-fold[data-state='done'] .m-fold-head > svg:first-child {
-  color: var(--m-ok);
+  color: var(--md-ext-color-success);
 }
 
 /* ---------- PermissionRow ---------- */
@@ -2277,7 +2284,7 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
   flex-direction: column;
   gap: var(--m-s2);
   padding: var(--m-s3) var(--m-s4);
-  border-top: 1px solid var(--m-hair);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 .m-perm:first-child {
   border-top: 0;
@@ -2286,13 +2293,13 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
   font-size: var(--m-text-body);
   font-weight: 500;
   line-height: 1.3;
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   overflow-wrap: break-word;
 }
 .m-perm-sub {
   font-size: var(--m-text-caption);
   line-height: 1.4;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   overflow-wrap: break-word;
 }
 
@@ -2311,7 +2318,7 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
 .m-md h5,
 .m-md h6 {
   margin: var(--m-s1) 0 0;
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   font-family: var(--m-font-display);
   font-weight: 600;
   line-height: 1.25;
@@ -2356,14 +2363,14 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
 .m-md blockquote {
   margin: 0;
   padding: 2px 0 2px var(--m-s3);
-  border-left: 3px solid var(--m-hair);
-  color: var(--m-t2);
+  border-left: 3px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-md hr {
   width: 100%;
   margin: 0;
   border: 0;
-  border-top: 1px solid var(--m-hair);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
 }
 .m-md strong {
   font-weight: 600;
@@ -2376,7 +2383,7 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
 .m-md :not(pre) > code {
   padding: 1px 5px;
   border-radius: 5px;
-  background: var(--m-fill-2);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 10%, transparent);
   font-family: var(--m-font-mono);
   font-size: 0.9em;
   overflow-wrap: anywhere;
@@ -2386,7 +2393,7 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
   display: inline;
   padding: 12px 0;
   margin: -12px 0;
-  color: var(--m-accent-text);
+  color: var(--md-sys-color-primary);
   text-decoration: underline;
   text-underline-offset: 2px;
   overflow-wrap: anywhere;
@@ -2394,7 +2401,7 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
 .m-md-table {
   max-width: 100%;
   overflow-x: auto;
-  border: 1px solid var(--m-hair);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-md);
 }
 .m-md-table table {
@@ -2404,13 +2411,13 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
 .m-md-table th,
 .m-md-table td {
   padding: 6px 10px;
-  border-bottom: 1px solid var(--m-hair);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
   text-align: left;
   vertical-align: top;
   white-space: nowrap;
 }
 .m-md-table th {
-  background: var(--m-fill);
+  background: color-mix(in oklab, var(--md-sys-color-on-surface) 6%, transparent);
   font-weight: 600;
 }
 .m-md-table tr:last-child td {
@@ -2421,9 +2428,9 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
 .m-code {
   max-width: 100%;
   min-width: 0;
-  border: 1px solid var(--m-hair);
+  border: 1px solid var(--md-sys-color-outline-variant);
   border-radius: var(--m-r-lg);
-  background: var(--m-surface);
+  background: var(--md-sys-color-surface-container-low);
   overflow: hidden;
 }
 .m-code-bar {
@@ -2432,8 +2439,8 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
   align-items: center;
   gap: 0 var(--m-s1);
   padding: 0 var(--m-s1) 0 var(--m-s3);
-  border-bottom: 1px solid var(--m-hair);
-  color: var(--m-t3);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  color: var(--md-sys-color-on-surface-variant);
   font-family: var(--m-font-mono);
   font-size: var(--m-text-label);
 }
@@ -2449,7 +2456,7 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
   font-family: var(--m-font);
   font-size: var(--m-text-caption);
   font-weight: 500;
@@ -2467,7 +2474,7 @@ html[data-m-text='large'] .m-chips--wrap > .m-chip {
   font-family: var(--m-font-mono);
   font-size: var(--m-text-mono);
   line-height: 1.5;
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
   white-space: pre;
   tab-size: 2;
 }

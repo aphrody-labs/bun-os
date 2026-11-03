@@ -1,7 +1,7 @@
 import { Component, type ReactNode } from 'react'
 import { AlertCircle, RefreshCw } from 'lucide-react'
 import { log } from '../../lib/logger'
-import { forceShowWindow, resetSettingsAndReload } from '../../lib/fatal-error'
+import { bootScheme, forceShowWindow, resetSettingsAndReload } from '../../lib/fatal-error'
 import { ICON_LG } from './icon-size'
 
 interface Props {
@@ -53,26 +53,29 @@ export class ErrorBoundary extends Component<Props, State> {
       // Inline styles (not Tailwind) so it renders even if a CSS/build problem
       // is part of the failure. Reload retries; Reset clears settings/state
       // (keeps chats & knowledge) — covers a poisoned persisted store.
+      // The colours are the generated M3 sheet values (bootScheme), because
+      // the stylesheet may be the thing that failed.
       if (this.props.root) {
+        const c = bootScheme()
         const overlay: React.CSSProperties = {
           position: 'fixed', inset: 0, display: 'flex', flexDirection: 'column',
           alignItems: 'center', justifyContent: 'center', gap: 14,
-          background: '#171717', color: '#e5e5e5', padding: 24, textAlign: 'center',
+          background: c.surface, color: c.onSurface, padding: 24, textAlign: 'center',
           fontFamily: 'system-ui, -apple-system, sans-serif',
         }
         const btn: React.CSSProperties = {
           cursor: 'pointer', borderRadius: 8, padding: '8px 16px', fontSize: 13,
-          border: '1px solid rgba(255,255,255,0.15)', background: 'rgba(255,255,255,0.06)',
-          color: '#e5e5e5',
+          border: `1px solid ${c.outline}`, background: c.surfaceContainerHigh,
+          color: c.onSurface,
         }
         return (
           <div style={overlay}>
-            <AlertCircle size={28} color="#f87171" />
+            <AlertCircle size={28} color={c.error} />
             <div style={{ fontSize: 18, fontWeight: 600 }}>LU hit a problem</div>
             <div style={{
-              fontSize: 12, color: '#9ca3af', maxWidth: 560, maxHeight: 160, overflow: 'auto',
+              fontSize: 12, color: c.onSurfaceVariant, maxWidth: 560, maxHeight: 160, overflow: 'auto',
               whiteSpace: 'pre-wrap', wordBreak: 'break-word', textAlign: 'left',
-              background: 'rgba(0,0,0,0.3)', padding: 10, borderRadius: 8,
+              background: c.surfaceContainer, padding: 10, borderRadius: 8,
             }}>
               {this.state.error?.message || 'Unknown error'}
             </div>
@@ -80,7 +83,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <button style={btn} onClick={() => window.location.reload()}>Reload</button>
               <button style={btn} onClick={resetSettingsAndReload}>Reset settings &amp; reload</button>
             </div>
-            <div style={{ fontSize: 11, color: '#6b7280', maxWidth: 520 }}>
+            <div style={{ fontSize: 11, color: c.onSurfaceVariant, maxWidth: 520 }}>
               Reset clears app settings (providers, preferences) but keeps your chats &amp; knowledge.
             </div>
           </div>
@@ -88,14 +91,14 @@ export class ErrorBoundary extends Component<Props, State> {
       }
       return (
         <div className={this.props.fallbackClassName || 'flex flex-col items-center justify-center p-6 gap-3'}>
-          <AlertCircle size={ICON_LG} className="text-red-400" />
-          <p className="text-sm text-red-400 text-center">Something went wrong</p>
-          <p className="text-xs text-gray-500 text-center max-w-[200px] break-words">
+          <AlertCircle size={ICON_LG} className="text-error" />
+          <p className="text-sm text-error text-center">Something went wrong</p>
+          <p className="text-xs text-on-surface-variant text-center max-w-[200px] break-words">
             {this.state.error?.message || 'Unknown error'}
           </p>
           <button
             onClick={this.handleReset}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs bg-white/5 border border-white/10 text-gray-300 hover:bg-white/10 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs border border-outline-variant text-on-surface hover:bg-on-surface/8 transition-colors"
           >
             <RefreshCw size={12} />
             Retry

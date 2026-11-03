@@ -8,6 +8,17 @@
  * itself throw and force-shows the hidden Tauri window. The Rust force-show
  * timeout is the ultimate net; this is the fast, actionable path.
  */
+import { SHEET } from '../mobile/styles/sheet/colours.g'
+
+/**
+ * The Material 3 scheme for a screen that has to paint without the app's
+ * stylesheet (a boot throw, a render throw at the root): the generated sheet
+ * values for the scheme the html element carries.
+ */
+export function bootScheme(): (typeof SHEET)[keyof typeof SHEET] {
+  const light = typeof document !== 'undefined' && document.documentElement.classList.contains('light')
+  return light ? SHEET.light : SHEET.dark
+}
 
 /**
  * zustand-persist keys holding SETTINGS / transient state — safe to reset.
@@ -72,22 +83,23 @@ export function mountFatalError(rootEl: HTMLElement, err: unknown): void {
   // Unterdrueckung hier war folgenlos.
   try { console.error('[LU] fatal boot error', err) } catch { /* ignore */ }
   const message = err instanceof Error ? err.stack || err.message : String(err)
+  const c = bootScheme()
   const btn =
     'cursor:pointer;border-radius:8px;padding:8px 16px;font-size:13px;' +
-    'border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#e5e5e5'
+    `border:1px solid ${c.outline};background:${c.surfaceContainerHigh};color:${c.onSurface}`
   rootEl.innerHTML =
     '<div style="position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;' +
-    'justify-content:center;gap:14px;background:#171717;color:#e5e5e5;' +
+    `justify-content:center;gap:14px;background:${c.surface};color:${c.onSurface};` +
     'font-family:system-ui,-apple-system,sans-serif;padding:24px;text-align:center">' +
     '<div style="font-size:18px;font-weight:600">LU couldn’t start</div>' +
-    '<div style="font-size:12px;color:#9ca3af;max-width:560px;max-height:160px;overflow:auto;' +
-    'white-space:pre-wrap;word-break:break-word;text-align:left;background:rgba(0,0,0,0.3);' +
+    `<div style="font-size:12px;color:${c.onSurfaceVariant};max-width:560px;max-height:160px;overflow:auto;` +
+    `white-space:pre-wrap;word-break:break-word;text-align:left;background:${c.surfaceContainer};` +
     'padding:10px;border-radius:8px">' + escapeHtml(message) + '</div>' +
     '<div style="display:flex;gap:12px;margin-top:6px">' +
     '<button id="lu-fatal-reload" style="' + btn + '">Reload</button>' +
     '<button id="lu-fatal-reset" style="' + btn + '">Reset settings &amp; reload</button>' +
     '</div>' +
-    '<div style="font-size:11px;color:#6b7280;max-width:520px">Reset clears app settings ' +
+    `<div style="font-size:11px;color:${c.onSurfaceVariant};max-width:520px">Reset clears app settings ` +
     '(providers, preferences) but keeps your chats &amp; knowledge.</div>' +
     '</div>'
   document.getElementById('lu-fatal-reload')?.addEventListener('click', () => window.location.reload())

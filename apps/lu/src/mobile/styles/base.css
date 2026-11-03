@@ -13,8 +13,8 @@
   height: var(--m-vh);
   display: flex;
   flex-direction: column;
-  background: var(--m-canvas);
-  color: var(--m-t1);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
   font-family: var(--m-font);
   font-size: var(--m-text-body);
   line-height: 1.45;
@@ -98,7 +98,7 @@ html.m-kb-open .m-resume-alert .m-note {
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: var(--m-canvas);
+  background: var(--md-sys-color-surface);
 }
 .m-page[data-m-hidden] {
   visibility: hidden;
@@ -233,7 +233,7 @@ html.m-kb-open .m-resume-alert .m-note {
   font-size: min(var(--m-text-mono), calc(20px / var(--m-zoom)));
   font-weight: 400;
   line-height: 1.3;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   overflow-wrap: break-word;
 }
 .m-hdr--big {
@@ -292,8 +292,8 @@ html.m-kb-open .m-resume-alert .m-note {
   flex-direction: column;
   gap: var(--m-s2);
   padding: var(--m-s3) var(--m-s4);
-  border-top: 1px solid var(--m-hair);
-  background: var(--m-canvas);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface);
   /* A footer with progress, two buttons and the main button would take the
      whole page at 320 by 568 px and 200 percent text. It gets at most 46
      percent of the page and scrolls inside beyond that. */
@@ -310,8 +310,8 @@ html.m-kb-open .m-resume-alert .m-note {
 .m-tabbar {
   flex: none;
   display: flex;
-  background: var(--m-surface);
-  border-top: 1px solid var(--m-hair);
+  background: var(--md-sys-color-surface-container-low);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
   padding-bottom: var(--m-safe-bottom);
   padding-left: var(--m-safe-left);
   padding-right: var(--m-safe-right);
@@ -326,7 +326,7 @@ html.m-kb-open .m-resume-alert .m-note {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
   font-size: var(--m-text-tab);
   font-weight: 500;
   line-height: 1;
@@ -343,7 +343,7 @@ html.m-kb-open .m-resume-alert .m-note {
   padding-bottom: 1px;
 }
 .m-tab[aria-selected='true'] {
-  color: var(--m-t1);
+  color: var(--md-sys-color-on-surface);
 }
 .m-tab[aria-selected='true'] svg {
   stroke-width: 2;
@@ -359,7 +359,7 @@ html.m-kb-open .m-resume-alert .m-note {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: var(--m-accent);
+  background: var(--md-sys-color-primary);
 }
 
 .m-app[data-orient='land'] .m-main {
@@ -369,7 +369,7 @@ html.m-kb-open .m-resume-alert .m-note {
   flex-direction: column;
   justify-content: center;
   border-top: 0;
-  border-right: 1px solid var(--m-hair);
+  border-right: 1px solid var(--md-sys-color-outline-variant);
   width: calc(var(--m-rail) + var(--m-safe-left));
   padding: var(--m-safe-top) 0 var(--m-safe-bottom) var(--m-safe-left);
 }
@@ -399,7 +399,7 @@ html.m-kb-open .m-resume-alert .m-note {
 .m-cap {
   font-size: var(--m-text-caption);
   line-height: 1.4;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-label {
   font-size: var(--m-text-label);
@@ -407,13 +407,13 @@ html.m-kb-open .m-resume-alert .m-note {
   line-height: 1.2;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-t2 {
-  color: var(--m-t2);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-t3 {
-  color: var(--m-t3);
+  color: var(--md-sys-color-on-surface-variant);
 }
 .m-sr {
   position: absolute;

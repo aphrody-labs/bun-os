@@ -33,13 +33,14 @@ import android.os.Build
 // chosen theme, so there is no change left at all. Android 7 to 11 have no
 // such call and keep the one change described above.
 //
-// The two colours are --m-canvas of src/mobile/styles/tokens.css. The guard
-// src/mobile/platform/__tests__/start-colours.test.ts keeps them equal.
+// The two colours are the surface role (light and dark) of the generated
+// Material 3 sheet @aphrody/m3-theme. apps/lu/src/mobile/styles/sheet/generate.ts
+// writes them here; never edit them by hand (its --check gate fails on drift).
 object StartTheme {
   const val FILE = "lu_start_theme"
   const val KEY = "theme"
-  const val CANVAS_LIGHT: Int = 0xFFF3F4F6.toInt()
-  const val CANVAS_DARK: Int = 0xFF141414.toInt()
+  const val CANVAS_LIGHT: Int = 0xFFFDF7FF.toInt()
+  const val CANVAS_DARK: Int = 0xFF141218.toInt()
 
   /** `dark`, `light` or `system`. Anything else is `system`. */
   fun parse(raw: String?): String = if (raw == "dark" || raw == "light") raw else "system"

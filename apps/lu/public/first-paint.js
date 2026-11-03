@@ -8,8 +8,10 @@
 //
 // This runs before the body is parsed and before the app is loaded. It reads
 // what theme.ts will read (the preference under "lu-mobile-theme", else the
-// system) and marks <html>, so the loading screen has the ground colour of
-// the phone shell from its first frame, light or dark. The native side shows
+// system) and marks <html>; public/first-paint.css, generated from the M3
+// sheet, paints the surface role for that mark, so the loading screen has the
+// ground colour of the phone shell from its first frame, light or dark. This
+// file holds no colour of its own. The native side shows
 // the same two colours before this page exists (start screen, window, empty
 // web view; mobile-docs/r5/start.md). On a desktop it does nothing at all.
 //
@@ -44,17 +46,15 @@
     var systemDark = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)').matches : true
     var dark = pinned === 'dark' || pinned === 'light' ? pinned === 'dark' : pref === 'dark' ? true : pref === 'light' ? false : systemDark
     var root = document.documentElement
+    // The inline background index.html starts with is dropped: the mark is
+    // what first-paint.css paints, the same surface the native window has.
+    root.style.removeProperty('background')
     if (dark) {
-      // The dark canvas of the phone shell (#141414), not the dark of the
-      // desktop start (#161616): the native window behind this page has the
-      // canvas already, and nothing may change colour on the way.
       root.classList.add('lu-first-dark')
-      root.style.background = '#141414'
       return
     }
     root.classList.remove('dark')
     root.classList.add('light', 'lu-first-light')
-    root.style.background = '#f3f4f6'
   } catch (e) {
     // The dark loading screen stays. The app sets the theme a moment later either way.
   }

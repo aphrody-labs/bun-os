@@ -42,6 +42,8 @@
   },
   "dependencies": {
     "@aphrody/bun-workspace": "workspace:*",
+    "@aphrody/m3-theme": "workspace:*",
+    "@aphrody/m3-tokens": "workspace:*",
     "@pipecat-ai/client-js": "1.13.1",
     "@pipecat-ai/websocket-transport": "1.7.2",
     "@react-three/drei": "catalog:",
