@@ -42,6 +42,7 @@ pub struct Surface {
     _visual: IDCompositionVisual,
     pub w: u32,
     pub h: u32,
+    pub alpha: bool,
 }
 
 impl Device {
@@ -112,7 +113,7 @@ impl Device {
             visual.SetContent(&swap)?;
             target.SetRoot(&visual)?;
             self.dcomp.Commit()?;
-            Ok(Surface { swap, tex: self.texture(w, h)?, _target: target, _visual: visual, w, h })
+            Ok(Surface { swap, tex: self.texture(w, h)?, _target: target, _visual: visual, w, h, alpha: translucent })
         }
     }
 

@@ -4,11 +4,14 @@
 //! Alt+Tab, taskbar), keyboard/mouse/focus/resize/close go back to the host.
 //!
 //! bunos-wayland-win [--ssh HOST | --wsl [DISTRO] | --command "TRANSPORT"] [--host-bin PATH] [--backdrop B]
-//!                   [--gdi] [--vsync] [--stats] [-- APP...]
+//!                   [--glass] [--gdi] [--vsync] [--stats] [-- APP...]
 //!   --ssh HOST      run the host on HOST over OpenSSH (stdin/stdout carry the protocol)
 //!   --wsl DISTRO    run the host in a WSL distro through wsl.exe (default distro: bunos)
+//!   --host-arg A    pass A to bunos-wlhost (repeatable), e.g. --host-arg --inflight --host-arg 3
 //!   --command CMD   any program whose stdin/stdout reach a bunos-wlhost (socat to vsock/TCP, a VM console...)
-//!   --backdrop B    mica (default) | acrylic | mica-alt | none; "none" also when Windows transparency is off
+//!   --glass         translucent Linux windows show a system backdrop under their content (default: chrome only)
+//!   --backdrop B    the --glass backdrop: mica (default) | acrylic | mica-alt | none
+//!   Chrome (caption, border, corners, Mica caption) follows the design spec; BUNOS_CHROME points at it.
 
 mod gpu;
 mod window;
@@ -47,7 +50,9 @@ pub(crate) const WM_HOST: u32 = WM_APP + 1;
 pub(crate) const WM_HOST_EOF: u32 = WM_APP + 2;
 
 pub(crate) struct Options {
+    /// Backdrop under translucent content when `glass` is on (Acrylic is always used for blur-requesting clients).
     pub backdrop: Backdrop,
+    pub glass: bool,
     pub gdi: bool,
     pub vsync: bool,
     pub stats: bool,
@@ -105,8 +110,9 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
     let mut transport: Option<Vec<String>> = None;
     let mut host_bin = "bunos-wlhost".to_string();
     let mut app: Vec<String> = Vec::new();
-    let mut opts = Options { backdrop: Backdrop::Mica, gdi: false, vsync: false, stats: false };
+    let mut opts = Options { backdrop: Backdrop::Mica, glass: false, gdi: false, vsync: false, stats: false };
     let mut host_stats = false;
+    let mut host_extra: Vec<String> = Vec::new();
     let mut kind = "wsl";
     let mut target = "bunos".to_string();
     let mut it = args.into_iter();
@@ -127,6 +133,7 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
                 transport = Some(it.next().ok_or("--command needs a program")?.split_whitespace().map(String::from).collect());
             }
             "--host-bin" => host_bin = it.next().ok_or("--host-bin needs a path")?,
+            "--host-arg" => host_extra.push(it.next().ok_or("--host-arg needs a value")?),
             "--backdrop" => {
                 opts.backdrop = match it.next().as_deref() {
                     Some("acrylic") => Backdrop::Acrylic,
@@ -135,6 +142,7 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
                     _ => Backdrop::Mica,
                 }
             }
+            "--glass" => opts.glass = true,
             "--gdi" => opts.gdi = true,
             "--vsync" => opts.vsync = true,
             "--stats" => {
@@ -148,7 +156,7 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
             "-h" | "--help" => {
                 eprintln!(
                     "usage: bunos-wayland-win [--ssh HOST | --wsl [DISTRO] | --command CMD] [--host-bin PATH] \
-                     [--backdrop mica|acrylic|mica-alt|none] [--gdi] [--vsync] [--stats] [-- APP...]"
+                     [--backdrop mica|acrylic|mica-alt|none] [--glass] [--gdi] [--vsync] [--stats] [-- APP...]"
                 );
                 return Ok(());
             }
@@ -163,6 +171,7 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
     if host_stats {
         host_args.push("--stats".into());
     }
+    host_args.extend(host_extra);
     if !app.is_empty() {
         host_args.push("--".into());
         host_args.extend(app);
