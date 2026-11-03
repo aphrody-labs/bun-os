@@ -102,7 +102,7 @@ export const McpAppCard: React.FC<McpAppCardProps> = ({
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
             title={isExpanded ? "Collapse" : "Expand Fullscreen"}
-            className="flex h-7 w-7 items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-on-surface-variant hover:bg-on-surface/8 active:bg-on-surface/10 transition-colors"
           >
             <span className="material-symbols-outlined text-base">
               {isExpanded ? "close_fullscreen" : "open_in_full"}

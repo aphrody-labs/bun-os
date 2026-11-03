@@ -234,7 +234,7 @@ export function MangaReader({
           {apiPlanche && (
             <a
               href={apiPlanche}
-              className="hidden shrink-0 rounded border border-outline-variant px-1.5 py-0.5 font-mono text-[18px] font-bold uppercase tracking-wider text-on-surface/50 transition-colors hover:border-primary hover:text-primary sm:inline-block"
+              className="hidden shrink-0 rounded border border-outline-variant px-1.5 py-0.5 font-mono text-[18px] font-bold uppercase tracking-wider text-on-surface-variant transition-colors hover:bg-[color-mix(in_srgb,var(--md-sys-color-on-surface)_8%,transparent)] active:bg-[color-mix(in_srgb,var(--md-sys-color-on-surface)_10%,transparent)] sm:inline-block"
               title="Cette planche en JSON (image + transcription)"
             >
               API
@@ -398,7 +398,7 @@ export function MangaReader({
               type="button"
               aria-label="Page précédente"
               onClick={goPrevPage}
-              className="absolute top-1/2 left-3 z-10 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/85 p-2.5 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] transition-all hover:bg-primary hover:text-on-primary hover:scale-105 active:translate-y-[calc(-50%+1px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="absolute top-1/2 left-3 z-10 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/85 p-2.5 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] transition-all hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_8%,var(--md-sys-color-surface))] active:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_10%,var(--md-sys-color-surface))] hover:scale-105 active:translate-y-[calc(-50%+1px)]"
             >
               {dir === "rtl" ? <ChevronRight size={22} aria-hidden /> : <ChevronLeft size={22} aria-hidden />}
             </button>
@@ -406,7 +406,7 @@ export function MangaReader({
               type="button"
               aria-label="Page suivante"
               onClick={goNextPage}
-              className="absolute top-1/2 right-3 z-10 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/85 p-2.5 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] transition-all hover:bg-primary hover:text-on-primary hover:scale-105 active:translate-y-[calc(-50%+1px)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              className="absolute top-1/2 right-3 z-10 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/85 p-2.5 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] transition-all hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_8%,var(--md-sys-color-surface))] active:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_10%,var(--md-sys-color-surface))] hover:scale-105 active:translate-y-[calc(-50%+1px)]"
             >
               {dir === "rtl" ? <ChevronLeft size={22} aria-hidden /> : <ChevronRight size={22} aria-hidden />}
             </button>
@@ -418,7 +418,7 @@ export function MangaReader({
             // (flèches/PgUp/PgDn) — sinon la lecture verticale est inatteignable.
             // oxlint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- zone de lecture défilable au clavier : aucun rôle interactif ne la décrit, retirer tabIndex rendrait le mode vertical inatteignable au clavier
             tabIndex={0}
-            className="h-full w-full overflow-y-auto overflow-x-hidden m3-reader-scroll focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+            className="h-full w-full overflow-y-auto overflow-x-hidden m3-reader-scroll focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary"
             aria-label={`${title} — lecture verticale`}
           >
             <div
@@ -467,7 +467,7 @@ export function MangaReader({
                 className={`relative shrink-0 w-12 h-16 rounded-md overflow-hidden border-2 transition-all ${
                   current === idx
                     ? "border-primary scale-105 shadow-[0_0_12px_color-mix(in_oklab,var(--md-sys-color-primary)_40%,transparent)]"
-                    : "border-outline shadow-[2px_2px_0px_var(--md-sys-color-shadow)] hover:border-outline"
+                    : "border-outline shadow-[2px_2px_0px_var(--md-sys-color-shadow)] hover:border-on-surface"
                 }`}
               >
                 <img
@@ -511,9 +511,9 @@ export function MangaReader({
             max={total}
             key={current}
             defaultValue={current + 1}
-            className="w-20 rounded-md border-2 border-outline bg-surface px-2.5 py-1 text-center text-[18px] font-extrabold tabular-nums text-primary shadow-[2px_2px_0px_var(--md-sys-color-shadow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="w-20 rounded-md border-2 border-outline bg-surface px-2.5 py-1 text-center text-[18px] font-extrabold tabular-nums text-primary shadow-[2px_2px_0px_var(--md-sys-color-shadow)]"
           />
-          <span className="text-[18px] font-bold tabular-nums text-on-surface/70">/ {total}</span>
+          <span className="text-[18px] font-bold tabular-nums text-on-surface-variant">/ {total}</span>
           <button type="submit" className="m3-reader-btn-active !py-1 !px-3.5">
             OK
           </button>

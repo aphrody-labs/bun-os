@@ -76,7 +76,7 @@ export function GoogleSpotlightBar({
         "google-spotlight-capsule relative mx-auto flex w-full max-w-[840px] items-center gap-3",
         "rounded-[var(--gemini-corner-prompt-bar,32px)] bg-surface-container-high/90 px-5 py-3.5 backdrop-blur-xl",
         "border border-outline-variant/30 text-on-surface shadow-md3-3 transition-all duration-200",
-        "focus-within:border-primary/50 focus-within:bg-surface-container-highest/95 focus-within:shadow-md3-4",
+        "focus-within:border-primary/50 focus-within:outline-2 focus-within:outline-solid focus-within:outline-offset-2 focus-within:outline-secondary focus-within:bg-surface-container-highest/95 focus-within:shadow-md3-4",
         className,
       )}
     >
@@ -146,7 +146,6 @@ export function GoogleSpotlightBar({
             onClick={onGoogleLens}
             aria-label="Google Lens"
             title="Search with Google Lens"
-            className="hover:text-primary"
           >
             <Icon name="center_focus_strong" size={20} />
           </CircleButton>

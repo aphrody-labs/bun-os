@@ -176,10 +176,10 @@ export function GoogleDriveListView({
                   }
                 }}
                 className={clsx(
-                  "group relative flex flex-col justify-between rounded-medium border border-outline-variant/25 p-3 transition-colors cursor-pointer select-none",
+                  "group relative flex flex-col justify-between rounded-medium border border-outline-variant/25 p-3 transition-colors cursor-pointer select-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-secondary",
                   isSelected
                     ? "bg-secondary-container text-on-secondary-container border-primary"
-                    : "bg-surface-container-low hover:bg-surface-container-high",
+                    : "bg-surface-container-low hover:bg-[color-mix(in_srgb,var(--md-sys-color-on-surface)_8%,var(--md-sys-color-surface-container-low))] active:bg-[color-mix(in_srgb,var(--md-sys-color-on-surface)_10%,var(--md-sys-color-surface-container-low))]",
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -234,10 +234,10 @@ export function GoogleDriveListView({
                       }
                     }}
                     className={clsx(
-                      "group cursor-pointer border-b border-outline-variant/15 transition-colors select-none",
+                      "group cursor-pointer border-b border-outline-variant/15 transition-colors select-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:-outline-offset-2 focus-visible:outline-secondary",
                       isSelected
                         ? "bg-secondary-container/60 text-on-secondary-container"
-                        : "hover:bg-on-surface/5 active:bg-on-surface/10",
+                        : "hover:bg-on-surface/8 active:bg-on-surface/10",
                     )}
                   >
                     {/* Name + Icon + Star */}

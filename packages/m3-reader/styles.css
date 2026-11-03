@@ -38,12 +38,24 @@
   background: var(--md-sys-color-primary);
   border-color: var(--md-sys-color-primary);
 }
+.m3-reader .m3-reader-btn:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 8%, var(--md-sys-color-surface));
+}
+.m3-reader .m3-reader-btn:active:not(:disabled) {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) 10%, var(--md-sys-color-surface));
+}
+.m3-reader .m3-reader-btn-active:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) 8%, var(--md-sys-color-primary));
+}
+.m3-reader .m3-reader-btn-active:active:not(:disabled) {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) 10%, var(--md-sys-color-primary));
+}
 .m3-reader :is(button, a, input):focus-visible {
   outline: 2px solid var(--md-sys-color-secondary);
   outline-offset: 2px;
 }
 .m3-reader :is(button, a):disabled {
-  opacity: 0.45;
+  opacity: 0.38;
   cursor: default;
 }
 .m3-reader .m3-reader-scroll {

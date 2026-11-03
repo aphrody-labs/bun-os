@@ -136,7 +136,7 @@ export const A2ATaskTimeline: React.FC<A2ATaskTimelineProps> = ({
               <div
                 className={clsx(
                   "flex-1 cursor-pointer rounded-2xl border p-3 text-xs transition-all",
-                  "bg-surface-container-low hover:bg-surface-container",
+                  "bg-surface-container-low hover:bg-[color-mix(in_srgb,var(--md-sys-color-on-surface)_8%,var(--md-sys-color-surface-container-low))]",
                   isCurrent ? "border-primary shadow-sm" : "border-outline-variant/60",
                 )}
               >
@@ -148,7 +148,7 @@ export const A2ATaskTimeline: React.FC<A2ATaskTimelineProps> = ({
                     toggleExpand(step.id);
                     onSelectStep?.(step);
                   }}
-                  className="block w-full rounded-medium text-left outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                  className="block w-full rounded-medium text-left focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-secondary"
                 >
                   <span className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-1.5">

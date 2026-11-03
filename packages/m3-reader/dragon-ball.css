@@ -27,12 +27,6 @@
   transform: translate(1px, 1px);
   box-shadow: 1px 1px 0 var(--md-sys-color-shadow);
 }
-.m3-reader--dragon-ball .m3-reader-btn-active:hover {
-  background: color-mix(in srgb, var(--md-sys-color-on-primary) 8%, var(--md-sys-color-primary));
-}
-.m3-reader--dragon-ball .m3-reader-btn-active:active {
-  background: color-mix(in srgb, var(--md-sys-color-on-primary) 10%, var(--md-sys-color-primary));
-}
 .m3-reader--dragon-ball .m3-reader-badge {
   display: inline-flex;
   align-items: center;

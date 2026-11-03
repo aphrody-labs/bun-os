@@ -371,7 +371,7 @@ export function CaptionedReader({
 
   if (total === 0) {
     return (
-      <div className="m3-reader-frame flex min-h-[200px] items-center justify-center rounded-xl p-8 text-[18px] text-on-surface/50">
+      <div className="m3-reader-frame flex min-h-[200px] items-center justify-center rounded-xl p-8 text-[18px] text-on-surface-variant">
         Aucune page à afficher pour le moment.
       </div>
     );
@@ -383,7 +383,7 @@ export function CaptionedReader({
         <span className="m3-reader-badge bg-primary text-on-primary px-2 py-0.5 text-[18px] font-black">
           <span>PLANCHE {currentNum}</span>
         </span>
-        <span className="text-[18px] font-bold tabular-nums text-on-surface/60">
+        <span className="text-[18px] font-bold tabular-nums text-on-surface-variant">
           {current + 1} / {total}
         </span>
       </div>
@@ -397,9 +397,9 @@ export function CaptionedReader({
         ) : currentItem?.aDuTexte ? (
           // La planche PORTE une transcription : dire « aucune description »
           // pendant qu'elle arrive ferait croire à une lacune du corpus.
-          <p className="text-[18px] italic text-on-surface/50">Chargement de la transcription…</p>
+          <p className="text-[18px] italic text-on-surface-variant">Chargement de la transcription…</p>
         ) : (
-          <p className="text-[18px] italic text-on-surface/50">Aucune description pour cette page.</p>
+          <p className="text-[18px] italic text-on-surface-variant">Aucune description pour cette page.</p>
         )}
       </div>
     </div>
@@ -516,12 +516,12 @@ export function CaptionedReader({
                             draggable={false}
                             className="max-h-full max-w-full object-contain transition-opacity group-hover:opacity-95"
                           />
-                          <span className="pointer-events-none absolute right-3 bottom-3 rounded-md border border-outline-variant bg-surface/60 px-2 py-1 text-[18px] font-bold uppercase tracking-wider text-on-surface/70 opacity-0 transition-opacity group-hover:opacity-100">
+                          <span className="pointer-events-none absolute right-3 bottom-3 rounded-md border border-outline-variant bg-surface/60 px-2 py-1 text-[18px] font-bold uppercase tracking-wider text-on-surface-variant opacity-0 transition-opacity group-hover:opacity-100">
                             Agrandir
                           </span>
                         </button>
                       ) : (
-                        <div className="px-6 text-center text-[18px] text-on-surface/50">
+                        <div className="px-6 text-center text-[18px] text-on-surface-variant">
                           Page {item.number} — pas d&apos;image
                         </div>
                       )}
@@ -535,7 +535,7 @@ export function CaptionedReader({
                 aria-label="Page précédente"
                 onClick={goPrevPage}
                 disabled={current <= 0}
-                className="absolute top-1/2 left-2 z-10 -translate-y-1/2 rounded-full border border-outline bg-surface/60 p-3 text-on-surface transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-30"
+                className="absolute top-1/2 left-2 z-10 -translate-y-1/2 rounded-full border border-outline bg-surface/60 p-3 text-on-surface transition-colors hover:bg-[color-mix(in_srgb,var(--md-sys-color-on-surface)_8%,var(--md-sys-color-surface))] active:bg-[color-mix(in_srgb,var(--md-sys-color-on-surface)_10%,var(--md-sys-color-surface))] disabled:opacity-38"
               >
                 <ChevronLeft size={20} aria-hidden />
               </button>
@@ -544,7 +544,7 @@ export function CaptionedReader({
                 aria-label="Page suivante"
                 onClick={goNextPage}
                 disabled={current >= total - 1}
-                className="absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-full border border-outline bg-surface/60 p-3 text-on-surface transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-30"
+                className="absolute top-1/2 right-2 z-10 -translate-y-1/2 rounded-full border border-outline bg-surface/60 p-3 text-on-surface transition-colors hover:bg-[color-mix(in_srgb,var(--md-sys-color-on-surface)_8%,var(--md-sys-color-surface))] active:bg-[color-mix(in_srgb,var(--md-sys-color-on-surface)_10%,var(--md-sys-color-surface))] disabled:opacity-38"
               >
                 <ChevronRight size={20} aria-hidden />
               </button>
@@ -576,7 +576,7 @@ export function CaptionedReader({
             // route, hauteurs mesurées après coup), et une accroche
             // obligatoire se bat avec ces remesures — elle produit des sauts au
             // moment où une planche entre dans la fenêtre.
-            className="h-full w-full snap-y snap-proximity overflow-y-auto overflow-x-hidden overscroll-y-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary"
+            className="h-full w-full snap-y snap-proximity overflow-y-auto overflow-x-hidden overscroll-y-auto focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary"
             aria-label={`${title} — lecture verticale`}
           >
             <div
@@ -625,13 +625,13 @@ export function CaptionedReader({
                             className="h-auto w-full rounded-sm bg-surface object-contain shadow-[0_0_24px_color-mix(in_oklab,var(--md-sys-color-shadow)_45%,transparent)] transition-[transform,box-shadow] duration-300 ease-out will-change-transform group-hover:scale-[1.015] group-hover:shadow-[0_0_60px_color-mix(in_oklab,var(--md-sys-color-shadow)_75%,transparent)] group-focus-visible:scale-[1.015] motion-reduce:transform-none motion-reduce:transition-none"
                           />
                           {/* Appel au plein écran, révélé au survol de la planche. */}
-                          <span className="pointer-events-none absolute right-3 bottom-3 inline-flex items-center gap-1.5 rounded-md border border-outline-variant bg-surface/70 px-2.5 py-1.5 text-[18px] font-bold uppercase tracking-wider text-on-surface/80 opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
+                          <span className="pointer-events-none absolute right-3 bottom-3 inline-flex items-center gap-1.5 rounded-md border border-outline-variant bg-surface/70 px-2.5 py-1.5 text-[18px] font-bold uppercase tracking-wider text-on-surface-variant opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100">
                             <ZoomIn size={12} aria-hidden />
                             Plein écran
                           </span>
                         </button>
                       ) : (
-                        <div className="flex min-h-[120px] items-center justify-center rounded border border-dashed border-outline-variant/60 bg-surface/40 text-[18px] text-on-surface/50">
+                        <div className="flex min-h-[120px] items-center justify-center rounded border border-dashed border-outline-variant/60 bg-surface/40 text-[18px] text-on-surface-variant">
                           Pas d&apos;image pour cette page
                         </div>
                       )}
@@ -682,7 +682,7 @@ export function CaptionedReader({
                     loading="lazy"
                   />
                 ) : (
-                  <span className="flex h-full w-full items-center justify-center bg-surface-container-highest text-[18px] text-on-surface/50">
+                  <span className="flex h-full w-full items-center justify-center bg-surface-container-highest text-[18px] text-on-surface-variant">
                     txt
                   </span>
                 )}
@@ -719,7 +719,7 @@ export function CaptionedReader({
             type="number"
             key={currentNum}
             defaultValue={currentNum}
-            className="w-20 rounded-md border-2 border-outline bg-surface px-2.5 py-1 text-center text-[18px] font-extrabold tabular-nums text-primary shadow-[2px_2px_0px_var(--md-sys-color-shadow)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            className="w-20 rounded-md border-2 border-outline bg-surface px-2.5 py-1 text-center text-[18px] font-extrabold tabular-nums text-primary shadow-[2px_2px_0px_var(--md-sys-color-shadow)]"
           />
           <button type="submit" className="m3-reader-btn-active !py-1 !px-3.5">
             OK
@@ -781,7 +781,7 @@ export function CaptionedReader({
               aria-label="Page précédente"
               onClick={() => goTo(current - 1)}
               disabled={current <= 0}
-              className="absolute top-1/2 left-4 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/90 p-3 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] hover:bg-primary hover:text-on-primary transition-all disabled:opacity-30"
+              className="absolute top-1/2 left-4 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/90 p-3 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_8%,var(--md-sys-color-surface))] active:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_10%,var(--md-sys-color-surface))] transition-all disabled:opacity-38"
             >
               <ChevronLeft size={22} aria-hidden />
             </button>
@@ -790,7 +790,7 @@ export function CaptionedReader({
               aria-label="Page suivante"
               onClick={() => goTo(current + 1)}
               disabled={current >= total - 1}
-              className="absolute top-1/2 right-4 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/90 p-3 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] hover:bg-primary hover:text-on-primary transition-all disabled:opacity-30"
+              className="absolute top-1/2 right-4 -translate-y-1/2 rounded-lg border-2 border-outline bg-surface/90 p-3 text-primary shadow-[3px_3px_0px_var(--md-sys-color-shadow)] hover:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_8%,var(--md-sys-color-surface))] active:bg-[color-mix(in_srgb,var(--md-sys-color-primary)_10%,var(--md-sys-color-surface))] transition-all disabled:opacity-38"
             >
               <ChevronRight size={22} aria-hidden />
             </button>

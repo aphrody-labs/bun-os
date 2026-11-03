@@ -181,7 +181,7 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
                   "flex items-center gap-2 rounded-full px-3.5 py-1.5 text-xs font-medium transition-colors shrink-0",
                   isSelected
                     ? "bg-secondary-container text-on-secondary-container shadow-sm"
-                    : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high",
+                    : "bg-surface-container text-on-surface-variant hover:bg-[color-mix(in_srgb,var(--md-sys-color-on-surface)_8%,var(--md-sys-color-surface-container))]",
                 )}
               >
                 <span
@@ -308,7 +308,7 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
           <select
             value={composeKind}
             onChange={e => setComposeKind(e.target.value as EnvelopeKind)}
-            className="rounded-xl border border-outline-variant bg-surface-container-low px-2.5 py-1.5 text-xs font-medium text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+            className="rounded-xl border border-outline-variant bg-surface-container-low px-2.5 py-1.5 text-xs font-medium text-on-surface focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-secondary"
           >
             <option value="ask">ASK</option>
             <option value="fact">FACT</option>
@@ -322,7 +322,7 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
             placeholder="Topic (e.g. work, claim-check, verification)..."
             value={composeTopic}
             onChange={e => setComposeTopic(e.target.value)}
-            className="flex-1 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs text-on-surface placeholder-outline focus:outline-none focus:ring-1 focus:ring-primary"
+            className="flex-1 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs text-on-surface placeholder-outline focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-secondary"
           />
         </div>
 
@@ -332,7 +332,7 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
             placeholder={`Message body to @${selectedPeerId}...`}
             value={composeBody}
             onChange={e => setComposeBody(e.target.value)}
-            className="flex-1 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs text-on-surface placeholder-outline focus:outline-none focus:ring-1 focus:ring-primary"
+            className="flex-1 rounded-xl border border-outline-variant bg-surface-container-low px-3 py-1.5 text-xs text-on-surface placeholder-outline focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-offset-2 focus-visible:outline-secondary"
           />
 
           <button
@@ -341,7 +341,7 @@ export const A2APeerInspector: React.FC<A2APeerInspectorProps> = ({
             className={clsx(
               "flex items-center gap-1.5 rounded-xl px-4 py-1.5 text-xs font-semibold transition-all",
               composeTopic.trim() && composeBody.trim()
-                ? "bg-primary text-on-primary hover:opacity-90 shadow-sm"
+                ? "bg-primary text-on-primary hover:bg-[color-mix(in_srgb,var(--md-sys-color-on-primary)_8%,var(--md-sys-color-primary))] active:bg-[color-mix(in_srgb,var(--md-sys-color-on-primary)_10%,var(--md-sys-color-primary))] shadow-sm"
                 : "bg-surface-container-high text-outline cursor-not-allowed",
             )}
           >
