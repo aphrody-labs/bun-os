@@ -12,7 +12,7 @@
 _commit=ae64a4be796239a86f40de4b3cc5bd7f43866296
 pkgname=bunos-omarchy
 pkgver=4.0.0.alpha
-pkgrel=1
+pkgrel=2
 pkgdesc='Omarchy (Hyprland configs, keybindings, menus, themes, Quickshell shell) as a Bun OS desktop layer'
 arch=(any)
 url='https://github.com/aphrody-labs/omarchy'
@@ -66,7 +66,9 @@ export OMARCHY_PATH=/usr/share/omarchy
 EOF
   install -Dm644 default/fonts/omarchy/omarchy.ttf "$pkgdir/usr/share/fonts/omarchy/omarchy.ttf"
   install -Dm644 icon.png "$pkgdir/usr/share/icons/hicolor/256x256/apps/omarchy.png"
-  install -d "$pkgdir/usr/share/applications"
-  for d in applications/*.desktop; do [[ -f $d ]] && install -Dm644 "$d" "$pkgdir/usr/share/applications/${d##*/}"; done
+  # Omarchy copies its launchers into ~/.local/share/applications (install/config): some are per-user overrides of
+  # other packages' entries (foot.desktop, imv.desktop, mpv.desktop), so system-wide they would conflict with them.
+  install -d "$pkgdir/etc/skel/.local/share/applications"
+  for d in applications/*.desktop; do [[ -f $d ]] && install -Dm644 "$d" "$pkgdir/etc/skel/.local/share/applications/${d##*/}"; done
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

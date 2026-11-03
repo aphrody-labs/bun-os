@@ -15,7 +15,7 @@ cp "$kdir/bzImage" "$kdir/modules.vhdx" "$b/"
 cp "$kdir/report.json" "$b/kernel-report.json"; cp "$kdir/config" "$b/kernel.config"
 cp "$ddir/bunos-wsl.wsl" "$b/"
 cp "$repo"/factory/wsl/windows/{install.ts,latency.ts,setup-elevated.ps1,wslconfig.template,wslgconfig.template} "$b/"
-cp "$repo/factory/wsl/bunos-wsl-native.sh" "$b/"
+cp "$repo/factory/wsl/bunos-wsl-native.sh" "$repo/factory/wsl/packages.desktop" "$b/"
 # Waydroid from the aphrody-labs fork, unpacked in the distro by bunos-wsl-native.sh.
 git -C "$repo/vendor/waydroid" archive --format=tar.gz -o "$b/waydroid-src.tar.gz" HEAD
 # bunos.exe (`bunos apk ...` on Windows), cross-compiled by Bun; signed on the target by setup-elevated.ps1.

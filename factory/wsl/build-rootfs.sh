@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Build the Bun OS WSL rootfs tarball for `wsl --import`. Run as root inside archlinux:base-devel with
 # --privileged (pacstrap/arch-chroot need mount namespaces). Never run on the Windows workstation.
-# Usage: build-rootfs.sh <repo-root> <out.tar.gz>   env: BUNOS_TIER (x86-64|x86-64-v3|x86-64-v4|znver4), BUNOS_PROFILE (base|cosmic|hyprland), BUNOS_DOTNET (1 = .NET SDK + PowerShell), BUNOS_DEFAULT_SHELL (pwsh)
+# Usage: build-rootfs.sh <repo-root> <out.tar.gz>   env: BUNOS_TIER (x86-64|x86-64-v3|x86-64-v4|znver4), BUNOS_PROFILE (base|cosmic|hyprland|desktop: the [bunos-testing] sessions of packages.desktop), BUNOS_DOTNET (1 = .NET SDK + PowerShell), BUNOS_DEFAULT_SHELL (pwsh)
 set -euo pipefail
 repo=$(realpath "${1:?repo root}"); out=${2:?output tarball}
 root=$(mktemp -d /tmp/bunos-rootfs.XXXXXX)

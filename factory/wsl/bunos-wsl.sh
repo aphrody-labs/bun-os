@@ -21,6 +21,8 @@ if [[ $tier != x86-64 ]]; then
   bun /opt/bunos/factory/distro/cli.ts repo --tier "$tier" --conf /etc/pacman.conf
 fi
 pacman -Syu --noconfirm
+# The desktop profile's sessions come from [bunos-testing] (signed; set up by the one owner of that repo entry).
+[[ $profile == desktop ]] && bash /opt/bunos/factory/wsl/bunos-wsl-native.sh repo
 for list in base $([[ $profile == base ]] || echo "$profile"); do
   grep -vE '^\s*(#|$)' "/opt/bunos/factory/wsl/packages.$list" | pacman -S --needed --noconfirm -
 done
@@ -51,7 +53,8 @@ fi
 
 # User, sudo, locale, os-release, services
 echo 'en_US.UTF-8 UTF-8' >/etc/locale.gen && locale-gen && echo LANG=en_US.UTF-8 >/etc/locale.conf
-useradd -m -G wheel -s "$login_shell" bun
+# video/render: Hyprland's headless backend (bunos-session) opens the vgem node as the user.
+useradd -m -G wheel,video,render -s "$login_shell" bun
 passwd -l bun
 # The Windows user already owns this VM; passwordless wheel keeps `wsl -d` + sudo usable without an OOBE.
 echo '%wheel ALL=(ALL:ALL) NOPASSWD: ALL' >/etc/sudoers.d/10-bunos-wheel && chmod 440 /etc/sudoers.d/10-bunos-wheel

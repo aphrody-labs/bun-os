@@ -85,7 +85,7 @@ foreach ($line in Get-Content $sums) { if ($line -match '^([0-9a-f]{64})\s+\*?(.
 $layout = [ordered]@{
   'bzImage' = 'wsl\bzImage'; 'modules.vhdx' = 'wsl\modules.vhdx'; 'bunos-wsl.wsl' = 'wsl\bunos-wsl.wsl'
   'waydroid-src.tar.gz' = 'wsl\waydroid-src.tar.gz'; 'bunos-wsl-native.sh' = 'wsl\bunos-wsl-native.sh'
-  'install.ts' = 'wsl\install.ts'; 'latency.ts' = 'wsl\latency.ts'
+  'install.ts' = 'wsl\install.ts'; 'latency.ts' = 'wsl\latency.ts'; 'packages.desktop' = 'wsl\packages.desktop'
   'wslconfig.template' = 'wsl\wslconfig.template'; 'wslgconfig.template' = 'wsl\wslgconfig.template'
   'docker.exe' = 'bin\docker.exe'; 'bunos.exe' = 'bin\bunos.exe'
 }

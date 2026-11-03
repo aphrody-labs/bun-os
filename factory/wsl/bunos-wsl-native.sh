@@ -1,16 +1,44 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: Apache-2.0
 # Docker Engine and Waydroid native in the bunos WSL distro (docs/WSL.md section 8). Runs as root inside the distro,
-# idempotent. Usage: bunos-wsl-native.sh <docker|waydroid|waydroid-init|all> [waydroid-src]
+# idempotent. Usage: bunos-wsl-native.sh <repo|desktop|docker|waydroid|waydroid-init|all> [waydroid-src]
+#   repo           [bunos-testing] (https://aphrody.com/repo/bunos-testing, factory/wsl/publish-testing.sh) before the
+#                  first repository, signatures required, key aphrody-store from https://aphrody.com/repo/os/aphrody.gpg
+#   desktop        repo + the session packages of factory/wsl/packages.desktop (docs/DESKTOP-SESSIONS.md)
 #   docker         Docker Engine + buildx + compose, systemd unit enabled, API on the unix socket and on
 #                  tcp://127.0.0.1:2375 (mirrored networking shares that loopback with Windows: docker.exe talks to it)
 #   waydroid       Waydroid from the aphrody-labs fork (vendor/waydroid, default /opt/bunos/src/waydroid), its
 #                  dependencies from pacman, container unit enabled. Needs the Bun OS kernel (binderfs).
 #   waydroid-init  download and initialise the LineageOS image (VANILLA), software rendering, one WSLg window per app
 set -euo pipefail
-mode=${1:?usage: bunos-wsl-native.sh <docker|waydroid|waydroid-init|all> [waydroid-src]}
+mode=${1:?usage: bunos-wsl-native.sh <repo|desktop|docker|waydroid|waydroid-init|all> [waydroid-src]}
 src=${2:-/opt/bunos/src/waydroid}
 user=$(id -nu 1000)
+
+here=$(dirname "$(realpath "$0")")
+origin=${BUNOS_REPO_ORIGIN:-https://aphrody.com}
+
+repo_setup() {
+  # Same key as the signed Store repo /repo/os (apps/webos/store/pacman.ts); trusted locally, for these repos only.
+  curl -fsSL "$origin/repo/os/aphrody.gpg" -o /tmp/aphrody-store.gpg
+  fpr=$(gpg --show-keys --with-colons /tmp/aphrody-store.gpg | awk -F: '/^fpr/{print $10; exit}')
+  pacman-key --list-keys "$fpr" >/dev/null 2>&1 || { pacman-key --add /tmp/aphrody-store.gpg && pacman-key --lsign-key "$fpr"; } >/dev/null
+  if ! grep -qx '\[bunos-testing\]' /etc/pacman.conf; then
+    # Before the first repository: its mutter/gnome-shell/cosmic/hyprland builds come from our pinned forks.
+    awk -v o="$origin" '/^\[/ && $0 != "[options]" && !d {
+        print "[bunos-testing]"; print "SigLevel = Required"; print "Server = " o "/repo/bunos-testing/$arch"; print ""; d = 1
+      } {print}' /etc/pacman.conf >/etc/pacman.conf.new && mv /etc/pacman.conf.new /etc/pacman.conf
+  fi
+  pacman -Sy --noconfirm >/dev/null
+}
+
+desktop_setup() {
+  repo_setup
+  grep -vE '^\s*(#|$)' "${PACKAGES_DESKTOP:-$here/packages.desktop}" | pacman -S --needed --noconfirm -
+  # Hyprland's headless backend opens the vgem node (/dev/dri/card0, group video) as the session user.
+  usermod -aG video,render "$user"
+  bunos-session --list
+}
 
 latency_setup() {
   # The kernel defaults to bbr + fq (wsl-latency.config), but systemd's 50-default.conf resets default_qdisc to
@@ -72,6 +100,8 @@ PY
 }
 
 case $mode in
+  repo) repo_setup ;;
+  desktop) desktop_setup ;;
   docker) docker_setup ;;
   waydroid) waydroid_setup ;;
   waydroid-init) waydroid_init ;;

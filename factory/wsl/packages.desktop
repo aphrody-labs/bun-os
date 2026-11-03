@@ -1,0 +1,13 @@
+# Desktop sessions from [bunos-testing] (docs/DESKTOP-SESSIONS.md), installed by `bunos-wsl-native.sh desktop`
+# and by the image build with BUNOS_PROFILE=desktop. bunos-session chooses among them under WSLg.
+bunos-cli
+bunos-desktop
+bunos-design-m3
+bunos-mesa
+bunos-omarchy
+cosmic-session
+gnome-shell
+mutter-devkit
+# Hyprland/Omarchy presentation: headless Hyprland -> wayvnc on 127.0.0.1 -> wlvncc as the WSLg window.
+wayvnc
+wlvncc

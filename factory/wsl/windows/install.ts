@@ -3,7 +3,7 @@
 // Bun OS for Windows installer: our WSL2 kernel + modules VHD, the bunos-wsl distro, WSLg settings and (opt-in)
 // the bunos.sys driver package. Runs on the target Windows 11 machine with Bun; no PowerShell needed.
 //
-//   bun install.ts [--bundle <dir>] [--dest <dir>] [--no-copy] [--location <dir>] [--name bunos] [--native] [--dry-run] [--driver]
+//   bun install.ts [--bundle <dir>] [--dest <dir>] [--no-copy] [--location <dir>] [--name bunos] [--native] [--desktop] [--dry-run] [--driver]
 //
 // --dry-run prints every action and the resulting .wslconfig/.wslgconfig without touching anything (safe anywhere).
 // Without it: copies the artifacts to <dest> (default %LOCALAPPDATA%\BunOS\wsl; --no-copy when setup-elevated.ps1
@@ -11,7 +11,8 @@
 // the user's originals as *.bunos-backup, later runs never overwrite that backup), `wsl --shutdown` so the kernel
 // applies, installs the distro unless it is already registered (its ext4.vhdx lives in --location, default
 // %LOCALAPPDATA%\BunOS\wsl\<name>: per-user data, not a system file) and checks `uname -r`. --native provisions
-// Docker + Waydroid in the distro (bunos-wsl-native.sh); a docker.exe gets a `bunos` context.
+// Docker + Waydroid in the distro (bunos-wsl-native.sh); --desktop adds [bunos-testing] and the desktop sessions
+// (packages.desktop); a docker.exe gets a `bunos` context.
 // --driver adds `pnputil /add-driver bunos.inf /install` (admin + test signing: Windows 11 test VM only).
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
@@ -113,6 +114,7 @@ function args(argv: string[]) {
     location: value("--location"),
     copy: !flag("--no-copy"),
     native: flag("--native"),
+    desktop: flag("--desktop"),
     dryRun: flag("--dry-run"),
     driver: flag("--driver"),
     profile: process.env.USERPROFILE ?? process.env.HOME ?? ".",
@@ -266,6 +268,11 @@ export function main(argv = process.argv.slice(2)) {
         o.dryRun,
       ),
     );
+  }
+  // --desktop: [bunos-testing] and the desktop sessions (packages.desktop next to the script).
+  if (o.desktop && existsSync(native)) {
+    const guest = (p: string) => `/mnt/${p[0]!.toLowerCase()}/${p.slice(3).replace(/\\/g, "/")}`;
+    console.log(run([wsl, "-d", o.name, "-u", "root", "--", "bash", guest(native), "desktop"], o.dryRun));
   }
   // docker.exe (bin\ next to wsl\, or PATH) talks to dockerd on the mirrored loopback: one `bunos` context.
   const docker = [join(dirname(o.dest), "bin", "docker.exe")].find(existsSync) ?? Bun.which("docker");

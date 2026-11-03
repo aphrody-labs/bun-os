@@ -3,7 +3,7 @@
 # repository files; factory/desktop/build.sh copies them next to this PKGBUILD.
 pkgname=bunos-desktop
 pkgver=2026.11.03
-pkgrel=1
+pkgrel=2
 pkgdesc='Bun OS desktop sessions for WSLg: COSMIC, cosmic-comp, Hyprland, Omarchy and GNOME 51 from one profile source'
 arch=(any)
 url='https://github.com/aphrody-labs/bun-os'

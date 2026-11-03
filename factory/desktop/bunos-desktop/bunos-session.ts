@@ -136,6 +136,11 @@ async function seedOmarchy() {
   const src = "/usr/share/omarchy/config";
   if (!existsSync(src)) die("bunos-omarchy is not installed");
   await Bun.spawn(["cp", "-rn", `${src}/.`, `${conf}/`]).exited;
+  // Its launchers are per-user (some override other packages' entries, e.g. foot.desktop), as in Omarchy's installer.
+  const apps = join(process.env.XDG_DATA_HOME ?? join(homedir(), ".local", "share"), "applications");
+  mkdirSync(apps, { recursive: true });
+  await Bun.spawn(["sh", "-c", 'cp -n /usr/share/omarchy/applications/*.desktop "$1"/ 2>/dev/null; true', "sh", apps])
+    .exited;
 }
 
 async function choose(all: Session[]): Promise<Session> {
