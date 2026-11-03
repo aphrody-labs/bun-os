@@ -305,9 +305,72 @@ function findDebExecutable(root: string): string | null {
   return null;
 }
 
+// The Bun OS front door (git/cargo model): built-in operator commands map to their owners in the checkout, any
+// other `bunos <name>` runs the `bunos-<name>` executable found on PATH, and `run`/`detect` stay local.
+const BUILTINS: Record<string, { script: string; args?: string[]; help: string }> = {
+  fleet: { script: "infra/fleet/fleet.ts", help: "hosts, ssh-config, firewall, audit (docs/ops/FLEET.md)" },
+  promote: { script: "infra/fleet/promote.ts", help: "promote a release from vps to bunos (docs/ops/DEPLOY.md)" },
+  api: { script: "infra/fleet/api.ts", help: "render/apply the api.aphrody.com gateway (docs/ops/API.md)" },
+  services: { script: "scripts/service-map.ts", help: "regenerate the service and API matrix (docs/ops/SERVICES.md)" },
+  sync: { script: "factory/sync/bunos-sync.ts", help: "synchronise this checkout with main (docs/ops/SYNC.md)" },
+  auto: { script: "factory/automation/auto.ts", help: "automation loops (docs/ops/AUTOMATION.md)" },
+  image: { script: "factory/images/build.ts", help: "plan, fetch, build or inspect OS images (docs/ops/BUILD.md)" },
+};
+
+function checkout(): string | undefined {
+  const candidates = [Bun.env.BUNOS_REPO, join(import.meta.dir, "..", "..", "..")];
+  return candidates.find(c => c && existsSync(join(c, "infra", "fleet", "fleet.toml")));
+}
+
+async function frontDoor(cmd: string | undefined, rest: string[]): Promise<number | undefined> {
+  if (cmd === "run" || cmd === "detect") return undefined;
+  if (!cmd || cmd === "help" || cmd === "--help" || cmd === "-h") {
+    console.log("usage: bunos <command> [args]\n\nbuilt-in commands:");
+    for (const [n, b] of Object.entries(BUILTINS)) console.log(`  ${n.padEnd(10)} ${b.help}`);
+    console.log(
+      `  ${"run".padEnd(10)} run any ELF, apk, deb, exe, wasm or script\n  ${"detect".padEnd(10)} identify a file`,
+    );
+    console.log("\nany other command runs `bunos-<command>` from PATH.");
+    return 0;
+  }
+  if (cmd === "version" || cmd === "--version") {
+    const repo = checkout();
+    const version = repo
+      ? ((await Bun.file(join(repo, "package.json")).json()) as { version: string }).version
+      : "unknown";
+    const commit = repo
+      ? Bun.spawnSync(["git", "-C", repo, "rev-parse", "--short", "HEAD"]).stdout.toString().trim()
+      : "";
+    console.log(`bunos ${version}${commit ? ` (${commit})` : ""}`);
+    return 0;
+  }
+  const builtin = BUILTINS[cmd];
+  if (builtin) {
+    const repo = checkout();
+    if (!repo) {
+      console.error("bunos: no Bun OS checkout found (set BUNOS_REPO)");
+      return 2;
+    }
+    const proc = Bun.spawn([process.execPath, join(repo, builtin.script), ...rest], {
+      cwd: repo,
+      stdio: ["inherit", "inherit", "inherit"],
+    });
+    return await proc.exited;
+  }
+  const external = Bun.which(`bunos-${cmd}`);
+  if (external) {
+    const proc = Bun.spawn([external, ...rest], { stdio: ["inherit", "inherit", "inherit"] });
+    return await proc.exited;
+  }
+  console.error(`bunos: unknown command '${cmd}' (no built-in and no bunos-${cmd} on PATH); see bunos help`);
+  return 2;
+}
+
 if (import.meta.main) {
   const argv = process.argv.slice(2);
   const cmd = argv.shift();
+  const routed = await frontDoor(cmd, argv);
+  if (routed !== undefined) process.exit(routed);
   const flag = (n: string) => {
     const i = argv.indexOf(n);
     if (i < 0) return false;
