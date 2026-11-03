@@ -1,0 +1,38 @@
+# Bun OS desktop layer: the session chooser (bunos-session), the theme switch (bunos-theme), the session manifest
+# generated from crates/bunos-win11/src/desktop.rs and one wayland-sessions entry per desktop. Sources are the
+# repository files; factory/desktop/build.sh copies them next to this PKGBUILD.
+pkgname=bunos-desktop
+pkgver=2026.11.03
+pkgrel=1
+pkgdesc='Bun OS desktop sessions for WSLg: COSMIC, cosmic-comp, Hyprland, Omarchy and GNOME 51 from one profile source'
+arch=(any)
+url='https://github.com/aphrody-labs/bun-os'
+license=('Apache-2.0' 'MIT')
+# bun itself is part of the distro base (factory/wsl/bunos-wsl.sh installs the pinned canary as /usr/bin/bun).
+depends=('dbus' 'xorg-xwayland')
+optdepends=(
+  'bunos-omarchy: Omarchy session (Hyprland + Omarchy configs, menus and themes)'
+  'cosmic-session: COSMIC session'
+  'gnome-shell: GNOME 51 session (with mutter-devkit for the WSLg viewer)'
+  'mutter-devkit: viewer window of the GNOME session'
+  'hyprland: Hyprland session'
+  'hyprland-plugin-hyprbars: window title bars on Hyprland'
+  'wayvnc: serves the headless Hyprland output on loopback'
+  'wlvncc: WSLg window of the Hyprland/Omarchy sessions'
+)
+source=(bunos-session.ts bunos-theme.ts sessions.json)
+b2sums=('SKIP' 'SKIP' 'SKIP')
+
+package() {
+  install -Dm755 bunos-session.ts "$pkgdir/usr/bin/bunos-session"
+  install -Dm755 bunos-theme.ts "$pkgdir/usr/bin/bunos-theme"
+  install -Dm644 sessions.json "$pkgdir/usr/share/bunos/desktop/sessions.json"
+  # Display-manager entries (a native Bun OS install); under WSLg the user runs bunos-session directly.
+  local ids
+  ids=$(sed -n 's/^ *"id": "\([^"]*\)".*/\1/p' sessions.json)
+  for id in $ids; do
+    install -d "$pkgdir/usr/share/wayland-sessions"
+    printf '[Desktop Entry]\nName=Bun OS: %s\nExec=bunos-session %s\nType=Application\nDesktopNames=%s\n' \
+      "$id" "$id" "$id" >"$pkgdir/usr/share/wayland-sessions/bunos-$id.desktop"
+  done
+}

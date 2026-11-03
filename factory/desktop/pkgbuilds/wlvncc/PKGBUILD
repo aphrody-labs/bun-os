@@ -1,0 +1,30 @@
+# Bun OS: wlvncc, the Wayland-native VNC viewer by the wayvnc author (any1/wlvncc; ISC, with GPL-2.0-or-later libvncclient code), built from the pinned
+# aphrody-labs fork. It is the WSLg window of the headless Hyprland/Omarchy sessions (docs/DESKTOP-SESSIONS.md).
+# vendor: vendor/wlvncc -> _commit
+_commit=cc0abf87c37920540f2439a556e6a480c28f8f46
+pkgname=wlvncc
+pkgver=0
+pkgrel=1
+pkgdesc='Wayland native VNC client (Bun OS build)'
+arch=(x86_64)
+url='https://github.com/aphrody-labs/wlvncc'
+license=('ISC' 'GPL-2.0-or-later')
+depends=('aml' 'ffmpeg' 'libdrm' 'libglvnd' 'libxkbcommon' 'mesa' 'pixman' 'wayland' 'gnutls' 'libgcrypt' 'libjpeg-turbo' 'libpng' 'lzo' 'zlib' 'openssl')
+makedepends=('git' 'meson' 'wayland-protocols')
+source=("wlvncc::git+https://github.com/aphrody-labs/wlvncc.git#commit=${_commit}")
+b2sums=('SKIP')
+
+pkgver() {
+  cd wlvncc
+  printf 'r%s.%s' "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+}
+
+build() {
+  arch-meson wlvncc build
+  meson compile -C build
+}
+
+package() {
+  meson install -C build --destdir "$pkgdir"
+  install -Dm644 -t "$pkgdir/usr/share/licenses/$pkgname/" wlvncc/COPYING wlvncc/COPYING.GPL
+}

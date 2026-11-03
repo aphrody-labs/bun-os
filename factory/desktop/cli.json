@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "note": "The bunos-cli stack: Rust CLIs built from the pinned aphrody-labs forks under vendor/ (the gitlink is the pin). Same picks as the native Windows userland (factory/windows/userland/tools.json) plus the Linux-only session tools. Checked current and maintained on 2026-11-03 (upstream release / last push). `bun factory/desktop/pkgbuilds.ts` writes factory/desktop/pkgbuilds/<pkg>/PKGBUILD from this file.",
+  "tools": [
+    { "pkg": "uutils-coreutils", "vendor": "vendor/uutils/coreutils", "license": "MIT", "desc": "Rust coreutils (uutils), multicall, uu- prefixed beside GNU coreutils", "release": "0.12.0 (2026-09-17)",
+      "build": "make PROFILE=release MULTICALL=y", "install": "make install DESTDIR=\"$pkgdir\" PREFIX=/usr PROG_PREFIX=uu- PROFILE=release MULTICALL=y MANDIR=/share/man/man1" },
+    { "pkg": "nushell", "vendor": "vendor/nushell", "license": "MIT", "desc": "Nushell, the Bun OS default shell", "release": "0.116.1 (2026-10-04)", "bins": ["nu"], "depends": ["openssl"], "cargo": "--features=default" },
+    { "pkg": "rio", "vendor": "vendor/rio", "license": "MIT", "desc": "Rio terminal (WebGPU/wgpu), the Bun OS terminal", "release": "v0.5.29 (2026-11-01)", "bins": ["rio"], "cargo": "-p rioterm", "depends": ["fontconfig", "freetype2", "libxkbcommon", "wayland", "vulkan-icd-loader"], "makedepends": ["cmake"] },
+    { "pkg": "helix", "vendor": "vendor/helix", "license": "MPL-2.0", "desc": "Helix modal editor (grammars: hx --grammar fetch && hx --grammar build)", "release": "25.07.1 (2025-07-18; master active 2026-09)", "bins": ["hx"], "env": "HELIX_DISABLE_AUTO_GRAMMAR_BUILD=1 HELIX_DEFAULT_RUNTIME=/usr/lib/helix/runtime", "extra": "install -d \"$pkgdir/usr/lib/helix\" && cp -r runtime \"$pkgdir/usr/lib/helix/\" && rm -rf \"$pkgdir/usr/lib/helix/runtime/grammars/sources\"" },
+    { "pkg": "ripgrep", "vendor": "vendor/ripgrep", "license": "MIT OR Unlicense", "desc": "ripgrep (rg)", "release": "15.2.0 (2026-07-15)", "bins": ["rg"], "cargo": "--features pcre2", "depends": ["pcre2"] },
+    { "pkg": "fd", "vendor": "vendor/fd", "license": "MIT OR Apache-2.0", "desc": "fd, a fast find", "release": "v10.5.0 (2026-08-26)", "bins": ["fd"] },
+    { "pkg": "sd", "vendor": "vendor/sd", "license": "MIT", "desc": "sd, intuitive find and replace", "release": "v1.1.0 (2026-02-25)", "bins": ["sd"] },
+    { "pkg": "bat", "vendor": "vendor/bat", "license": "MIT OR Apache-2.0", "desc": "bat, cat with syntax highlighting", "release": "v0.26.1 (2025-12-02; master active 2026-11)", "bins": ["bat"] },
+    { "pkg": "eza", "vendor": "vendor/eza", "license": "EUPL-1.2", "desc": "eza, a modern ls", "release": "v0.23.5 (2026-07-09)", "bins": ["eza"] },
+    { "pkg": "dust", "vendor": "vendor/du-dust", "license": "Apache-2.0", "desc": "dust, du in Rust", "release": "v1.2.7 (2026-11-01)", "bins": ["dust"] },
+    { "pkg": "procs", "vendor": "vendor/procs", "license": "MIT", "desc": "procs, a modern ps", "release": "v0.14.12 (2026-06-25)", "bins": ["procs"] },
+    { "pkg": "zoxide", "vendor": "vendor/zoxide", "license": "MIT", "desc": "zoxide, a smarter cd", "release": "v0.10.0 (2026-07-04)", "bins": ["zoxide"] },
+    { "pkg": "atuin", "vendor": "vendor/atuin", "license": "MIT", "desc": "atuin, synced shell history", "release": "v18.24.4 (2026-10-30)", "bins": ["atuin"], "cargo": "-p atuin", "makedepends": ["protobuf"] },
+    { "pkg": "starship", "vendor": "vendor/starship", "license": "ISC", "desc": "starship prompt", "release": "v1.27.0 (2026-10-17)", "bins": ["starship"], "makedepends": ["cmake"] },
+    { "pkg": "yazi", "vendor": "vendor/yazi", "license": "MIT", "desc": "yazi file manager", "release": "v26.9.1 (2026-09-01)", "bins": ["yazi", "ya"], "cargo": "-p yazi-fm -p yazi-cli", "env": "YAZI_GEN_COMPLETIONS=0" },
+    { "pkg": "bottom", "vendor": "vendor/bottom", "license": "MIT", "desc": "bottom (btm) system monitor", "release": "0.15.0 (2026-11-01)", "bins": ["btm"] },
+    { "pkg": "zellij", "vendor": "vendor/zellij", "license": "MIT", "desc": "zellij terminal workspace", "release": "v0.45.1 (2026-08-28)", "bins": ["zellij"], "depends": ["curl"], "makedepends": ["perl"] },
+    { "pkg": "xh", "vendor": "vendor/xh", "license": "MIT", "desc": "xh, HTTP client", "release": "v0.26.3 (2026-10-21)", "bins": ["xh"] },
+    { "pkg": "ouch", "vendor": "vendor/ouch", "license": "MIT", "desc": "ouch, compress and decompress", "release": "0.8.3 (2026-09-13)", "bins": ["ouch"], "makedepends": ["clang"] },
+    { "pkg": "just", "vendor": "vendor/just", "license": "CC0-1.0", "desc": "just command runner", "release": "1.59.0 (2026-10-15)", "bins": ["just"] },
+    { "pkg": "hyperfine", "vendor": "vendor/hyperfine", "license": "MIT OR Apache-2.0", "desc": "hyperfine benchmarking", "release": "v2.0.0 (2026-10-07)", "bins": ["hyperfine"] },
+    { "pkg": "tokei", "vendor": "vendor/tokei", "license": "MIT OR Apache-2.0", "desc": "tokei, code statistics", "release": "v15.0.0 (2026-09-06)", "bins": ["tokei"] },
+    { "pkg": "git-delta", "vendor": "vendor/delta", "license": "MIT", "desc": "delta, a syntax-highlighting pager for git", "release": "0.20.1 (2026-10-04)", "bins": ["delta"], "depends": ["libgit2", "oniguruma"] },
+    { "pkg": "gitui", "vendor": "vendor/gitui", "license": "MIT", "desc": "gitui, terminal UI for git", "release": "v0.28.1 (2026-03-24; master active 2026-10)", "bins": ["gitui"], "makedepends": ["cmake", "perl"] }
+  ]
+}

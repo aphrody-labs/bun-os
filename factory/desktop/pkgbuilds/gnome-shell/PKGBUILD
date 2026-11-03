@@ -1,0 +1,146 @@
+# Bun OS: Arch's recipe (gitlab.archlinux.org/archlinux/packaging/packages/gnome-shell @ 2e447ea06429, 0BSD) with the
+# source moved to the pinned aphrody-labs fork. Contributors of the Arch recipe are kept below.
+# vendor: vendor/gnome/gnome-shell -> _commit
+_commit=33da06854e229c256afd5872fedd83c28cbfa176
+# Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
+# Maintainer: Fabian Bornschein <fabiscafe@archlinux.org>
+# Contributor: Ionut Biru <ibiru@archlinux.org>
+# Contributor: Flamelab <panosfilip@gmail.com
+
+pkgbase=gnome-shell
+pkgname=(
+  gnome-shell
+  gnome-shell-docs
+)
+pkgver=51.1
+pkgrel=1.1
+epoch=1
+pkgdesc="Next generation desktop shell"
+url="https://gitlab.gnome.org/GNOME/gnome-shell"
+arch=(x86_64)
+license=(GPL-3.0-or-later)
+depends=(
+  accountsservice
+  at-spi2-core
+  bash
+  cairo
+  dconf
+  gcr-4
+  gdk-pixbuf2
+  gjs
+  glib2
+  glibc
+  gnome-autoar
+  gnome-desktop-4
+  gnome-session
+  gnome-settings-daemon
+  graphene
+  gsettings-desktop-schemas
+  gtk4
+  hicolor-icon-theme
+  ibus
+  json-glib
+  libadwaita
+  libcanberra-pulse
+  libgcc
+  libgdm
+  libglvnd
+  libgweather-4
+  libibus
+  libical
+  libnm
+  libnma-gtk4
+  libpipewire
+  libpulse
+  libsecret
+  libsoup3
+  libx11
+  libxext
+  libxfixes
+  mutter
+  pango
+  polkit
+  systemd-libs
+  unzip
+  upower
+  webkitgtk-6.0
+)
+makedepends=(
+  asciidoc
+  bash-completion
+  evolution-data-server
+  gi-docgen
+  git
+  glib2-devel
+  gnome-keybindings
+  gobject-introspection
+  meson
+  python-docutils
+  sassc
+)
+source=(
+  # GNOME Shell tags use SSH signatures which makepkg doesn't understand
+  "gnome-shell::git+https://github.com/aphrody-labs/gnome-shell.git#commit=${_commit}"
+  "git+https://gitlab.gnome.org/GNOME/libgnome-volume-control.git#commit=0a4eda0cdc2deb352bebc70ec697c42af46094e4"
+  "git+https://github.com/ptomato/jasmine-gjs.git#commit=856465dddbd92e82e574891e1ebc79e17d7b708a"
+  "git+https://gitlab.gnome.org/GNOME/libshew.git#commit=d16afc40412b565d2bbecf80335f54a19a978009"
+)
+b2sums=('SKIP'
+        'b3ff7babceb21522cbdc8f2d11b00fe7c83a820250629f79831b42c4802613aa116a0df58038c76d9948c452c27cd47eca7a0172f06800df571c90f8671c0b6c'
+        'ecbbb9ce5895cc1caed2ddef39c70b4768d78ea0a929ea932d4149f923f92650973cdaefc2aacc9063f2ccf4ec965b57a9698a286f9a6561e39ce2e579ae4522'
+        '7b39ef786d0af34f207c36c078fda5410848a5eceb84509b145184be1dbb994aeb3ffa70cb3de363a8460d59c140aafbdee8f74312cf2971a80cc5d485f1b829')
+
+prepare() {
+  # Inject gvc
+  ln -s libgnome-volume-control gvc
+
+  cd $pkgbase
+}
+
+build() {
+  local meson_options=(
+    -D gtk_doc=true
+    -D tests=false
+  )
+
+  CFLAGS="${CFLAGS/-O2/-O3} -fno-semantic-interposition"
+  LDFLAGS+=" -Wl,-Bsymbolic-functions"
+
+  # Inject subprojects
+  export MESON_PACKAGE_CACHE_DIR="$srcdir"
+
+  arch-meson $pkgbase build "${meson_options[@]}"
+  meson compile -C build
+}
+
+package_gnome-shell() {
+  depends+=(libmutter-51.so)
+  optdepends=(
+    'evolution-data-server: Evolution calendar integration'
+    'gnome-bluetooth-3.0: Bluetooth support'
+    'gnome-control-center: System settings'
+    'gnome-disk-utility: Mount with keyfiles'
+    'gnome-extensions-app: Manage gnome-shell extensions'
+    'gst-plugin-pipewire: Screen recording'
+    'gst-plugins-good: Screen recording'
+    'power-profiles-daemon: Power profile switching'
+    'python-gobject: gnome-shell-test-tool performance tester'
+    'python-simplejson: gnome-shell-test-tool performance tester'
+    'switcheroo-control: Multi-GPU support'
+  )
+  groups=(gnome)
+
+  meson install -C build --no-rebuild --destdir "$pkgdir"
+
+  mkdir -p doc/usr/share
+  mv {"$pkgdir",doc}/usr/share/doc
+}
+
+package_gnome-shell-docs() {
+  pkgdesc+=" (API documentation)"
+  depends=()
+
+  mv doc/* "$pkgdir"
+}
+
+# vim:set sw=2 sts=-1 et:

@@ -65,6 +65,9 @@ enum Command {
     Desktop {
         /// A profile id to describe (cosmic, cosmic-comp, hyprland, omarchy, gnome, windows-mac).
         name: Option<String>,
+        /// Print the session manifest (factory/desktop/sessions.json) instead.
+        #[arg(long)]
+        json: bool,
     },
     /// Build a debloated Windows 11 ISO from an official ISO (offline target).
     Iso(IsoArgs),
@@ -135,7 +138,14 @@ fn main() -> Result<()> {
         Command::Apply { profile, plan, yes } => apply(&profile, plan.as_deref(), yes),
         Command::Verify { journal } => verify(journal.as_deref()),
         Command::Undo { journal } => undo(journal.as_deref()),
-        Command::Desktop { name } => desktop_cmd(name.as_deref()),
+        Command::Desktop { name, json } => {
+            if json {
+                print!("{}", desktop::manifest_json());
+                Ok(())
+            } else {
+                desktop_cmd(name.as_deref())
+            }
+        }
         Command::Iso(args) => iso::build(&args),
     }
 }

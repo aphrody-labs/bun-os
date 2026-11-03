@@ -5,9 +5,14 @@
 //! - the Linux desktops (`cosmic`, `cosmic-comp`, `hyprland`, `omarchy`, `gnome`) run from the Bun OS WSL bundle
 //!   through WSLg, appearing as native Windows windows. This crate owns the profile wiring and the per-desktop
 //!   package lists for the Bun OS Arch-style pacman repos; another member owns the WSL kernel/WSLg bundle, reached
-//!   only through the documented interface in [`WslDesktop`].
+//!   only through the documented interface in docs/WSL.md.
 //! - `windows-mac` is the native path: the macOS-style window chrome, dock, Rust tiling WM (GlazeWM, vendored) and
 //!   the Rust wallpaper engine, all running on Windows itself.
+//!
+//! This enum is the single desktop profile source: the Linux session chooser (`bunos-session`, package
+//! `bunos-desktop`) reads `factory/desktop/sessions.json`, which `bunos-win11 desktop --json` writes from here and a
+//! test keeps identical. How each session reaches the Windows desktop under WSLg, and why, is in
+//! docs/DESKTOP-SESSIONS.md.
 //!
 //! Nothing here starts WSL or registers a live shell; the wiring is emitted as a launch plan the user runs.
 
@@ -22,9 +27,9 @@ pub enum Desktop {
     CosmicComp,
     /// Hyprland dynamic tiling Wayland compositor.
     Hyprland,
-    /// Omarchy (our try-omarchy-windows fork): Hyprland + Omarchy dotfiles and tooling.
+    /// Omarchy (vendor/omarchy, package `bunos-omarchy`): Hyprland + Omarchy configs, keybindings, menus, themes.
     Omarchy,
-    /// GNOME 51 Shell (Mutter Wayland).
+    /// GNOME 51 Shell (Mutter Wayland; 51.1 released 2026-10).
     Gnome,
     /// Native Windows: macOS-style chrome + dock + GlazeWM + Rust wallpaper engine.
     WindowsMac,
@@ -69,30 +74,32 @@ impl Desktop {
             Self::Cosmic => "COSMIC desktop (Pop!_OS, via WSLg)",
             Self::CosmicComp => "cosmic-comp compositor only (via WSLg)",
             Self::Hyprland => "Hyprland (via WSLg)",
-            Self::Omarchy => "Omarchy — Hyprland + dotfiles (via WSLg)",
+            Self::Omarchy => "Omarchy: Hyprland + Omarchy configs, menus and themes (via WSLg)",
             Self::Gnome => "GNOME 51 (via WSLg)",
             Self::WindowsMac => "Windows, macOS-style (native: chrome + dock + GlazeWM + wallpaper engine)",
         }
     }
 
     /// Bun OS pacman packages the profile needs in the WSL guest (empty for the native profile). Names match the
-    /// Bun OS Arch-style repos; upstreams live under `vendor/` as pinned forks built from source.
+    /// Bun OS Arch-style repos; upstreams live under `vendor/` as pinned forks built from source
+    /// (factory/desktop/pkgbuilds). Every Linux profile also pulls `bunos-desktop` (chooser, theme) and `bunos-cli`.
     #[must_use]
     pub fn packages(self) -> &'static [&'static str] {
         match self {
             Self::Cosmic => &[
-                "cosmic-session", "cosmic-comp", "cosmic-panel", "cosmic-launcher", "cosmic-settings",
-                "cosmic-files", "cosmic-term", "cosmic-greeter", "xdg-desktop-portal-cosmic",
+                "bunos-desktop", "bunos-cli", "cosmic-session", "cosmic-comp", "cosmic-panel", "cosmic-launcher",
+                "cosmic-settings", "cosmic-files", "cosmic-term", "xdg-desktop-portal-cosmic",
             ],
-            Self::CosmicComp => &["cosmic-comp", "cosmic-session"],
+            Self::CosmicComp => &["bunos-desktop", "bunos-cli", "cosmic-comp"],
             Self::Hyprland => &[
-                "hyprland", "waybar", "wofi", "mako", "kitty", "xdg-desktop-portal-hyprland", "hyprpaper",
+                "bunos-desktop", "bunos-cli", "hyprland", "xdg-desktop-portal-hyprland", "waybar", "mako", "wayvnc",
+                "wlvncc",
             ],
-            Self::Omarchy => &[
-                "omarchy", "hyprland", "waybar", "walker", "mako", "alacritty", "hyprpaper",
-                "xdg-desktop-portal-hyprland",
+            Self::Omarchy => &["bunos-desktop", "bunos-cli", "bunos-omarchy", "hyprland", "wayvnc", "wlvncc"],
+            Self::Gnome => &[
+                "bunos-desktop", "bunos-cli", "gnome-shell", "mutter", "gnome-session", "gnome-control-center",
+                "nautilus", "xdg-desktop-portal-gnome",
             ],
-            Self::Gnome => &["gnome-shell", "gnome-session", "mutter", "gnome-control-center", "nautilus", "gnome-terminal"],
             Self::WindowsMac => &[],
         }
     }
@@ -101,24 +108,78 @@ impl Desktop {
     #[must_use]
     pub fn vendored(self) -> &'static [&'static str] {
         match self {
-            Self::Cosmic | Self::CosmicComp => &["vendor/cosmic-epoch", "vendor/pop-os"],
+            Self::Cosmic | Self::CosmicComp => &["vendor/cosmic-epoch"],
             Self::Hyprland => &["vendor/hyprland"],
-            Self::Omarchy => &["vendor/omarchy-windows", "vendor/omarchy", "vendor/hyprland"],
-            Self::Gnome => &[],
+            Self::Omarchy => &["vendor/omarchy", "vendor/omarchy-windows", "vendor/hyprland"],
+            Self::Gnome => &["vendor/gnome/mutter", "vendor/gnome/gnome-shell"],
             Self::WindowsMac => &["vendor/glazewm", "crates/bunos-win11-chrome", "crates/bunos-win11-wallpaper"],
         }
     }
 
+    /// How the session's output reaches Windows under WSLg. `None` for the native profile.
+    #[must_use]
+    pub fn presentation(self) -> Option<Presentation> {
+        match self {
+            Self::Cosmic | Self::CosmicComp => Some(Presentation::NestedWindow),
+            Self::Gnome => Some(Presentation::DevkitViewer),
+            Self::Hyprland | Self::Omarchy => Some(Presentation::HeadlessViewer),
+            Self::WindowsMac => None,
+        }
+    }
+
+    /// Environment the session starts with, on top of WSLg's (`WAYLAND_DISPLAY=wayland-0`, `DISPLAY=:0`). An empty
+    /// value unsets the variable.
+    #[must_use]
+    pub fn env(self) -> &'static [(&'static str, &'static str)] {
+        match self {
+            // cosmic-comp src/backend/mod.rs: COSMIC_BACKEND=winit skips the x11 backend, which needs DRI3/GBM and
+            // a DRM node that WSL does not have; winit opens one WSLg window and renders through Mesa d3d12.
+            Self::Cosmic | Self::CosmicComp => &[("COSMIC_BACKEND", "winit"), ("XDG_CURRENT_DESKTOP", "COSMIC")],
+            // Aquamarine's Wayland backend refuses WSLg's Weston (no dmabuf, old xdg_wm_base/wl_seat; docs/WSLG.md),
+            // so Hyprland runs on its headless backend (no WAYLAND_DISPLAY, no seat) on the vgem render node with
+            // software GL, as in the WSLg fork's hyprland-headless mode.
+            Self::Hyprland | Self::Omarchy => &[
+                ("WAYLAND_DISPLAY", ""),
+                ("LIBSEAT_BACKEND", "noop"),
+                ("XDG_CURRENT_DESKTOP", "Hyprland"),
+                ("XDG_SESSION_DESKTOP", "Hyprland"),
+            ],
+            Self::Gnome => &[("XDG_CURRENT_DESKTOP", "GNOME"), ("XDG_SESSION_DESKTOP", "gnome")],
+            Self::WindowsMac => &[],
+        }
+    }
+
     /// Launch command the guest runs under WSLg (the Bun OS WSL bundle sets up the distro). `None` for native.
+    /// `bunos-session` wraps it in `dbus-run-session` and, for `HeadlessViewer`, adds the viewer.
     #[must_use]
     pub fn wslg_launch(self) -> Option<&'static str> {
         match self {
-            Self::Cosmic => Some("cosmic-session"),
+            Self::Cosmic => Some("start-cosmic"),
             Self::CosmicComp => Some("cosmic-comp"),
-            Self::Hyprland | Self::Omarchy => Some("Hyprland"),
-            Self::Gnome => Some("dbus-run-session -- gnome-session"),
+            Self::Hyprland => Some("Hyprland --config /usr/share/hypr/hyprland.lua"),
+            Self::Omarchy => Some("Hyprland"),
+            Self::Gnome => Some("gnome-shell --devkit"),
             Self::WindowsMac => None,
         }
+    }
+
+    /// One machine-readable record per Linux profile, the contract of `factory/desktop/sessions.json`.
+    #[must_use]
+    pub fn manifest() -> Vec<SessionRecord> {
+        Self::ALL
+            .into_iter()
+            .filter_map(|d| {
+                Some(SessionRecord {
+                    id: d.id(),
+                    title: d.title(),
+                    exec: d.wslg_launch()?,
+                    presentation: d.presentation()?,
+                    env: d.env().iter().map(|(k, v)| [*k, *v]).collect(),
+                    packages: d.packages().to_vec(),
+                    vendored: d.vendored().to_vec(),
+                })
+            })
+            .collect()
     }
 
     /// A human-readable launch plan: the ordered steps to bring the desktop up. Nothing is executed here.
@@ -131,8 +192,11 @@ impl Desktop {
                 format!("pacman -S --needed {} (in {distro})", self.packages().join(" ")),
             ];
             if let Some(cmd) = self.wslg_launch() {
-                steps.push(format!("launch under WSLg: wsl -d {distro} -- env WAYLAND_DISPLAY=wayland-0 {cmd}"));
-                steps.push("WSLg projects each Wayland surface as a native Windows window".to_owned());
+                steps.push(format!("launch under WSLg: wsl -d {distro} -- bunos-session {} ({cmd})", self.id()));
+                steps.push(format!("or pick it from the chooser: wsl -d {distro} -- bunos-session"));
+            }
+            if let Some(p) = self.presentation() {
+                steps.push(p.describe().to_owned());
             }
             steps
         } else {
@@ -143,6 +207,80 @@ impl Desktop {
                 "run the macOS chrome module (rounded corners, Mica, unified dark caption, colored borders, dock)".to_owned(),
                 "start GlazeWM for tiling (not registered as the live shell)".to_owned(),
             ]
+        }
+    }
+}
+
+/// How a Linux session is shown on the Windows desktop through WSLg (lowest latency first).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum Presentation {
+    /// The compositor is itself a WSLg client: one Windows window, buffers shared with WSLg, no encoding.
+    NestedWindow,
+    /// Mutter headless with a virtual monitor; the GTK 4 `mutter-devkit` viewer shows it as a WSLg window
+    /// (PipeWire screen cast, one copy, no encoding).
+    DevkitViewer,
+    /// The compositor runs headless; `wayvnc` serves it on loopback and the `wlvncc` Wayland viewer shows it as a
+    /// WSLg window (raw encoding over loopback, one copy).
+    HeadlessViewer,
+}
+
+impl Presentation {
+    #[must_use]
+    pub fn describe(self) -> &'static str {
+        match self {
+            Self::NestedWindow => "the compositor opens one WSLg window (nested Wayland, no encoding)",
+            Self::DevkitViewer => {
+                "mutter runs headless; the mutter-devkit viewer is the WSLg window (PipeWire, no encoding)"
+            }
+            Self::HeadlessViewer => "Hyprland runs headless; wayvnc on loopback + the wlvncc viewer is the WSLg window",
+        }
+    }
+}
+
+/// One entry of `factory/desktop/sessions.json`.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct SessionRecord {
+    pub id: &'static str,
+    pub title: &'static str,
+    pub exec: &'static str,
+    pub presentation: Presentation,
+    pub env: Vec<[&'static str; 2]>,
+    pub packages: Vec<&'static str>,
+    pub vendored: Vec<&'static str>,
+}
+
+/// The committed manifest: pretty JSON with a trailing newline.
+#[must_use]
+pub fn manifest_json() -> String {
+    let mut out = serde_json::to_string_pretty(&serde_json::json!({
+        "schema": 1,
+        "generator": "bunos-win11 desktop --json (crates/bunos-win11/src/desktop.rs)",
+        "sessions": Desktop::manifest(),
+    }))
+    .expect("manifest serialises");
+    out.push('\n');
+    out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn committed_manifest_matches_profiles() {
+        let committed = include_str!("../../../factory/desktop/sessions.json").replace("\r\n", "\n");
+        assert_eq!(committed, manifest_json(), "run: bunos-win11 desktop --json > factory/desktop/sessions.json");
+    }
+
+    #[test]
+    fn every_linux_profile_has_a_session() {
+        for d in Desktop::ALL {
+            assert_eq!(d.is_wsl(), d.presentation().is_some(), "{}", d.id());
+            assert_eq!(d.is_wsl(), d.wslg_launch().is_some(), "{}", d.id());
+            if d.is_wsl() {
+                assert!(d.packages().contains(&"bunos-desktop") && d.packages().contains(&"bunos-cli"));
+            }
         }
     }
 }

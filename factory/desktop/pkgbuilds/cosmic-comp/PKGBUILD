@@ -1,0 +1,60 @@
+# Bun OS: Arch's recipe (gitlab.archlinux.org/archlinux/packaging/packages/cosmic-comp @ 243256b284e4, 0BSD) with the
+# source moved to the pinned aphrody-labs fork. Contributors of the Arch recipe are kept below.
+# vendor: vendor/cosmic-epoch/cosmic-comp -> _commit
+_commit=8fb0fd48936c0900ab1b36828b6e1aa16399d650
+# Maintainer: Maxime Gauduin <alucryd@archlinux.org>
+# Maintainer: Peter Jung <ptr1337@archlinux.org>
+# Contributor: soloturn <soloturn@gmail.com>
+# Contributor: Mark Wagie <mark.wagie@proton.me>
+
+pkgname=cosmic-comp
+pkgver=1.11.0
+pkgrel=1.1
+epoch=1
+pkgdesc='Compositor for the COSMIC desktop environment'
+arch=(x86_64)
+url='https://github.com/pop-os/cosmic-comp'
+license=(GPL-3.0-only)
+groups=(cosmic)
+depends=(
+  fontconfig
+  libgcc
+  glibc
+  libdisplay-info
+  libseat.so
+  libinput
+  libxcb
+  libxkbcommon
+  mesa
+  pixman
+  systemd-libs
+  wayland
+)
+makedepends=(
+  cargo
+  git
+  just
+  lld
+)
+source=("cosmic-comp::git+https://github.com/aphrody-labs/cosmic-comp.git#commit=${_commit}")
+b2sums=('SKIP')
+
+prepare() {
+  cd cosmic-comp
+
+  cargo fetch --locked
+  sed 's/lto = "fat"/lto = "thin"/' -i Cargo.toml
+}
+
+build() {
+  cd cosmic-comp
+  RUSTFLAGS+=" -C link-arg=-fuse-ld=lld"
+  just build-release --frozen
+}
+
+package() {
+  cd cosmic-comp
+  just rootdir="${pkgdir}" install
+}
+
+# vim: ts=2 sw=2 et:

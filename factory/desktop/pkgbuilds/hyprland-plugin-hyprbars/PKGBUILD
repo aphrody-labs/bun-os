@@ -1,0 +1,24 @@
+# Bun OS: hyprbars, the Hyprland window title-bar plugin (hyprwm/hyprland-plugins, BSD-3-Clause), built from the
+# pinned aphrody-labs fork at the tag matching Hyprland 0.57.0. Buttons and colours come from the desktop theme.
+# vendor: vendor/hyprland/hyprland-plugins -> _commit
+_commit=d2427d4d15b36df40468f5a58bbd67cdba19835d
+pkgname=hyprland-plugin-hyprbars
+pkgver=0.57.0
+pkgrel=1
+pkgdesc='Window title bars for Hyprland (hyprbars plugin, Bun OS build)'
+arch=(x86_64)
+url='https://github.com/aphrody-labs/hyprland-plugins'
+license=('BSD-3-Clause')
+depends=('hyprland=0.57.0' 'pango' 'cairo')
+makedepends=('git' 'pkgconf' 'hyprland' 'libdrm' 'libinput' 'pixman' 'systemd-libs' 'wayland' 'libxkbcommon')
+source=("hyprland-plugins::git+https://github.com/aphrody-labs/hyprland-plugins.git#commit=${_commit}")
+b2sums=('SKIP')
+
+build() {
+  make -C hyprland-plugins/hyprbars
+}
+
+package() {
+  install -Dm755 hyprland-plugins/hyprbars/hyprbars.so "$pkgdir/usr/lib/hyprland/plugins/hyprbars.so"
+  install -Dm644 hyprland-plugins/LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

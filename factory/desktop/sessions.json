@@ -1,0 +1,165 @@
+{
+  "generator": "bunos-win11 desktop --json (crates/bunos-win11/src/desktop.rs)",
+  "schema": 1,
+  "sessions": [
+    {
+      "env": [
+        [
+          "COSMIC_BACKEND",
+          "winit"
+        ],
+        [
+          "XDG_CURRENT_DESKTOP",
+          "COSMIC"
+        ]
+      ],
+      "exec": "start-cosmic",
+      "id": "cosmic",
+      "packages": [
+        "bunos-desktop",
+        "bunos-cli",
+        "cosmic-session",
+        "cosmic-comp",
+        "cosmic-panel",
+        "cosmic-launcher",
+        "cosmic-settings",
+        "cosmic-files",
+        "cosmic-term",
+        "xdg-desktop-portal-cosmic"
+      ],
+      "presentation": "nested-window",
+      "title": "COSMIC desktop (Pop!_OS, via WSLg)",
+      "vendored": [
+        "vendor/cosmic-epoch"
+      ]
+    },
+    {
+      "env": [
+        [
+          "COSMIC_BACKEND",
+          "winit"
+        ],
+        [
+          "XDG_CURRENT_DESKTOP",
+          "COSMIC"
+        ]
+      ],
+      "exec": "cosmic-comp",
+      "id": "cosmic-comp",
+      "packages": [
+        "bunos-desktop",
+        "bunos-cli",
+        "cosmic-comp"
+      ],
+      "presentation": "nested-window",
+      "title": "cosmic-comp compositor only (via WSLg)",
+      "vendored": [
+        "vendor/cosmic-epoch"
+      ]
+    },
+    {
+      "env": [
+        [
+          "WAYLAND_DISPLAY",
+          ""
+        ],
+        [
+          "LIBSEAT_BACKEND",
+          "noop"
+        ],
+        [
+          "XDG_CURRENT_DESKTOP",
+          "Hyprland"
+        ],
+        [
+          "XDG_SESSION_DESKTOP",
+          "Hyprland"
+        ]
+      ],
+      "exec": "Hyprland --config /usr/share/hypr/hyprland.lua",
+      "id": "hyprland",
+      "packages": [
+        "bunos-desktop",
+        "bunos-cli",
+        "hyprland",
+        "xdg-desktop-portal-hyprland",
+        "waybar",
+        "mako",
+        "wayvnc",
+        "wlvncc"
+      ],
+      "presentation": "headless-viewer",
+      "title": "Hyprland (via WSLg)",
+      "vendored": [
+        "vendor/hyprland"
+      ]
+    },
+    {
+      "env": [
+        [
+          "WAYLAND_DISPLAY",
+          ""
+        ],
+        [
+          "LIBSEAT_BACKEND",
+          "noop"
+        ],
+        [
+          "XDG_CURRENT_DESKTOP",
+          "Hyprland"
+        ],
+        [
+          "XDG_SESSION_DESKTOP",
+          "Hyprland"
+        ]
+      ],
+      "exec": "Hyprland",
+      "id": "omarchy",
+      "packages": [
+        "bunos-desktop",
+        "bunos-cli",
+        "bunos-omarchy",
+        "hyprland",
+        "wayvnc",
+        "wlvncc"
+      ],
+      "presentation": "headless-viewer",
+      "title": "Omarchy: Hyprland + Omarchy configs, menus and themes (via WSLg)",
+      "vendored": [
+        "vendor/omarchy",
+        "vendor/omarchy-windows",
+        "vendor/hyprland"
+      ]
+    },
+    {
+      "env": [
+        [
+          "XDG_CURRENT_DESKTOP",
+          "GNOME"
+        ],
+        [
+          "XDG_SESSION_DESKTOP",
+          "gnome"
+        ]
+      ],
+      "exec": "gnome-shell --devkit",
+      "id": "gnome",
+      "packages": [
+        "bunos-desktop",
+        "bunos-cli",
+        "gnome-shell",
+        "mutter",
+        "gnome-session",
+        "gnome-control-center",
+        "nautilus",
+        "xdg-desktop-portal-gnome"
+      ],
+      "presentation": "devkit-viewer",
+      "title": "GNOME 51 (via WSLg)",
+      "vendored": [
+        "vendor/gnome/mutter",
+        "vendor/gnome/gnome-shell"
+      ]
+    }
+  ]
+}

@@ -829,6 +829,16 @@
       "origin": "https://github.com/aphrody-labs/wil.git",
       "upstream": "https://github.com/microsoft/wil.git",
       "path": "wil"
+    },
+    "hyprland/hyprland-plugins": {
+      "origin": "https://github.com/aphrody-labs/hyprland-plugins.git",
+      "upstream": "https://github.com/hyprwm/hyprland-plugins.git",
+      "path": "hyprland/hyprland-plugins"
+    },
+    "wlvncc": {
+      "origin": "https://github.com/aphrody-labs/wlvncc.git",
+      "upstream": "https://github.com/any1/wlvncc.git",
+      "path": "wlvncc"
     }
   },
   "references": {

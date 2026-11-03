@@ -1,0 +1,72 @@
+# Bun OS: the Omarchy desktop layer (omacom/omarchy, MIT, by David Heinemeier Hansson and contributors) for the Bun
+# OS WSL distro, from the pinned aphrody-labs fork. It merges Omarchy's two upstream packages (omarchy runtime and
+# omarchy-settings, aphrody-labs/omarchy-pkgs) into one user-level layer and leaves out what WSL or Bun OS owns:
+#   kept     bin/ (the omarchy-* commands), config/ (seeded into /etc/skel/.config), default/ (Hyprland Lua config,
+#            keybindings, menus, Walker/Waybar/Mako defaults), themes/, shell/ (Quickshell desktop shell),
+#            applications/, migrations/, install/, fonts, icons, branding
+#   dropped  etc/ (Limine, mkinitcpio, Plymouth, SDDM, logind, zram/oomd, resolved, Docker), the pacman update guard
+#            hook (Bun OS updates with pacman -Syu), systemd system units: WSL boots the distro, factory/wsl owns /etc
+#   added    OMARCHY_PATH in /etc/profile.d, hyprbars title bars loaded at Hyprland start
+# The session itself is started by bunos-session (package bunos-desktop): `bunos-session omarchy`.
+# vendor: vendor/omarchy -> _commit
+_commit=ae64a4be796239a86f40de4b3cc5bd7f43866296
+pkgname=bunos-omarchy
+pkgver=4.0.0.alpha
+pkgrel=1
+pkgdesc='Omarchy (Hyprland configs, keybindings, menus, themes, Quickshell shell) as a Bun OS desktop layer'
+arch=(any)
+url='https://github.com/aphrody-labs/omarchy'
+license=('MIT')
+depends=(
+  'bunos-desktop' 'hyprland' 'hyprland-plugin-hyprbars' 'xdg-desktop-portal-hyprland' 'quickshell' 'uwsm'
+  'pipewire' 'wireplumber' 'gnome-keyring' 'gum' 'jq' 'git' 'perl' 'fakeroot' 'pacman-contrib'
+  'ttf-jetbrains-mono-nerd' 'mako' 'swayosd' 'hyprsunset' 'hypridle' 'hyprlock' 'udiskie' 'wayvnc' 'wlvncc'
+)
+optdepends=('walker: Omarchy launcher and menus (omacom/walker; not in Arch, packaged from omarchy-pkgs)')
+provides=('omarchy' 'omarchy-settings')
+conflicts=('omarchy' 'omarchy-settings')
+makedepends=('git')
+source=("omarchy::git+https://github.com/aphrody-labs/omarchy.git#commit=${_commit}")
+b2sums=('SKIP')
+
+pkgver() {
+  tr -d '\n' <omarchy/version
+}
+
+package() {
+  cd omarchy
+  local share="$pkgdir/usr/share/omarchy"
+  install -d "$pkgdir/usr/bin" "$share/bin"
+  for bin in bin/*; do
+    [[ -f $bin ]] || continue
+    install -Dm755 "$bin" "$pkgdir/usr/bin/${bin##*/}"
+    ln -s "/usr/bin/${bin##*/}" "$share/bin/${bin##*/}"
+  done
+  cp -a config default themes shell applications migrations install "$share/"
+  rm -rf "$share"/themes/*/backgrounds/intros "$share/applications/icons" "$share/default/libalpm"
+  install -Dm644 version logo.txt logo.svg icon.txt icon.png -t "$share/"
+
+  install -d "$pkgdir/etc/skel/.config"
+  cp -a config/. "$pkgdir/etc/skel/.config/"
+  # hyprbars: window title bars; its buttons and colours come from the active theme.
+  cat >>"$pkgdir/etc/skel/.config/hypr/autostart.lua" <<'EOF'
+
+-- Bun OS: window title bars (hyprland-plugin-hyprbars).
+hl.on("hyprland.start", function()
+  hl.exec_cmd("hyprctl plugin load /usr/lib/hyprland/plugins/hyprbars.so")
+end)
+EOF
+  install -d "$pkgdir/etc/skel/.local/state/omarchy/migrations"
+  for m in migrations/*.sh; do [[ -f $m ]] && touch "$pkgdir/etc/skel/.local/state/omarchy/migrations/${m##*/}"; done
+  install -Dm644 default/hypr/toggles/flags.lua "$pkgdir/etc/skel/.local/state/omarchy/toggles/hypr/flags.lua"
+
+  install -Dm644 /dev/stdin "$pkgdir/etc/profile.d/bunos-omarchy.sh" <<'EOF'
+# Bun OS: Omarchy's commands find their tree here (bunos-omarchy).
+export OMARCHY_PATH=/usr/share/omarchy
+EOF
+  install -Dm644 default/fonts/omarchy/omarchy.ttf "$pkgdir/usr/share/fonts/omarchy/omarchy.ttf"
+  install -Dm644 icon.png "$pkgdir/usr/share/icons/hicolor/256x256/apps/omarchy.png"
+  install -d "$pkgdir/usr/share/applications"
+  for d in applications/*.desktop; do [[ -f $d ]] && install -Dm644 "$d" "$pkgdir/usr/share/applications/${d##*/}"; done
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}
