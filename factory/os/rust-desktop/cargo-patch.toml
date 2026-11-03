@@ -9,24 +9,24 @@
 # Upstream licences (MPL-2.0 libcosmic, MIT/Apache-2.0 iced/winit/softbuffer, GPL-3.0 COSMIC apps) stay in the forks.
 
 [patch."https://github.com/pop-os/libcosmic"]
-libcosmic = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-cosmic-config = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-cosmic-config-derive = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-cosmic-theme = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-build_helpers = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_accessibility = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_core = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_debug = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_futures = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_graphics = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_program = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_renderer = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_runtime = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_tiny_skia = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_wgpu = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_widget = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
-iced_winit = { git = "https://github.com/aphrody-labs/libcosmic", rev = "8fee30aa5079b0aed9318091c99c271c4b587803" }
+libcosmic = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+cosmic-config = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+cosmic-config-derive = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+cosmic-theme = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+build_helpers = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_accessibility = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_core = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_debug = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_futures = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_graphics = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_program = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_renderer = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_runtime = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_tiny_skia = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_wgpu = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_widget = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
+iced_winit = { git = "https://github.com/aphrody-labs/libcosmic", rev = "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499" }
 
 [patch."https://github.com/pop-os/winit"]
 winit = { git = "https://github.com/aphrody-labs/winit", rev = "9567503d34130113e36b0167a2b8829c3756e429" }

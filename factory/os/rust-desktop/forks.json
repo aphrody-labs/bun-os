@@ -101,7 +101,7 @@
   "shared": {
     "libcosmic": {
       "upstream": "https://github.com/pop-os/libcosmic",
-      "rev": "8fee30aa5079b0aed9318091c99c271c4b587803",
+      "rev": "cf61fc92bf42c2abb74b7806fbbabb5a24b7b499",
       "patch": "Aphrody built-in dark theme, Omarchy geometry, iced/cosmic-icons submodules on aphrody-labs",
       "redoxBranches": "redox-upstream/*"
     },
