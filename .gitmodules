@@ -362,7 +362,7 @@
 	shallow = true
 [submodule "vendor/directx-headers"]
 	path = vendor/directx-headers
-	url = https://github.com/microsoft/DirectX-Headers.git
+	url = https://github.com/aphrody-labs/DirectX-Headers.git
 	shallow = true
 [submodule "vendor/directx-samples"]
 	path = vendor/directx-samples
@@ -885,7 +885,7 @@
 	update = none
 [submodule "vendor/wayland/directx-headers"]
 	path = vendor/wayland/directx-headers
-	url = https://github.com/microsoft/DirectX-Headers.git
+	url = https://github.com/aphrody-labs/DirectX-Headers.git
 	shallow = true
 	update = none
 [submodule "vendor/wayland/freerdp"]
@@ -1115,7 +1115,7 @@
 	update = none
 [submodule "vendor/wayland/mesa"]
 	path = vendor/wayland/mesa
-	url = https://gitlab.freedesktop.org/mesa/mesa.git
+	url = https://github.com/aphrody-labs/mesa.git
 	shallow = true
 	update = none
 [submodule "vendor/wayland/mtdev"]

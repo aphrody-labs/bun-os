@@ -301,7 +301,7 @@ export const SOURCES: Source[] = [
     group: "graphics",
     consumers: B,
     ignore: ["libunwind", "valgrind", "libsensors", "libva", "libarchive", "libdrm_nouveau"],
-    note: "aphrody-labs/mesa exists but is a fork of OpenGamingCollective/mesa (gaming patches), not of upstream; upstream mesa.git is pinned. d3d12 (WSL) and zink are in-tree gallium drivers.",
+    note: "aphrody-labs/mesa mirrors upstream mesa.git (bunos/* branches carry Bun OS patches; the OpenGamingCollective patch fork is aphrody-labs/mesa-ogc-patches); tags are tracked upstream. d3d12 (WSL) and zink are in-tree gallium drivers; factory/bunos/pkgbuilds/bunos-mesa builds them for WSL.",
     wslgOptions: ["-Dgallium-drivers=swrast,d3d12", "-Dvulkan-drivers=", "-Dllvm=disabled"],
     wslgOptionsVerified: true,
   },

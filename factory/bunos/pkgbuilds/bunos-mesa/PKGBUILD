@@ -1,0 +1,132 @@
+# SPDX-License-Identifier: MIT
+# Mesa for Bun OS on WSL, built from the Bun OS fork (aphrody-labs/mesa, branch bunos/26.3, a mirror of
+# gitlab.freedesktop.org/mesa/mesa) with DirectX-Headers from aphrody-labs/DirectX-Headers. The GPU path on WSL is
+# D3D12 over /dev/dxg: OpenGL/GLES/EGL/GBM through the d3d12 gallium driver, Vulkan through dzn
+# (microsoft-experimental), VA-API through d3d12 video. llvmpipe/lavapipe stay as the software fallback, zink for
+# GL-on-Vulkan. Layout and package split follow Arch's mesa PKGBUILD (packaging/packages/mesa, MIT notices kept).
+pkgbase=bunos-mesa
+pkgname=(bunos-mesa bunos-vulkan-dzn bunos-vulkan-swrast)
+pkgver=26.3.0rc3
+_tag=mesa-26.3.0-rc3
+_commit=90a959ebba9dbb36f2ea5176091c15d6ebdd0af0
+_dxh=6064ae312901a77e8700e84a2341470d050fcbca # v1.721.2
+pkgrel=1
+# The Arch and CachyOS mesa packages carry epochs 1 and 3; provides use the highest so versioned dependents resolve.
+_epoch=3
+pkgdesc='Mesa 3D for Bun OS on WSL: d3d12 (OpenGL/GLES/EGL/GBM/VA-API over DirectX 12), llvmpipe, zink (Bun OS fork)'
+url='https://github.com/aphrody-labs/mesa'
+arch=(x86_64)
+license=('MIT AND BSD-3-Clause AND SGI-B-2.0')
+makedepends=(
+  git meson ninja cmake clang llvm llvm-libs glslang spirv-tools spirv-llvm-translator libclc
+  python-mako python-packaging python-ply python-pycparser python-yaml
+  expat libdrm libelf libglvnd libva libx11 libxcb libxext libxrandr libxshmfence libxxf86vm libxml2
+  lm_sensors systemd-libs vulkan-icd-loader wayland wayland-protocols xorgproto xcb-util-keysyms zlib zstd
+)
+options=(!lto)
+source=(
+  "mesa::git+https://github.com/aphrody-labs/mesa.git#commit=${_commit}"
+  "DirectX-Headers::git+https://github.com/aphrody-labs/DirectX-Headers.git#commit=${_dxh}"
+)
+sha256sums=('SKIP' 'SKIP')
+
+prepare() {
+  cd mesa
+  # The fork's d3d12 headers instead of a system directx-headers package: meson falls back to the
+  # DirectX-Headers wrap directory when pkg-config has no directx-headers.
+  rm -rf subprojects/DirectX-Headers-1.0
+  ln -s "$srcdir/DirectX-Headers" subprojects/DirectX-Headers-1.0
+  # Release in the version string so GPU shader caches (Chromium, Helium) invalidate on rebuild.
+  echo "${_tag#mesa-}-bunos.$pkgrel" >VERSION
+}
+
+build() {
+  local meson_options=(
+    --optimization 2
+    --wrap-mode=nodownload
+    --force-fallback-for=DirectX-Headers
+    -D b_ndebug=true
+    -D platforms=x11,wayland
+    -D gallium-drivers=d3d12,llvmpipe,softpipe,zink
+    -D gallium-va=enabled
+    -D gallium-d3d12-video=enabled
+    -D gallium-d3d12-graphics=enabled
+    -D gallium-rusticl=false
+    -D gallium-mediafoundation=disabled
+    -D video-codecs=all
+    -D vulkan-drivers=microsoft-experimental,swrast
+    -D vulkan-layers=
+    -D vulkan-manifest-per-architecture=false
+    -D microsoft-clc=disabled
+    -D spirv-to-dxil=true
+    -D egl=enabled
+    -D gbm=enabled
+    -D glx=dri
+    -D gles1=disabled
+    -D gles2=enabled
+    -D llvm=enabled
+    -D shared-llvm=enabled
+    -D libunwind=disabled
+    -D valgrind=disabled
+    -D android-libbacktrace=disabled
+    -D html-docs=disabled
+  )
+  arch-meson mesa build "${meson_options[@]}"
+  meson compile -C build
+}
+
+_pick() {
+  local p="$1" f d; shift
+  for f; do
+    d="$srcdir/$p/${f#$pkgdir/}"
+    mkdir -p "$(dirname "$d")"
+    mv -v "$f" "$d"
+    rmdir -p --ignore-fail-on-non-empty "$(dirname "$f")"
+  done
+}
+
+_licenses() {
+  install -Dm644 "$srcdir/mesa/docs/license.rst" -t "$pkgdir/usr/share/licenses/$pkgname"
+  install -Dm644 "$srcdir/DirectX-Headers/LICENSE" "$pkgdir/usr/share/licenses/$pkgname/DirectX-Headers.LICENSE"
+}
+
+package_bunos-mesa() {
+  depends=(expat glibc libdrm libelf libgcc libglvnd libstdc++ libva libx11 libxcb libxext libxshmfence libxxf86vm
+           llvm-libs lm_sensors spirv-tools wayland zlib zstd)
+  provides=("mesa=${_epoch}:${pkgver}" "libva-mesa-driver=${_epoch}:${pkgver}" "mesa-libgl=${_epoch}:${pkgver}"
+            libva-driver opengl-driver)
+  conflicts=(mesa libva-mesa-driver mesa-libgl)
+
+  meson install -C "$srcdir/build" --destdir "$pkgdir" --no-rebuild
+  (
+    cd "$pkgdir"
+    _pick vkd3d12 usr/lib/libvulkan_dzn.so
+    _pick vkd3d12 usr/lib/libspirv_to_dxil.*
+    _pick vkd3d12 usr/bin/spirv2dxil
+    _pick vkd3d12 usr/share/vulkan/icd.d/dzn_icd.json
+    _pick vkswrast usr/lib/libvulkan_lvp.so
+    _pick vkswrast usr/share/vulkan/icd.d/lvp_icd.json
+    ln -sr usr/lib/libGLX_{mesa,indirect}.so.0
+  )
+  _licenses
+}
+
+package_bunos-vulkan-dzn() {
+  pkgdesc='Mesa dzn: Vulkan over DirectX 12 for Bun OS on WSL (Bun OS fork)'
+  depends=(expat glibc libdrm libgcc libstdc++ libx11 libxcb libxshmfence wayland xcb-util-keysyms zlib zstd)
+  optdepends=('vulkan-mesa-implicit-layers: device-select layer')
+  provides=("vulkan-dzn=${_epoch}:${pkgver}" vulkan-driver)
+  conflicts=(vulkan-dzn)
+  mv -v "$srcdir"/vkd3d12/* "$pkgdir"
+  _licenses
+}
+
+package_bunos-vulkan-swrast() {
+  pkgdesc='Mesa lavapipe: software Vulkan for Bun OS (Bun OS fork)'
+  depends=(expat glibc libdrm libgcc libstdc++ libx11 libxcb libxshmfence llvm-libs spirv-tools wayland
+           xcb-util-keysyms zlib zstd)
+  provides=("vulkan-swrast=${_epoch}:${pkgver}" vulkan-driver)
+  conflicts=(vulkan-swrast vulkan-mesa)
+  mv -v "$srcdir"/vkswrast/* "$pkgdir"
+  _licenses
+}
