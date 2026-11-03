@@ -4197,6 +4197,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ariadne"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8454c8a44ce2cb9cc7e7fae67fc6128465b343b92c6631e94beca3c8d1524ea5"
+dependencies = [
+ "unicode-width 0.2.2",
+ "yansi",
+]
+
+[[package]]
 name = "arm-decoder"
 version = "0.0.0"
 source = "git+https://github.com/kelpsyberry/arm-decoder#f853ca666532cc2fbd58e5760d98afbb47660655"
@@ -8182,7 +8192,9 @@ dependencies = [
  "base64 0.23.1",
  "bun-re",
  "bun-steam",
+ "dirs 7.0.0",
  "image",
+ "libloading 0.8.9",
  "ort",
  "pollster 1.0.1",
  "reqwest 0.13.5",
@@ -8195,6 +8207,7 @@ dependencies = [
  "tempfile",
  "thiserror 2.0.21",
  "tokio",
+ "toml 1.1.8+spec-1.1.0",
  "uiautomation",
  "vigem-rust",
  "windows 0.62.2",
@@ -8771,6 +8784,21 @@ dependencies = [
  "uucore 0.12.0",
  "uucore 0.13.0",
  "uucore 0.2.2",
+]
+
+[[package]]
+name = "bunos-win11"
+version = "1.4.7"
+dependencies = [
+ "anyhow",
+ "bun-windows-winclean",
+ "clap",
+ "crossterm",
+ "dirs 7.0.0",
+ "ratatui",
+ "serde",
+ "serde_json",
+ "toml 1.1.8+spec-1.1.0",
 ]
 
 [[package]]
@@ -15289,6 +15317,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "fancy-regex"
+version = "0.20.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "20ed7f62ce0ae0da1a8b93c3c7104ab7e0760a74491e097c701fff966e945390"
+dependencies = [
+ "bit-set 0.8.0",
+ "regex-automata",
+ "regex-syntax",
+]
+
+[[package]]
 name = "fast-float2"
 version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -16575,6 +16614,7 @@ dependencies = [
  "itertools 0.15.0",
  "nix 0.31.3",
  "onig",
+ "parse_datetime 0.17.0",
  "regex",
  "rustix 1.1.5",
  "thiserror 2.0.21",
@@ -26361,9 +26401,9 @@ dependencies = [
 
 [[package]]
 name = "num-modular"
-version = "0.6.1"
+version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17bb261bf36fa7d83f4c294f834e91256769097b3cb505d44831e0a179ac647f"
+checksum = "bd8e500409e6cd603b03e477c26a6caecdc27ac58979a53e881c75eafc079f44"
 dependencies = [
  "num-bigint 0.4.8",
  "num-integer",
@@ -26381,9 +26421,9 @@ dependencies = [
 
 [[package]]
 name = "num-prime"
-version = "0.6.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d25a3c4d8a61c86376f9372bea15400e076398135c866495186972cdf5888a45"
+checksum = "6de1394909173a98f21f28406f9d82f0e11d87be4bf36473364f37a5bd100741"
 dependencies = [
  "bitvec",
  "either",
@@ -28660,9 +28700,9 @@ dependencies = [
 
 [[package]]
 name = "parse_datetime"
-version = "0.16.0"
+version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "503fd4c8b0685e5eb32a8276533611f63e3b44768e9e8724e73f6852c2542f82"
+checksum = "cb51967a779ef73b125a243688e53e4bb2474f91cae72734ee5051e857fb2645"
 dependencies = [
  "jiff",
  "num-traits",
@@ -32742,6 +32782,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4dd4211456b4172d7e44261920c25acf07367c4f04bb5f5d54fc21b090d9b159"
 dependencies = [
  "digest 0.11.3",
+]
+
+[[package]]
+name = "rlimit"
+version = "0.11.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f35ee2729c56bb610f6dba436bf78135f728b7373bdffae2ec815b2d3eb98cc3"
+dependencies = [
+ "libc",
 ]
 
 [[package]]
@@ -40377,7 +40426,7 @@ dependencies = [
  "jiff-icu",
  "jiff-tzdb",
  "libc",
- "parse_datetime 0.16.0",
+ "parse_datetime 0.17.0",
  "rustix 1.1.5",
  "thiserror 2.0.21",
  "uucore 0.13.0",
@@ -40498,7 +40547,7 @@ name = "uu_expr"
 version = "0.13.0"
 dependencies = [
  "clap",
- "fancy-regex 0.19.2",
+ "fancy-regex 0.20.0",
  "fluent",
  "num-bigint 0.4.8",
  "num-traits",
@@ -40807,7 +40856,6 @@ version = "0.13.0"
 dependencies = [
  "clap",
  "fluent",
- "rustix 1.1.5",
  "uucore 0.13.0",
 ]
 
@@ -41335,6 +41383,7 @@ dependencies = [
  "memchr",
  "rand 0.10.3",
  "rayon",
+ "rlimit",
  "rustix 1.1.5",
  "self_cell",
  "tempfile",
@@ -41350,6 +41399,7 @@ dependencies = [
  "fluent",
  "memchr",
  "rustix 1.1.5",
+ "tempfile",
  "thiserror 2.0.21",
  "uucore 0.13.0",
 ]
@@ -41373,6 +41423,7 @@ dependencies = [
  "clap",
  "fluent",
  "nix 0.31.3",
+ "rustix 1.1.5",
  "uucore 0.13.0",
 ]
 
@@ -41507,7 +41558,7 @@ dependencies = [
  "fluent",
  "jiff",
  "libc",
- "parse_datetime 0.16.0",
+ "parse_datetime 0.17.0",
  "rustix 1.1.5",
  "thiserror 2.0.21",
  "uucore 0.13.0",
@@ -41757,6 +41808,7 @@ version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f24a5910ebbf2c0baf486a9125705f8e026a8f7741a3ea8cf5eca3c9257c9bdf"
 dependencies = [
+ "ariadne",
  "bstr",
  "clap",
  "dns-lookup",
@@ -41788,6 +41840,7 @@ dependencies = [
  "blake2b_simd",
  "blake3",
  "bstr",
+ "cfg_aliases",
  "clap",
  "crc-fast",
  "data-encoding",
