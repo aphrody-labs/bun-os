@@ -490,8 +490,10 @@ async function lu() {
   const target = join(ROOT, ".lu-target");
   const env = { ...Bun.env, CARGO_TARGET_DIR: target };
   await $`bun install --frozen-lockfile --filter @aphrody/lu`.cwd(ROOT);
+  await $`bash scripts/verify-sidecar-isa.selftest.sh`.cwd(app).env(env);
   await $`bash scripts/build-llama.sh x86_64-unknown-linux-gnu`.cwd(app).env(env);
   await $`bash scripts/build-llama.sh --check`.cwd(app).env(env);
+  await $`bash scripts/verify-sidecar-isa.sh x86_64-unknown-linux-gnu`.cwd(app).env(env);
   await $`bun run tauri build --bundles deb --ci -- --locked`.cwd(app).env(env);
   const bundle = join(target, "release/bundle/deb");
   const files = (await readdir(bundle)).filter(name => name.endsWith(".deb"));
