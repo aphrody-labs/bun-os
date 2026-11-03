@@ -15,8 +15,8 @@ source=()
 
 pkgver() {
   local c d
-  c=$(sed -n 's/^  "commit": "\([0-9a-f]\{12\}\).*/\1/p' design/receipt.json | head -1)
-  d=$(sed -n 's/^  "created": "\([0-9-]*\)T.*/\1/p' design/receipt.json | head -1)
+  c=$(sed -n 's/^  "commit": "\([0-9a-f]\{12\}\).*/\1/p' "$startdir/design/receipt.json" | head -1)
+  d=$(sed -n 's/^  "created": "\([0-9-]*\)T.*/\1/p' "$startdir/design/receipt.json" | head -1)
   printf '%s.g%s' "${d//-/}" "$c"
 }
 
