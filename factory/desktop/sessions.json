@@ -144,9 +144,13 @@
         [
           "XDG_SESSION_DESKTOP",
           "gnome"
+        ],
+        [
+          "XDG_DESKTOP_PORTAL_DIR",
+          "/var/empty"
         ]
       ],
-      "exec": "gnome-shell --devkit",
+      "exec": "gnome-shell --devkit --no-x11",
       "id": "gnome",
       "packages": [
         "bunos-desktop",

@@ -90,7 +90,9 @@ impl Desktop {
             Self::Hyprland => "Hyprland (via WSLg)",
             Self::Omarchy => "Omarchy: Hyprland + Omarchy configs, menus and themes (via WSLg)",
             Self::Gnome => "GNOME 51 (via WSLg)",
-            Self::WindowsMac => "Windows, macOS-style (native: chrome + dock + GlazeWM + wallpaper engine)",
+            Self::WindowsMac => {
+                "Windows, macOS-style (native: chrome + dock + GlazeWM + wallpaper engine)"
+            }
             Self::WindowsHyprland => {
                 "Windows, Hyprland-style (native: animated GlazeWM + gradient borders + Zebar + Flow Launcher + AltSnap)"
             }
@@ -105,18 +107,54 @@ impl Desktop {
     pub fn packages(self) -> &'static [&'static str] {
         match self {
             Self::Cosmic => &[
-                "bunos-desktop", "bunos-cli", "bunos-design-m3", "cosmic-session", "cosmic-comp", "cosmic-panel", "cosmic-launcher",
-                "cosmic-settings", "cosmic-files", "cosmic-term", "xdg-desktop-portal-cosmic",
+                "bunos-desktop",
+                "bunos-cli",
+                "bunos-design-m3",
+                "cosmic-session",
+                "cosmic-comp",
+                "cosmic-panel",
+                "cosmic-launcher",
+                "cosmic-settings",
+                "cosmic-files",
+                "cosmic-term",
+                "xdg-desktop-portal-cosmic",
             ],
-            Self::CosmicComp => &["bunos-desktop", "bunos-cli", "bunos-design-m3", "cosmic-comp"],
+            Self::CosmicComp => &[
+                "bunos-desktop",
+                "bunos-cli",
+                "bunos-design-m3",
+                "cosmic-comp",
+            ],
             Self::Hyprland => &[
-                "bunos-desktop", "bunos-cli", "bunos-design-m3", "hyprland", "xdg-desktop-portal-hyprland", "waybar", "mako", "wayvnc",
+                "bunos-desktop",
+                "bunos-cli",
+                "bunos-design-m3",
+                "hyprland",
+                "xdg-desktop-portal-hyprland",
+                "waybar",
+                "mako",
+                "wayvnc",
                 "wlvncc",
             ],
-            Self::Omarchy => &["bunos-desktop", "bunos-cli", "bunos-design-m3", "bunos-omarchy", "hyprland", "wayvnc", "wlvncc"],
+            Self::Omarchy => &[
+                "bunos-desktop",
+                "bunos-cli",
+                "bunos-design-m3",
+                "bunos-omarchy",
+                "hyprland",
+                "wayvnc",
+                "wlvncc",
+            ],
             Self::Gnome => &[
-                "bunos-desktop", "bunos-cli", "bunos-design-m3", "gnome-shell", "mutter", "gnome-session", "gnome-control-center",
-                "nautilus", "xdg-desktop-portal-gnome",
+                "bunos-desktop",
+                "bunos-cli",
+                "bunos-design-m3",
+                "gnome-shell",
+                "mutter",
+                "gnome-session",
+                "gnome-control-center",
+                "nautilus",
+                "xdg-desktop-portal-gnome",
             ],
             Self::WindowsMac | Self::WindowsHyprland => &[],
         }
@@ -128,9 +166,17 @@ impl Desktop {
         match self {
             Self::Cosmic | Self::CosmicComp => &["vendor/cosmic-epoch"],
             Self::Hyprland => &["vendor/hyprland"],
-            Self::Omarchy => &["vendor/omarchy", "vendor/omarchy-windows", "vendor/hyprland"],
+            Self::Omarchy => &[
+                "vendor/omarchy",
+                "vendor/omarchy-windows",
+                "vendor/hyprland",
+            ],
             Self::Gnome => &["vendor/gnome/mutter", "vendor/gnome/gnome-shell"],
-            Self::WindowsMac => &["vendor/glazewm", "crates/bunos-win11-chrome", "crates/bunos-win11-wallpaper"],
+            Self::WindowsMac => &[
+                "vendor/glazewm",
+                "crates/bunos-win11-chrome",
+                "crates/bunos-win11-wallpaper",
+            ],
             Self::WindowsHyprland => &[
                 "vendor/glazewm",
                 "vendor/tacky-borders",
@@ -161,7 +207,10 @@ impl Desktop {
         match self {
             // cosmic-comp src/backend/mod.rs: COSMIC_BACKEND=winit skips the x11 backend, which needs DRI3/GBM and
             // a DRM node that WSL does not have; winit opens one WSLg window and renders through Mesa d3d12.
-            Self::Cosmic | Self::CosmicComp => &[("COSMIC_BACKEND", "winit"), ("XDG_CURRENT_DESKTOP", "COSMIC")],
+            Self::Cosmic | Self::CosmicComp => &[
+                ("COSMIC_BACKEND", "winit"),
+                ("XDG_CURRENT_DESKTOP", "COSMIC"),
+            ],
             // Aquamarine's Wayland backend refuses WSLg's Weston (no dmabuf, old xdg_wm_base/wl_seat; docs/WSLG.md),
             // so Hyprland runs on its headless backend (no WAYLAND_DISPLAY, no seat) on the vgem render node with
             // software GL, as in the WSLg fork's hyprland-headless mode.
@@ -171,7 +220,14 @@ impl Desktop {
                 ("XDG_CURRENT_DESKTOP", "Hyprland"),
                 ("XDG_SESSION_DESKTOP", "Hyprland"),
             ],
-            Self::Gnome => &[("XDG_CURRENT_DESKTOP", "GNOME"), ("XDG_SESSION_DESKTOP", "gnome")],
+            // The devkit viewer asks org.freedesktop.portal.Desktop, whose GTK backend waits for a display that is not up
+            // yet: 25 s D-Bus timeouts before the virtual monitor exists (measured 27 s to the window). With no backend
+            // directory the portal answers at once (1.8 s); this session needs no portal (docs/WSL.md section 8).
+            Self::Gnome => &[
+                ("XDG_CURRENT_DESKTOP", "GNOME"),
+                ("XDG_SESSION_DESKTOP", "gnome"),
+                ("XDG_DESKTOP_PORTAL_DIR", "/var/empty"),
+            ],
             Self::WindowsMac | Self::WindowsHyprland => &[],
         }
     }
@@ -185,7 +241,8 @@ impl Desktop {
             Self::CosmicComp => Some("cosmic-comp"),
             Self::Hyprland => Some("Hyprland --config /usr/share/hypr/hyprland.lua"),
             Self::Omarchy => Some("Hyprland"),
-            Self::Gnome => Some("gnome-shell --devkit"),
+            // --no-x11: WSLg mounts /tmp/.X11-unix read-only and mutter aborts when it cannot start Xwayland there.
+            Self::Gnome => Some("gnome-shell --devkit --no-x11"),
             Self::WindowsMac | Self::WindowsHyprland => None,
         }
     }
@@ -215,12 +272,22 @@ impl Desktop {
         if self.is_wsl() {
             let distro = "BunOS";
             let mut steps = vec![
-                format!("ensure the Bun OS WSL bundle is installed (another member owns it): wsl -d {distro} -- true"),
-                format!("pacman -S --needed {} (in {distro})", self.packages().join(" ")),
+                format!(
+                    "ensure the Bun OS WSL bundle is installed (another member owns it): wsl -d {distro} -- true"
+                ),
+                format!(
+                    "pacman -S --needed {} (in {distro})",
+                    self.packages().join(" ")
+                ),
             ];
             if let Some(cmd) = self.wslg_launch() {
-                steps.push(format!("launch under WSLg: wsl -d {distro} -- bunos-session {} ({cmd})", self.id()));
-                steps.push(format!("or pick it from the chooser: wsl -d {distro} -- bunos-session"));
+                steps.push(format!(
+                    "launch under WSLg: wsl -d {distro} -- bunos-session {} ({cmd})",
+                    self.id()
+                ));
+                steps.push(format!(
+                    "or pick it from the chooser: wsl -d {distro} -- bunos-session"
+                ));
             }
             if let Some(p) = self.presentation() {
                 steps.push(p.describe().to_owned());
@@ -263,11 +330,15 @@ impl Presentation {
     #[must_use]
     pub fn describe(self) -> &'static str {
         match self {
-            Self::NestedWindow => "the compositor opens one WSLg window (nested Wayland, no encoding)",
+            Self::NestedWindow => {
+                "the compositor opens one WSLg window (nested Wayland, no encoding)"
+            }
             Self::DevkitViewer => {
                 "mutter runs headless; the mutter-devkit viewer is the WSLg window (PipeWire, no encoding)"
             }
-            Self::HeadlessViewer => "Hyprland runs headless; wayvnc on loopback + the wlvncc viewer is the WSLg window",
+            Self::HeadlessViewer => {
+                "Hyprland runs headless; wayvnc on loopback + the wlvncc viewer is the WSLg window"
+            }
         }
     }
 }
@@ -303,8 +374,13 @@ mod tests {
 
     #[test]
     fn committed_manifest_matches_profiles() {
-        let committed = include_str!("../../../factory/desktop/sessions.json").replace("\r\n", "\n");
-        assert_eq!(committed, manifest_json(), "run: bunos-win11 desktop --json > factory/desktop/sessions.json");
+        let committed =
+            include_str!("../../../factory/desktop/sessions.json").replace("\r\n", "\n");
+        assert_eq!(
+            committed,
+            manifest_json(),
+            "run: bunos-win11 desktop --json > factory/desktop/sessions.json"
+        );
     }
 
     #[test]

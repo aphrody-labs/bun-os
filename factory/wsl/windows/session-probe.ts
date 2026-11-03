@@ -3,11 +3,12 @@
 // Start a Linux desktop session in the bunos distro and time it until its window is on the Windows desktop.
 //
 //   bun session-probe.ts <session-id> [--title <substring>] [--timeout 60] [--keep] [--cmd "<shell line>"]
+//   bun session-probe.ts stop          end every running session (after --keep)
 //
 // Default command: `bunos-session <id>` as the distro user under WSLg (docs/DESKTOP-SESSIONS.md). --cmd replaces it
 // (e.g. a bunos-wayland-win run). The window is any top-level window of msrdc.exe (WSLg) or bunos-wayland-win.exe whose
 // title contains --title (default: any new window). Prints JSON: ms from spawn to the window, its title and size.
-// Without --keep the session is stopped afterwards (the spawned wsl.exe is killed and the session's processes ended).
+// The session runs detached in the guest (setsid), so it outlives this probe; without --keep it is stopped afterwards.
 import { CString, JSCallback, dlopen, FFIType, ptr } from "bun:ffi";
 
 const argv = process.argv.slice(2);
@@ -17,6 +18,10 @@ if (!id || id.startsWith("--")) throw new Error("usage: bun session-probe.ts <se
 const timeout = Number(opt("--timeout", "60")) * 1000;
 const title = opt("--title");
 const distro = process.env.BUNOS_WSL_DISTRO ?? "bunos";
+if (id === "stop") {
+  stop();
+  process.exit(0);
+}
 
 const user32 = dlopen("user32.dll", {
   EnumWindows: { args: [FFIType.function, FFIType.i64], returns: FFIType.i32 },
@@ -94,7 +99,7 @@ const proc = Bun.spawn(
     "--",
     "sh",
     "-c",
-    `echo ${Buffer.from(line).toString("base64")} | base64 -d | sh >${log} 2>&1`,
+    `echo ${Buffer.from(line).toString("base64")} | base64 -d >/tmp/session-probe-${id}.sh; setsid -f sh /tmp/session-probe-${id}.sh >${log} 2>&1 </dev/null`,
   ],
   { stdout: "ignore", stderr: "ignore" },
 );
@@ -113,9 +118,14 @@ console.log(
     2,
   ),
 );
-if (!argv.includes("--keep")) {
-  proc.kill();
-  // End what the session started (compositor, viewer, wayvnc, dbus-run-session) as the distro user.
+if (!argv.includes("--keep")) stop();
+process.exit(found ? 0 : 1);
+
+/** End what a session started (compositor, its helpers, viewer, wayvnc, dbus-run-session): TERM, then KILL. */
+function stop() {
+  const pattern =
+    "bunos-session|wlvncc|wayvnc|Hyprland|/usr/bin/cosmic|cosmic-comp|gnome-shell|mutter-devkit|dbus-run-session";
+  const script = `pkill -f '${pattern}'; sleep 1; pkill -9 -f '${pattern}'; true`;
   Bun.spawnSync([
     "wsl.exe",
     "-d",
@@ -123,7 +133,6 @@ if (!argv.includes("--keep")) {
     "--",
     "sh",
     "-c",
-    "pkill -f bunos-session; pkill -x wlvncc; pkill -x wayvnc; pkill -f 'Hyprland|cosmic-comp|cosmic-session|gnome-shell|mutter-devkit'; true",
+    `echo ${Buffer.from(script).toString("base64")} | base64 -d | sh`,
   ]);
 }
-process.exit(found ? 0 : 1);

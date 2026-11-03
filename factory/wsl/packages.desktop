@@ -8,6 +8,10 @@ bunos-omarchy
 cosmic-session
 gnome-shell
 mutter-devkit
+# GNOME's screen-cast service (org.gnome.Shell.Screencast) hangs at activation without its GStreamer elements.
+gst-plugin-pipewire
+gst-plugins-base
+gst-plugins-good
 # Hyprland/Omarchy presentation: headless Hyprland -> wayvnc on 127.0.0.1 -> wlvncc as the WSLg window.
 wayvnc
 wlvncc

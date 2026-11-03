@@ -28,8 +28,8 @@ export LLVM=1
 # component); check it first so a missing component fails here with the real reason, not as a dropped line.
 make rustavailable || { echo "Rust toolchain unusable for the kernel (rustup component add rust-src?)" >&2; exit 1; }
 make olddefconfig
-# Fragments in order: Rust + identity, Android binder (Waydroid), Docker/Waydroid networking, Hyper-V latency.
-frags=(wsl-rust wsl-android wsl-docker wsl-latency)
+# Fragments in order: Rust + identity, Android binder (Waydroid), Docker/Waydroid networking, desktop (vkms), Hyper-V latency.
+frags=(wsl-rust wsl-android wsl-docker wsl-desktop wsl-latency)
 fragfiles=(); for f in "${frags[@]}"; do fragfiles+=("$repo/factory/wsl/kernel/$f.config"); done
 scripts/kconfig/merge_config.sh -m .config "${fragfiles[@]}"
 make olddefconfig
