@@ -7,7 +7,7 @@
  * where the desktop puts it; the reused renderers (MarkdownRenderer,
  * CodeBlock) read their `dark:` variants from there.
  */
-import { SHEET } from '../styles/sheet/colours.g'
+import { SHEET } from '../../lib/fatal-error'
 
 export type ThemePref = 'system' | 'dark' | 'light'
 export type ResolvedTheme = 'dark' | 'light'
