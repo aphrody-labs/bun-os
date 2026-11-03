@@ -16,28 +16,16 @@ describe("Craft agent bridge", () => {
       args: ["gridcraft-cli", "info", "a;$(touch nope).xlsx"],
     });
     expect(CRAFT_EXECUTE.category).toBe("terminal");
-    expect(CRAFT_EXECUTE.inputSchema.properties.engine.enum).toEqual(
-      allAppCapabilities().map((c) => c.libraryId),
-    );
+    expect(CRAFT_EXECUTE.inputSchema.properties.engine.enum).toEqual(allAppCapabilities().map(c => c.libraryId));
   });
 
   test("rejects unknown engines and malformed model input", () => {
     expect(typeof craftShellArgs({ engine: "sh", args: [] })).toBe("string");
-    expect(
-      typeof craftShellArgs({ engine: "wordcraft", args: ["ok", 2] }),
-    ).toBe("string");
-    expect(
-      typeof craftShellArgs({ engine: "filmcraft", args: ["bad\0value"] }),
-    ).toBe("string");
-    expect(
-      typeof craftShellArgs({ engine: "deckcraft", args: Array(33).fill("x") }),
-    ).toBe("string");
-    expect(
-      typeof craftShellArgs({ engine: "filmcraft", args: [], timeoutMs: -1 }),
-    ).toBe("string");
-    expect(
-      craftShellArgs({ engine: "filmcraft", args: [], timeoutMs: 180000 }),
-    ).toMatchObject({ timeout: 180000 });
+    expect(typeof craftShellArgs({ engine: "wordcraft", args: ["ok", 2] })).toBe("string");
+    expect(typeof craftShellArgs({ engine: "filmcraft", args: ["bad\0value"] })).toBe("string");
+    expect(typeof craftShellArgs({ engine: "deckcraft", args: Array(33).fill("x") })).toBe("string");
+    expect(typeof craftShellArgs({ engine: "filmcraft", args: [], timeoutMs: -1 })).toBe("string");
+    expect(craftShellArgs({ engine: "filmcraft", args: [], timeoutMs: 180000 })).toMatchObject({ timeout: 180000 });
   });
 
   test("keeps terminal execution out of read-only turns and mobile catalogs", () => {
