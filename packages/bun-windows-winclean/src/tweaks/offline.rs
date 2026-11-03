@@ -233,16 +233,17 @@ impl Drop for Hive {
     }
 }
 
-/// A mounted install image.
-pub struct OfflineBackend {
+/// A mounted install image. Borrows the process-wide [`Dism`] runtime so there is exactly one
+/// `DismInitialize`/`DismShutdown` pair for the whole build.
+pub struct OfflineBackend<'d> {
     mount: PathBuf,
-    dism: Dism,
+    dism: &'d Dism,
     hives: BTreeMap<&'static str, Hive>,
 }
 
-impl OfflineBackend {
-    /// Open an offline backend over an already mounted image directory with its DISM session.
-    pub fn new(mount: impl Into<PathBuf>, dism: Dism) -> Self {
+impl<'d> OfflineBackend<'d> {
+    /// Open an offline backend over an already mounted image directory, using `dism` for appx deprovisioning.
+    pub fn new(mount: impl Into<PathBuf>, dism: &'d Dism) -> Self {
         Self { mount: mount.into(), dism, hives: BTreeMap::new() }
     }
 
@@ -268,7 +269,7 @@ impl OfflineBackend {
     }
 }
 
-impl Backend for OfflineBackend {
+impl Backend for OfflineBackend<'_> {
     fn kind(&self) -> TargetKind {
         TargetKind::Offline
     }

@@ -1,0 +1,30 @@
+# SPDX-License-Identifier: Apache-2.0
+[package]
+name = "bunos-win11"
+version = "1.4.7"
+edition = "2024"
+authors = ["aphrody-dev <contact@aphrody.com>"]
+homepage = "https://aphrody.app"
+repository = "https://github.com/aphrody-labs/bun-os"
+license = "Apache-2.0"
+description = "Bun OS Windows 11 optimiser: an archinstall-style installer for the running Windows (guided TUI + declarative profiles) and an offline ISO builder, both driven by the bun-windows-winclean tweak engine and the same catalog. Tiny11-grade debloat, reversible, with a journal and restore point."
+
+[[bin]]
+name = "bunos-win11"
+path = "src/main.rs"
+
+[dependencies]
+bun-windows-winclean = { path = "../../packages/bun-windows-winclean", version = "1.4.7" }
+anyhow = { workspace = true }
+clap = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+toml = { workspace = true, features = ["parse", "display", "serde"] }
+dirs = { workspace = true }
+
+[target.'cfg(windows)'.dependencies]
+ratatui = { workspace = true }
+crossterm = { workspace = true }
+
+[lints]
+workspace = true

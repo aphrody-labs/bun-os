@@ -41,6 +41,7 @@ members = [
   "crates/aphrody-boq",
   "crates/aphrody-accounts",
   "packages/bun-windows-winclean",
+  "crates/bunos-win11",
   "crates/aphrody-shell-session",
   "crates/aphrody-shell-vfs",
   "crates/aphrody-terminal-core",
