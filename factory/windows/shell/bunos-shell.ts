@@ -442,6 +442,60 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
     status: () => regKeyExists(`HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Desktop\\NameSpace\\${NAVPANE_CLSID}`),
   },
 
+  icons: {
+    // Bun OS Material icons (design agent's bunos-icons.dll + icon-theme.json) applied per user:
+    // known folders through their desktop.ini IconResource (previous file content and attributes are
+    // kept and restored), This PC and the Recycle Bin through the per-user CLSID DefaultIcon override.
+    // File-type icons stay on our own ProgIDs only (BunOS.*): never another app's ProgID.
+    enable(c, files) {
+      const theme = iconTheme();
+      if (!theme) throw new Error(`${ICON_DLL} or its icon-theme.json is not installed`);
+      const folders = knownFolderPaths();
+      for (const entry of theme.icons.filter((i: any) => i.knownFolder && i.knownFolder !== "Public")) {
+        const path = folders[KNOWN_FOLDER_NAMES[entry.knownFolder] ?? entry.knownFolder];
+        if (!path || !existsSync(path)) continue;
+        setFolderIcon(files, path, iconRef(entry));
+      }
+      const clsid = "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\CLSID";
+      const byId = (id: string) => theme.icons.find((i: any) => i.id === id);
+      c.set(`${clsid}\\{20D04FE0-3AEA-1069-A2D8-08002B30309D}\\DefaultIcon`, "(default)", iconRef(byId("computer")));
+      const bin = `${clsid}\\{645FF040-5081-101B-9F08-00AA002F954E}\\DefaultIcon`;
+      c.set(bin, "(default)", iconRef(byId("trash-empty")));
+      c.set(bin, "empty", iconRef(byId("trash-empty")));
+      c.set(bin, "full", iconRef(byId("trash-full")));
+    },
+    disable(files) {
+      for (const id of Object.keys(files).filter(k => k.startsWith("folder-icon:"))) restoreFolderIcon(files, id);
+    },
+    status: () => regGet("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\CLSID\\{645FF040-5081-101B-9F08-00AA002F954E}\\DefaultIcon", "full")?.value?.includes("bunos-icons.dll") ?? false,
+  },
+
+  "icons-system": {
+    // Elevated (sudo): the system-wide shell icon slots (HKLM Shell Icons: folders, generic file,
+    // Recycle Bin, drives, This PC) and per-letter DriveIcons for the drives present now.
+    enable(c) {
+      requireAdmin();
+      const theme = iconTheme();
+      if (!theme) throw new Error(`${ICON_DLL} or its icon-theme.json is not installed`);
+      const shellIcons = "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Icons";
+      c.key(shellIcons);
+      for (const entry of theme.icons) for (const index of entry.shellIndex ?? []) c.set(shellIcons, String(index), iconRef(entry));
+      const drives = win("shell_drives", {})?.drives ?? [];
+      for (const d of drives) {
+        const entry = theme.icons.find((i: any) => i.kind === "drive" && i.drive === (d.type === "ramdisk" ? "ram" : d.type));
+        if (!entry) continue;
+        const letter = String(d.root)[0];
+        const key = `HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\DriveIcons\\${letter}\\DefaultIcon`;
+        c.key(`HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\DriveIcons\\${letter}`);
+        c.set(key, "(default)", iconRef(entry));
+      }
+    },
+    disable() {
+      requireAdmin();
+    },
+    status: () => regGet("HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Shell Icons", "3")?.value?.includes("bunos-icons.dll") ?? false,
+  },
+
   wm: {
     // The window manager session is owned by factory/windows/desktop/hyprland.ts (GlazeWM fork, tacky-borders,
     // Zebar, Flow Launcher, AltSnap, bunos-win11-chrome watch, bunos-win11-wallpaper; docs/WINDOWS-DESKTOP.md),
@@ -464,6 +518,80 @@ const components: Record<string, { enable(c: Changes, files: Files): void; disab
   },
 };
 
+// ---------------------------------------------------------------- icon theme
+
+const ICON_DLL = join(bunosRoot, "icons", "bunos-icons.dll");
+/** icon-theme.json names -> known-folder canonical names (IKnownFolderManager). */
+const KNOWN_FOLDER_NAMES: Record<string, string> = {
+  Desktop: "Desktop", Documents: "Personal", Downloads: "Downloads", Music: "My Music", Pictures: "My Pictures",
+  Videos: "My Video", Profile: "Profile", Screenshots: "Screenshots", SavedGames: "SavedGames", Favorites: "Favorites",
+  Links: "Links", Contacts: "Contacts", CameraRoll: "Camera Roll", Templates: "Templates", SkyDrive: "OneDrive",
+};
+
+function iconTheme(): any | null {
+  const file = join(bunosRoot, "icons", "icon-theme.json");
+  return existsSync(ICON_DLL) && existsSync(file) ? JSON.parse(readFileSync(file, "utf8")) : null;
+}
+
+/** `<dll>,-<ordinal>` in the light or dark set, following the user's app theme. */
+function iconRef(entry: any): string {
+  const light = regGet("HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme")?.value === "1";
+  return `${ICON_DLL},-${light ? entry.ordinal.light : entry.ordinal.dark}`;
+}
+
+function knownFolderPaths(): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const f of win("shell_known_folders", {})?.folders ?? []) if (f.path) out[f.name] = f.path;
+  return out;
+}
+
+/** desktop.ini is usually UTF-16 LE with a BOM; keep whatever encoding the folder had. */
+function readIni(path: string): { text: string; utf16: boolean } | null {
+  if (!existsSync(path)) return null;
+  const bytes = readFileSync(path);
+  const utf16 = bytes[0] === 0xff && bytes[1] === 0xfe;
+  return { text: utf16 ? bytes.subarray(2).toString("utf16le") : bytes.toString("utf8"), utf16 };
+}
+function writeIni(path: string, text: string, utf16: boolean) {
+  writeFileSync(path, utf16 ? Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from(text, "utf16le")]) : text);
+}
+const attrib = (...args: string[]) => run(["attrib.exe", ...args], { allowFail: true }).out;
+
+function setFolderIcon(files: Files, folder: string, ref: string) {
+  const ini = join(folder, "desktop.ini");
+  const id = `folder-icon:${folder}`;
+  const before = readIni(ini);
+  if (!files[id]) {
+    const readOnly = (attrib(folder).split(folder)[0] ?? "").includes("R");
+    files[id] = { path: ini, previous: before ? JSON.stringify({ text: before.text, utf16: before.utf16 }) : null, restore: { file: folder, key: "readonly", value: readOnly ? "1" : null } };
+  }
+  let text = before?.text ?? "";
+  const line = `IconResource=${ref}`;
+  if (/^\[\.ShellClassInfo\]/im.test(text)) {
+    text = /^IconResource=.*$/im.test(text) ? text.replace(/^IconResource=.*$/im, line) : text.replace(/^\[\.ShellClassInfo\]\r?$/im, m => `${m}\r\n${line}`);
+  } else {
+    text = `[.ShellClassInfo]\r\n${line}\r\n${text}`;
+  }
+  attrib("-s", "-h", "-r", ini);
+  writeIni(ini, text, before?.utf16 ?? true);
+  attrib("+s", "+h", ini);
+  attrib("+r", folder);
+}
+
+function restoreFolderIcon(files: Files, id: string) {
+  const f = files[id];
+  if (!f) return;
+  attrib("-s", "-h", "-r", f.path);
+  if (f.previous === null) rmSync(f.path, { force: true });
+  else {
+    const prev = JSON.parse(f.previous);
+    writeIni(f.path, prev.text, prev.utf16);
+    attrib("+s", "+h", f.path);
+  }
+  if (f.restore && f.restore.value === null) attrib("-r", f.restore.file);
+  delete files[id];
+}
+
 /** The windows-hyprland session is up when its staged GlazeWM runs (its own `status`). */
 function desktopRunning(): boolean {
   return existsSync(desktopTool) && /^running \d+ .*[\\/]glazewm\.exe\s*$/im.test(run([process.execPath, desktopTool, "status"], { allowFail: true }).out);
@@ -484,7 +612,7 @@ function shortcut(lnk: string, target: string, workdir: string) {
 }
 
 
-const ALL = ["nu-plugin", "terminal", "assoc", "verbs", "files", "navpane", "wm"];
+const ALL = ["nu-plugin", "terminal", "assoc", "verbs", "files", "navpane", "icons", "wm"];
 
 function enable(names: string[]) {
   const journal = loadJournal();

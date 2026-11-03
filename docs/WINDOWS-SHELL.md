@@ -157,16 +157,32 @@ unchanged files.
 Per user (no elevation):
 
 ```sh
-bun factory/windows/shell/bunos-shell.ts enable            # nu-plugin terminal assoc verbs files navpane wm
+bun factory/windows/shell/bunos-shell.ts enable            # nu-plugin terminal assoc verbs files navpane icons wm
 bun factory/windows/shell/bunos-shell.ts enable files-default
 bun factory/windows/shell/bunos-shell.ts disable wm        # toggle the window manager off
-bun factory/windows/shell/bunos-shell.ts undo              # everything back
+bun factory/windows/shell/bunos-shell.ts undo              # everything per-user back
 bun factory/windows/shell/bunos-shell.ts status
 ```
 
 Every registry value is written through `win set-registry-value` after its previous value (or absence) is
 journaled in `%LOCALAPPDATA%\bunos\shell\journal.json`; files we write are tracked in `files.json` with
 any previous content. `disable`/`undo` restore in reverse order.
+
+### Icons (Bun OS Material, design agent)
+
+`%SystemRoot%\BunOS\icons\bunos-icons.dll` and its `icon-theme.json` ([DESIGN-M3-WINDOWS.md](DESIGN-M3-WINDOWS.md))
+are applied in the light or dark set following `AppsUseLightTheme`:
+
+- `icons` (per user): each known folder's `desktop.ini` gets `IconResource=<dll>,-<ordinal>` (the original
+  file, its UTF-16 encoding and the folder's read-only bit are kept and restored byte for byte); This PC and
+  the Recycle Bin (empty/full) through `HKCU\...\Explorer\CLSID\{...}\DefaultIcon`; our own ProgIDs
+  (`BunOS.*`, the verbs, the pane entry) use the dll. Another application's ProgID is never re-iconed.
+- `icons-system` (elevated, `sudo.exe pwsh -NoProfile -Command "bun ...\bunos-shell.ts enable icons-system"`, same
+  for `disable`): `HKLM\...\Explorer\Shell Icons` (folder, open folder, generic file, Recycle Bin, drives,
+  This PC) and `HKLM\...\Explorer\DriveIcons\<letter>\DefaultIcon` for the drives present.
+
+No code here draws window frames or caption buttons (the chrome sets DWM attributes only; COSMIC Files' header
+bar comes from libcosmic), so the UIA names Close / Minimise / Zoom belong to those drawers.
 
 ## Verified on the workstation (2026-11-03, Windows 11 Pro 10.0.28120)
 
@@ -189,7 +205,7 @@ any previous content. `disable`/`undo` restore in reverse order.
   folder menu, COSMIC Files Open-with app and Start menu shortcut, the "Bun OS (Linux)" namespace entry
   resolving to `\\wsl.localhost\bunos`, WT fragment + `defaultProfile`, Rio config, plugin registered and
   callable, autostart), then `undo` returned every check to its previous state (WT `defaultProfile` restored,
-  the WT fragment stub removed, JSON still valid). Left enabled afterwards: everything except `files-default`.
+  the WT fragment stub removed, JSON still valid). Left enabled afterwards: everything except `files-default`, plus `icons-system`. `icons` and `icons-system` were each enabled, disabled (Documents `desktop.ini` byte-identical, HKCU/HKLM values back to their originals, including type) and enabled again; Explorer shows the Material icons and the pinned "Bun OS (Linux)" entry. `shell_context_menu --action popup` showed Explorer's full menu (Open with, Send to, 7-Zip, Rizin, Properties) and returned `chosen: null` when dismissed.
 - **COSMIC Files**: runs natively; the sidebar lists `OS (C:)`, `BunShare (V:)` and `Bun OS (Linux)`; Trash
   is the Windows Recycle Bin. Screenshots: `.tmp-shell/shots` on the workstation (not committed).
 - `.sh`: Windows keeps an Open-with list for `.sh` and honours only a hash-protected `UserChoice` there, so
