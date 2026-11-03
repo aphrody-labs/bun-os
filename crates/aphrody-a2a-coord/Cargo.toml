@@ -27,6 +27,7 @@ perf = { level = "warn", priority = -1 }
 [dependencies]
 aphrody-proc = { path = "../aphrody-proc", version = "1.4.7", features = [] }
 aphrody-a2a = { path = "../aphrody-a2a", version = "1.4.7", features = [] }
+aphrody-http-error = { path = "../aphrody-http-error", version = "1.4.7" }
 aphrody-a2a-server = { path = "../aphrody-a2a-server", version = "1.4.7", default-features = false, features = [] }
 axum = { version = "0.8", default-features = false, features = ["json", "query", "tokio", "http1", "http2"] }
 serde = { version = "1.0.228", features = ["derive", "std"], default-features = false }

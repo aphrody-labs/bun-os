@@ -1,0 +1,3343 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Bun OS API",
+    "version": "1",
+    "description": "Every service behind api.aphrody.com, one document (docs/ops/API.md). Each service also serves its own document at /v1/<service>/openapi.json.",
+    "license": {
+      "name": "Apache-2.0",
+      "identifier": "Apache-2.0"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.aphrody.com/v1",
+      "description": "Bun OS API gateway"
+    }
+  ],
+  "tags": [
+    {
+      "name": "a2a/a2a",
+      "description": "Aphrody A2A hub: a2a"
+    },
+    {
+      "name": "a2a/contract",
+      "description": "Aphrody A2A hub: contract"
+    },
+    {
+      "name": "a2a/coord",
+      "description": "Aphrody A2A hub: coord"
+    },
+    {
+      "name": "a2a/peers",
+      "description": "Aphrody A2A hub: peers"
+    },
+    {
+      "name": "bunos/contract",
+      "description": "Bun OS product API: contract"
+    },
+    {
+      "name": "bunos/product",
+      "description": "Bun OS product API: product"
+    },
+    {
+      "name": "chat/contract",
+      "description": "Aphrody Chat: contract"
+    },
+    {
+      "name": "chat/openai",
+      "description": "Aphrody Chat: openai"
+    },
+    {
+      "name": "downloads/contract",
+      "description": "Aphrody downloads: contract"
+    },
+    {
+      "name": "downloads/install",
+      "description": "Aphrody downloads: install"
+    },
+    {
+      "name": "downloads/release",
+      "description": "Aphrody downloads: release"
+    },
+    {
+      "name": "fonts/assets",
+      "description": "Aphrody fonts and asset CDN: assets"
+    },
+    {
+      "name": "fonts/contract",
+      "description": "Aphrody fonts and asset CDN: contract"
+    },
+    {
+      "name": "fonts/fonts",
+      "description": "Aphrody fonts and asset CDN: fonts"
+    },
+    {
+      "name": "site/catalog",
+      "description": "Aphrody site: catalog"
+    },
+    {
+      "name": "site/contract",
+      "description": "Aphrody site: contract"
+    },
+    {
+      "name": "site/design",
+      "description": "Aphrody site: design"
+    },
+    {
+      "name": "site/search",
+      "description": "Aphrody site: search"
+    },
+    {
+      "name": "store/catalog",
+      "description": "Bun OS Store: catalog"
+    },
+    {
+      "name": "store/contract",
+      "description": "Bun OS Store: contract"
+    },
+    {
+      "name": "store/winget",
+      "description": "Bun OS Store: winget"
+    },
+    {
+      "name": "webos/contract",
+      "description": "Bun OS WebOS server: contract"
+    },
+    {
+      "name": "webos/emulators",
+      "description": "Bun OS WebOS server: emulators"
+    },
+    {
+      "name": "webos/inventory",
+      "description": "Bun OS WebOS server: inventory"
+    },
+    {
+      "name": "webos/sessions",
+      "description": "Bun OS WebOS server: sessions"
+    }
+  ],
+  "x-tagGroups": [
+    {
+      "name": "Aphrody A2A hub",
+      "tags": ["a2a/a2a", "a2a/contract", "a2a/coord", "a2a/peers"]
+    },
+    {
+      "name": "Bun OS product API",
+      "tags": ["bunos/contract", "bunos/product"]
+    },
+    {
+      "name": "Aphrody Chat",
+      "tags": ["chat/contract", "chat/openai"]
+    },
+    {
+      "name": "Aphrody downloads",
+      "tags": ["downloads/contract", "downloads/install", "downloads/release"]
+    },
+    {
+      "name": "Aphrody fonts and asset CDN",
+      "tags": ["fonts/assets", "fonts/contract", "fonts/fonts"]
+    },
+    {
+      "name": "Aphrody site",
+      "tags": ["site/catalog", "site/contract", "site/design", "site/search"]
+    },
+    {
+      "name": "Bun OS Store",
+      "tags": ["store/catalog", "store/contract", "store/winget"]
+    },
+    {
+      "name": "Bun OS WebOS server",
+      "tags": ["webos/contract", "webos/emulators", "webos/inventory", "webos/sessions"]
+    }
+  ],
+  "paths": {
+    "/a2a/": {
+      "post": {
+        "operationId": "a2a_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "A2A JSON-RPC",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "jsonrpc"
+      }
+    },
+    "/a2a/.well-known/agent-card.json": {
+      "get": {
+        "operationId": "a2a_getWellKnownAgentCardJson",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Agent card",
+        "tags": ["a2a/a2a"]
+      }
+    },
+    "/a2a/a2a": {
+      "post": {
+        "operationId": "a2a_postA2a",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "A2A JSON-RPC bridge to the mailbox",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "jsonrpc"
+      }
+    },
+    "/a2a/coord": {
+      "get": {
+        "operationId": "a2a_getCoord",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Coordination state",
+        "tags": ["a2a/coord"]
+      }
+    },
+    "/a2a/coord/{namespace}/envelopes": {
+      "get": {
+        "operationId": "a2a_getCoordByNamespaceEnvelopes",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List envelopes",
+        "tags": ["a2a/coord"]
+      },
+      "post": {
+        "operationId": "a2a_postCoordByNamespaceEnvelopes",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Append an envelope",
+        "tags": ["a2a/coord"]
+      }
+    },
+    "/a2a/coord/{namespace}/tasks": {
+      "get": {
+        "operationId": "a2a_getCoordByNamespaceTasks",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List coordination tasks",
+        "tags": ["a2a/coord"]
+      },
+      "post": {
+        "operationId": "a2a_postCoordByNamespaceTasks",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a coordination task",
+        "tags": ["a2a/coord"]
+      }
+    },
+    "/a2a/coord/{namespace}/tasks/{task_id}": {
+      "delete": {
+        "operationId": "a2a_deleteCoordByNamespaceTasksByTaskId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a coordination task",
+        "tags": ["a2a/coord"]
+      },
+      "get": {
+        "operationId": "a2a_getCoordByNamespaceTasksByTaskId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "namespace",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "task_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a coordination task",
+        "tags": ["a2a/coord"]
+      }
+    },
+    "/a2a/extendedAgentCard": {
+      "get": {
+        "operationId": "a2a_getExtendedAgentCard",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Extended agent card",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "a2a"
+      }
+    },
+    "/a2a/health": {
+      "get": {
+        "operationId": "a2a_getHealth",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "A required check failed"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Health",
+        "tags": ["a2a/contract"]
+      }
+    },
+    "/a2a/message:send": {
+      "post": {
+        "operationId": "a2a_postMessageSend",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send a message",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "a2a"
+      }
+    },
+    "/a2a/message:stream": {
+      "post": {
+        "operationId": "a2a_postMessageStream",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Send a message and stream the task",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "a2a",
+        "x-stream": "sse"
+      }
+    },
+    "/a2a/msg": {
+      "post": {
+        "operationId": "a2a_postMsg",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Post a coordination message",
+        "tags": ["a2a/coord"]
+      }
+    },
+    "/a2a/openapi.json": {
+      "get": {
+        "operationId": "a2a_getOpenapi",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "OpenAPI document",
+        "tags": ["a2a/contract"]
+      }
+    },
+    "/a2a/peers": {
+      "get": {
+        "operationId": "a2a_getPeers",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List peers",
+        "tags": ["a2a/peers"]
+      },
+      "post": {
+        "operationId": "a2a_postPeers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Register a peer",
+        "tags": ["a2a/peers"]
+      }
+    },
+    "/a2a/ping": {
+      "get": {
+        "operationId": "a2a_getPing",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Liveness of the listener",
+        "tags": ["a2a/coord"]
+      }
+    },
+    "/a2a/tasks": {
+      "get": {
+        "operationId": "a2a_getTasks",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List tasks",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "a2a"
+      }
+    },
+    "/a2a/tasks/{id}": {
+      "get": {
+        "operationId": "a2a_getTasksById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a task",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "a2a"
+      },
+      "post": {
+        "operationId": "a2a_postTasksById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Task action (cancel, subscribe)",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "a2a"
+      }
+    },
+    "/a2a/tasks/{id}/pushNotificationConfigs": {
+      "get": {
+        "operationId": "a2a_getTasksByIdPushNotificationConfigs",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List push configurations",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "a2a"
+      },
+      "post": {
+        "operationId": "a2a_postTasksByIdPushNotificationConfigs",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create a push configuration",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "a2a"
+      }
+    },
+    "/a2a/tasks/{id}/pushNotificationConfigs/{config_id}": {
+      "delete": {
+        "operationId": "a2a_deleteTasksByIdPushNotificationConfigsByConfigId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "config_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete a push configuration",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "a2a"
+      },
+      "get": {
+        "operationId": "a2a_getTasksByIdPushNotificationConfigsByConfigId",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "config_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get a push configuration",
+        "tags": ["a2a/a2a"],
+        "x-error-format": "a2a"
+      }
+    },
+    "/bunos/apps": {
+      "get": {
+        "operationId": "bunos_getApps",
+        "summary": "Apps and qualification",
+        "tags": ["bunos/product"],
+        "responses": {
+          "200": {
+            "description": "Apps",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/bunos/health": {
+      "get": {
+        "operationId": "bunos_getHealth",
+        "summary": "Health",
+        "description": "Liveness and version of the running release; 503 when a required check fails.",
+        "tags": ["bunos/contract"],
+        "responses": {
+          "200": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/bunos/openapi.json": {
+      "get": {
+        "operationId": "bunos_getOpenapi",
+        "summary": "OpenAPI document",
+        "description": "This document (OpenAPI 3.1).",
+        "tags": ["bunos/contract"],
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.1 document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/bunos/owners": {
+      "get": {
+        "operationId": "bunos_getOwners",
+        "summary": "API owners",
+        "tags": ["bunos/product"],
+        "responses": {
+          "200": {
+            "description": "Owner of each surface",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/bunos/sources": {
+      "get": {
+        "operationId": "bunos_getSources",
+        "summary": "Product sources",
+        "tags": ["bunos/product"],
+        "responses": {
+          "200": {
+            "description": "Sources and revisions",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/bunos/status": {
+      "get": {
+        "operationId": "bunos_getStatus",
+        "summary": "Process status",
+        "tags": ["bunos/product"],
+        "responses": {
+          "200": {
+            "description": "Product, runtime and catalog",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/chat/health": {
+      "get": {
+        "operationId": "chat_getHealth",
+        "summary": "Health",
+        "description": "Liveness and version of the running release; 503 when a required check fails.",
+        "tags": ["chat/contract"],
+        "responses": {
+          "200": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/chat/healthz": {
+      "get": {
+        "operationId": "chat_getHealthz",
+        "summary": "Legacy health",
+        "tags": ["chat/contract"],
+        "responses": {
+          "200": {
+            "description": "Legacy health body; use /health",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/chat/openapi.json": {
+      "get": {
+        "operationId": "chat_getOpenapi",
+        "summary": "OpenAPI document",
+        "description": "This document (OpenAPI 3.1).",
+        "tags": ["chat/contract"],
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.1 document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/chat/v1/chat/completions": {
+      "post": {
+        "operationId": "chat_postV1ChatCompletions",
+        "summary": "Create a chat completion",
+        "description": "`stream: true` answers Server-Sent Events. `max_tokens` is capped; requests are budgeted per client.",
+        "tags": ["chat/openai"],
+        "requestBody": {
+          "required": true,
+          "description": "OpenAI ChatCompletionRequest (model, messages, stream, temperature, max_tokens)",
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Completion, or an SSE stream of chunks",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown model",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "429": {
+            "description": "Request budget exhausted",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "502": {
+            "description": "Model backend error",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "503": {
+            "description": "Inference credentials or backend unavailable",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "x-stream": "sse",
+        "x-error-format": "openai"
+      }
+    },
+    "/chat/v1/models": {
+      "get": {
+        "operationId": "chat_getV1Models",
+        "summary": "List models",
+        "tags": ["chat/openai"],
+        "responses": {
+          "200": {
+            "description": "OpenAI model list",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "x-error-format": "openai"
+      }
+    },
+    "/downloads/": {
+      "get": {
+        "operationId": "downloads_get",
+        "summary": "Download page",
+        "tags": ["downloads/release"],
+        "responses": {
+          "200": {
+            "description": "HTML index",
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/downloads/files/{name}": {
+      "get": {
+        "operationId": "downloads_getFilesByName",
+        "summary": "Artifact",
+        "description": "Supports `Range` (206, 416).",
+        "tags": ["downloads/release"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Range",
+            "in": "header",
+            "required": false,
+            "description": "bytes=<start>-<end>",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Artifact bytes",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "206": {
+            "description": "Partial content",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such artifact",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "416": {
+            "description": "Range not satisfiable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/downloads/health": {
+      "get": {
+        "operationId": "downloads_getHealth",
+        "summary": "Health",
+        "description": "Liveness and version of the running release; 503 when a required check fails.",
+        "tags": ["downloads/contract"],
+        "responses": {
+          "200": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/downloads/healthz": {
+      "get": {
+        "operationId": "downloads_getHealthz",
+        "summary": "Legacy health",
+        "tags": ["downloads/contract"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/downloads/install.ps1": {
+      "get": {
+        "operationId": "downloads_getInstallPs1",
+        "summary": "Windows installer",
+        "tags": ["downloads/install"],
+        "responses": {
+          "200": {
+            "description": "PowerShell installer",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/downloads/install.sh": {
+      "get": {
+        "operationId": "downloads_getInstallSh",
+        "summary": "POSIX installer",
+        "tags": ["downloads/install"],
+        "responses": {
+          "200": {
+            "description": "Shell installer",
+            "content": {
+              "text/x-shellscript": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/downloads/latest.json": {
+      "get": {
+        "operationId": "downloads_getLatestJson",
+        "summary": "Release manifest",
+        "description": "Artifacts with name, version, platform, url, sha256 and size.",
+        "tags": ["downloads/release"],
+        "responses": {
+          "200": {
+            "description": "Manifest",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "No published release",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/downloads/openapi.json": {
+      "get": {
+        "operationId": "downloads_getOpenapi",
+        "summary": "OpenAPI document",
+        "description": "This document (OpenAPI 3.1).",
+        "tags": ["downloads/contract"],
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.1 document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/downloads/releases/{id}/files/{name}": {
+      "get": {
+        "operationId": "downloads_getReleasesByIdFilesByName",
+        "summary": "Artifact of a kept release",
+        "tags": ["downloads/release"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Artifact bytes (immutable)",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No such release or artifact",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/downloads/releases/{id}/latest.json": {
+      "get": {
+        "operationId": "downloads_getReleasesByIdLatestJson",
+        "summary": "Manifest of a kept release",
+        "tags": ["downloads/release"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Manifest",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "No such release",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/downloads/SHA256SUMS": {
+      "get": {
+        "operationId": "downloads_getSHA256SUMS",
+        "summary": "Checksums",
+        "tags": ["downloads/release"],
+        "responses": {
+          "200": {
+            "description": "`<sha256>  <file>` lines",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/fonts/css": {
+      "get": {
+        "operationId": "fonts_getCss",
+        "summary": "Font CSS (v1 API)",
+        "tags": ["fonts/fonts"],
+        "parameters": [
+          {
+            "name": "family",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stylesheet",
+            "content": {
+              "text/css": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Family not allowed",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              }
+            }
+          },
+          "403": {
+            "description": "Family not allowed",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "x-error-format": "text"
+      }
+    },
+    "/fonts/css2": {
+      "get": {
+        "operationId": "fonts_getCss2",
+        "summary": "Font CSS (css2 API)",
+        "tags": ["fonts/fonts"],
+        "parameters": [
+          {
+            "name": "family",
+            "in": "query",
+            "required": true,
+            "description": "Family and axes, repeatable",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stylesheet with rewritten font URLs",
+            "content": {
+              "text/css": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Family not allowed",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              }
+            }
+          },
+          "403": {
+            "description": "Family not allowed",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "x-error-format": "text"
+      }
+    },
+    "/fonts/h/{file}": {
+      "get": {
+        "operationId": "fonts_getHByFile",
+        "summary": "Content-addressed asset",
+        "tags": ["fonts/assets"],
+        "parameters": [
+          {
+            "name": "file",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Immutable file named by its hash",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/fonts/health": {
+      "get": {
+        "operationId": "fonts_getHealth",
+        "summary": "Health",
+        "description": "Liveness and version of the running release; 503 when a required check fails.",
+        "tags": ["fonts/contract"],
+        "responses": {
+          "200": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/fonts/icon": {
+      "get": {
+        "operationId": "fonts_getIcon",
+        "summary": "Icon font CSS",
+        "tags": ["fonts/fonts"],
+        "parameters": [
+          {
+            "name": "family",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stylesheet",
+            "content": {
+              "text/css": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Family not allowed",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "x-error-format": "text"
+      }
+    },
+    "/fonts/openapi.json": {
+      "get": {
+        "operationId": "fonts_getOpenapi",
+        "summary": "OpenAPI document",
+        "description": "This document (OpenAPI 3.1).",
+        "tags": ["fonts/contract"],
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.1 document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/fonts/s/{path}": {
+      "get": {
+        "operationId": "fonts_getSByPath",
+        "summary": "Font file, Material Symbols SVG or asset CDN file",
+        "description": "`/s/<family>/v<n>/<file>.woff2` (immutable), `/s/i/...` icons, `/s/<scope>/<path>` CDN release files.",
+        "tags": ["fonts/fonts", "fonts/assets"],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "File",
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Family not allowed",
+            "content": {
+              "text/plain": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "x-error-format": "text"
+      }
+    },
+    "/site/design": {
+      "get": {
+        "operationId": "site_getDesign",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Design reference summary",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/design/assets": {
+      "get": {
+        "operationId": "site_getDesignAssets",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Design assets",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/design/docs": {
+      "get": {
+        "operationId": "site_getDesignDocs",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Design documents",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/design/docs/{slug}": {
+      "get": {
+        "operationId": "site_getDesignDocsBySlug",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "One design document",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/design/google": {
+      "get": {
+        "operationId": "site_getDesignGoogle",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Google design catalog",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/design/google/docs/{slug}": {
+      "get": {
+        "operationId": "site_getDesignGoogleDocsBySlug",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "One Google design document",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/design/specs": {
+      "get": {
+        "operationId": "site_getDesignSpecs",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Component specs",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/design/specs/{slug}": {
+      "get": {
+        "operationId": "site_getDesignSpecsBySlug",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "One component spec",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/design/style-tokens": {
+      "get": {
+        "operationId": "site_getDesignStyleTokens",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Style tokens",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/design/tokens": {
+      "get": {
+        "operationId": "site_getDesignTokens",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "M3 design tokens",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/design/tokens/high-contrast": {
+      "get": {
+        "operationId": "site_getDesignTokensHighContrast",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "High-contrast tokens",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/docs": {
+      "get": {
+        "operationId": "site_getDocs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "category",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Search documentation",
+        "tags": ["site/catalog"]
+      }
+    },
+    "/site/health": {
+      "get": {
+        "operationId": "site_getHealth",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "A required check failed"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Health",
+        "tags": ["site/contract"]
+      }
+    },
+    "/site/m3/css": {
+      "get": {
+        "operationId": "site_getM3Css",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sheet",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "seed",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "variant",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "dark",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "contrast",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/css": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Generated M3 stylesheet",
+        "tags": ["site/design"]
+      }
+    },
+    "/site/openapi.json": {
+      "get": {
+        "operationId": "site_getOpenapi",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "OpenAPI document",
+        "tags": ["site/contract"]
+      }
+    },
+    "/site/search": {
+      "get": {
+        "operationId": "site_getSearch",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "vertical",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hl",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "safe",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Web search",
+        "tags": ["site/search"]
+      }
+    },
+    "/site/templates": {
+      "get": {
+        "operationId": "site_getTemplates",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Template catalog",
+        "tags": ["site/catalog"]
+      }
+    },
+    "/store/catalog": {
+      "get": {
+        "operationId": "store_getCatalog",
+        "summary": "Store catalog",
+        "tags": ["store/catalog"],
+        "responses": {
+          "200": {
+            "description": "Unified catalog",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Not generated yet",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/store/health": {
+      "get": {
+        "operationId": "store_getHealth",
+        "summary": "Health",
+        "description": "Liveness and version of the running release; 503 when a required check fails.",
+        "tags": ["store/contract"],
+        "responses": {
+          "200": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service health",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/store/index/{format}": {
+      "get": {
+        "operationId": "store_getIndexByFormat",
+        "summary": "Package index of one format",
+        "tags": ["store/catalog"],
+        "parameters": [
+          {
+            "name": "format",
+            "in": "path",
+            "description": "Package format",
+            "schema": {
+              "type": "string",
+              "enum": ["pacman", "apk", "flatpak", "npm", "cargo", "android", "winget", "apt", "appstream"]
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Index entries",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown format or not generated",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/store/openapi.json": {
+      "get": {
+        "operationId": "store_getOpenapi",
+        "summary": "OpenAPI document",
+        "description": "This document (OpenAPI 3.1).",
+        "tags": ["store/contract"],
+        "responses": {
+          "200": {
+            "description": "OpenAPI 3.1 document",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/store/qualification": {
+      "get": {
+        "operationId": "store_getQualification",
+        "summary": "Qualification results",
+        "description": "Last install/run qualification of every package format.",
+        "tags": ["store/catalog"],
+        "responses": {
+          "200": {
+            "description": "Qualification report",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Not generated yet",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        }
+      }
+    },
+    "/store/winget/information": {
+      "get": {
+        "operationId": "store_getWingetInformation",
+        "summary": "winget REST source information",
+        "tags": ["store/winget"],
+        "responses": {
+          "200": {
+            "description": "Source information (winget-cli-restsource)",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "x-error-format": "winget"
+      }
+    },
+    "/store/winget/manifestSearch": {
+      "post": {
+        "operationId": "store_postWingetManifestSearch",
+        "summary": "winget manifest search",
+        "tags": ["store/winget"],
+        "requestBody": {
+          "required": true,
+          "description": "winget ManifestSearchRequest",
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Matching packages",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No match",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid JSON",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "x-error-format": "winget"
+      }
+    },
+    "/store/winget/packageManifests/{id}": {
+      "get": {
+        "operationId": "store_getWingetPackageManifestsById",
+        "summary": "winget package manifest",
+        "tags": ["store/winget"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Version",
+            "in": "query",
+            "description": "Only this package version",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Package manifests",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "204": {
+            "description": "No such version",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "404": {
+            "description": "Package not found",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "x-error-format": "winget"
+      }
+    },
+    "/webos/emulators": {
+      "get": {
+        "operationId": "webos_getEmulators",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Emulator catalog",
+        "tags": ["webos/emulators"]
+      }
+    },
+    "/webos/emulators/qualification": {
+      "get": {
+        "operationId": "webos_getEmulatorsQualification",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Emulator qualification",
+        "tags": ["webos/emulators"]
+      }
+    },
+    "/webos/emulators/qualification/{file}": {
+      "get": {
+        "operationId": "webos_getEmulatorsQualificationByFile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "file",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/png": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Qualification screenshot",
+        "tags": ["webos/emulators"]
+      }
+    },
+    "/webos/health": {
+      "get": {
+        "operationId": "webos_getHealth",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "A required check failed"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Health",
+        "tags": ["webos/contract"]
+      }
+    },
+    "/webos/inventory": {
+      "get": {
+        "operationId": "webos_getInventory",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Inventory index",
+        "tags": ["webos/inventory"]
+      }
+    },
+    "/webos/inventory/{rest}": {
+      "get": {
+        "operationId": "webos_getInventoryByRest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rest",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Inventory file",
+        "tags": ["webos/inventory"]
+      }
+    },
+    "/webos/openapi.json": {
+      "get": {
+        "operationId": "webos_getOpenapi",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "OpenAPI document",
+        "tags": ["webos/contract"]
+      }
+    },
+    "/webos/rpc": {
+      "get": {
+        "operationId": "webos_getRpc",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Inventory JSON-RPC (query form)",
+        "tags": ["webos/inventory"],
+        "x-error-format": "jsonrpc"
+      },
+      "post": {
+        "operationId": "webos_postRpc",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Inventory JSON-RPC",
+        "tags": ["webos/inventory"],
+        "x-error-format": "jsonrpc"
+      }
+    },
+    "/webos/session": {
+      "get": {
+        "operationId": "webos_getSession",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Session availability",
+        "tags": ["webos/sessions"]
+      }
+    },
+    "/webos/sessions": {
+      "post": {
+        "operationId": "webos_postSessions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {}
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Start a session",
+        "tags": ["webos/sessions"]
+      }
+    },
+    "/webos/sessions/{id}": {
+      "delete": {
+        "operationId": "webos_deleteSessionsById",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Stop a session",
+        "tags": ["webos/sessions"]
+      }
+    },
+    "/webos/sessions/{id}/stream": {
+      "get": {
+        "operationId": "webos_getSessionsByIdStream",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "101": {
+            "description": "WebSocket upgrade"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Session stream",
+        "tags": ["webos/sessions"],
+        "x-stream": "websocket"
+      }
+    },
+    "/webos/{kind}": {
+      "get": {
+        "operationId": "webos_getByKind",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "Inventory records of one kind (apps, packages, crates, factory, ...)",
+        "tags": ["webos/inventory"]
+      }
+    },
+    "/webos/{kind}/{rest}": {
+      "get": {
+        "operationId": "webos_getByKindByRest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "rest",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "OK"
+          },
+          "default": {
+            "$ref": "#/components/responses/Problem"
+          }
+        },
+        "summary": "One inventory record",
+        "tags": ["webos/inventory"]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Check": {
+        "properties": {
+          "detail": {
+            "type": "string"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "optional": {
+            "type": "boolean"
+          }
+        },
+        "required": ["ok"],
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "channel": {
+            "type": ["string", "null"]
+          },
+          "checks": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Check"
+            },
+            "type": "object"
+          },
+          "commit": {
+            "type": ["string", "null"]
+          },
+          "service": {
+            "type": "string"
+          },
+          "status": {
+            "enum": ["ok", "degraded", "down"],
+            "type": "string"
+          },
+          "uptimeSeconds": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "version": {
+            "type": "string"
+          }
+        },
+        "required": ["status", "service", "version"],
+        "type": "object"
+      },
+      "Problem": {
+        "description": "RFC 9457 problem details",
+        "properties": {
+          "detail": {
+            "type": "string"
+          },
+          "instance": {
+            "format": "uri-reference",
+            "type": "string"
+          },
+          "status": {
+            "maximum": 599,
+            "minimum": 100,
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "default": "about:blank",
+            "format": "uri-reference",
+            "type": "string"
+          }
+        },
+        "required": ["type", "title", "status"],
+        "type": "object"
+      }
+    },
+    "responses": {
+      "Problem": {
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        },
+        "description": "Error"
+      },
+      "Unauthorized": {
+        "content": {
+          "application/problem+json": {
+            "schema": {
+              "$ref": "#/components/schemas/Problem"
+            }
+          }
+        },
+        "description": "Missing or invalid bearer token"
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  }
+}

@@ -5,11 +5,62 @@
  * User-Agent (WOFF2 + unicode-range subsets) and its gstatic URLs are rewritten to this origin.
  * Only the allowed families are proxied (default: the Material 3 fonts and Material Symbols).
  * With `staticRoot`, the files of the asset CDN release trees (`/h/`, `/s/<scope>/`) are served
- * first, roots in order; paths none holds fall through to the proxy.
+ * first, roots in order; paths none holds fall through to the proxy. Public as https://api.aphrody.com/v1/fonts/
+ * with /openapi.json and /health (docs/ops/API.md).
  */
 import { stat } from "node:fs/promises";
 import { extname, join } from "node:path";
+import { apiContract, defineApi } from "../../bun-os-platform/src/api/index.ts";
 import { type EdgeRoute, createEdgeProxy } from "./edge-proxy.ts";
+
+const text = (description: string, type: string) => ({ description, type, schema: { type: "string" } });
+const refused = { description: "Family not allowed", type: "text/plain" };
+/** The fonts proxy routes: the single source of its OpenAPI document. */
+export const fontsSpec = defineApi(
+  {
+    service: "fonts",
+    title: "Aphrody fonts and asset CDN",
+    version: "1.4.7",
+    description:
+      "Google Fonts edge proxy with the fonts.googleapis.com and fonts.gstatic.com paths, restricted to the Material 3 families and Material Symbols, plus the content-addressed asset CDN release trees.",
+  },
+  {
+    "GET /css2": {
+      summary: "Font CSS (css2 API)",
+      tags: ["fonts"],
+      errorFormat: "text",
+      params: [{ name: "family", in: "query", required: true, description: "Family and axes, repeatable" }],
+      responses: { 200: text("Stylesheet with rewritten font URLs", "text/css"), 400: refused, 403: refused },
+    },
+    "GET /css": {
+      summary: "Font CSS (v1 API)",
+      tags: ["fonts"],
+      errorFormat: "text",
+      params: [{ name: "family", in: "query", required: true }],
+      responses: { 200: text("Stylesheet", "text/css"), 400: refused, 403: refused },
+    },
+    "GET /icon": {
+      summary: "Icon font CSS",
+      tags: ["fonts"],
+      errorFormat: "text",
+      params: [{ name: "family", in: "query", required: true }],
+      responses: { 200: text("Stylesheet", "text/css"), 403: refused },
+    },
+    "GET /s/{path*}": {
+      summary: "Font file, Material Symbols SVG or asset CDN file",
+      description:
+        "`/s/<family>/v<n>/<file>.woff2` (immutable), `/s/i/...` icons, `/s/<scope>/<path>` CDN release files.",
+      tags: ["fonts", "assets"],
+      errorFormat: "text",
+      responses: { 200: text("File", "application/octet-stream"), 403: refused },
+    },
+    "GET /h/{file}": {
+      summary: "Content-addressed asset",
+      tags: ["assets"],
+      responses: { 200: text("Immutable file named by its hash", "application/octet-stream") },
+    },
+  },
+);
 
 export const M3_FONT_FAMILIES = [
   "Google Sans Flex",
@@ -169,11 +220,25 @@ export function serveFontsProxy(
 ) {
   const handle = createFontsProxy(opts);
   const roots = [opts.staticRoot ?? []].flat().filter(Boolean);
+  const contract = apiContract(fontsSpec, {
+    checks: async () => ({
+      cache: {
+        ok: await stat(opts.cacheDir).then(
+          i => i.isDirectory(),
+          () => false,
+        ),
+        optional: true,
+        detail: "font cache directory",
+      },
+    }),
+    extra: () => ({ ok: true }),
+  });
   return Bun.serve({
     hostname: opts.hostname ?? "127.0.0.1",
     port: opts.port ?? 8796,
-    routes: { "/health": Response.json({ ok: true, service: "aphrody-fonts-proxy" }) },
     fetch: async req => {
+      const standard = await contract(req);
+      if (standard) return standard;
       if (roots.length && (req.method === "GET" || req.method === "HEAD")) {
         const file = await staticFromRoots(roots, new URL(req.url).pathname);
         if (file) return file;

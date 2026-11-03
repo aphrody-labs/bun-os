@@ -25,6 +25,51 @@ use tower_http::{
     compression::CompressionLayer, services::ServeDir, set_header::SetResponseHeaderLayer,
 };
 
+use aphrody_http_error::api::{Op, Service};
+
+/// Public API of the WebOS server: https://api.aphrody.com/v1/webos/ (mounted at `/api`; docs/ops/API.md).
+pub const API: Service = Service {
+    name: "webos",
+    title: "Bun OS WebOS server",
+    version: env!("CARGO_PKG_VERSION"),
+    description: "Sessions of the host's Bun OS desktops and their WebSocket stream, the emulator catalog and its qualification, and the inventory of every Bun OS member (records and JSON-RPC).",
+    ops: &[
+        Op::get("/session", "Session availability").tag("sessions"),
+        Op::post("/sessions", "Start a session")
+            .tag("sessions")
+            .auth(),
+        Op::delete("/sessions/{id}", "Stop a session")
+            .tag("sessions")
+            .auth(),
+        Op::get("/sessions/{id}/stream", "Session stream")
+            .tag("sessions")
+            .auth()
+            .websocket(),
+        Op::get("/emulators", "Emulator catalog").tag("emulators"),
+        Op::get("/emulators/qualification", "Emulator qualification").tag("emulators"),
+        Op::get(
+            "/emulators/qualification/{file}",
+            "Qualification screenshot",
+        )
+        .tag("emulators")
+        .content("image/png"),
+        Op::get("/inventory", "Inventory index").tag("inventory"),
+        Op::get("/inventory/{rest*}", "Inventory file").tag("inventory"),
+        Op::get("/rpc", "Inventory JSON-RPC (query form)")
+            .tag("inventory")
+            .errors("jsonrpc"),
+        Op::post("/rpc", "Inventory JSON-RPC")
+            .tag("inventory")
+            .errors("jsonrpc"),
+        Op::get(
+            "/{kind}",
+            "Inventory records of one kind (apps, packages, crates, factory, ...)",
+        )
+        .tag("inventory"),
+        Op::get("/{kind}/{rest*}", "One inventory record").tag("inventory"),
+    ],
+};
+
 const CSP: &str = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; \
 img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; \
 frame-ancestors 'none'; base-uri 'none'; object-src 'none'; form-action 'self'";
@@ -122,6 +167,7 @@ fn app(state: Arc<AppState>) -> Router {
         .route("/api/health", get(health::health))
         .route("/healthz", get(health::health))
         .with_state(state)
+        .merge(API.routes_at("/api"))
         .merge(inventory)
         .merge(sessions::router(state_sessions))
         .merge(emulators::router(

@@ -4,11 +4,11 @@ use std::{net::SocketAddr, sync::Arc};
 
 use aphrody_a2a_server::auth::{AuthUserBuilder, StaticBearerValidator, UserBuilder};
 use axum::{
-    Json, Router,
+    Router,
     extract::{Request, State},
     http::{Method, StatusCode},
     middleware::{Next, from_fn_with_state},
-    response::{IntoResponse, Response},
+    response::Response,
 };
 
 pub(crate) fn token() -> Option<String> {
@@ -42,17 +42,22 @@ async fn require_bearer(
     let discovery = request.method() == Method::GET
         && matches!(
             request.uri().path(),
-            "/ping" | "/.well-known/agent-card.json"
+            "/ping" | "/health" | "/openapi.json" | "/.well-known/agent-card.json"
         );
     if discovery || matches!(auth.build(request.headers()).await, Ok(Some(_))) {
         return next.run(request).await;
     }
-    (
+    // RFC 9457 problem; `error` stays for existing A2A clients.
+    let mut response = aphrody_http_error::api::problem_with(
         StatusCode::UNAUTHORIZED,
-        [(axum::http::header::WWW_AUTHENTICATE, "Bearer")],
-        Json(serde_json::json!({ "error": "unauthorized" })),
-    )
-        .into_response()
+        "A bearer token is required.",
+        serde_json::json!({ "error": "unauthorized" }),
+    );
+    response.headers_mut().insert(
+        axum::http::header::WWW_AUTHENTICATE,
+        axum::http::HeaderValue::from_static("Bearer"),
+    );
+    response
 }
 
 #[cfg(test)]

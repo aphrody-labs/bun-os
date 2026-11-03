@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 import { timingSafeEqual } from "node:crypto";
 import { hashContent } from "@aphrody/bun-workspace";
+import { problem } from "../../bun-os-platform/src/api/index.ts";
 
 export const responseHeaders = {
   "Cache-Control": "no-store",
@@ -37,12 +38,12 @@ export function authenticateRequest(
       new TextEncoder().encode(hashContent(token)),
     )
   )
-    return jsonReply({ error: "Authentication required." }, 401);
+    return problem(401, undefined, "Authentication required.", { headers: { "WWW-Authenticate": "Bearer" } });
   const url = new URL(request.url);
   const origin = validatePublicOrigin(options.publicOrigin) ?? url.origin;
   if (
     request.headers.get("Sec-Fetch-Site") === "cross-site" ||
     (request.headers.get("Origin") && request.headers.get("Origin") !== origin)
   )
-    return jsonReply({ error: "Origin denied." }, 403);
+    return problem(403, undefined, "Origin denied.");
 }

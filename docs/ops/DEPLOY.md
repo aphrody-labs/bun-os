@@ -71,7 +71,9 @@ From Git Bash, prefix `MSYS_NO_PATHCONV=1` so `/home/...` arguments are not rewr
 
 ## API gateway
 
-`api.aphrody.com` (Cloudflare proxied, Let's Encrypt origin certificate, SSL strict) terminates at nginx on `bunos`.
+`api.aphrody.com` (Cloudflare proxied, Let's Encrypt origin certificate, SSL strict) terminates at nginx on `vps`.
 Routes are declared in `infra/fleet/api.toml` and rendered by `bun infra/fleet/api.ts apply`, which also installs
-the mesh-only listener on `vps` (`10.200.77.1:8080`) for services still running there. Moving a service to `bunos`
-changes only its `host` in `api.toml`. Contract: [API.md](API.md).
+the API catalogue and, for a service on another host, the mesh-only listener there; moving a service changes only
+its `host`. `bun infra/fleet/api.ts deploy <service>` releases one gateway service from `origin/main` with the same
+health gate and rollback as above, and `verify` checks every `/v1/<service>/{health,openapi.json}`. Contract:
+[API.md](API.md).

@@ -99,6 +99,7 @@ fn router_with_mailbox(cfg: &ListenerConfig, mailbox: Mailbox, requires_bearer: 
         .with_state(state);
 
     Router::new()
+        .merge(crate::api::router(task_api_root.clone()))
         .merge(coord)
         .merge(crate::bridge::a2a_router(
             state_mailbox,

@@ -12,6 +12,7 @@ pub mod templates;
 pub mod ui;
 pub use catalog::{Catalog, CatalogView, SearchFilter};
 
+use aphrody_http_error::api::{Op, Service};
 use axum::{
     Router,
     extract::{Query, State},
@@ -21,6 +22,49 @@ use axum::{
 };
 use serde_json::Value;
 use std::{io, net::SocketAddr, path::Path, sync::Arc};
+
+/// Public API of the site: https://api.aphrody.com/v1/site/ (mounted at `/api`; docs/ops/API.md).
+pub const API: Service = Service {
+    name: "site",
+    title: "Aphrody site",
+    version: env!("CARGO_PKG_VERSION"),
+    description: "Read-only product site APIs: documentation and template catalog, web search, the Material 3 design reference (tokens, specs, documents, assets) and generated M3 stylesheets.",
+    ops: &[
+        Op::get("/docs", "Search documentation")
+            .tag("catalog")
+            .query(&["q", "category", "id"]),
+        Op::get("/templates", "Template catalog").tag("catalog"),
+        Op::get("/search", "Web search")
+            .tag("search")
+            .query(&["query", "vertical", "hl", "safe", "start"]),
+        Op::get("/design", "Design reference summary").tag("design"),
+        Op::get("/design/tokens", "M3 design tokens").tag("design"),
+        Op::get("/design/tokens/high-contrast", "High-contrast tokens").tag("design"),
+        Op::get("/design/style-tokens", "Style tokens").tag("design"),
+        Op::get("/design/assets", "Design assets").tag("design"),
+        Op::get("/design/specs", "Component specs").tag("design"),
+        Op::get("/design/specs/{slug*}", "One component spec").tag("design"),
+        Op::get("/design/docs", "Design documents").tag("design"),
+        Op::get("/design/docs/{slug*}", "One design document").tag("design"),
+        Op::get("/design/google", "Google design catalog").tag("design"),
+        Op::get("/design/google/docs/{slug*}", "One Google design document").tag("design"),
+        Op::get("/m3/css", "Generated M3 stylesheet")
+            .tag("design")
+            .content("text/css")
+            .query(&["sheet", "seed", "variant", "dark", "contrast"]),
+    ],
+};
+
+async fn health() -> Response {
+    aphrody_http_error::api::health(
+        API.name,
+        API.version,
+        option_env!("APHRODY_COMMIT"),
+        option_env!("APHRODY_CHANNEL"),
+        &[],
+        Value::Null,
+    )
+}
 
 struct Site {
     catalog: Arc<Catalog>,
@@ -84,7 +128,9 @@ fn router_with_ui(
         .route("/api/templates", get(template_catalog))
         .route("/api/search", get(search::search))
         .route("/webos", get(webos))
-        .route("/health", get(|| async { StatusCode::NO_CONTENT }))
+        .route("/health", get(health))
+        .route("/api/health", get(health))
+        .merge(API.routes_at("/api"))
         .fallback(app_ui)
         .with_state(site))
 }
@@ -163,6 +209,32 @@ mod tests {
         std::fs::write(ui.join("app.css"), "canonical_theme").unwrap();
         std::fs::write(ui.join("fonts/icon.svg"), "<svg></svg>").unwrap();
         root
+    }
+
+    #[test]
+    fn openapi_snapshot_is_current() {
+        API.check_snapshot(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../.."));
+    }
+
+    #[tokio::test]
+    async fn serves_the_api_contract() {
+        let root = fixture();
+        let app = router(root.path(), None).unwrap();
+        for path in ["/api/openapi.json", "/api/health", "/health"] {
+            let response = app
+                .clone()
+                .oneshot(Request::builder().uri(path).body(Body::empty()).unwrap())
+                .await
+                .unwrap();
+            assert_eq!(response.status(), StatusCode::OK, "{path}");
+            let body: Value =
+                serde_json::from_slice(&to_bytes(response.into_body(), usize::MAX).await.unwrap())
+                    .unwrap();
+            assert!(
+                body.get("openapi").is_some() || body["status"] == "ok",
+                "{path}"
+            );
+        }
     }
 
     #[tokio::test]

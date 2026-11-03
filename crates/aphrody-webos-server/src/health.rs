@@ -69,9 +69,33 @@ pub async fn health(State(state): State<Arc<AppState>>) -> impl IntoResponse {
     } else {
         StatusCode::SERVICE_UNAVAILABLE
     };
+    // The API standard fields (docs/ops/API.md) beside the protocol's own.
+    let mut value = serde_json::to_value(&body).unwrap_or_default();
+    let degraded = checks_degraded(&body.checks);
+    value["status"] = serde_json::json!(if !ok {
+        "down"
+    } else if degraded {
+        "degraded"
+    } else {
+        "ok"
+    });
+    value["commit"] = serde_json::json!(state.source_commit);
+    value["channel"] = serde_json::json!(std::env::var("WEBOS_CHANNEL").ok());
     (
         status,
         [(axum::http::header::CACHE_CONTROL, "no-store")],
-        Json(body),
+        Json(value),
     )
+}
+
+fn checks_degraded(checks: &BTreeMap<String, HealthCheck>) -> bool {
+    checks.values().any(|c| !c.ok)
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn openapi_snapshot_is_current() {
+        crate::API.check_snapshot(&std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../.."));
+    }
 }

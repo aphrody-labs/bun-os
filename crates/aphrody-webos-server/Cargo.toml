@@ -16,6 +16,7 @@ name = "aphrody-webos"
 path = "src/main.rs"
 
 [dependencies]
+aphrody-http-error = { workspace = true }
 aphrody-inventory = { workspace = true, features = ["server"] }
 aphrody-webos-protocol = { path = "../aphrody-webos-protocol" }
 bun-ui-web = { path = "../bun-ui-web", features = ["server"] }

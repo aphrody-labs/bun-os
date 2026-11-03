@@ -4,9 +4,14 @@
 //!
 //! Wire shape: `{"error": {"code": "<string>", "message": "<string>", "data": <any, optional>}}`.
 //!
+//! [`api`] holds the Bun OS API contract (`docs/ops/API.md`): OpenAPI 3.1 from a typed route table,
+//! the standard `/health` body and RFC 9457 problem responses, for services behind api.aphrody.com.
+//!
 //! Provider-compatible servers (`aphrody-gateway`, `aphrody-jev`) deliberately
 //! do NOT use this crate: they mimic the OpenAI / Anthropic error formats so
 //! stock clients keep working.
+
+pub mod api;
 
 use axum::{
     Json,

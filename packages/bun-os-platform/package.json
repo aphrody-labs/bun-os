@@ -20,6 +20,7 @@
     "./files": "./src/files/index.ts",
     "./transfer": "./src/transfer/index.ts",
     "./server": "./src/server.ts",
+    "./api": "./src/api/index.ts",
     "./locales/*": "./locales/*",
     "./themes/*": "./themes/*"
   },

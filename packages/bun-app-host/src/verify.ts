@@ -201,6 +201,8 @@ export async function verifyProduct(
     const publicOrigin = "https://product.aphrody.com";
     const cases = [
       { path: "/healthz", status: 200, auth: false },
+      { path: "/health", status: 200, auth: false },
+      { path: "/openapi.json", status: 200, auth: false },
       { path: "/api/v1/apps", status: 401, auth: false },
       { path: "/api/v1/sources", status: 401, auth: false },
       { path: "/api/v1/status", status: 401, auth: false },
@@ -287,8 +289,11 @@ export async function verifyProduct(
               });
               if (
                 response.status !== probe.status ||
-                !response.headers.get("Content-Type")?.startsWith("application/json") ||
-                response.headers.get("Cache-Control") !== "no-store" ||
+                !response.headers
+                  .get("Content-Type")
+                  ?.startsWith(probe.status >= 400 ? "application/problem+json" : "application/json") ||
+                response.headers.get("Cache-Control") !==
+                  (probe.path === "/openapi.json" ? "public, max-age=60" : "no-store") ||
                 response.headers.get("X-Content-Type-Options") !== "nosniff"
               )
                 throw new Error("Product HTTP contract failed.");

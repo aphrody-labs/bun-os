@@ -45,6 +45,9 @@ const BUN_TYPESCRIPT = /\.(?:[cm]?tsx?)$/i;
 const BUN_FORMAT = /\.(?:[cm]?[jt]sx?|jsonc?|mdx?|md|css|html|ya?ml|svg|svelte|vue)$/i;
 
 const IMAGE = /^factory\/images\//;
+/** The API contract (docs/ops/API.md): the gateway, its catalogue, the shared helpers and the gateway services. */
+const API =
+  /^(infra\/fleet\/api\.(ts|toml)|scripts\/service-map\.ts|docs\/generated\/openapi\/|packages\/bun-os-platform\/src\/api\/|apps\/webos\/(store|services)\/|packages\/product\/src\/downloads\/|packages\/google\/src\/fonts-|packages\/bun-app-host\/src\/|crates\/(aphrody-http-error|aphrody-site|aphrody-webos-server|aphrody-a2a-coord)\/)/;
 const SELF = "factory/sync/bunos-gate.ts";
 
 /** Only current, tracked changes can be gate inputs; deletions still trigger `when` checks. */
@@ -75,6 +78,8 @@ export function gateSteps(range: { since?: string; head: string } = { head: "HEA
       timeoutMs: 600_000,
     },
     { name: "check", argv: ["bun", "check"], timeoutMs: 900_000 },
+    // Every gateway service has an OpenAPI 3.1 document that follows the standard and is current.
+    { name: "api-standard", argv: ["bun", "scripts/service-map.ts", "--check-api"], when: API, timeoutMs: 300_000 },
     {
       name: "lint",
       argv: [

@@ -136,14 +136,13 @@ impl Sessions {
     }
 }
 
+/// RFC 9457 problem; `error` keeps the protocol's `ApiError` readable by existing clients.
 fn error(status: StatusCode, message: &str) -> Response {
-    (
-        status,
-        Json(ApiError {
-            error: message.into(),
-        }),
-    )
-        .into_response()
+    let legacy = serde_json::to_value(ApiError {
+        error: message.into(),
+    })
+    .unwrap_or_default();
+    aphrody_http_error::api::problem_with(status, message, legacy)
 }
 
 async fn availability(State(sessions): State<Sessions>) -> Json<SessionAvailability> {

@@ -17,12 +17,81 @@
  * Site hosts (SITE_HOSTS, default aphrody.com and www.aphrody.com) are served first from the static tree
  * SITE_ROOT (default <root>/../site/current): the Bun fork site published by the former Bun fork
  * packages/web/site/publish.ts. Paths missing from it fall back to the download routes above.
- * Deployed alone as /home/ubuntu/apps/downloads/app/server.ts: no relative imports.
+ * Deployed as one `bun build --target bun` bundle (infra/fleet/api.toml, `bun infra/fleet/api.ts deploy downloads`),
+ * public as https://api.aphrody.com/v1/downloads/ with /openapi.json and /health (docs/ops/API.md).
  */
 import { existsSync, lstatSync, readFileSync, realpathSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { basename, dirname, extname, isAbsolute, join, resolve, sep } from "node:path";
 import type { PublicIndexSearch, PublicIndexSdkOptions } from "./public-index.ts";
+import { defineApi, healthResponse, problem } from "../../../bun-os-platform/src/api/index.ts";
+
+const fileContent = (description: string, type: string) => ({ description, type, schema: { type: "string" } });
+/** The download routes: the single source of the OpenAPI document of the downloads service. */
+export const downloadsSpec = defineApi(
+  {
+    service: "downloads",
+    title: "Aphrody downloads",
+    version: "1.4.7",
+    description:
+      "Read-only published release: manifest, checksums, installers and artifacts (byte ranges), plus immutable routes to every kept release. Public and unauthenticated by design.",
+  },
+  {
+    "GET /": {
+      summary: "Download page",
+      tags: ["release"],
+      responses: { 200: fileContent("HTML index", "text/html") },
+    },
+    "GET /latest.json": {
+      summary: "Release manifest",
+      description: "Artifacts with name, version, platform, url, sha256 and size.",
+      tags: ["release"],
+      responses: { 200: { description: "Manifest" }, 404: { description: "No published release" } },
+    },
+    "GET /SHA256SUMS": {
+      summary: "Checksums",
+      tags: ["release"],
+      responses: { 200: fileContent("`<sha256>  <file>` lines", "text/plain") },
+    },
+    "GET /install.sh": {
+      summary: "POSIX installer",
+      tags: ["install"],
+      responses: { 200: fileContent("Shell installer", "text/x-shellscript") },
+    },
+    "GET /install.ps1": {
+      summary: "Windows installer",
+      tags: ["install"],
+      responses: { 200: fileContent("PowerShell installer", "text/plain") },
+    },
+    "GET /files/{name}": {
+      summary: "Artifact",
+      description: "Supports `Range` (206, 416).",
+      tags: ["release"],
+      params: [{ name: "Range", in: "header", required: false, description: "bytes=<start>-<end>" }],
+      responses: {
+        200: fileContent("Artifact bytes", "application/octet-stream"),
+        206: fileContent("Partial content", "application/octet-stream"),
+        404: { description: "No such artifact" },
+        416: { description: "Range not satisfiable" },
+      },
+    },
+    "GET /releases/{id}/latest.json": {
+      summary: "Manifest of a kept release",
+      tags: ["release"],
+      responses: { 200: { description: "Manifest" }, 404: { description: "No such release" } },
+    },
+    "GET /releases/{id}/files/{name}": {
+      summary: "Artifact of a kept release",
+      tags: ["release"],
+      responses: {
+        200: fileContent("Artifact bytes (immutable)", "application/octet-stream"),
+        404: { description: "No such release or artifact" },
+      },
+    },
+    "GET /healthz": { summary: "Legacy health", deprecated: true, tags: ["contract"] },
+  },
+);
+const DOWNLOADS_OPENAPI = JSON.stringify(downloadsSpec.document);
 
 /** Resolve a deployment without assuming a VPS layout or a fixed ingress port. */
 export function serverOptions(env: Record<string, string | undefined> = process.env) {
@@ -938,6 +1007,7 @@ export function createHandler(
       !site.hosts.has(url.hostname.toLowerCase()) ||
       pathname === "/health" ||
       pathname === "/healthz" ||
+      pathname === "/openapi.json" ||
       (request.method !== "GET" && request.method !== "HEAD")
     )
       return downloads(request);
@@ -965,30 +1035,27 @@ export function createHandler(
 function downloadsHandler(root: string): (request: Request) => Promise<Response> {
   return async request => {
     const url = new URL(request.url);
-    if (request.method !== "GET" && request.method !== "HEAD") {
-      return new Response("method not allowed", {
-        status: 405,
+    if (request.method !== "GET" && request.method !== "HEAD")
+      return problem(405, undefined, `${request.method} is not supported`, {
         headers: withHeaders({ allow: "GET, HEAD" }),
       });
-    }
     const head = request.method === "HEAD";
     const path = url.pathname;
 
     if (path === "/health" || path === "/healthz") {
       const manifest = await readManifest(root);
-      const body = JSON.stringify({
-        ok: manifest !== null,
-        release: manifest?.release.id ?? null,
-        artifacts: manifest?.artifacts.length ?? 0,
-      });
-      return new Response(head ? null : body, {
-        status: manifest ? 200 : 503,
-        headers: withHeaders({
-          "content-type": "application/json",
-          "cache-control": "no-store",
-        }),
-      });
+      return healthResponse(
+        downloadsSpec.info,
+        { manifest: { ok: manifest !== null, detail: "latest.json of the published release" } },
+        { ok: manifest !== null, release: manifest?.release.id ?? null, artifacts: manifest?.artifacts.length ?? 0 },
+        head,
+      );
     }
+
+    if (path === "/openapi.json")
+      return new Response(head ? null : DOWNLOADS_OPENAPI, {
+        headers: withHeaders({ "content-type": "application/json", "cache-control": "public, max-age=60" }),
+      });
 
     if (path === "/" || path === "/index.html") {
       const html = renderIndex(await readManifest(root));
@@ -1009,28 +1076,17 @@ function downloadsHandler(root: string): (request: Request) => Promise<Response>
       try {
         id = match ? decodeURIComponent(match[1]!) : "";
       } catch {
-        return new Response("bad request", {
-          status: 400,
-          headers: withHeaders({}),
-        });
+        return problem(400, undefined, "Malformed path", { headers: withHeaders({}) });
       }
       const pinnedRoot = resolveRelease(root, id);
-      if (!match || pinnedRoot === null)
-        return new Response("not found", {
-          status: 404,
-          headers: withHeaders({}),
-        });
+      if (!match || pinnedRoot === null) return problem(404, undefined, undefined, { headers: withHeaders({}) });
       releaseRoot = pinnedRoot;
       resourcePath = match[2]!;
     }
 
     if (PUBLIC_ASSETS.has(resourcePath.slice(1))) {
       const real = resolveContainedFile(releaseRoot, "", resourcePath.slice(1));
-      if (real === null)
-        return new Response("not found", {
-          status: 404,
-          headers: withHeaders({}),
-        });
+      if (real === null) return problem(404, undefined, undefined, { headers: withHeaders({}) });
       const file = Bun.file(real);
       const ext = resourcePath.slice(resourcePath.lastIndexOf("."));
       return new Response(head ? null : file, {
@@ -1047,17 +1103,10 @@ function downloadsHandler(root: string): (request: Request) => Promise<Response>
       try {
         name = decodeURIComponent(resourcePath.slice("/files/".length));
       } catch {
-        return new Response("bad request", {
-          status: 400,
-          headers: withHeaders({}),
-        });
+        return problem(400, undefined, "Malformed path", { headers: withHeaders({}) });
       }
       const real = resolveFile(releaseRoot, name);
-      if (real === null)
-        return new Response("not found", {
-          status: 404,
-          headers: withHeaders({}),
-        });
+      if (real === null) return problem(404, undefined, undefined, { headers: withHeaders({}) });
       const file = Bun.file(real);
       const size = file.size;
       const type = TEXT_TYPES[name.slice(name.lastIndexOf("."))] ?? "application/octet-stream";
@@ -1085,7 +1134,7 @@ function downloadsHandler(root: string): (request: Request) => Promise<Response>
       });
     }
 
-    return new Response("not found", { status: 404, headers: withHeaders({}) });
+    return problem(404, undefined, undefined, { headers: withHeaders({}) });
   };
 }
 

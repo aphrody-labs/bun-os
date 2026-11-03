@@ -5,6 +5,8 @@
 // here and never reach the client. Loopback only (127.0.0.1:8794) behind nginx /api/chat/.
 // Abuse bounds: model allowlist, max_tokens cap, per-client request budget.
 
+import { chatContract } from "./chat-api.ts";
+
 const PORT = Number(process.env.PORT ?? 8794);
 const PROJECT = process.env.GOOGLE_CLOUD_PROJECT ?? "aphrody";
 const REGION = process.env.APHRODY_VERTEX_REGION ?? "us-central1";
@@ -14,6 +16,9 @@ const MAX_TOKENS = Number(process.env.APHRODY_CHAT_MAX_TOKENS ?? 4096);
 const BUDGET = Number(process.env.APHRODY_CHAT_BUDGET ?? 60); // requests per client per 10 minutes
 const UPSTREAM = `https://${REGION}-aiplatform.googleapis.com/v1/projects/${PROJECT}/locations/${REGION}/endpoints/openapi`;
 const SCOPE = "https://www.googleapis.com/auth/cloud-platform";
+const contract = chatContract(async () => ({
+  credentials: { ok: await Bun.file(ADC).exists(), detail: "Vertex AI credentials file present" },
+}));
 
 interface Token {
   value: string;
@@ -98,6 +103,8 @@ Bun.serve({
   port: PORT,
   idleTimeout: 255,
   async fetch(request) {
+    const standard = await contract(request);
+    if (standard) return standard;
     const path = new URL(request.url).pathname.replace(/^\/api\/chat/, "");
     if (path === "/v1/models" && request.method === "GET")
       return json({ object: "list", data: MODELS.map((id) => ({ id, object: "model", owned_by: "google" })) });

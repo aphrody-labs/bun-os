@@ -811,6 +811,7 @@ version = "1.4.7"
 dependencies = [
  "aphrody-a2a",
  "aphrody-a2a-server",
+ "aphrody-http-error",
  "aphrody-proc",
  "async-trait",
  "axum",
@@ -3450,6 +3451,7 @@ name = "aphrody-site"
 version = "1.4.7"
 dependencies = [
  "aphrody-google",
+ "aphrody-http-error",
  "aphrody-m3-tokens",
  "axum",
  "clap",
@@ -3876,6 +3878,7 @@ dependencies = [
 name = "aphrody-webos-server"
 version = "1.4.7"
 dependencies = [
+ "aphrody-http-error",
  "aphrody-inventory",
  "aphrody-webos-protocol",
  "axum",

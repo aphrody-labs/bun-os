@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: MIT
+import { apiContract, defineApi, problem } from "../../bun-os-platform/src/api/index.ts";
 import { authenticateRequest, jsonReply, validatePublicOrigin } from "./transport.ts";
 
 export interface ProductCatalog {
@@ -29,15 +30,51 @@ export const apiOwners = {
   secrets: "Aphrody Infra protected stores",
 } as const;
 
+const authed = { auth: true, tags: ["product"] };
+/** The product API routes (public base https://api.aphrody.com/v1/bunos, mounted at /api/v1). */
+export const productSpec = defineApi(
+  {
+    service: "bunos",
+    title: "Bun OS product API",
+    version: "1.4.7",
+    description:
+      "Read-only product snapshot: sources and their revisions, apps and their qualification, API owners and process status. Every route except /health and /openapi.json needs the application bearer token.",
+  },
+  {
+    "GET /sources": {
+      ...authed,
+      summary: "Product sources",
+      responses: { 200: { description: "Sources and revisions" } },
+    },
+    "GET /apps": { ...authed, summary: "Apps and qualification", responses: { 200: { description: "Apps" } } },
+    "GET /owners": { ...authed, summary: "API owners", responses: { 200: { description: "Owner of each surface" } } },
+    "GET /status": {
+      ...authed,
+      summary: "Process status",
+      responses: { 200: { description: "Product, runtime and catalog" } },
+    },
+  },
+);
+
 /** Read-only product API. The snapshot does not imply live native qualification. */
 export function productHandler(
   catalog: ProductCatalog,
   token: string,
   options: { publicOrigin?: string } = {},
-): (request: Request) => Response {
+): (request: Request) => Promise<Response> {
   if (token.length < 32) throw new Error("Inject the application token from its protected store.");
   const publicOrigin = validatePublicOrigin(options.publicOrigin);
-  return request => {
+  const spec = defineApi(
+    { ...productSpec.info, version: catalog.version, commit: catalog.sourceRevision },
+    productSpec.routes,
+  );
+  const contract = apiContract(spec, {
+    base: ["/api/v1", ""],
+    extra: () => ({ product: catalog.product, observedAt: catalog.observedAt }),
+  });
+  return async request => {
+    const standard = await contract(request);
+    if (standard) return standard;
     const path = new URL(request.url).pathname;
     if (request.method === "GET" && path === "/healthz")
       return jsonReply({
@@ -47,7 +84,7 @@ export function productHandler(
       });
     const denied = authenticateRequest(request, token, { publicOrigin });
     if (denied) return denied;
-    if (request.method !== "GET") return jsonReply({ error: "Method not allowed." }, 405);
+    if (request.method !== "GET") return problem(405, undefined, "Only GET is supported.");
     switch (path) {
       case "/api/v1/sources":
         return jsonReply({
@@ -81,7 +118,7 @@ export function productHandler(
           owners: apiOwners,
         });
       default:
-        return jsonReply({ error: "Not found." }, 404);
+        return problem(404, undefined, undefined, { instance: path });
     }
   };
 }

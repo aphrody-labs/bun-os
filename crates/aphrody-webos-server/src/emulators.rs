@@ -44,11 +44,12 @@ async fn catalog(State(store): State<Store>) -> Response {
     let report = read_json(&store.objects.join("emulators/qualification.json")).await;
     let Some(Value::Array(list)) = read_json(&store.objects.join("emulators/emulators.json")).await
     else {
-        return (
+        let detail = "no emulator catalog published (emulators/emulators.json)";
+        return aphrody_http_error::api::problem_with(
             StatusCode::SERVICE_UNAVAILABLE,
-            Json(json!({ "error": "no emulator catalog published (emulators/emulators.json)" })),
-        )
-            .into_response();
+            detail,
+            json!({ "error": detail }),
+        );
     };
     let entries = report
         .as_ref()
