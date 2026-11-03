@@ -108,7 +108,7 @@ pub struct Apploader {
 pub enum FstNode {
     File {
         name: String,
-        offset: u32,
+        offset: u64,
         size: u32,
     },
     Directory {
@@ -119,38 +119,58 @@ pub enum FstNode {
 
 impl FstNode {
     pub fn parse(fst: &[u8], file_offset_shift: u32) -> Self {
-        let total_entries = u32::from_be_bytes(fst[8..12].try_into().unwrap()) as usize;
-        let string_table = &fst[total_entries * 12..];
+        Self::try_parse(fst, file_offset_shift).expect("invalid disc filesystem table")
+    }
+
+    /// Parse an untrusted filesystem table without indexing outside its bounds.
+    pub fn try_parse(fst: &[u8], file_offset_shift: u32) -> Result<Self, &'static str> {
+        let root = fst.get(..12).ok_or("truncated root entry")?;
+        if root[0] != 1 {
+            return Err("root is not a directory");
+        }
+        let total_entries = u32::from_be_bytes(root[8..12].try_into().unwrap()) as usize;
+        if total_entries == 0 {
+            return Err("empty filesystem table");
+        }
+        let table_size = total_entries
+            .checked_mul(12)
+            .ok_or("entry table overflow")?;
+        let string_table = fst.get(table_size..).ok_or("truncated entry table")?;
 
         let mut index = 1;
-        let children = Self::parse_dir(
+        let children = Self::parse_dir_checked(
             fst,
             string_table,
             &mut index,
             total_entries,
             file_offset_shift,
-        );
+            0,
+        )?;
 
-        Self::Directory {
+        Ok(Self::Directory {
             name: String::new(),
             children,
-        }
+        })
     }
 
-    fn parse_dir(
+    fn parse_dir_checked(
         fst: &[u8],
         strings: &[u8],
         index: &mut usize,
         end: usize,
         file_offset_shift: u32,
-    ) -> Vec<Self> {
+        depth: usize,
+    ) -> Result<Vec<Self>, &'static str> {
+        if depth > 256 {
+            return Err("filesystem nesting too deep");
+        }
         let mut entries = Vec::new();
         while *index < end {
             let base = *index * 12;
             let flags = fst[base];
             let name_off =
                 u32::from_be_bytes([0, fst[base + 1], fst[base + 2], fst[base + 3]]) as usize;
-            let name = Self::read_cstr(strings, name_off);
+            let name = Self::read_cstr_checked(strings, name_off)?;
             let offset = u32::from_be_bytes(fst[base + 4..base + 8].try_into().unwrap());
             let length = u32::from_be_bytes(fst[base + 8..base + 12].try_into().unwrap());
             *index += 1;
@@ -158,22 +178,40 @@ impl FstNode {
             if flags == 0 {
                 entries.push(Self::File {
                     name,
-                    offset: offset << file_offset_shift,
+                    offset: u64::from(offset)
+                        .checked_shl(file_offset_shift)
+                        .filter(|value| (*value >> file_offset_shift) == u64::from(offset))
+                        .ok_or("file offset overflow")?,
                     size: length,
                 });
-            } else {
+            } else if flags == 1 {
                 let next = length as usize;
-                let children = Self::parse_dir(fst, strings, index, next, file_offset_shift);
+                if next < *index || next > end {
+                    return Err("directory range outside parent");
+                }
+                let children = Self::parse_dir_checked(
+                    fst,
+                    strings,
+                    index,
+                    next,
+                    file_offset_shift,
+                    depth + 1,
+                )?;
                 entries.push(Self::Directory { name, children });
+            } else {
+                return Err("invalid entry type");
             }
         }
-        entries
+        Ok(entries)
     }
 
-    fn read_cstr(table: &[u8], offset: usize) -> String {
-        let slice = &table[offset..];
-        let len = slice.iter().position(|&b| b == 0).unwrap_or(slice.len());
-        String::from_utf8_lossy(&slice[..len]).into_owned()
+    fn read_cstr_checked(table: &[u8], offset: usize) -> Result<String, &'static str> {
+        let slice = table.get(offset..).ok_or("name outside string table")?;
+        let len = slice
+            .iter()
+            .position(|&b| b == 0)
+            .ok_or("unterminated name")?;
+        Ok(String::from_utf8_lossy(&slice[..len]).into_owned())
     }
 
     pub fn name(&self) -> &str {
@@ -185,5 +223,72 @@ impl FstNode {
 
     pub fn is_file(&self) -> bool {
         matches!(self, Self::File { .. })
+    }
+}
+
+#[cfg(test)]
+mod fst_tests {
+    use super::FstNode;
+
+    #[test]
+    fn rejects_malformed_tables_and_accepts_a_file() {
+        assert!(FstNode::try_parse(&[], 0).is_err());
+        let mut fst = vec![0; 24];
+        fst[0] = 1;
+        fst[11] = 2;
+        assert!(FstNode::try_parse(&fst, 0).is_err());
+        fst.extend_from_slice(b"file\0");
+        assert!(FstNode::try_parse(&fst, 0).is_ok());
+        fst[12] = 1;
+        fst[23] = 3;
+        assert!(FstNode::try_parse(&fst, 0).is_err());
+    }
+
+    #[test]
+    fn validates_names_ranges_and_file_offsets() {
+        let mut fst = vec![0; 24];
+        fst[0] = 1;
+        fst[11] = 2;
+        fst.extend_from_slice(b"name\0");
+        fst[15] = 6;
+        assert!(FstNode::try_parse(&fst, 0).is_err());
+        fst[15] = 0;
+        fst[16..20].copy_from_slice(&0x4000_0000u32.to_be_bytes());
+        if let FstNode::Directory { children, .. } = FstNode::try_parse(&fst, 2).unwrap() {
+            assert!(matches!(
+                children[0],
+                FstNode::File {
+                    offset: 0x1_0000_0000,
+                    ..
+                }
+            ));
+        } else {
+            panic!("expected root directory");
+        }
+        assert!(FstNode::try_parse(&fst, 64).is_err());
+        fst[16..20].copy_from_slice(&4u32.to_be_bytes());
+        if let FstNode::Directory { children, .. } = FstNode::try_parse(&fst, 2).unwrap() {
+            assert!(matches!(children[0], FstNode::File { offset: 16, .. }));
+        } else {
+            panic!("expected root directory");
+        }
+    }
+
+    #[test]
+    fn arbitrary_short_tables_do_not_panic() {
+        let mut state = 0x17b4_6a29u32;
+        for size in 0..256 {
+            for _ in 0..32 {
+                let mut data = vec![0; size];
+                for byte in &mut data {
+                    state = state.wrapping_mul(1_664_525).wrapping_add(1_013_904_223);
+                    *byte = (state >> 24) as u8;
+                }
+                if !data.is_empty() {
+                    data[0] = 1;
+                }
+                let _ = FstNode::try_parse(&data, state % 34);
+            }
+        }
     }
 }

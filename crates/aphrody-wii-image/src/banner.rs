@@ -28,11 +28,11 @@ pub fn extract(dvd: &dyn Dvd) -> Option<Banner> {
     let mut fst_buf = vec![0u8; fst_size];
     dvd.read_disc_into(fst_offset, &mut fst_buf);
     let shift = if header.is_wii() { 2 } else { 0 };
-    let root = FstNode::parse(&fst_buf, shift);
+    let root = FstNode::try_parse(&fst_buf, shift).ok()?;
     let (file_offset, file_size) = self::find_file(&root, "opening.bnr")?;
 
     let mut buf = vec![0u8; file_size as usize];
-    dvd.read_disc_into(file_offset as usize, &mut buf);
+    dvd.read_disc_into(usize::try_from(file_offset).ok()?, &mut buf);
 
     if buf.len() >= 4 && (&buf[0..4] == b"BNR1" || &buf[0..4] == b"BNR2") {
         return self::decode_gcn(&buf);
@@ -102,7 +102,7 @@ fn strip_imd5_and_lz77(banner_bin: &[u8]) -> Option<Vec<u8>> {
     inner
 }
 
-fn find_file(node: &FstNode, name: &str) -> Option<(u32, u32)> {
+fn find_file(node: &FstNode, name: &str) -> Option<(u64, u32)> {
     match node {
         FstNode::File {
             name: n,
