@@ -776,6 +776,10 @@
     "packages/fluent": {
       "name": "@aphrody/fluent",
       "version": "1.4.7",
+      "devDependencies": {
+        "@aphrody/identity": "workspace:*",
+        "@aphrody/m3-tokens": "workspace:*",
+      },
     },
     "packages/gemma-web": {
       "name": "@aphrody/gemma-web",

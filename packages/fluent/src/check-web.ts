@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 // Loads web/dist in headless Chrome (playwright-core, the recipe of .github/workflows/wasmos.yml) and checks that the Fluent web components
-// are defined, that the Microsoft theme was applied and that the dialog opens. WASMOS_CHROME = Chrome executable.
+// are defined, that the generated Bun OS Fluent theme was applied and that the dialog opens. WASMOS_CHROME = Chrome executable.
 import { join } from "node:path";
+import tokens from "../tokens/fluent2.json" with { type: "json" };
 
 const dist = join(import.meta.dir, "..", "web", "dist");
 const server = Bun.serve({
@@ -34,7 +35,7 @@ try {
     };
   });
   console.log(JSON.stringify(r));
-  if (!r.button || !r.text || r.brand !== "#0f6cbd" || !r.dialogOpen)
+  if (!r.button || !r.text || r.brand !== tokens.light.colorBrandBackground || !r.dialogOpen)
     throw new Error(`web check failed: ${JSON.stringify(r)}`);
 } finally {
   await browser.close();
