@@ -61,6 +61,8 @@ export function serve(
   return Bun.serve({
     port,
     hostname: "127.0.0.1",
+    // Large local images and WASM files can stall briefly on a busy build host.
+    idleTimeout: 120,
     async fetch(request) {
       const url = new URL(request.url);
       let response: Response;
