@@ -28,9 +28,14 @@ test("qualification identifies a clean harness and rejects modified or missing i
     }
     git("add", "--", ...paths);
     git("-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--quiet", "-m", "fixture");
-    expect(qualificationHarnessRevision(root)).toMatch(/^[a-f0-9]{40}$/);
+    const baseline = qualificationHarnessRevision(root);
+    expect(baseline).toMatch(/^[a-f0-9]{40}$/);
+    writeFileSync(join(root, "unrelated.txt"), "unrelated\n");
+    git("add", "unrelated.txt");
+    git("-c", "user.name=Test", "-c", "user.email=test@example.invalid", "commit", "--quiet", "-m", "unrelated");
+    expect(qualificationHarnessRevision(root, baseline)).toBe(baseline);
     writeFileSync(join(root, paths[0]!), "changed\n");
-    expect(() => qualificationHarnessRevision(root)).toThrow("uncommitted changes");
+    expect(() => qualificationHarnessRevision(root, baseline)).toThrow("uncommitted changes");
     git("checkout", "--", paths[0]!);
     git("rm", "--quiet", paths[1]!);
     expect(() => qualificationHarnessRevision(root)).toThrow();
