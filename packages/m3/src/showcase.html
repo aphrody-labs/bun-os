@@ -80,7 +80,9 @@
         overflow: hidden;
         transition: box-shadow var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
       }
-      .btn::after {
+      .btn::after,
+      nav button::after,
+      .chip::after {
         content: "";
         position: absolute;
         inset: 0;
@@ -89,13 +91,19 @@
         pointer-events: none;
         transition: opacity var(--md-sys-motion-duration-short2) var(--md-sys-motion-easing-standard);
       }
-      .btn:hover::after {
+      .btn:hover::after,
+      nav button:hover::after,
+      .chip:hover::after {
         opacity: var(--md-sys-state-hover-state-layer-opacity);
       }
-      .btn:focus-visible::after {
+      .btn:focus-visible::after,
+      nav button:focus-visible::after,
+      .chip:focus-visible::after {
         opacity: var(--md-sys-state-focus-state-layer-opacity);
       }
-      .btn:active::after {
+      .btn:active::after,
+      nav button:active::after,
+      .chip:active::after {
         opacity: var(--md-sys-state-pressed-state-layer-opacity);
       }
       .btn-filled {
@@ -124,6 +132,8 @@
         overflow-x: auto;
       }
       nav button {
+        position: relative;
+        overflow: hidden;
         padding: 8px 16px;
         border-radius: var(--md-sys-shape-corner-small);
         font-family: var(--md-sys-typescale-label-large-font);
@@ -205,7 +215,6 @@
       .swatch code {
         font-family: var(--md-ref-typeface-code);
         font-weight: 400;
-        opacity: 0.8;
       }
 
       .chips {
@@ -215,6 +224,8 @@
         margin-top: 16px;
       }
       .chip {
+        position: relative;
+        overflow: hidden;
         display: inline-flex;
         align-items: center;
         min-height: 32px;
@@ -254,7 +265,6 @@
         font-size: var(--md-sys-typescale-body-large-size);
       }
       input[type="text"]:focus {
-        outline: none;
         border-color: var(--md-sys-color-primary);
         box-shadow: inset 0 0 0 1px var(--md-sys-color-primary);
       }
@@ -303,7 +313,9 @@
         .dot,
         body,
         .btn,
-        .btn::after {
+        .btn::after,
+        nav button::after,
+        .chip::after {
           transition: none;
         }
       }
@@ -460,14 +472,26 @@
       toggle.addEventListener("click", () => setDark(!root.classList.contains("dark")));
 
       const tabs = [...document.querySelectorAll('[role="tab"]')];
-      for (const tab of tabs)
-        tab.addEventListener("click", () => {
-          for (const other of tabs) {
-            const selected = other === tab;
-            other.setAttribute("aria-selected", String(selected));
-            document.getElementById(other.getAttribute("aria-controls")).hidden = !selected;
-          }
+      const select = tab => {
+        for (const other of tabs) {
+          const selected = other === tab;
+          other.setAttribute("aria-selected", String(selected));
+          other.tabIndex = selected ? 0 : -1;
+          document.getElementById(other.getAttribute("aria-controls")).hidden = !selected;
+        }
+      };
+      for (const [index, tab] of tabs.entries()) {
+        tab.addEventListener("click", () => select(tab));
+        tab.addEventListener("keydown", event => {
+          const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
+          if (!step) return;
+          event.preventDefault();
+          const next = tabs[(index + step + tabs.length) % tabs.length];
+          select(next);
+          next.focus();
         });
+      }
+      select(tabs[0]);
 
       for (const chip of document.querySelectorAll("#chips .chip"))
         chip.addEventListener("click", () =>

@@ -1,0 +1,73 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* M3TauriTitlebar caption buttons: roles and state layers only (hover 0.08, focus 0.10, pressed 0.10),
+   a secondary focus ring on top of the focus layer, and no transition under reduced motion. */
+
+.m3-tauri-titlebar {
+  position: relative;
+}
+
+.m3-tauri-control {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition:
+    background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard),
+    color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard);
+}
+.m3-tauri-control:hover {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%),
+    transparent
+  );
+}
+.m3-tauri-control:focus-visible {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) calc(var(--md-sys-state-focus-state-layer-opacity) * 100%),
+    transparent
+  );
+  outline: 2px solid var(--md-sys-color-secondary);
+  outline-offset: -2px;
+}
+.m3-tauri-control:active {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) calc(var(--md-sys-state-pressed-state-layer-opacity) * 100%),
+    transparent
+  );
+}
+
+/* Close: the error container role, with the on-error state layer for focus and press. */
+.m3-tauri-control[data-danger]:is(:hover, :focus-visible, :active) {
+  color: var(--md-sys-color-on-error);
+}
+.m3-tauri-control[data-danger]:hover {
+  background: var(--md-sys-color-error);
+}
+.m3-tauri-control[data-danger]:focus-visible {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-error) calc(var(--md-sys-state-focus-state-layer-opacity) * 100%),
+    var(--md-sys-color-error)
+  );
+}
+.m3-tauri-control[data-danger]:active {
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-error) calc(var(--md-sys-state-pressed-state-layer-opacity) * 100%),
+    var(--md-sys-color-error)
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m3-tauri-control {
+    transition: none;
+  }
+}

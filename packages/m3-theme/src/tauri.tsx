@@ -1,8 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
-// The titlebar paints with the generated roles and the static scale (typescale, motion, state layers).
+// The titlebar paints with the generated roles and the static scale (typescale, motion, state layers);
+// tauri.css carries the caption-button state layers, focus ring and reduced-motion rule.
 import "@aphrody/m3-tokens/m3-tokens.css";
 import "../tokens.css";
+import "./tauri.css";
 import React, { useEffect, useState } from "react";
 import { useM3Theme } from "./react";
 
@@ -62,43 +64,21 @@ export interface M3TauriTitlebarProps {
 interface WindowControlProps {
   label: string;
   onClick: () => void;
-  /** Close uses the error role on hover/focus, the others an 8 % on-surface state layer. */
+  /** Close fills with the error role on hover; the others use on-surface state layers. */
   danger?: boolean;
   children: React.ReactNode;
 }
 
-/** A caption button: hover and keyboard focus show the same M3 state. */
+/** A caption button: hover, focus and press are distinct M3 state layers (tauri.css). */
 function WindowControl({ label, onClick, danger = false, children }: WindowControlProps) {
-  const [active, setActive] = useState(false);
-  const on = () => setActive(true);
-  const off = () => setActive(false);
   return (
     <button
       type="button"
+      className="m3-tauri-control"
+      data-danger={danger || undefined}
       onClick={onClick}
       title={label}
       aria-label={label}
-      onMouseEnter={on}
-      onMouseLeave={off}
-      onFocus={on}
-      onBlur={off}
-      style={{
-        background: active
-          ? danger
-            ? "var(--md-sys-color-error)"
-            : "color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%), transparent)"
-          : "transparent",
-        border: "none",
-        color: active && danger ? "var(--md-sys-color-on-error)" : "inherit",
-        cursor: "pointer",
-        width: "46px",
-        height: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        transition:
-          "background-color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard), color var(--md-sys-motion-duration-short3) var(--md-sys-motion-easing-standard)",
-      }}
     >
       {children}
     </button>
@@ -134,6 +114,7 @@ export function M3TauriTitlebar({ title, logo, forceShow = false, style, extraAc
 
   return (
     <div
+      className="m3-tauri-titlebar"
       style={{
         display: "flex",
         alignItems: "center",
