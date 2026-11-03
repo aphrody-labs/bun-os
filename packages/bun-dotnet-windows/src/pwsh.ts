@@ -162,6 +162,15 @@ export function executable(): string | null {
   return existsSync(built) ? built : Bun.which("pwsh");
 }
 
+/**
+ * Environment for the source-built pwsh.exe: it is framework-dependent on .NET 11, which the apphost only finds
+ * through DOTNET_ROOT when it is installed per user.
+ */
+export function executableEnv(): Record<string, string | undefined> {
+  const root = dotnet11Root();
+  return root ? { ...process.env, DOTNET_ROOT: root } : { ...process.env };
+}
+
 /** Out-of-process route: pwsh.exe -NoProfile, output as JSON (ConvertTo-Json). */
 export async function spawn(
   script: string,
@@ -172,6 +181,7 @@ export async function spawn(
   const wrapped = `$ProgressPreference='SilentlyContinue'; & { ${script} } | ConvertTo-Json -Depth ${options.depth ?? 2} -Compress`;
   const proc = Bun.spawn([exe, "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", wrapped], {
     cwd: options.cwd,
+    env: executableEnv(),
     stdin: "ignore",
     stdout: "pipe",
     stderr: "pipe",

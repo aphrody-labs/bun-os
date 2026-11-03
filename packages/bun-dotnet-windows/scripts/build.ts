@@ -3,17 +3,18 @@
 /**
  * Build of @aphrody/bun-dotnet-windows (Windows only: Native AOT and MSVC cannot cross-compile from Linux).
  *
- *   bun packages/bun-dotnet-windows/scripts/build.ts [all|winmd|native|pwsh|pwsh-host|cpp|bins] [--tfm net11.0]
+ *   bun packages/bun-dotnet-windows/scripts/build.ts [all|winmd|native|pwsh|pwsh-r2r|pwsh-host|cpp|bins] [--tfm net11.0]
  *
  * Steps, outputs under <checkout>/target/bun-dotnet-windows/:
  *   winmd      midl /winrt: vendor/winget-cli PackageManager.idl -> winmd/Microsoft.Management.Deployment.winmd
  *   native     dotnet publish -c Release (Native AOT): native/bunos_windows.dll (+ .lib, .pdb)
  *   pwsh       Start-PSBuild of vendor/powershell (fxdependent-win-desktop, .NET 11): pwsh-fxdependent/
+ *   pwsh-r2r   crossgen2 ReadyToRun of the IL-only PSHOME assemblies (also run by `pwsh`)
  *   pwsh-host  dotnet publish of pwsh/BunOs.Pwsh.csproj against that PSHOME: pwsh-host/BunOs.Pwsh.dll
  *   cpp        cmake + ninja + cl (C++/WinRT, WIL, DirectX-Headers): cpp/bunos_win_cpp.dll
  *   bins       bun build --compile --bytecode: bin/bunos-winget.exe, bin/bunos-pwsh.exe
  */
-import { existsSync, mkdirSync, readdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, statSync } from "node:fs";
 import { join, resolve, win32 } from "node:path";
 
 const pkg = resolve(import.meta.dir, "..");
@@ -144,7 +145,7 @@ function buildNative(): void {
 
 const pshome = join(out, "pwsh-fxdependent");
 
-function buildPwsh(): void {
+async function buildPwsh(): Promise<void> {
   const script = join(out, "build-pwsh.ps1");
   mkdirSync(out, { recursive: true });
   // Start-PSBuild is PowerShell's own build entry (vendor/powershell/build.psm1); its SDK pin is global.json.
@@ -159,10 +160,74 @@ function buildPwsh(): void {
   ].join("\n");
   Bun.write(script, body);
   run(["pwsh", "-NoProfile", "-File", script]);
+  await readyToRun();
 }
 
-function buildPwshHost(): void {
-  if (!existsSync(join(pshome, "System.Management.Automation.dll"))) buildPwsh();
+/** Newest entry of a versioned directory whose name starts with `prefix`. */
+function newest(dir: string, prefix: string): string | undefined {
+  if (!existsSync(dir)) return undefined;
+  return readdirSync(dir)
+    .filter(v => v.startsWith(prefix))
+    .sort((a, b) => Bun.semver.order(a, b))
+    .at(-1);
+}
+
+/**
+ * ReadyToRun-compiles the IL-only assemblies of PSHOME with crossgen2. Start-PSBuild publishes the
+ * framework-dependent layout IL-only (PowerShell.Common.props: AppDeployment FxDependent), so every pwsh start and
+ * the in-process host would JIT the whole engine. Already-compiled and mixed-mode files are left as they are.
+ */
+async function readyToRun(): Promise<void> {
+  const nuget = join(process.env.USERPROFILE ?? "", ".nuget", "packages", "microsoft.netcore.app.crossgen2.win-x64");
+  const dn = dotnetRoot();
+  const runtime = newest(join(dn, "shared", "Microsoft.NETCore.App"), "11.");
+  const crossgenVersion = runtime && existsSync(join(nuget, runtime)) ? runtime : newest(nuget, "11.");
+  if (!runtime || !crossgenVersion) {
+    console.warn("crossgen2 11.x not in the NuGet cache (build pwsh-host first); PSHOME stays IL-only");
+    return;
+  }
+  const crossgen = join(nuget, crossgenVersion, "tools", "crossgen2.exe");
+  const desktop = newest(join(dn, "shared", "Microsoft.WindowsDesktop.App"), "11.");
+  const refs = [join(dn, "shared", "Microsoft.NETCore.App", runtime, "*.dll"), join(pshome, "*.dll")];
+  if (desktop) refs.push(join(dn, "shared", "Microsoft.WindowsDesktop.App", desktop, "*.dll"));
+  const staging = join(out, "obj", "pwsh-r2r");
+  mkdirSync(staging, { recursive: true });
+  // PowerShell's own assemblies only: the NuGet dependencies are Microsoft-signed and a rewrite would drop that.
+  const own =
+    /^(System\.Management\.Automation|Microsoft\.PowerShell\.|Microsoft\.Management\.Infrastructure\.CimCmdlets|Microsoft\.WSMan\.|pwsh)[\w.]*\.dll$/i;
+  const files = readdirSync(pshome).filter(f => own.test(f));
+  const parallel = Math.max(2, navigator.hardwareConcurrency >> 1);
+  const queue = [...files];
+  const done: string[] = [];
+  const workers = Array.from({ length: parallel }, async () => {
+    for (let file = queue.shift(); file; file = queue.shift()) {
+      const output = join(staging, file);
+      const proc = Bun.spawn(
+        [
+          crossgen,
+          join(pshome, file),
+          "-o",
+          output,
+          "--targetos",
+          "windows",
+          "--targetarch",
+          "x64",
+          "-O",
+          ...refs.flatMap(r => ["-r", r]),
+        ],
+        { stdout: "pipe", stderr: "pipe" },
+      );
+      if ((await proc.exited) === 0 && existsSync(output) && statSync(output).size > 0) done.push(file);
+    }
+  });
+  // Swap in only after every crossgen2 run ended: the others map PSHOME assemblies as references.
+  await Promise.all(workers);
+  for (const file of done) copyFileSync(join(staging, file), join(pshome, file));
+  console.log(`ReadyToRun: ${done.length}/${files.length} PSHOME assemblies compiled (crossgen2 ${crossgenVersion})`);
+}
+
+async function buildPwshHost(): Promise<void> {
+  if (!existsSync(join(pshome, "System.Management.Automation.dll"))) await buildPwsh();
   run(
     [
       join(dotnetRoot(), "dotnet.exe"),
@@ -238,16 +303,17 @@ function buildBins(): void {
   }
 }
 
-const table: Record<string, () => void> = {
+const table: Record<string, () => void | Promise<void>> = {
   winmd: buildWinmd,
   native: buildNative,
   pwsh: buildPwsh,
   "pwsh-host": buildPwshHost,
+  "pwsh-r2r": readyToRun,
   cpp: buildCpp,
   bins: buildBins,
 };
 
 if (import.meta.main) {
   const wanted = steps.length === 0 || steps.includes("all") ? ["winmd", "native", "pwsh-host", "cpp", "bins"] : steps;
-  for (const step of wanted) (table[step] ?? die(`unknown step '${step}'`))();
+  for (const step of wanted) await (table[step] ?? die(`unknown step '${step}'`))();
 }

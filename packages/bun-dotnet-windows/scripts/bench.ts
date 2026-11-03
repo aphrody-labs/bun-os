@@ -6,7 +6,7 @@
  *               process, winget search through COM, D3D12 adapter enumeration
  *   hyperfine   cold starts: bun + AOT dlopen, pwsh.exe vs in-process, winget.exe vs bunos-winget (COM)
  *
- *   bun packages/bun-dotnet-windows/scripts/bench.ts [--quick] [--no-hyperfine]
+ *   bun packages/bun-dotnet-windows/scripts/bench.ts [--quick] [--no-hyperfine] [--hyperfine-only]
  */
 import { existsSync, mkdirSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -15,7 +15,14 @@ const pkg = resolve(import.meta.dir, "..");
 const root = resolve(pkg, "..", "..");
 const out = join(root, "target", "bun-dotnet-windows");
 const quick = process.argv.includes("--quick");
-const results: Record<string, unknown> = { date: new Date().toISOString(), host: process.env.COMPUTERNAME };
+const hyperfineOnly = process.argv.includes("--hyperfine-only");
+const previous =
+  hyperfineOnly && existsSync(join(out, "bench.json")) ? await Bun.file(join(out, "bench.json")).json() : {};
+const results: Record<string, unknown> = {
+  ...previous,
+  date: new Date().toISOString(),
+  host: process.env.COMPUTERNAME,
+};
 
 function perCall(name: string, iterations: number, body: () => unknown): number {
   for (let i = 0; i < Math.min(10_000, iterations); i++) body();
@@ -54,30 +61,32 @@ const winget = await import("../src/winget.ts");
 const pwsh = await import("../src/pwsh.ts");
 
 const n = quick ? 200_000 : 2_000_000;
-perCall("ffi -> C# Native AOT bunos_ping", n, () => native.ping(1));
-perCall("ffi -> C++ bunos_cpp_ping", n, () => native.cppPing(1));
-perCall("ffi -> C# AOT bunos_call(winget.status)", quick ? 2_000 : 20_000, () => native.call("winget.status"));
-await pwsh.start();
-const managedPing = (await import("@aphrody/bun-os-plugins/dotnet")).unmanaged(
-  { type: "BunOs.Pwsh.Exports, BunOs.Pwsh", method: "Ping" },
-  { args: ["i64"], returns: "i64" },
-) as (v: number) => bigint;
-perCall("ffi -> hostfxr managed (JIT) Ping", n, () => managedPing(1));
+if (!hyperfineOnly) {
+  perCall("ffi -> C# Native AOT bunos_ping", n, () => native.ping(1));
+  perCall("ffi -> C++ bunos_cpp_ping", n, () => native.cppPing(1));
+  perCall("ffi -> C# AOT bunos_call(winget.status)", quick ? 2_000 : 20_000, () => native.call("winget.status"));
+  await pwsh.start();
+  const managedPing = (await import("@aphrody/bun-os-plugins/dotnet")).unmanaged(
+    { type: "BunOs.Pwsh.Exports, BunOs.Pwsh", method: "Ping" },
+    { args: ["i64"], returns: "i64" },
+  ) as (v: number) => bigint;
+  perCall("ffi -> hostfxr managed (JIT) Ping", n, () => managedPing(1));
 
-await timed("d3d12.adapters (C#, device per adapter)", 5, () => d3d12.adapters());
-await timed("d3d12.adapters (C++, device per adapter)", 5, () => d3d12.adapters({ via: "cpp" }));
-await timed("system.info (CsWinRT + CsWin32)", 20, () => d3d12.systemInfo());
+  await timed("d3d12.adapters (C#, device per adapter)", 5, () => d3d12.adapters());
+  await timed("d3d12.adapters (C++, device per adapter)", 5, () => d3d12.adapters({ via: "cpp" }));
+  await timed("system.info (CsWinRT + CsWin32)", 20, () => d3d12.systemInfo());
 
-await timed("pwsh in-process: Get-Date", quick ? 10 : 50, () => pwsh.evaluate("Get-Date"));
-await timed("pwsh in-process: Get-Process | Select -First 5", quick ? 5 : 20, () =>
-  pwsh.evaluate("Get-Process | Select-Object -First 5 Name,Id,WS"),
-);
-await timed("pwsh spawn (source build): Get-Date", quick ? 3 : 10, () => pwsh.spawn("Get-Date"));
+  await timed("pwsh in-process: Get-Date", quick ? 10 : 50, () => pwsh.evaluate("Get-Date"));
+  await timed("pwsh in-process: Get-Process | Select -First 5", quick ? 5 : 20, () =>
+    pwsh.evaluate("Get-Process | Select-Object -First 5 Name,Id,WS"),
+  );
+  await timed("pwsh spawn (source build): Get-Date", quick ? 3 : 10, () => pwsh.spawn("Get-Date"));
 
-await timed("winget COM: search ripgrep (source winget)", quick ? 3 : 10, () =>
-  winget.search("ripgrep", { source: "winget", limit: 10 }),
-);
-await timed("winget COM: list --upgradable", quick ? 2 : 5, () => winget.list({ upgradable: true }));
+  await timed("winget COM: search ripgrep (source winget)", quick ? 3 : 10, () =>
+    winget.search("ripgrep", { source: "winget", limit: 10 }),
+  );
+  await timed("winget COM: list --upgradable", quick ? 2 : 5, () => winget.list({ upgradable: true }));
+}
 
 if (!process.argv.includes("--no-hyperfine") && Bun.which("hyperfine")) {
   const bun = process.execPath;
@@ -111,7 +120,7 @@ if (!process.argv.includes("--no-hyperfine") && Bun.which("hyperfine")) {
   const exportJson = join(out, "hyperfine.json");
   const args = ["hyperfine", "-N", "--warmup", "1", "--runs", quick ? "3" : "10", "--export-json", exportJson];
   for (const [name, command] of commands) args.push("-n", name, command);
-  Bun.spawnSync(args, { stdio: ["ignore", "inherit", "inherit"] });
+  Bun.spawnSync(args, { env: pwsh.executableEnv(), stdio: ["ignore", "inherit", "inherit"] });
   if (existsSync(exportJson)) {
     const report = (await Bun.file(exportJson).json()) as {
       results: { command: string; mean: number; stddev: number; min: number }[];

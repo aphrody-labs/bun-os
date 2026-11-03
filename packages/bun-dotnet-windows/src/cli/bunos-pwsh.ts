@@ -36,7 +36,10 @@ async function main(): Promise<number> {
   if (script === undefined) {
     const exe = pwsh.executable();
     if (!exe) throw new Error("no pwsh executable");
-    const proc = Bun.spawn([exe, "-NoLogo", ...positionals.slice(1)], { stdio: ["inherit", "inherit", "inherit"] });
+    const proc = Bun.spawn([exe, "-NoLogo", ...positionals.slice(1)], {
+      env: pwsh.executableEnv(),
+      stdio: ["inherit", "inherit", "inherit"],
+    });
     return await proc.exited;
   }
   const depth = values.depth ? Number(values.depth) : undefined;
