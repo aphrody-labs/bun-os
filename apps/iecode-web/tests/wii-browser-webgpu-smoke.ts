@@ -39,7 +39,7 @@ const server = Bun.serve({
     if (path !== "/") return new Response("Not found", { status: 404 });
     return new Response(
       `<!doctype html><script type="module">
-      import init, { start_wii_emulator, execution_status } from '/pkg/gecko_web.js';
+      import init, { start_emulator, start_wii_emulator, execution_status } from '/pkg/gecko_web.js';
       const report = data => fetch('/report', {method:'POST', body:JSON.stringify(data)});
       const originalError = console.error.bind(console);
       console.error = (...args) => { originalError(...args); report({error:args.map(String).join(' ')}); };
@@ -51,6 +51,9 @@ const server = Bun.serve({
         let rejected = false;
         try { start_wii_emulator(new Uint8Array(16)); } catch { rejected = true; }
         if (!rejected) throw new Error('Malformed DOL was accepted');
+        rejected = false;
+        try { start_emulator(new Uint8Array(16), 'broken.dol'); } catch { rejected = true; }
+        if (!rejected) throw new Error('Malformed GameCube DOL was accepted');
         start_wii_emulator(dol);
         const timer = setInterval(() => {
           const status = Array.from(execution_status());
