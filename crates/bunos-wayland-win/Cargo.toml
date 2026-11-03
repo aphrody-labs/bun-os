@@ -1,0 +1,61 @@
+# SPDX-License-Identifier: Apache-2.0
+# bunos-wayland-win: Linux Wayland/X11 apps as native Win32 windows, without WSLg or RDP.
+# Two halves speak one framed protocol (src/wire.rs) over any byte stream (stdio of ssh or wsl.exe, TCP, hvsocket):
+#   bunos-wlhost      Linux. Headless smithay compositor; each xdg_toplevel is rendered (pixman) and shipped as
+#                     damage rectangles; input, configure and close come back.
+#   bunos-wayland-win Windows. One Win32 window per toplevel (DWM: Mica/Acrylic, rounded corners, snap, dark mode),
+#                     keyboard/mouse/focus/resize back to the host, D3D11 flip-model or GDI presentation.
+# Standalone lock: smithay (vendor/smithay, aphrody-labs fork) is excluded from the root workspace.
+[package]
+name = "bunos-wayland-win"
+version = "0.1.0"
+edition = "2024"
+license = "Apache-2.0"
+description = "Bun OS native Wayland on Windows: Linux toplevels as real Win32/DWM windows over a portable stream protocol."
+publish = false
+
+[workspace]
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "bunos-wlhost"
+path = "src/bin/bunos-wlhost.rs"
+
+[[bin]]
+name = "bunos-wayland-win"
+path = "src/bin/bunos-wayland-win.rs"
+
+[dependencies]
+lz4_flex = { version = "0.11.6", default-features = false, features = ["safe-encode", "safe-decode", "std"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+smithay = { path = "../../vendor/smithay", default-features = false, features = [
+  "wayland_frontend",
+  "desktop",
+  "renderer_pixman",
+  "xwayland",
+] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", features = [
+  "Win32_Foundation",
+  "Win32_Graphics_Dwm",
+  "Win32_Graphics_Gdi",
+  "Win32_Graphics_Direct3D",
+  "Win32_Graphics_Direct3D11",
+  "Win32_Graphics_DirectComposition",
+  "Win32_Graphics_Dxgi",
+  "Win32_Graphics_Dxgi_Common",
+  "Win32_System_LibraryLoader",
+  "Win32_System_Registry",
+  "Win32_UI_Controls",
+  "Win32_UI_HiDpi",
+  "Win32_UI_Input_KeyboardAndMouse",
+  "Win32_UI_WindowsAndMessaging",
+] }
+
+[profile.release]
+lto = "thin"
+codegen-units = 4
