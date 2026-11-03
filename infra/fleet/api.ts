@@ -19,6 +19,7 @@ type Deploy = {
   unit_file?: string;
   package?: string;
   bin?: string;
+  features?: string;
   command?: string;
 };
 type Service = {
@@ -330,7 +331,7 @@ fi`;
 want=$(git rev-parse origin/main)
 rel="$HOME/apps/api-releases/${name}/$want-$(date +%s%3N)"
 mkdir -p "$rel"
-bun build ${sq(entry)} --target bun --outfile "$rel/${file}" --metafile "$rel/meta.json" \\
+bun build ${sq(entry)} --target bun --outfile "$rel/${file}" --metafile="$rel/meta.json" \\
   --define "process.env.APHRODY_COMMIT=\\"$want\\"" --define 'process.env.APHRODY_CHANNEL="stable"' >/dev/null
 # Provenance: every bundled source of the checkout equals origin/main.
 jq -r '.inputs | keys[]' "$rel/meta.json" | grep -v '^node_modules/\\|/node_modules/\\|^<\\|^bun:' | while read -r f; do
@@ -352,7 +353,7 @@ mkdir -p "$rel"
 lane="$HOME/.cache/aphrody/lanes/api"; target="$HOME/build/storage/targets/api"; mkdir -p "$lane" "$target"
 APHRODY_COMMIT="$want" APHRODY_CHANNEL=stable CARGO_BUILD_JOBS="" APHRODY_BUILD_HOST='' APHRODY_LOCAL_CARGO=1 \\
   APHRODY_CARGO_LOCK_DIR="$lane" APHRODY_CARGO_TARGET_DIR="$target" CARGO_BUILD_BUILD_DIR="$target/build" \\
-  scripts/aphrody/build/rust/cargo-serial.sh build --release --locked -p ${pkg} --bin ${bin}
+  scripts/aphrody/build/rust/cargo-serial.sh build --release --locked -p ${pkg} --bin ${bin}${d.features ? ` --features ${d.features}` : ""}
 install -m 0755 "$target/release/${bin}" "$rel/${bin}"
 echo "built $rel/${bin} from $want"
 ${dry ? "exit 0" : swap(`$rel/${bin}`)}`;

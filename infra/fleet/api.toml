@@ -14,7 +14,7 @@
 # [services.<name>.deploy] is the release recipe of `api.ts deploy` (built from origin/main on the gateway host,
 # installed, restarted, gated on <upstream>health reporting the commit, rolled back on failure):
 #   kind = "bun"      bun build --target bun of `entry` into `install` (APHRODY_COMMIT defined at build time)
-#   kind = "cargo"    cargo build --release of `package`/`bin` through the lane wrapper, binary installed at `install`
+#   kind = "cargo"    cargo build --release of `package`/`bin` (`features`) through the lane wrapper, installed at `install`
 #   kind = "command"  `command` builds and activates by itself (its own health gate); the deploy waits for the commit
 # `unit_file` (optional) is installed from origin/main before the restart and restored on rollback.
 
@@ -93,6 +93,8 @@ unit = "aphrody-a2a.service"
 kind = "cargo"
 package = "aphrody"
 bin = "aphrody"
+# The multi-call CLI: aphrody-mcp, aphrody-infra and aphrody-kernel are links to it.
+features = "jobs,mcp-toolbox"
 install = "~/.local/share/aphrody/bin/aphrody"
 
 [services.bunos]
