@@ -34,10 +34,10 @@ control_persist = "10m"
 # ---------------------------------------------------------------------------------------------------------------------
 
 [hosts.vps]
-description = "Build, qualification and release factory; WebOS edge for aphrody.com; mesh hub"
+description = "Build, qualification and release factory; mesh hub"
 provider = "OVH"
 os = "ubuntu-26.10"
-roles = ["mesh-hub", "build", "qualification", "release", "webos-edge"]
+roles = ["mesh-hub", "build", "qualification", "release"]
 user = "ubuntu"
 mesh_ip = "10.200.77.1"
 public_ipv4 = "51.77.147.152"
@@ -50,12 +50,11 @@ checkout = "~/src/bun-os"
 public_tcp = [22, 80, 443]
 public_udp = [443, 51821]
 
-[hosts.dbfr]
-description = "Shenron data host: object storage, extraction workers, Shenron admin"
-aliases = ["shenron"]
+[hosts.bunos]
+description = "Bun OS production: aphrody.com services and the WebOS session (formerly dbfr)"
 provider = "OVH"
 os = "ubuntu-26.10"
-roles = ["shenron-data"]
+roles = ["bunos-prod"]
 user = "ubuntu"
 mesh_ip = "10.200.77.3"
 public_ipv4 = "51.255.162.6"
@@ -68,7 +67,7 @@ public_tcp = [22, 80, 443]
 public_udp = [443, 45667]
 
 [hosts.prod]
-description = "Shenron production (dragonballfr.com) behind Cloudflare"
+description = "Shenron (dragonballfr.com), fully migrated here, behind Cloudflare"
 provider = "Hostinger"
 os = "arch"
 roles = ["shenron-prod"]

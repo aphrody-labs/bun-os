@@ -1,5 +1,5 @@
 # Generated from infra/fleet/fleet.toml. Pinned host keys, keyed by HostKeyAlias.
 vps ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINPa730pnwLsaHzUJ7T2IErtqGyBgH6gNGdsHNC4h02O
-dbfr,shenron ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHYR3pwug0v845mC0RZLveKK7ZG5QzqQcRtExNwTniOl
+bunos ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHYR3pwug0v845mC0RZLveKK7ZG5QzqQcRtExNwTniOl
 prod ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIARirhBJIljCJ/n/b7+3hZKOBI+MZ5W6qJtHT4BgDbQs
 omar ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID6m0hYvMoqVUcjqaokolMWxnelpP5XoKCUGXSWAHvov

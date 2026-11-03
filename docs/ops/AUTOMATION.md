@@ -7,7 +7,7 @@ State lives in `~/.local/state/bunos-auto`; reports go to [aphrody.com/status](h
 never Discord.
 
 Scope: Bun OS only (aphrody.com WebOS, store, site, gateways, Bun OS images). Shenron (dragonballfr.com,
-`/srv/shenron-build`, host `dbfr`) is a separate project with its own release pipeline: no loop builds, deploys or
+`/srv/shenron-build`, host `prod`) is a separate project with its own release pipeline: no loop builds, deploys or
 restarts it.
 
 ## Loops

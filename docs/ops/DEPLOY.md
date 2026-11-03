@@ -51,6 +51,6 @@ Disk images and ISOs are release artifacts of build stage 4 ([BUILD.md](BUILD.md
 
 ## Shenron
 
-Shenron (dragonballfr.com, hosts `prod` and `dbfr`) is a separate project with its own release pipeline
+Shenron (dragonballfr.com, host `prod`) is a separate project with its own release pipeline
 (`shenron-autodeploy.service` on `prod`). No Bun OS lane builds, deploys or restarts it; the fleet only owns its
 host access, mesh and firewall ([FLEET.md](FLEET.md)).

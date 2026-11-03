@@ -3,13 +3,13 @@
 `infra/fleet/fleet.toml` is the only description of the Bun OS hosts. SSH access, pinned host keys, host firewalls
 and the audit are generated from it by `bun infra/fleet/fleet.ts`. Change the TOML, regenerate, commit.
 
-| Host          | Role                                                                 | Mesh           | OS           | Provider  |
-| ------------- | -------------------------------------------------------------------- | -------------- | ------------ | --------- |
-| `vps`         | Build, qualification and release factory; aphrody.com edge; mesh hub | `10.200.77.1`  | Ubuntu 26.10 | OVH       |
-| `dbfr`        | Shenron data host (object storage, extraction, admin)                | `10.200.77.3`  | Ubuntu 26.10 | OVH       |
-| `prod`        | Shenron production (dragonballfr.com) behind Cloudflare              | `10.200.77.5`  | Arch Linux   | Hostinger |
-| `omar`        | Collaborator workstation (Windows), mesh client                      | `10.200.77.10` | Windows      | —         |
-| `workstation` | Owner workstation (Windows): edits, syncs, drives the fleet          | `10.200.77.4`  | Windows      | —         |
+| Host          | Role                                                                                                    | Mesh           | OS           | Provider  |
+| ------------- | ------------------------------------------------------------------------------------------------------- | -------------- | ------------ | --------- |
+| `vps`         | Build, qualification and release factory; mesh hub (still fronts aphrody.com until it moves to `bunos`) | `10.200.77.1`  | Ubuntu 26.10 | OVH       |
+| `bunos`       | Bun OS production (formerly `dbfr`): receives qualified releases from `vps`                             | `10.200.77.3`  | Ubuntu 26.10 | OVH       |
+| `prod`        | Shenron (dragonballfr.com), fully migrated here, behind Cloudflare                                      | `10.200.77.5`  | Arch Linux   | Hostinger |
+| `omar`        | Collaborator workstation (Windows), mesh client                                                         | `10.200.77.10` | Windows      | —         |
+| `workstation` | Owner workstation (Windows): edits, syncs, drives the fleet                                             | `10.200.77.4`  | Windows      | —         |
 
 `bun infra/fleet/fleet.ts hosts` prints the live table from the TOML.
 
@@ -17,7 +17,7 @@ and the audit are generated from it by `bun infra/fleet/fleet.ts`. Change the TO
 
 ```sh
 bun infra/fleet/fleet.ts ssh-config     # writes infra/fleet/generated/* and installs ~/.ssh/fleet/{ssh_config,known_hosts}
-ssh vps | ssh dbfr | ssh prod           # over the WireGuard mesh, strict host-key checking against the pinned keys
+ssh vps | ssh bunos | ssh prod          # over the WireGuard mesh, strict host-key checking against the pinned keys
 ssh vps-t                               # same host, attached to the persistent tmux session `main`
 ssh prod-public                         # recovery path over the public address when the mesh is down
 ```
@@ -43,7 +43,7 @@ ssh prod-public                         # recovery path over the public address 
   and loaded by `fleet-firewall.service` from `/etc/fleet/firewall.nft`. Only the public interface is filtered:
   mesh, loopback and container bridges are trusted; the fleet's own public addresses are trusted; everything else
   reaches only `public_tcp`/`public_udp`. It coexists with Docker's iptables-nft tables and replaces ufw (retired on
-  2026-11-03 on `vps` and `dbfr`; `prod` had no firewall at all).
+  2026-11-03 on `vps` and `bunos`; `prod` had no firewall at all).
 - **Public entry**: nginx on 80/443 (aphrody.com on `vps`, dragonballfr.com on `prod`) or Cloudflare tunnels.
   Services bind loopback or the mesh; a service listening on `0.0.0.0` is still unreachable from outside, but the
   audit lists it so it gets fixed at the source.
