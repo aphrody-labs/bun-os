@@ -127,6 +127,11 @@ ${proxyCommon(!!s.realtime)}${cors}    }`;
 
 ${locations}
 
+    # The bare host sends people to the catalogue instead of an error.
+    location = / {
+        return 302 /v1/;
+    }
+
     location / {
         default_type application/problem+json;
         return 404 '{"type":"about:blank","title":"Not Found","status":404,"detail":"See https://${api.domain}/v1/ for the API catalogue"}';
