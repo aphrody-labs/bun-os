@@ -24,7 +24,7 @@ const plugins = [
       { from: resolve(__dirname, "wii/index.html"), to: "wii/index.html" },
       { from: resolve(__dirname, "wii/pkg"), to: "wii/pkg" },
       {
-        from: resolve(__dirname, "../../crates/emu/game_db.json"),
+        from: resolve(__dirname, "../../vendor/dust/game_db.json"),
         to: "resources/game_db.json",
       },
       {

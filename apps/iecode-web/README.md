@@ -14,12 +14,13 @@ live together here; reusable JavaScript/TypeScript libraries belong in
 The console switcher shows the current capability of each owner. It does not
 offer a game launcher for a console whose CPU, devices and renderer are not yet
 integrated. The remaining execution gates are in
-[`docs/emulation/MULTICONSOLE-RUST-MIGRATION.md`](../../docs/emulation/MULTICONSOLE-RUST-MIGRATION.md).
+[`docs/EMULATION.md`](../../docs/EMULATION.md).
 
 ## Build
 
-Run `bun run build:web` from the repository root. Both browser adapters build
-from the root Cargo lockfile through `scripts/iecode/build/build-emulator-web.ts`; install
+Run `bun run --cwd apps/iecode-web build` from the repository root. Both browser adapters build
+from the root Cargo lockfile through `scripts/iecode/build/build-emulator-web.ts`; initialize
+the pinned `vendor/dust` submodule for its game database, and install
 the `wasm32-unknown-unknown` Rust target and the wasm-bindgen CLI version listed
 in Cargo.lock. DS retains compiler features and uses a bounded per-command
 `RUSTC_BOOTSTRAP=1`. `bun run --cwd apps/iecode-web build:wii` builds only Wii;
@@ -33,7 +34,7 @@ It does not provide Wii disc loading or browser NAND persistence. Keyboard:
 Z/X = A/B, 1/2, Enter = Plus, Minus, Home, arrows and Space = shake;
 the pointer drives IR aim. Selecting another console unloads the Wii frame.
 
-The explicit browser gate is `IECODE_BROWSER=/path/to/chromium bun run
-test:wii:browser`. It checks malformed input rejection, three actual Broadway
+The explicit browser gate is `IECODE_BROWSER=/path/to/chromium bun
+apps/iecode-web/tests/wii-browser-webgpu-smoke.ts` after building the Wii adapter. It checks malformed input rejection, three actual Broadway
 frames and a WebGPU canvas using an original generated instruction fixture.
 It does not establish game compatibility or rendering fidelity.

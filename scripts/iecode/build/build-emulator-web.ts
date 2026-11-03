@@ -20,10 +20,13 @@ async function run(command: string[]) {
   if (code !== 0) process.exit(code);
 }
 const lock = await Bun.file(join(root, "Cargo.lock")).text();
-const expected = lock.match(/name = "wasm-bindgen"\nversion = "([^"]+)"/)?.[1];
-const version = Bun.spawnSync(["wasm-bindgen", "--version"], { cwd: root });
-if (!expected || version.exitCode !== 0 || version.stdout.toString().trim() !== `wasm-bindgen ${expected}`) {
-  throw new Error(`Install wasm-bindgen-cli ${expected ?? "from Cargo.lock"} before building.`);
+const expected = lock.match(/^name = "wasm-bindgen"\r?\nversion = "([^"]+)"/m)?.[1];
+if (!expected) throw new Error("Could not find the wasm-bindgen version in Cargo.lock.");
+const bindgen = Bun.which("wasm-bindgen");
+if (!bindgen) throw new Error(`Install wasm-bindgen-cli ${expected} and add it to PATH before building.`);
+const version = Bun.spawnSync([bindgen, "--version"], { cwd: root });
+if (version.exitCode !== 0 || version.stdout.toString().trim() !== `wasm-bindgen ${expected}`) {
+  throw new Error(`wasm-bindgen-cli must match Cargo.lock (${expected}); found ${version.stdout.toString().trim() || "an unusable executable"}.`);
 }
 await run([
   process.execPath,
@@ -41,7 +44,7 @@ await run([
 ]);
 const target = resolve(root, process.env.CARGO_TARGET_DIR ?? "target");
 await run([
-  "wasm-bindgen",
+  bindgen,
   join(target, "wasm32-unknown-unknown", profile, `${outputName}.wasm`),
   "--target",
   "web",

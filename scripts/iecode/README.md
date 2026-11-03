@@ -67,7 +67,7 @@ Registry mode preserves native host configuration without inventing a source che
 `upstream/nie/tsconfig.gate.historical.json` preserves the former standalone NIE
 ratchet as evidence. The broader retained domain scripts are not asserted to be
 covered by that TypeScript gate. `typecheck:web` requires generated WASM bindings;
-`build:web` regenerates them through `build/build-emulator-web.ts`.
+`bun run --cwd apps/iecode-web build` regenerates them through `build/build-emulator-web.ts`.
 
 Python domain commands use `uv run`. Proofs require user-provided private inputs
 and their existing Python dependencies; a syntax/path check does not establish

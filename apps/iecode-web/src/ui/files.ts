@@ -205,11 +205,11 @@ export class Files {
 export function dbLookup(db: GameDbEntry[], code: number): GameDbEntry | undefined {
   let start = 0;
   let end = db.length - 1;
-  while (start !== end) {
-    const i = (start + end) >> 1;
+  while (start <= end) {
+    const i = start + Math.floor((end - start) / 2);
     const possible = db[i]!;
     if (possible.code > code) {
-      end = i;
+      end = i - 1;
     } else if (possible.code < code) {
       start = i + 1;
     } else {
