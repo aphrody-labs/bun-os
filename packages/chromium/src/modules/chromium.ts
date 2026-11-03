@@ -286,6 +286,7 @@ async function launch(
     url?: string;
     extensions?: string[];
     webgpu?: boolean;
+    args?: string[];
   } = {},
 ) {
   const timeout = timeoutValue(options.timeout);
@@ -306,6 +307,18 @@ async function launch(
   options.signal?.throwIfAborted();
   if (options.webgpu !== undefined && typeof options.webgpu !== "boolean")
     throw new TypeError("webgpu must be a boolean");
+  const extraArgs = options.args ?? [];
+  // Extra switches (GPU backends, window size, ...) may not replace the profile, the debugging endpoint or the URL.
+  if (
+    !Array.isArray(extraArgs) ||
+    extraArgs.some(
+      arg =>
+        typeof arg !== "string" ||
+        !/^--[a-z0-9][a-z0-9-]*(=[^\0\s]*)?$/.test(arg) ||
+        /^--(user-data-dir|remote-debugging-[a-z-]+|headless|load-extension|profile-directory|app)(=|$)/.test(arg),
+    )
+  )
+    throw new TypeError("args must be --switches that do not replace the profile, debugging endpoint, headless mode or URL");
   const linux = process.platform === "linux" ? linuxProcessGroup() : undefined;
   if (linux) {
     const probe = linux.pidfdOpen(process.pid);
@@ -338,6 +351,7 @@ async function launch(
   if (process.platform === "linux" && options.headless === true && ownedProfile) args.push("--password-store=basic");
   args.push(options.webgpu === false ? "--disable-features=WebGPUService" : "--enable-features=WebGPUService");
   if (extensions.length) args.push(`--load-extension=${extensions.join(",")}`);
+  args.push(...extraArgs);
   args.push(url);
   let proc: Bun.Subprocess<"ignore", "ignore", "pipe"> | undefined;
   let connection: ChromiumConnection | undefined;
