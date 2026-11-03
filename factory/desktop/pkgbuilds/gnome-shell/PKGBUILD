@@ -13,7 +13,7 @@ pkgname=(
   gnome-shell-docs
 )
 pkgver=51.1
-pkgrel=1.1
+pkgrel=1.2
 epoch=1
 pkgdesc="Next generation desktop shell"
 url="https://gitlab.gnome.org/GNOME/gnome-shell"
@@ -114,9 +114,10 @@ build() {
 }
 
 package_gnome-shell() {
-  depends+=(libmutter-51.so)
+  # Bun OS: gnome-shell-calendar-server links libecal (evolution-data-server); Arch lists it as optional, so the
+  # calendar server failed to start in the session ("libecal-2.0.so.3: cannot open shared object file").
+  depends+=(libmutter-51.so evolution-data-server)
   optdepends=(
-    'evolution-data-server: Evolution calendar integration'
     'gnome-bluetooth-3.0: Bluetooth support'
     'gnome-control-center: System settings'
     'gnome-disk-utility: Mount with keyfiles'
