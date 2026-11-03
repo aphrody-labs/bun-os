@@ -520,7 +520,7 @@ registry = [
 # Replaces the retired resident desktop stack (GlazeWM, tacky-borders, AltSnap, Flow Launcher, the chrome watcher and
 # overlay, the wgpu wallpaper; docs/WINDOWS-ARCHITECTURE.md): Windows draws all of this itself from these values.
 # Colours are the M3 seed #5b45a2 of the design receipt (vps ~/build/storage/artifacts/design/current/receipt.json);
-# DWORD colours are 0xAABBGGRR. The live apply broadcasts WM_SETTINGCHANGE (ImmersiveColorSet) and calls
+# DWORD colours are 0xAABBGGRR. Windows normalises DWM AccentColor to AccentColorMenu (palette entry 4, #44347a) and ColorizationColor to 0xC4 + that colour on the first broadcast, so the catalog stores the converged values (measured 2026-11-03). The live apply broadcasts WM_SETTINGCHANGE (ImmersiveColorSet) and calls
 # SPI_SETDESKWALLPAPER, so nothing needs a logoff (src/tweaks/live.rs notify_settings_changed).
 
 [[tweak]]
@@ -532,9 +532,9 @@ registry = [
   # Manual accent: with AutoColorization on, Windows re-derives the accent from the wallpaper on every wallpaper change
   # (measured 2026-11-03: it overwrote AccentColor/ColorizationColor within a second of the wallpaper apply).
   { hive = "user", key = 'Control Panel\Desktop', name = "AutoColorization", type = "dword", value = 0 },
-  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "AccentColor", type = "dword", value = 4288824667 },
-  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "ColorizationColor", type = "dword", value = 3294315938 },
-  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "ColorizationAfterglow", type = "dword", value = 3294315938 },
+  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "AccentColor", type = "dword", value = 4286198852 },
+  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "ColorizationColor", type = "dword", value = 3292804218 },
+  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "ColorizationAfterglow", type = "dword", value = 3292804218 },
   { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "ColorPrevalence", type = "dword", value = 1 },
   { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Accent', name = "AccentColorMenu", type = "dword", value = 4286198852 },
   { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Accent', name = "StartColorMenu", type = "dword", value = 4284032562 },

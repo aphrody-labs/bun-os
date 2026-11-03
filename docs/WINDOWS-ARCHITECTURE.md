@@ -211,7 +211,7 @@ Catalog module `look` (all HKCU, journaled, `bunos-win11 undo` restores each val
 
 | Tweak | Values | Replaces |
 | --- | --- | --- |
-| `look.accent` | `DWM\AccentColor` 0xFFA2455B, `ColorizationColor`/`ColorizationAfterglow` 0xC45B45A2, `DWM\ColorPrevalence` 1 (accent on title bars and window borders), `Explorer\Accent\AccentColorMenu`/`StartColorMenu`/`AccentPalette` (8-tone palette from the seed #5b45a2), `Personalize\ColorPrevalence` 0 | tacky-borders, chrome watcher |
+| `look.accent` | `DWM\AccentColor` 0xFF7A3444 (the menu colour Windows converges to), AutoColorization 0 so it is not re-derived from the wallpaper, `ColorizationColor`/`ColorizationAfterglow` 0xC444347A, `DWM\ColorPrevalence` 1 (accent on title bars and window borders), `Explorer\Accent\AccentColorMenu`/`StartColorMenu`/`AccentPalette` (8-tone palette from the seed #5b45a2), `Personalize\ColorPrevalence` 0 | tacky-borders, chrome watcher |
 | `look.transparency` | `Personalize\EnableTransparency` 1 | the glass profile |
 | `look.wallpaper` | `Control Panel\Desktop\Wallpaper` = `%SystemRoot%\BunOS\share\wallpaper\bunos-dusk-3840x2160.png` (REG_EXPAND_SZ), `WallpaperStyle` 10 (fill), `TileWallpaper` 0 | bunos-win11-wallpaper |
 | `look.snap` | `WindowArrangementActive` 1, `SnapAssist`, `EnableSnapAssistFlyout`, `EnableSnapBar`, `EnableTaskGroups` 1 | GlazeWM, AltSnap |
