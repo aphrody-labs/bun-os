@@ -124,7 +124,7 @@ export function QuickPreview() {
 
 	if (error) {
 		return (
-			<div className="h-screen flex items-center justify-center bg-app text-red-400">
+			<div className="h-screen flex items-center justify-center bg-app text-error">
 				<div>
 					<div className="text-lg font-medium mb-2">
 						Error loading file

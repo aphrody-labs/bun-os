@@ -186,7 +186,7 @@ export const FileCard = memo(
 					<div
 						className={clsx(
 							"absolute inset-0 rounded-lg ring-2 ring-inset pointer-events-none z-10",
-							hoverFinding?.severity === "error" ? "ring-red-500" : "ring-accent",
+							hoverFinding?.severity === "error" ? "ring-error" : "ring-accent",
 						)}
 					/>
 				)}
@@ -195,8 +195,8 @@ export const FileCard = memo(
 						className={clsx(
 							"absolute left-1 right-1 top-1 z-20 rounded px-1.5 py-0.5 text-[10px] font-medium leading-tight pointer-events-none truncate",
 							hoverFinding.severity === "error"
-								? "bg-red-500 text-white"
-								: "bg-amber-500 text-white",
+								? "bg-error text-on-error"
+								: "bg-warning text-on-warning",
 						)}
 						title={hoverFinding.message}
 					>
@@ -244,7 +244,7 @@ export const FileCard = memo(
 							<div
 								className={clsx(
 									"text-sm truncate px-2 py-0.5 rounded-md inline-block max-w-full",
-									selected && !dndIsDragging ? "bg-accent text-white" : "text-ink",
+									selected && !dndIsDragging ? "bg-accent text-on-primary" : "text-ink",
 								)}
 							>
 								{file.name}{file.extension && `.${file.extension}`}

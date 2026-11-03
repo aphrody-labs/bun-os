@@ -291,8 +291,8 @@ export function AudioPlayer({ src, file }: AudioPlayerProps) {
 												}}
 												className={`cursor-pointer text-center text-2xl transition-all duration-300 ${
 													isActive
-														? "font-bold text-white"
-														: "text-white/40 hover:text-white/60"
+														? "font-bold text-media-ink"
+														: "text-media-ink/40 hover:text-media-ink/60"
 												}`}
 												style={{
 													transform: isActive
@@ -309,10 +309,10 @@ export function AudioPlayer({ src, file }: AudioPlayerProps) {
 							</div>
 						) : (
 							<div className="text-center">
-								<div className="mb-4 text-6xl font-bold text-white/30">
+								<div className="mb-4 text-6xl font-bold text-media-ink/30">
 									♪
 								</div>
-								<p className="text-white/50">
+								<p className="text-media-ink/50">
 									No lyrics available
 								</p>
 							</div>
@@ -334,7 +334,7 @@ export function AudioPlayer({ src, file }: AudioPlayerProps) {
 					onMouseUp={() => setSeeking(false)}
 					onMouseLeave={() => setSeeking(false)}
 				>
-					<div className="relative h-1.5 w-full overflow-hidden rounded-full bg-white/20 transition-all group-hover:h-2">
+					<div className="relative h-1.5 w-full overflow-hidden rounded-full bg-media-ink/20 transition-all group-hover:h-2">
 						{/* Progress */}
 						<div
 							className="absolute left-0 top-0 h-full bg-accent transition-all"
@@ -360,7 +360,7 @@ export function AudioPlayer({ src, file }: AudioPlayerProps) {
 					{/* Left side - Fixed width */}
 					<div className="flex w-[200px] items-center gap-3">
 						{/* Time */}
-						<div className="text-sm font-medium text-white/70 tabular-nums">
+						<div className="text-sm font-medium text-media-ink/70 tabular-nums">
 							{formatTime(currentTime)}
 						</div>
 					</div>
@@ -369,7 +369,7 @@ export function AudioPlayer({ src, file }: AudioPlayerProps) {
 					<div className="flex flex-1 items-center justify-center gap-2">
 						<button
 							onClick={skipBack}
-							className="rounded-full p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+							className="rounded-full p-2 text-media-ink/70 transition-colors hover:bg-media-ink/10 hover:text-media-ink"
 							title="Skip back 10s"
 						>
 							<SkipBack size={24} weight="fill" />
@@ -377,7 +377,7 @@ export function AudioPlayer({ src, file }: AudioPlayerProps) {
 
 						<button
 							onClick={togglePlay}
-							className="rounded-full bg-accent p-3 text-white shadow-lg transition-all hover:scale-105 hover:bg-accent/90"
+							className="rounded-full bg-accent p-3 text-on-primary shadow-lg transition-all hover:scale-105 hover:bg-accent/90"
 						>
 							{playing ? (
 								<Pause size={28} weight="fill" />
@@ -392,7 +392,7 @@ export function AudioPlayer({ src, file }: AudioPlayerProps) {
 
 						<button
 							onClick={skipForward}
-							className="rounded-full p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+							className="rounded-full p-2 text-media-ink/70 transition-colors hover:bg-media-ink/10 hover:text-media-ink"
 							title="Skip forward 10s"
 						>
 							<SkipForward size={24} weight="fill" />
@@ -402,7 +402,7 @@ export function AudioPlayer({ src, file }: AudioPlayerProps) {
 					{/* Right side - Fixed width matching left */}
 					<div className="flex w-[200px] items-center justify-end gap-3">
 						{/* Time remaining */}
-						<div className="text-sm font-medium text-white/70 tabular-nums">
+						<div className="text-sm font-medium text-media-ink/70 tabular-nums">
 							-{formatTime(duration - currentTime)}
 						</div>
 
@@ -410,7 +410,7 @@ export function AudioPlayer({ src, file }: AudioPlayerProps) {
 						<div className="flex items-center gap-2">
 							<button
 								onClick={() => setMuted(!muted)}
-								className="rounded-md p-2 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+								className="rounded-md p-2 text-media-ink/70 transition-colors hover:bg-media-ink/10 hover:text-media-ink"
 							>
 								{muted || volume === 0 ? (
 									<SpeakerSlash size={20} weight="fill" />
@@ -430,7 +430,7 @@ export function AudioPlayer({ src, file }: AudioPlayerProps) {
 									onChange={(e) =>
 										setVolume(parseFloat(e.target.value))
 									}
-									className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/20 [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:hover:scale-110"
+									className="h-1 w-full cursor-pointer appearance-none rounded-full bg-media-ink/20 [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:shadow-lg [&::-webkit-slider-thumb]:transition-all [&::-webkit-slider-thumb]:hover:scale-110"
 								/>
 							</div>
 						</div>

@@ -353,7 +353,7 @@ export function VolumeBar({volume, sources, isLocal, index}: VolumeBarProps) {
 							className="bg-accent/60"
 							style={{
 								backgroundImage:
-									'repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255,255,255,0.1) 4px, rgba(255,255,255,0.1) 8px)'
+									'repeating-linear-gradient(45deg, transparent, transparent 4px, color-mix(in srgb, var(--md-sys-color-on-surface) 10%, transparent) 4px, color-mix(in srgb, var(--md-sys-color-on-surface) 10%, transparent) 8px)'
 							}}
 							title={`Duplicate: ${formatBytes(duplicateBytes)} (${duplicatePercent.toFixed(1)}%)`}
 						/>
@@ -375,7 +375,7 @@ export function VolumeBar({volume, sources, isLocal, index}: VolumeBarProps) {
 								className="absolute inset-0 opacity-30"
 								style={{
 									backgroundImage:
-										'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.4) 50%, transparent 100%)',
+										'linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--md-sys-color-on-surface) 40%, transparent) 50%, transparent 100%)',
 									backgroundSize: '200% 100%',
 									animation: 'shimmer 2s infinite'
 								}}

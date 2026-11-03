@@ -96,9 +96,9 @@ function Findings({
 function FindingRow({ finding }: { finding: Finding }) {
 	const tone =
 		finding.severity === "error"
-			? { icon: XCircle, className: "bg-red-500/10 border-red-500/20 text-red-500" }
+			? { icon: XCircle, className: "bg-error/10 border-error/20 text-error" }
 			: finding.severity === "warning"
-				? { icon: Warning, className: "bg-amber-500/10 border-amber-500/20 text-amber-500" }
+				? { icon: Warning, className: "bg-warning/10 border-warning/20 text-warning" }
 				: { icon: Info, className: "bg-app-box border-app-line text-ink-dull" };
 	const Icon = tone.icon;
 	return (
@@ -185,8 +185,8 @@ function Row({
 			<div
 				className={clsx(
 					"text-ink-dull",
-					tone === "warn" && files > 0 && "text-amber-500",
-					tone === "danger" && files > 0 && "text-red-500",
+					tone === "warn" && files > 0 && "text-warning",
+					tone === "danger" && files > 0 && "text-error",
 				)}
 			>
 				{label}
@@ -229,8 +229,8 @@ function ChangeRow({ change }: { change: PlannedChange }) {
 					"flex-shrink-0 rounded px-1 py-px font-medium",
 					change.change.type === "conflict" ||
 						(change.change.type === "delete" && change.change.last_copy)
-						? "bg-red-500/15 text-red-500"
-						: "bg-amber-500/15 text-amber-500",
+						? "bg-error/15 text-error"
+						: "bg-warning/15 text-warning",
 				)}
 			>
 				{changeLabel(change.change)}

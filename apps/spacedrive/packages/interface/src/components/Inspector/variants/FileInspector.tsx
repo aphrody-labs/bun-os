@@ -1466,7 +1466,7 @@ function ChatTab() {
 					</div>
 
 					<button
-						className="bg-accent hover:bg-accent/90 rounded-lg p-1.5 text-white transition-colors"
+						className="bg-accent hover:bg-accent/90 rounded-lg p-1.5 text-on-primary transition-colors"
 						title="Send message"
 					>
 						<PaperPlaneRight size={4} weight="bold" />

@@ -35,7 +35,7 @@ export function Tag({ color, children, size = "sm", className, onRemove }: TagPr
             e.stopPropagation();
             onRemove();
           }}
-          className="ml-0.5 rounded-full p-0.5 opacity-50 hover:opacity-100 hover:bg-black/10 transition-opacity"
+          className="ml-0.5 rounded-full p-0.5 opacity-50 hover:opacity-100 hover:bg-scrim/10 transition-opacity"
           aria-label="Remove tag"
         >
           <X size={size === "sm" ? 8 : 10} weight="bold" />

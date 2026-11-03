@@ -52,7 +52,7 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
               <div className="relative z-10 flex items-center justify-center">
                 <Icon className="size-4" weight="bold" />
                 {tab.badge !== undefined && tab.badge > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 px-1 min-w-[16px] h-4 flex items-center justify-center text-[9px] font-bold bg-accent text-white rounded-full">
+                  <span className="absolute -top-1.5 -right-1.5 px-1 min-w-[16px] h-4 flex items-center justify-center text-[9px] font-bold bg-accent text-on-primary rounded-full">
                     {tab.badge}
                   </span>
                 )}

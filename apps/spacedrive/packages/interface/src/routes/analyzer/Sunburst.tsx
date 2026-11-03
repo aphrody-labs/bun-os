@@ -8,6 +8,7 @@ import type { SizeNode } from "@sd/ts-client";
  * bytes render as muted slices so the wheel always sums to the truth.
  */
 
+// design:content: chart series colours for the sunburst wheel (data, not chrome).
 const PALETTE = [
 	"#5B8DEF",
 	"#9B7BEF",
@@ -21,7 +22,8 @@ const PALETTE = [
 	"#E58888",
 ];
 
-const OTHER_COLOR = "hsla(220, 10%, 55%, 0.35)";
+// The muted "other" slice is chrome-coloured: the outline role at 35%.
+const OTHER_COLOR = "color-mix(in srgb, var(--md-sys-color-outline) 35%, transparent)";
 const MIN_FRACTION = 0.004;
 
 type Slice = {

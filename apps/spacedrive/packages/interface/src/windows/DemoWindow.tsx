@@ -64,16 +64,16 @@ function LibrariesView() {
 	const status = isLoading ? "connecting" : error ? "error" : "connected";
 
 	return (
-		<div className="h-screen bg-gray-950 text-white overflow-hidden flex flex-col">
+		<div className="h-screen bg-app text-ink overflow-hidden flex flex-col">
 			{/* Header */}
-			<div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur">
+			<div className="border-b border-app-line bg-app/50 backdrop-blur">
 				<div className="px-6 py-4">
 					<div className="flex items-center justify-between">
 						<div>
 							<h1 className="text-2xl font-bold">
 								Spacedrive V2
 							</h1>
-							<p className="text-sm text-gray-400">
+							<p className="text-sm text-ink-dull">
 								Multi-window Architecture Demo
 							</p>
 						</div>
@@ -81,13 +81,13 @@ function LibrariesView() {
 							<div
 								className={`w-2 h-2 rounded-full ${
 									status === "connecting"
-										? "bg-yellow-500 animate-pulse"
+										? "bg-warning animate-pulse"
 										: status === "connected"
-											? "bg-green-500"
-											: "bg-red-500"
+											? "bg-success"
+											: "bg-error"
 								}`}
 							/>
-							<span className="text-xs text-gray-400">
+							<span className="text-xs text-ink-dull">
 								{status === "connected"
 									? "Connected"
 									: status === "error"
@@ -110,8 +110,8 @@ function LibrariesView() {
 							</h2>
 							<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
 								{libraries.length === 0 ? (
-									<div className="col-span-full bg-gray-900 rounded-lg p-8 border border-gray-800 text-center">
-										<p className="text-gray-400">
+									<div className="col-span-full bg-app rounded-lg p-8 border border-app-line text-center">
+										<p className="text-ink-dull">
 											No libraries found
 										</p>
 									</div>
@@ -119,22 +119,22 @@ function LibrariesView() {
 									libraries.map((lib: LibraryInfo) => (
 										<div
 											key={lib.id}
-											className="bg-gray-900 rounded-lg p-4 border border-gray-800 hover:border-gray-700 transition-colors"
+											className="bg-app rounded-lg p-4 border border-app-line hover:border-app-line transition-colors"
 										>
 											<h3 className="font-semibold mb-3">
 												{lib.name}
 											</h3>
 											<div className="space-y-2 text-sm">
-												<div className="flex justify-between text-gray-400">
+												<div className="flex justify-between text-ink-dull">
 													<span>Files</span>
-													<span className="text-white">
+													<span className="text-ink">
 														{lib.stats?.total_files?.toLocaleString() ||
 															0}
 													</span>
 												</div>
-												<div className="flex justify-between text-gray-400">
+												<div className="flex justify-between text-ink-dull">
 													<span>Size</span>
-													<span className="text-white">
+													<span className="text-ink">
 														{formatBytes(
 															lib.stats
 																?.total_size ||
@@ -143,9 +143,9 @@ function LibrariesView() {
 													</span>
 												</div>
 												{lib.path && (
-													<div className="pt-2 border-t border-gray-800">
+													<div className="pt-2 border-t border-app-line">
 														<p
-															className="text-xs text-gray-500 truncate"
+															className="text-xs text-ink-faint truncate"
 															title={lib.path}
 														>
 															{lib.path}
@@ -166,17 +166,17 @@ function LibrariesView() {
 							<h2 className="text-lg font-semibold">
 								Live Events
 							</h2>
-							<span className="text-xs bg-gray-800 px-2 py-1 rounded-full">
+							<span className="text-xs bg-app-box px-2 py-1 rounded-full">
 								{eventCount} received
 							</span>
 						</div>
-						<div className="bg-gray-900 rounded-lg border border-gray-800 p-4">
+						<div className="bg-app rounded-lg border border-app-line p-4">
 							{lastEvent ? (
-								<pre className="text-xs text-gray-400 overflow-auto max-h-48 font-mono">
+								<pre className="text-xs text-ink-dull overflow-auto max-h-48 font-mono">
 									{JSON.stringify(lastEvent, null, 2)}
 								</pre>
 							) : (
-								<p className="text-gray-500 text-sm text-center py-4">
+								<p className="text-ink-faint text-sm text-center py-4">
 									Waiting for events...
 								</p>
 							)}
@@ -218,8 +218,8 @@ function LibrariesView() {
 							</ShinyButton>
 						</div>
 						{windowError && (
-							<div className="mt-3 bg-red-900/20 border border-red-500 rounded-lg p-3">
-								<p className="text-red-400 text-sm">
+							<div className="mt-3 bg-error-container/20 border border-error rounded-lg p-3">
+								<p className="text-error text-sm">
 									{windowError}
 								</p>
 							</div>
@@ -229,12 +229,12 @@ function LibrariesView() {
 			</div>
 
 			{error && (
-				<div className="absolute inset-0 bg-black/50 backdrop-blur flex items-center justify-center">
-					<div className="bg-gray-900 rounded-lg p-6 border border-red-500 max-w-md">
-						<h2 className="text-xl font-bold mb-2 text-red-400">
+				<div className="absolute inset-0 bg-scrim/50 backdrop-blur flex items-center justify-center">
+					<div className="bg-app rounded-lg p-6 border border-error max-w-md">
+						<h2 className="text-xl font-bold mb-2 text-error">
 							Error
 						</h2>
-						<p className="text-sm text-gray-300">{error.message}</p>
+						<p className="text-sm text-ink">{error.message}</p>
 					</div>
 				</div>
 			)}

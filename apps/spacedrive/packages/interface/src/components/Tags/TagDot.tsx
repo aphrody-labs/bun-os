@@ -1,8 +1,11 @@
 import clsx from 'clsx';
 
+// design:content: tag colours are user data; a tag made without one shows the default swatch.
+const DEFAULT_TAG_COLOR = '#3B82F6';
+
 /** A tag's color, or the default blue for a tag made without one. */
 export function tagColor(tag: { color?: string | null }): string {
-	return tag.color || '#3B82F6';
+	return tag.color || DEFAULT_TAG_COLOR;
 }
 
 interface TagDotProps {

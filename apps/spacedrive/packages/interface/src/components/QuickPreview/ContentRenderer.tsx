@@ -160,7 +160,7 @@ function ImageRenderer({ file, onZoomChange }: ContentRendererProps) {
 				{/* Fullscreen canvas layer */}
 				<Suspense
 					fallback={
-						<div className="relative w-full h-full z-10 pointer-events-none bg-black flex items-center justify-center">
+						<div className="relative w-full h-full z-10 pointer-events-none bg-media-shade flex items-center justify-center">
 							{thumbnailUrl && (
 								<img
 									src={thumbnailUrl}
@@ -197,7 +197,7 @@ function ImageRenderer({ file, onZoomChange }: ContentRendererProps) {
 
 				{/* Image overlay - shown during splat loading, fades out when loaded */}
 				{!splatLoaded && (
-					<div className="relative w-full h-full z-10 pointer-events-none bg-black flex items-center justify-center">
+					<div className="relative w-full h-full z-10 pointer-events-none bg-media-shade flex items-center justify-center">
 						{/* Thumbnail (always available) */}
 						{thumbnailUrl && (
 							<img

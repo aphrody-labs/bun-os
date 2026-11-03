@@ -137,7 +137,7 @@ export function AdaptersScreen() {
 										v{adapter.version}
 									</span>
 									{adapter.update_available && (
-										<span className="shrink-0 rounded-full bg-blue-500/15 px-2 py-0.5 text-[10px] font-medium text-blue-400 ring-1 ring-blue-500/30">
+										<span className="shrink-0 rounded-full bg-accent/15 px-2 py-0.5 text-[10px] font-medium text-accent ring-1 ring-accent/30">
 											Update
 										</span>
 									)}
@@ -158,7 +158,7 @@ export function AdaptersScreen() {
 
 			{/* Configure dialog */}
 			{selected && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/40 backdrop-blur-sm">
 					<div className="border-app-line bg-app-box w-full max-w-md rounded-xl border p-6 shadow-2xl">
 						<div className="mb-4 flex items-center gap-3">
 							<SourceTypeIcon
@@ -269,7 +269,7 @@ function ConfigureForm({
 
 	if (queryError) {
 		return (
-			<div className="rounded-md border border-red-400/20 p-3 text-xs text-red-400">
+			<div className="rounded-md border border-error/20 p-3 text-xs text-error">
 				Failed to load config: {String(queryError)}
 			</div>
 		);
@@ -280,7 +280,7 @@ function ConfigureForm({
 		return (
 			<div className="flex flex-col items-center py-6">
 				<p
-					className={`text-sm ${isError ? "text-red-400" : "text-ink"}`}
+					className={`text-sm ${isError ? "text-error" : "text-ink"}`}
 				>
 					{isError ? "Something went wrong" : "Source added"}
 				</p>
@@ -290,7 +290,7 @@ function ConfigureForm({
 						onDone();
 						navigate("/sources");
 					}}
-					className="bg-accent hover:bg-accent-deep mt-4 rounded-lg px-3.5 py-1.5 text-sm font-medium text-white transition-colors"
+					className="bg-accent hover:bg-accent-deep mt-4 rounded-lg px-3.5 py-1.5 text-sm font-medium text-on-primary transition-colors"
 				>
 					Done
 				</button>
@@ -317,7 +317,7 @@ function ConfigureForm({
 					<label className="text-ink-dull mb-1 block text-xs font-medium">
 						{field.name}
 						{field.required && (
-							<span className="ml-1 text-red-400">*</span>
+							<span className="ml-1 text-error">*</span>
 						)}
 					</label>
 					{field.description && (
@@ -342,7 +342,7 @@ function ConfigureForm({
 			))}
 
 			{error && (
-				<div className="rounded-md border border-red-400/20 p-2 text-xs text-red-400">
+				<div className="rounded-md border border-error/20 p-2 text-xs text-error">
 					{error}
 				</div>
 			)}
@@ -351,7 +351,7 @@ function ConfigureForm({
 				<button
 					onClick={handleSubmit}
 					disabled={createSource.isPending}
-					className="bg-accent hover:bg-accent-deep flex-1 rounded-lg px-3.5 py-1.5 text-sm font-medium text-white transition-colors disabled:opacity-40"
+					className="bg-accent hover:bg-accent-deep flex-1 rounded-lg px-3.5 py-1.5 text-sm font-medium text-on-primary transition-colors disabled:opacity-40"
 				>
 					Add & Sync
 				</button>

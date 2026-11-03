@@ -114,7 +114,7 @@ export function MultiFileInspector({ files }: MultiFileInspectorProps) {
 								className={clsx(
 									"w-full h-full rounded-lg",
 									thumbs.length > 1 &&
-										"shadow-md shadow-black/20",
+										"shadow-md shadow-shadow/20",
 								)}
 							/>
 						</div>

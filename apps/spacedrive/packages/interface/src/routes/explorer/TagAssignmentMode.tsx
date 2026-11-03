@@ -136,7 +136,7 @@ export function TagAssignmentMode({ isActive, onExit }: TagAssignmentModeProps) 
 										}}
 									>
 										{/* Keyboard Number */}
-										<kbd className="px-1 py-0.5 text-[10px] font-bold rounded bg-black/20 min-w-[16px] text-center">
+										<kbd className="px-1 py-0.5 text-[10px] font-bold rounded bg-scrim/20 min-w-[16px] text-center">
 											{number}
 										</kbd>
 

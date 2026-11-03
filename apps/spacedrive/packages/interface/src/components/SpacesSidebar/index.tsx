@@ -589,7 +589,7 @@ export function SpacesSidebar({
 							{activityCount !== undefined && (
 								<span
 									aria-hidden="true"
-									className="bg-accent pointer-events-none absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold text-white"
+									className="bg-accent pointer-events-none absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold text-on-primary"
 								>
 									{activityCount}
 								</span>

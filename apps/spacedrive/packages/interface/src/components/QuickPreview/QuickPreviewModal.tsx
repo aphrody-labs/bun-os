@@ -67,7 +67,7 @@ export function QuickPreviewModal({
 						animate={{ opacity: 1 }}
 						exit={{ opacity: 0 }}
 						transition={{ duration: 0.15 }}
-						className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-sm"
+						className="fixed inset-0 z-[9999] bg-media-shade/80 backdrop-blur-sm"
 						onClick={onClose}
 					/>
 
@@ -86,7 +86,7 @@ export function QuickPreviewModal({
 								<div className="animate-pulse">Loading...</div>
 							</div>
 						) : error ? (
-							<div className="flex h-full items-center justify-center text-red-400">
+							<div className="flex h-full items-center justify-center text-error">
 								<div>
 									<div className="mb-2 text-lg font-medium">Error loading file</div>
 									<div className="text-sm">{error.message}</div>

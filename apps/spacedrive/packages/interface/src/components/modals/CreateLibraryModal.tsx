@@ -243,7 +243,7 @@ function CreateLibraryDialog(props: CreateLibraryDialogProps) {
 			>
 				<div className="flex flex-col items-center justify-center py-8 gap-4">
 					<CheckCircle
-						className="size-12 text-green-500"
+						className="size-12 text-success"
 						weight="fill"
 					/>
 					<div className="text-center">
@@ -266,7 +266,7 @@ function CreateLibraryDialog(props: CreateLibraryDialogProps) {
 				dialog={dialog}
 				form={form}
 				title="Error"
-				icon={<Warning size={20} weight="fill" className="text-red-500" />}
+				icon={<Warning size={20} weight="fill" className="text-error" />}
 				ctaLabel="Try Again"
 				onSubmit={async () => {
 					setStep("form");
@@ -276,14 +276,14 @@ function CreateLibraryDialog(props: CreateLibraryDialogProps) {
 			>
 				<div className="flex flex-col items-center justify-center py-6 gap-4">
 					<Warning
-						className="size-12 text-red-500"
+						className="size-12 text-error"
 						weight="fill"
 					/>
 					<div className="text-center">
 						<p className="text-sm font-medium text-ink">
 							Failed to create library
 						</p>
-						<p className="text-xs text-red-400 mt-1">
+						<p className="text-xs text-error mt-1">
 							{errorMessage}
 						</p>
 					</div>
@@ -316,7 +316,7 @@ function CreateLibraryDialog(props: CreateLibraryDialogProps) {
 						className="bg-app-input"
 					/>
 					{form.formState.errors.name && (
-						<p className="text-xs text-red-500">
+						<p className="text-xs text-error">
 							{form.formState.errors.name.message}
 						</p>
 					)}

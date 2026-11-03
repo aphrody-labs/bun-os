@@ -81,7 +81,7 @@ export function DaemonManager() {
 
 	function getStatusColor() {
 		if (isLoading) return 'text-ink-faint';
-		return status?.is_running ? 'text-green-500' : 'text-red-500';
+		return status?.is_running ? 'text-success' : 'text-error';
 	}
 
 	function getStatusIcon() {
@@ -122,8 +122,8 @@ export function DaemonManager() {
 				</div>
 
 				{error && (
-					<div className="bg-red-500/10 border border-red-500/20 rounded-md p-3 mb-4">
-						<p className="text-sm text-red-400">{error}</p>
+					<div className="bg-error/10 border border-error/20 rounded-md p-3 mb-4">
+						<p className="text-sm text-error">{error}</p>
 					</div>
 				)}
 
@@ -150,7 +150,7 @@ export function DaemonManager() {
 
 				<button
 					onClick={checkDaemonStatus}
-					className="mt-4 w-full px-4 py-2 bg-accent hover:bg-accent-deep text-white rounded-md text-sm font-medium transition-colors"
+					className="mt-4 w-full px-4 py-2 bg-accent hover:bg-accent-deep text-on-primary rounded-md text-sm font-medium transition-colors"
 				>
 					Refresh Status
 				</button>
@@ -176,7 +176,7 @@ export function DaemonManager() {
 							}`}
 						>
 							<span
-								className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+								className={`inline-block h-4 w-4 transform rounded-full bg-ink transition-transform ${
 									autoStart ? 'translate-x-6' : 'translate-x-1'
 								}`}
 							/>
@@ -198,7 +198,7 @@ export function DaemonManager() {
 							}`}
 						>
 							<span
-								className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+								className={`inline-block h-4 w-4 transform rounded-full bg-ink transition-transform ${
 									runInProcess ? 'translate-x-6' : 'translate-x-1'
 								}`}
 							/>
@@ -210,7 +210,7 @@ export function DaemonManager() {
 			{/* macOS Background Permission Notice */}
 			<div className="bg-sidebar-box border border-sidebar-line rounded-lg p-4">
 				<div className="flex items-start gap-3">
-					<Warning className="size-5 text-yellow-500 flex-shrink-0 mt-0.5" weight="fill" />
+					<Warning className="size-5 text-warning flex-shrink-0 mt-0.5" weight="fill" />
 					<div>
 						<h3 className="text-sm font-medium text-ink">macOS Background Items</h3>
 						<p className="text-xs text-ink-dull mt-1">
@@ -233,7 +233,7 @@ export function DaemonManager() {
 				<button
 					onClick={handleStartDaemon}
 					disabled={isRunning || isStarting || isLoading}
-					className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 disabled:bg-app-line disabled:text-ink-faint text-white rounded-md text-sm font-medium transition-colors"
+					className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-success hover:bg-success disabled:bg-app-line disabled:text-ink-faint text-on-success rounded-md text-sm font-medium transition-colors"
 				>
 					{isStarting ? (
 						<CircleNotch className="size-4 animate-spin" weight="bold" />
@@ -245,7 +245,7 @@ export function DaemonManager() {
 				<button
 					onClick={handleStopDaemon}
 					disabled={!isRunning || isStopping || isLoading || !status?.started_by_us}
-					className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 disabled:bg-app-line disabled:text-ink-faint text-white rounded-md text-sm font-medium transition-colors"
+					className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-error hover:bg-error disabled:bg-app-line disabled:text-ink-faint text-on-error rounded-md text-sm font-medium transition-colors"
 				>
 					{isStopping ? (
 						<CircleNotch className="size-4 animate-spin" weight="bold" />

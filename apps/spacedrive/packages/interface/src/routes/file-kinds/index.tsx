@@ -19,6 +19,7 @@ interface ContentKindStatsOutput {
 // Map content kind names to icon names and colors
 // Keys must match backend ContentKind variants (lowercase)
 // Icon names must match actual files in packages/assets/icons/
+// design:content: per-kind colours identify file kinds (chart and badge data), the same in every theme.
 const CONTENT_KIND_CONFIG: Record<string, { iconName: string; color: string }> =
 	{
 		image: { iconName: "Image", color: "#3B82F6" },

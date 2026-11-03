@@ -66,10 +66,10 @@ function SettingsSidebar({
 								"flex h-8 w-full flex-row items-center gap-1.5 rounded-lg px-2 text-sm transition-colors duration-300",
 								isSelected
 									? isAboutPage
-										? "bg-white/20 text-white"
+										? "bg-ink/20 text-ink"
 										: "bg-sidebar-selected text-sidebar-ink"
 									: isAboutPage
-										? "text-white/60 hover:bg-white/10 hover:text-white"
+										? "text-ink/60 hover:bg-ink/10 hover:text-ink"
 										: "text-sidebar-ink-dull hover:bg-sidebar-box hover:text-sidebar-ink",
 							)}
 						>
@@ -108,7 +108,7 @@ function SettingsFooter({ isAboutPage }: { isAboutPage: boolean }) {
 		<div
 			className={clsx(
 				"flex flex-col items-start gap-0.5 border-t p-2.5 transition-colors duration-500",
-				isAboutPage ? "border-white/10" : "border-sidebar-line",
+				isAboutPage ? "border-ink/10" : "border-sidebar-line",
 			)}
 		>
 			<button
@@ -123,7 +123,7 @@ function SettingsFooter({ isAboutPage }: { isAboutPage: boolean }) {
 				className={clsx(
 					"-ml-1 cursor-copy rounded px-1 py-0.5 text-xs transition-colors",
 					isAboutPage
-						? "text-white/50 hover:bg-white/10 hover:text-white"
+						? "text-ink/50 hover:bg-ink/10 hover:text-ink"
 						: "text-sidebar-ink-dull hover:bg-sidebar-box hover:text-sidebar-ink",
 				)}
 			>
@@ -132,7 +132,7 @@ function SettingsFooter({ isAboutPage }: { isAboutPage: boolean }) {
 			<span
 				className={clsx(
 					"px-1 text-tiny transition-colors duration-500",
-					isAboutPage ? "text-white/30" : "text-sidebar-ink-faint",
+					isAboutPage ? "text-ink/30" : "text-sidebar-ink-faint",
 				)}
 			>
 				Built {builtLabel}
@@ -176,13 +176,13 @@ function SettingsContentWrapper() {
 		<div
 			className={clsx(
 				"relative flex h-screen transition-colors duration-500",
-				isAboutPage ? "bg-black" : "bg-app",
+				isAboutPage ? "bg-surface-container-lowest" : "bg-app",
 			)}
 		>
 			<nav
 				className={clsx(
 					"flex w-48 shrink-0 flex-col border-r transition-colors duration-500",
-					isAboutPage ? "border-black bg-black" : "border-sidebar-line bg-sidebar",
+					isAboutPage ? "border-surface-container-lowest bg-surface-container-lowest" : "border-sidebar-line bg-sidebar",
 				)}
 			>
 				{/* Traffic lights sit over the sidebar, which doubles as the drag handle */}
@@ -190,7 +190,7 @@ function SettingsContentWrapper() {
 				<h1
 					className={clsx(
 						"px-3.5 pb-4 text-xl font-semibold transition-colors duration-500",
-						isAboutPage ? "text-white" : "text-sidebar-ink",
+						isAboutPage ? "text-ink" : "text-sidebar-ink",
 					)}
 				>
 					Settings

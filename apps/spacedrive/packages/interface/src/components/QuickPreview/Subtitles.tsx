@@ -200,11 +200,11 @@ export function Subtitles({
 			<div
 				className="max-w-4xl rounded-lg px-6 py-3 text-center backdrop-blur-sm"
 				style={{
-					backgroundColor: `rgba(0, 0, 0, ${settings.backgroundOpacity})`,
+					backgroundColor: `color-mix(in srgb, var(--color-media-shade) ${settings.backgroundOpacity * 100}%, transparent)`,
 				}}
 			>
 				<p
-					className="leading-relaxed text-white"
+					className="leading-relaxed text-media-ink"
 					style={{
 						fontSize: `${settings.fontSize}rem`,
 					}}

@@ -1,9 +1,5 @@
-import { useEffect, useState } from 'react';
-
-// @ts-ignore - SCSS imports
-import oneDarkCss from './one-dark.scss?url';
-// @ts-ignore - SCSS imports
-import oneLightCss from './one-light.scss?url';
+// @ts-ignore - stylesheet URL import
+import prismCss from './prism-m3.css?url';
 
 export const languageMapping = Object.entries({
 	applescript: ['scpt', 'scptd'],
@@ -26,22 +22,7 @@ export const languageMapping = Object.entries({
 	return mapping;
 }, new Map());
 
+// The sheet binds every token to an M3 role, so it follows the active scheme (light or dark) by itself.
 export function WithPrismTheme() {
-	const [isDark, setIsDark] = useState(() =>
-		window.matchMedia('(prefers-color-scheme: dark)').matches
-	);
-
-	useEffect(() => {
-		const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-		const handleChange = (e: MediaQueryListEvent) => setIsDark(e.matches);
-
-		mediaQuery.addEventListener('change', handleChange);
-		return () => mediaQuery.removeEventListener('change', handleChange);
-	}, []);
-
-	return isDark ? (
-		<link rel="stylesheet" href={oneDarkCss} />
-	) : (
-		<link rel="stylesheet" href={oneLightCss} />
-	);
+	return <link rel="stylesheet" href={prismCss} />;
 }

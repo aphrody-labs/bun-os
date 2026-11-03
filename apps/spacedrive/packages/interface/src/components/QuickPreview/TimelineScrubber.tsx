@@ -92,7 +92,7 @@ export const TimelineScrubber = memo(function TimelineScrubber({
 		>
 			{/* Preview frame */}
 			<div
-				className="rounded-lg bg-black border-2 border-white overflow-hidden shadow-2xl"
+				className="rounded-lg bg-media-shade border-2 border-media-ink overflow-hidden shadow-2xl"
 				style={{
 					width: previewWidth,
 					height: previewHeight,
@@ -106,7 +106,7 @@ export const TimelineScrubber = memo(function TimelineScrubber({
 
 			{/* Timestamp below preview */}
 			<div className="mt-1 flex justify-center">
-				<div className="rounded bg-black/90 px-2 py-0.5 text-xs font-mono text-white">
+				<div className="rounded bg-media-shade/90 px-2 py-0.5 text-xs font-mono text-media-ink">
 					{timestamp}
 				</div>
 			</div>

@@ -118,8 +118,8 @@ export function SourcesHome() {
 				)}
 
 				{error && (
-					<div className="rounded-lg border border-red-400/20 p-4">
-						<p className="text-sm text-red-400">
+					<div className="rounded-lg border border-error/20 p-4">
+						<p className="text-sm text-error">
 							Failed to load sources: {String(error)}
 						</p>
 					</div>
@@ -136,7 +136,7 @@ export function SourcesHome() {
 							onClick={() =>
 								createTab('Adapters', '/sources/adapters')
 							}
-							className="bg-accent hover:bg-accent-deep mt-4 rounded-lg px-3.5 py-1.5 text-sm font-medium text-white transition-colors"
+							className="bg-accent hover:bg-accent-deep mt-4 rounded-lg px-3.5 py-1.5 text-sm font-medium text-on-primary transition-colors"
 						>
 							Add Source
 						</button>

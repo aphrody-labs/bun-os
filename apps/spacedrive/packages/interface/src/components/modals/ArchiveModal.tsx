@@ -265,7 +265,7 @@ function ExtractDialog(props: ExtractDialogProps) {
 								onClick={() => setPolicy(option.value)}
 								className={
 									policy === option.value
-										? "rounded-md bg-accent px-2.5 py-1.5 text-left text-white"
+										? "rounded-md bg-accent px-2.5 py-1.5 text-left text-on-primary"
 										: "rounded-md bg-app-box px-2.5 py-1.5 text-left text-ink hover:bg-app-hover"
 								}
 							>

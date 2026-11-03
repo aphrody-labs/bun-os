@@ -44,7 +44,7 @@ function PeerCard({ peer }: { peer: SyncPeerActivity }) {
           <div
             className={clsx(
               "size-2 rounded-full",
-              peer.isOnline ? "bg-green-500" : "bg-ink-faint",
+              peer.isOnline ? "bg-success" : "bg-ink-faint",
             )}
           />
           <span className="text-sm font-medium text-ink">
@@ -53,7 +53,7 @@ function PeerCard({ peer }: { peer: SyncPeerActivity }) {
         </div>
 
         {peer.watermarkLagMs && peer.watermarkLagMs > 60000 && (
-          <Lightning className="size-4 text-yellow-500" weight="fill" />
+          <Lightning className="size-4 text-warning" weight="fill" />
         )}
         <span>
           {peer.isOnline ? "Online" : `Last seen ${timeAgo(peer.lastSeen)}`}

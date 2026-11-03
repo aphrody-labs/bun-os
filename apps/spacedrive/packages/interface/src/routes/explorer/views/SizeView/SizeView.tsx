@@ -45,20 +45,15 @@ function getTailwindColor(className: string): string {
 	return color;
 }
 
-// Get accent colors for gradient from CSS custom properties
+// Accent colours for the gradient: the active scheme's primary roles (canvas needs resolved values).
 function getAccentColors(): {faint: string; base: string; deep: string} {
-	const root = document.documentElement;
-	const style = getComputedStyle(root);
-
-	// CSS variables store HSL values like "208, 100%, 57%"
-	const accentFaint = style.getPropertyValue('--color-accent-faint').trim();
-	const accent = style.getPropertyValue('--color-accent').trim();
-	const accentDeep = style.getPropertyValue('--color-accent-deep').trim();
+	const style = getComputedStyle(document.documentElement);
+	const role = (name: string) => style.getPropertyValue(`--md-sys-color-${name}`).trim();
 
 	return {
-		faint: accentFaint ? `hsl(${accentFaint})` : 'hsl(208, 100%, 64%)',
-		base: accent ? `hsl(${accent})` : 'hsl(208, 100%, 57%)',
-		deep: accentDeep ? `hsl(${accentDeep})` : 'hsl(208, 100%, 47%)'
+		faint: role('primary-fixed'),
+		base: role('primary'),
+		deep: role('primary-container')
 	};
 }
 

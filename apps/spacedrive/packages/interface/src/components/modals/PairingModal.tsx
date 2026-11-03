@@ -104,7 +104,7 @@ export function PairingModal({ isOpen, onClose, mode: initialMode = "generate" }
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+          className="absolute inset-0 bg-scrim/50 backdrop-blur-sm"
           onClick={handleClose}
         />
 
@@ -250,7 +250,7 @@ function GenerateMode({
               "w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-medium transition-colors",
               isLoading
                 ? "bg-accent/50 cursor-not-allowed"
-                : "bg-accent hover:bg-accent/90 text-white"
+                : "bg-accent hover:bg-accent/90 text-on-primary"
             )}
           >
             {isLoading && <ArrowsClockwise className="size-5 animate-spin" weight="bold" />}
@@ -264,7 +264,8 @@ function GenerateMode({
             {/* QR Code */}
             <div className="flex flex-col items-center gap-3">
               <p className="text-sm text-ink-dull">Scan with mobile device</p>
-              <div className="inline-block p-4 bg-white rounded-lg">
+              {/* design:content: the QR code keeps its black-on-white quiet zone so every scanner reads it. */}
+              <div className="inline-block p-4 bg-media-ink rounded-lg">
                 <QRCodeCanvas data={generatePairing.data.qr_json} size={192} />
               </div>
             </div>
@@ -403,10 +404,10 @@ function GenerateMode({
 
       {/* Error */}
       {generatePairing.isError && (
-        <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-          <Warning className="size-5 text-red-500 shrink-0 mt-0.5" weight="bold" />
+        <div className="flex items-start gap-2 p-3 bg-error/10 border border-error/30 rounded-lg">
+          <Warning className="size-5 text-error shrink-0 mt-0.5" weight="bold" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-red-500">Failed to generate code</p>
+            <p className="text-sm font-medium text-error">Failed to generate code</p>
             <p className="text-xs text-ink-dull mt-0.5">{String(generatePairing.error)}</p>
           </div>
         </div>
@@ -522,8 +523,8 @@ function JoinMode({
               className={clsx(
                 "flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-colors",
                 isLoading || !joinCode.trim()
-                  ? "bg-accent/50 text-white/70 cursor-not-allowed"
-                  : "bg-accent hover:bg-accent/90 text-white"
+                  ? "bg-accent/50 text-on-primary/70 cursor-not-allowed"
+                  : "bg-accent hover:bg-accent/90 text-on-primary"
               )}
             >
               {isLoading && <ArrowsClockwise className="size-5 animate-spin" weight="bold" />}
@@ -535,10 +536,10 @@ function JoinMode({
 
       {/* Error */}
       {joinPairing.isError && (
-        <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-          <Warning className="size-5 text-red-500 shrink-0 mt-0.5" weight="bold" />
+        <div className="flex items-start gap-2 p-3 bg-error/10 border border-error/30 rounded-lg">
+          <Warning className="size-5 text-error shrink-0 mt-0.5" weight="bold" />
           <div className="flex-1">
-            <p className="text-sm font-medium text-red-500">Failed to join</p>
+            <p className="text-sm font-medium text-error">Failed to join</p>
             <p className="text-xs text-ink-dull mt-0.5">{String(joinPairing.error)}</p>
           </div>
         </div>

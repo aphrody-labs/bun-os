@@ -10,14 +10,6 @@
 @theme {
 	--color-*: initial;
 
-	/*
-	 * design:content: ink and shade for controls drawn over arbitrary media pixels (video, audio
-	 * artwork, image and 3D previews, thumbnails). No scheme role keeps contrast over unknown
-	 * pixels, so these stay fixed in every theme; chrome never uses them.
-	 */
-	--color-media-ink: #ffffff;
-	--color-media-shade: #000000;
-
 	/* Spacedrive's tighter type scale (upstream SpaceUI). */
 	--text-tiny: 0.7rem;
 	--text-xs: 0.75rem;
@@ -31,4 +23,14 @@
 	--text-5xl: 3rem;
 	--text-6xl: 4rem;
 	--text-7xl: 5rem;
+}
+
+/*
+ * design:content: ink and shade for controls drawn over arbitrary media pixels (video, audio artwork,
+ * image and 3D previews, thumbnails). No scheme role keeps contrast over unknown pixels, so these stay
+ * fixed in every theme; chrome never uses them. `static` keeps the variables emitted for inline styles.
+ */
+@theme static {
+	--color-media-ink: #ffffff;
+	--color-media-shade: #000000;
 }

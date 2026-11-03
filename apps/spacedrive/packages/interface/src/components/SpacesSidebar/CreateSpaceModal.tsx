@@ -14,6 +14,7 @@ interface FormData {
 	name: string;
 }
 
+// design:content: space colours are user data (stored with the space), picked from these swatches.
 const PRESET_COLORS = [
 	'#3B82F6', // Blue
 	'#8B5CF6', // Purple
@@ -94,7 +95,7 @@ function CreateSpaceDialog(props: {id: number}) {
 								className={clsx(
 									'h-8 w-8 rounded-full border-2 transition-all',
 									selectedColor === color
-										? 'scale-110 border-white'
+										? 'scale-110 border-ink'
 										: 'border-transparent'
 								)}
 								style={{backgroundColor: color}}

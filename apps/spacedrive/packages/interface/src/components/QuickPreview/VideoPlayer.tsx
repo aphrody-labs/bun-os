@@ -287,12 +287,12 @@ export function VideoPlayer({
 	return (
 		<div
 			ref={containerRef}
-			className="relative flex h-full w-full items-center justify-center bg-black"
+			className="relative flex h-full w-full items-center justify-center bg-media-shade"
 			onMouseMove={handleMouseMove}
 		>
 			{/* Zoom level indicator */}
 			{zoom > 1 && (
-				<div className="absolute top-4 left-4 z-20 rounded-lg bg-black/80 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-xl">
+				<div className="absolute top-4 left-4 z-20 rounded-lg bg-media-shade/80 px-3 py-1.5 text-sm font-medium text-media-ink backdrop-blur-xl">
 					{Math.round(zoom * 100)}%
 				</div>
 			)}

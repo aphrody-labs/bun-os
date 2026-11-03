@@ -76,17 +76,17 @@ export function DaemonDisconnectedOverlay({
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					transition={{ duration: 0.2 }}
-					className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-lg bg-black/50"
+					className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-blur-lg bg-scrim/50"
 				>
 					<div className="fixed right-4 top-4 flex items-center gap-2">
 						<div className="flex items-center gap-2 rounded-full border border-app-line bg-app-box px-3 py-1.5 text-xs font-medium">
 							<div
 								className={`size-2 rounded-full ${
 									isChecking
-										? "bg-yellow-500"
+										? "bg-warning"
 										: isConnected
-											? "bg-green-500"
-											: "bg-red-500"
+											? "bg-success"
+											: "bg-error"
 								} animate-pulse`}
 							/>
 							<span className="text-ink-dull">
@@ -101,7 +101,7 @@ export function DaemonDisconnectedOverlay({
 						<div className="flex items-center gap-2 rounded-full border border-app-line bg-app-box px-3 py-1.5 text-xs font-medium">
 							<div
 								className={`size-2 rounded-full ${
-									isInstalled ? "bg-accent" : "bg-gray-500"
+									isInstalled ? "bg-accent" : "bg-app-light-box"
 								}`}
 							/>
 							<span className="text-ink-dull">

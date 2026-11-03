@@ -17,6 +17,9 @@ import {
 	Sliders,
 } from "@phosphor-icons/react";
 
+// design:content: neutral grey material for meshes that carry no colours of their own (document rendering).
+const MESH_MATERIAL_COLOR = "#888888";
+
 interface MeshViewerProps {
 	file: File;
 	onZoomChange?: (isZoomed: boolean) => void;
@@ -74,7 +77,7 @@ function MeshScene({ url }: MeshSceneProps) {
 	return (
 		<mesh ref={meshRef} geometry={geometry}>
 			<meshStandardMaterial
-				color="#888888"
+				color={MESH_MATERIAL_COLOR}
 				metalness={0.3}
 				roughness={0.7}
 			/>
@@ -796,10 +799,10 @@ export function MeshViewerUI({
 	if (!isGaussianSplat) {
 		return (
 			<>
-				<div className="pointer-events-none absolute left-4 top-4 rounded-lg bg-black/80 px-3 py-1.5 text-sm font-medium text-white backdrop-blur-xl">
+				<div className="pointer-events-none absolute left-4 top-4 rounded-lg bg-media-shade/80 px-3 py-1.5 text-sm font-medium text-media-ink backdrop-blur-xl">
 					3D Mesh
 				</div>
-				<div className="pointer-events-none absolute bottom-4 left-4 rounded-lg bg-black/80 px-3 py-2 text-xs text-white/70 backdrop-blur-xl">
+				<div className="pointer-events-none absolute bottom-4 left-4 rounded-lg bg-media-shade/80 px-3 py-2 text-xs text-media-ink/70 backdrop-blur-xl">
 					<div>Left drag: Rotate</div>
 					<div>Right drag: Pan</div>
 					<div>Scroll: Zoom</div>
@@ -1050,7 +1053,7 @@ export function MeshViewer({
 
 	// Just render the canvas, UI will be handled by ContentRenderer
 	return (
-		<div className="absolute inset-0 bg-black">
+		<div className="absolute inset-0 bg-media-shade">
 			{isGaussianSplat && !splatFailed ? (
 				<GaussianSplatViewer
 					url={meshUrl}

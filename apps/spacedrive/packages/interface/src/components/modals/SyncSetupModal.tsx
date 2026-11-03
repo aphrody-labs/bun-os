@@ -270,7 +270,7 @@ function SelectDeviceStep({
                   <DeviceMobile size={20} />
                   <h3 className="font-medium text-ink">{device.name}</h3>
                   {device.isConnected && (
-                    <span className="rounded-full bg-green-500 px-2 py-0.5 text-xs text-white">
+                    <span className="rounded-full bg-success px-2 py-0.5 text-xs text-on-success">
                       Connected
                     </span>
                   )}
@@ -456,8 +456,8 @@ function ConfirmStep({
         </div>
       </div>
 
-      <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4">
-        <p className="text-sm text-yellow-200">
+      <div className="rounded-lg border border-warning/20 bg-warning/10 p-4">
+        <p className="text-sm text-warning-container">
           {action === "share"
             ? "This will create a synchronized copy of your library on the remote device. Both devices will stay in sync."
             : "This will download the remote library to your device. Your local library will sync with theirs."}
@@ -495,7 +495,7 @@ function ExecutingStep({ isLoading, error }: ExecutingStepProps) {
   if (error) {
     return (
       <div className="flex h-full flex-col items-center justify-center space-y-4">
-        <div className="text-red-500">
+        <div className="text-error">
           <p className="font-medium">Sync setup failed</p>
           <p className="text-sm">{error}</p>
         </div>
@@ -505,7 +505,7 @@ function ExecutingStep({ isLoading, error }: ExecutingStepProps) {
 
   return (
     <div className="flex h-full flex-col items-center justify-center space-y-4">
-      <CheckCircle size={48} className="text-green-500" />
+      <CheckCircle size={48} className="text-success" />
       <div className="text-center">
         <p className="font-medium text-ink">Sync setup complete!</p>
         <p className="text-sm text-ink-dull">Your library is now syncing</p>

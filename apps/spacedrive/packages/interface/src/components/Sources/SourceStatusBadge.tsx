@@ -10,7 +10,7 @@ export function SourceStatusBadge({ status }: SourceStatusBadgeProps) {
 					status === "syncing"
 						? "bg-accent animate-pulse"
 						: status === "error"
-							? "bg-red-400"
+							? "bg-error"
 							: "bg-ink-faint"
 				}`}
 			/>

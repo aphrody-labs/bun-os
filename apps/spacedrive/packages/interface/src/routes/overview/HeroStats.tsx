@@ -113,7 +113,6 @@ export function HeroStats({
 							src={DevicesIcon}
 							alt="Storage"
 							className="size-10 opacity-80"
-							// style={{ filter: 'drop-shadow(0 0 4px rgba(217, 70, 239, 0.4))' }}
 						/>
 					}
 					label="Total Storage"
@@ -137,7 +136,7 @@ export function HeroStats({
 						</>
 					}
 					progress={usagePercent}
-					color="from-accent to-cyan-500"
+					color="from-accent to-primary-container"
 				/>
 
 				{/* Files */}
@@ -156,7 +155,7 @@ export function HeroStats({
 							? `${uniqueContentCount.toLocaleString()} unique files`
 							: "content hashing pending"
 					}
-					color="from-purple-500 to-pink-500"
+					color="from-tertiary to-tertiary-container"
 				/>
 
 				{/* Devices */}
@@ -171,7 +170,7 @@ export function HeroStats({
 					label="Connected Devices"
 					value={deviceCount}
 					subtitle={`registered in library`}
-					color="from-green-500 to-emerald-500"
+					color="from-success to-success-container"
 				/>
 
 				{/* Library Size (Database) */}
@@ -193,7 +192,7 @@ export function HeroStats({
 						</>
 					}
 					subtitle="database on disk"
-					color="from-blue-500 to-cyan-500"
+					color="from-accent to-primary-container"
 				/>
 
 				{/* Sidecar Storage */}
@@ -215,7 +214,7 @@ export function HeroStats({
 						</>
 					}
 					subtitle={`${sidecarCount.toLocaleString()} files generated`}
-					color="from-orange-500 to-red-500"
+					color="from-warning to-error"
 				/>
 
 				{/* Sources */}
@@ -230,7 +229,7 @@ export function HeroStats({
 					label="Sources"
 					value={sourceCount}
 					subtitle="kept in this library"
-					color="from-teal-500 to-green-500"
+					color="from-success-container to-success"
 				/>
 
 				{/* Tags */}
@@ -245,7 +244,7 @@ export function HeroStats({
 					label="Tags"
 					value={tagCount}
 					subtitle="organization labels"
-					color="from-pink-500 to-rose-500"
+					color="from-tertiary to-error"
 				/>
 			</div>
 

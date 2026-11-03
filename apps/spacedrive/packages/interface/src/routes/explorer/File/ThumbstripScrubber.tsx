@@ -189,7 +189,7 @@ export const ThumbstripScrubber = memo(function ThumbstripScrubber({
 					}}
 				>
 					{/* Progress indicator */}
-					<div className="absolute bottom-1 left-1 right-1 h-0.5 bg-black/50 rounded-full overflow-hidden">
+					<div className="absolute bottom-1 left-1 right-1 h-0.5 bg-media-shade/50 rounded-full overflow-hidden">
 						<div
 							className="h-full bg-accent"
 							style={{ width: `${hoverProgress * 100}%` }}

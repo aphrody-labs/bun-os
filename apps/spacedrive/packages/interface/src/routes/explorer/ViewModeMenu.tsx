@@ -36,42 +36,42 @@ const viewOptions: ViewOption[] = [
 		id: 'list',
 		label: 'List',
 		icon: Rows,
-		color: 'bg-purple-500',
+		color: 'bg-tertiary',
 		keybind: '⌘2'
 	},
 	{
 		id: 'media',
 		label: 'Media',
 		icon: Camera,
-		color: 'bg-pink-500',
+		color: 'bg-tertiary',
 		keybind: '⌘3'
 	},
 	{
 		id: 'column',
 		label: 'Column',
 		icon: Columns,
-		color: 'bg-orange-500',
+		color: 'bg-warning',
 		keybind: '⌘4'
 	},
 	{
 		id: 'size',
 		label: 'Size',
 		icon: ChartPieSlice,
-		color: 'bg-green-500',
+		color: 'bg-success',
 		keybind: '⌘5'
 	},
 	{
 		id: 'knowledge',
 		label: 'Knowledge',
 		icon: Sparkle,
-		color: 'bg-purple-500',
+		color: 'bg-tertiary',
 		keybind: '⌘6'
 	}
 	// {
 	// 	id: "timeline",
 	// 	label: "Timeline",
 	// 	icon: Clock,
-	// 	color: "bg-yellow-500",
+	// 	color: "bg-warning",
 	// 	keybind: "⌘7",
 	// },
 ];
@@ -113,7 +113,7 @@ export function ViewModeMenuPanel({
 						)}
 					>
 						<option.icon
-							className="size-6 text-white"
+							className="size-6 text-ink"
 							weight={viewMode === option.id ? 'fill' : 'bold'}
 						/>
 						<div className="flex flex-col items-center gap-0.5">

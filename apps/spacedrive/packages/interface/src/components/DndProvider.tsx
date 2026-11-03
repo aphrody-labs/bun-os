@@ -425,7 +425,7 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
 			<DragOverlay dropAnimation={null}>
 				{activeItem?.type === "palette-item" ? (
 					// Palette item preview
-					<div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent text-white shadow-lg min-w-[180px]">
+					<div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent text-on-primary shadow-lg min-w-[180px]">
 						{activeItem.itemType === "Overview" && (
 							<House size={20} weight="bold" />
 						)}
@@ -467,13 +467,13 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
 										)}
 									/>
 								</div>
-								<div className="text-sm truncate px-2 py-0.5 rounded-md bg-accent text-white max-w-full">
+								<div className="text-sm truncate px-2 py-0.5 rounded-md bg-accent text-on-primary max-w-full">
 									{activeItem.name}
 								</div>
 								{/* Show count badge if dragging multiple files */}
 								{activeItem.selectedFiles &&
 									activeItem.selectedFiles.length > 1 && (
-										<div className="absolute -top-2 -right-2 size-6 rounded-full bg-accent text-white text-xs font-bold flex items-center justify-center shadow-lg border-2 border-app">
+										<div className="absolute -top-2 -right-2 size-6 rounded-full bg-accent text-on-primary text-xs font-bold flex items-center justify-center shadow-lg border-2 border-app">
 											{activeItem.selectedFiles.length}
 										</div>
 									)}
@@ -481,7 +481,7 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
 						</div>
 					) : (
 						// Column/List view preview
-						<div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-accent text-white shadow-lg min-w-[200px] max-w-[300px]">
+						<div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-accent text-on-primary shadow-lg min-w-[200px] max-w-[300px]">
 							<FileComponent.Thumb
 								file={activeItem.file}
 								size={24}
@@ -492,7 +492,7 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
 							{/* Show count badge if dragging multiple files */}
 							{activeItem.selectedFiles &&
 								activeItem.selectedFiles.length > 1 && (
-									<div className="ml-auto size-5 rounded-full bg-white text-accent text-xs font-bold flex items-center justify-center">
+									<div className="ml-auto size-5 rounded-full bg-ink text-accent text-xs font-bold flex items-center justify-center">
 										{activeItem.selectedFiles.length}
 									</div>
 								)}

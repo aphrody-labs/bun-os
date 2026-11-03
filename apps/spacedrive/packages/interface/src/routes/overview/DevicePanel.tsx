@@ -269,22 +269,22 @@ function ConnectionBadge({method, online, current, icon: customIcon, color: cust
 			label: 'Local',
 			description: 'Connected via local network',
 			icon: WifiHigh,
-			color: 'bg-green-500'
+			color: 'bg-success'
 		},
 		DirectInternet: {
 			label: 'Direct',
 			description: 'Connected directly via internet',
-			color: 'bg-blue-500'
+			color: 'bg-accent'
 		},
 		Tailscale: {
 			label: 'Tailscale',
 			description: 'Connected directly over your Tailscale network',
-			color: 'bg-indigo-400'
+			color: 'bg-accent'
 		},
 		RelayProxy: {
 			label: 'Relay',
 			description: 'Connected via relay proxy',
-			color: 'bg-yellow-500'
+			color: 'bg-warning'
 		},
 		Offline: {
 			label: 'Offline',

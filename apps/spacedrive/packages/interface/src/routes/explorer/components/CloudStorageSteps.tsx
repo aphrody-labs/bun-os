@@ -286,7 +286,7 @@ export function CloudConnectionFields({
 			)}
 
 			{form.formState.errors.root && (
-				<p className="text-xs text-red-500">{form.formState.errors.root.message}</p>
+				<p className="text-xs text-error">{form.formState.errors.root.message}</p>
 			)}
 		</div>
 	);

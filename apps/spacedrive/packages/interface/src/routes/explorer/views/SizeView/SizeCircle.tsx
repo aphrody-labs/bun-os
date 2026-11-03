@@ -35,22 +35,22 @@ function getFileColor(file: File): string {
 
 	// Images
 	if (["jpg", "jpeg", "png", "gif", "svg", "webp", "heic"].includes(ext)) {
-		return "bg-purple-500";
+		return "bg-tertiary";
 	}
 
 	// Videos
 	if (["mp4", "mov", "avi", "mkv", "webm"].includes(ext)) {
-		return "bg-red-500";
+		return "bg-error";
 	}
 
 	// Audio
 	if (["mp3", "wav", "flac", "aac", "ogg"].includes(ext)) {
-		return "bg-pink-500";
+		return "bg-tertiary";
 	}
 
 	// Documents
 	if (["pdf", "doc", "docx", "txt", "md"].includes(ext)) {
-		return "bg-orange-500";
+		return "bg-warning";
 	}
 
 	// Code
@@ -59,12 +59,12 @@ function getFileColor(file: File): string {
 			ext,
 		)
 	) {
-		return "bg-green-500";
+		return "bg-success";
 	}
 
 	// Archives
 	if (["zip", "tar", "gz", "rar", "7z"].includes(ext)) {
-		return "bg-yellow-500";
+		return "bg-warning";
 	}
 
 	return "bg-accent";
@@ -175,7 +175,7 @@ export function SizeCircle({
 					height: `${diameter}px`,
 				}}
 			>
-				<div className="text-white font-bold text-center px-4">
+				<div className="text-ink font-bold text-center px-4">
 					<div
 						className="truncate max-w-full"
 						style={{
@@ -190,7 +190,7 @@ export function SizeCircle({
 						{file.name}
 					</div>
 					<div
-						className="text-white/80 mt-1"
+						className="text-ink/80 mt-1"
 						style={{
 							fontSize:
 								diameter > 200

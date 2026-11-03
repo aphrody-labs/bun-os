@@ -213,7 +213,7 @@ function RenameDialog(props: RenameDialogProps) {
 								key={`${entry.to}-${index}`}
 								className={clsx(
 									"flex items-center gap-2",
-									entry.conflict && "text-red-500",
+									entry.conflict && "text-error",
 								)}
 							>
 								{entry.conflict ? (
@@ -246,7 +246,7 @@ function RenameDialog(props: RenameDialogProps) {
 				)}
 
 				{failure && (
-					<div className="rounded-md border border-red-500/20 bg-red-500/10 px-2.5 py-2 text-xs text-red-500">
+					<div className="rounded-md border border-error/20 bg-error/10 px-2.5 py-2 text-xs text-error">
 						{failure}
 					</div>
 				)}
@@ -313,7 +313,7 @@ function RuleRow({
 			</button>
 			<button
 				type="button"
-				className="rounded p-0.5 text-ink-faint hover:text-red-500"
+				className="rounded p-0.5 text-ink-faint hover:text-error"
 				onClick={onRemove}
 				title="Remove the rule"
 			>

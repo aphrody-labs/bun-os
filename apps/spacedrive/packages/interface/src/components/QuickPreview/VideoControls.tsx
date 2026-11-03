@@ -88,7 +88,7 @@ export function VideoControls({
 					animate={{ opacity: 1 }}
 					exit={{ opacity: 0 }}
 					transition={{ duration: 0.2 }}
-					className="absolute bottom-0 z-50 bg-gradient-to-t from-black/80 via-black/40 to-transparent px-4 pb-4 pt-16"
+					className="absolute bottom-0 z-50 bg-gradient-to-t from-media-shade/80 via-media-shade/40 to-transparent px-4 pb-4 pt-16"
 					style={{
 						pointerEvents: "auto",
 						left: sidebarWidth,
@@ -123,7 +123,7 @@ export function VideoControls({
 						onMouseUp={callbacks.onSeekingEnd}
 						onMouseLeave={callbacks.onTimelineLeave}
 					>
-						<div className="relative h-1 w-full overflow-hidden rounded-full bg-white/20 transition-all group-hover:h-1.5">
+						<div className="relative h-1 w-full overflow-hidden rounded-full bg-media-ink/20 transition-all group-hover:h-1.5">
 							{/* Progress */}
 							<div
 								className="absolute left-0 top-0 h-full bg-accent transition-all"
@@ -149,7 +149,7 @@ export function VideoControls({
 						{/* Play/Pause */}
 						<button
 							onClick={callbacks.onTogglePlay}
-							className="rounded-md p-2 text-white transition-colors hover:bg-white/10"
+							className="rounded-md p-2 text-media-ink transition-colors hover:bg-media-ink/10"
 						>
 							{state.playing ? (
 								<Pause size={20} weight="fill" />
@@ -164,7 +164,7 @@ export function VideoControls({
 							className={`rounded-md p-2 transition-colors ${
 								state.loop
 									? "bg-accent/20 text-accent"
-									: "text-white hover:bg-white/10"
+									: "text-media-ink hover:bg-media-ink/10"
 							}`}
 							title="Loop (L)"
 						>
@@ -172,7 +172,7 @@ export function VideoControls({
 						</button>
 
 						{/* Time */}
-						<div className="text-sm font-medium text-white">
+						<div className="text-sm font-medium text-media-ink">
 							{formatTime(state.currentTime)} /{" "}
 							{formatTime(state.duration)}
 						</div>
@@ -187,7 +187,7 @@ export function VideoControls({
 									className={`rounded-md p-2 transition-colors ${
 										state.subtitlesEnabled
 											? "bg-accent/20 text-accent"
-											: "text-white hover:bg-white/10"
+											: "text-media-ink hover:bg-media-ink/10"
 									}`}
 									title="Toggle subtitles"
 								>
@@ -198,7 +198,7 @@ export function VideoControls({
 										onClick={
 											callbacks.onSubtitleSettingsToggle
 										}
-										className="rounded-md p-2 text-white transition-colors hover:bg-white/10"
+										className="rounded-md p-2 text-media-ink transition-colors hover:bg-media-ink/10"
 										title="Subtitle settings"
 									>
 										<Gear size={20} weight="fill" />
@@ -212,7 +212,7 @@ export function VideoControls({
 							<button
 								onClick={callbacks.onZoomOut}
 								disabled={state.zoom <= 1}
-								className="rounded-md p-2 text-white transition-colors hover:bg-white/10 disabled:opacity-30"
+								className="rounded-md p-2 text-media-ink transition-colors hover:bg-media-ink/10 disabled:opacity-30"
 								title="Zoom out (-)"
 							>
 								<MagnifyingGlassMinus size={18} weight="bold" />
@@ -220,7 +220,7 @@ export function VideoControls({
 							<button
 								onClick={callbacks.onZoomIn}
 								disabled={state.zoom >= 5}
-								className="rounded-md p-2 text-white transition-colors hover:bg-white/10 disabled:opacity-30"
+								className="rounded-md p-2 text-media-ink transition-colors hover:bg-media-ink/10 disabled:opacity-30"
 								title="Zoom in (+)"
 							>
 								<MagnifyingGlassPlus size={18} weight="bold" />
@@ -228,7 +228,7 @@ export function VideoControls({
 							{state.zoom > 1 && (
 								<button
 									onClick={callbacks.onZoomReset}
-									className="rounded-md p-2 text-white transition-colors hover:bg-white/10"
+									className="rounded-md p-2 text-media-ink transition-colors hover:bg-media-ink/10"
 									title="Reset zoom (0)"
 								>
 									<ArrowCounterClockwise
@@ -243,7 +243,7 @@ export function VideoControls({
 						<div className="group flex items-center gap-2">
 							<button
 								onClick={callbacks.onMuteToggle}
-								className="rounded-md p-2 text-white transition-colors hover:bg-white/10"
+								className="rounded-md p-2 text-media-ink transition-colors hover:bg-media-ink/10"
 							>
 								{state.muted || state.volume === 0 ? (
 									<SpeakerSlash size={20} weight="fill" />
@@ -265,7 +265,7 @@ export function VideoControls({
 											parseFloat(e.target.value),
 										)
 									}
-									className="h-1 w-full cursor-pointer appearance-none rounded-full bg-white/20 [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+									className="h-1 w-full cursor-pointer appearance-none rounded-full bg-media-ink/20 [&::-webkit-slider-thumb]:size-3 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-media-ink"
 								/>
 							</div>
 						</div>
@@ -273,7 +273,7 @@ export function VideoControls({
 						{/* Fullscreen */}
 						<button
 							onClick={callbacks.onFullscreenToggle}
-							className="rounded-md p-2 text-white transition-colors hover:bg-white/10"
+							className="rounded-md p-2 text-media-ink transition-colors hover:bg-media-ink/10"
 						>
 							<ArrowsOut size={20} weight="bold" />
 						</button>

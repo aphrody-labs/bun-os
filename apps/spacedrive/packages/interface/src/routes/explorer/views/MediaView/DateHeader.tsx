@@ -30,12 +30,12 @@ export function DateHeader({ date }: DateHeaderProps) {
       style={{ height: DATE_HEADER_HEIGHT }}
       className={clsx(
         "pointer-events-none sticky inset-x-0 -top-px z-10 p-5 transition-colors duration-500",
-        !isSticky ? "text-ink" : "text-white",
+        !isSticky ? "text-ink" : "text-media-ink",
       )}
     >
       <div
         className={clsx(
-          "absolute inset-0 bg-gradient-to-b from-black/60 to-transparent transition-opacity duration-500",
+          "absolute inset-0 bg-gradient-to-b from-media-shade/60 to-transparent transition-opacity duration-500",
           isSticky ? "opacity-100" : "opacity-0",
         )}
       />

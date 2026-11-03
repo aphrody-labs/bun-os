@@ -71,13 +71,13 @@ function ActivityItem({ activity }: { activity: SyncActivity }) {
 			case "received":
 				return "text-accent";
 			case "applied":
-				return "text-green-500";
+				return "text-success";
 			case "backfill":
-				return "text-purple-500";
+				return "text-tertiary";
 			case "connection":
 				return "text-ink-dull";
 			case "error":
-				return "text-red-500";
+				return "text-error";
 			default:
 				return "text-ink-faint";
 		}

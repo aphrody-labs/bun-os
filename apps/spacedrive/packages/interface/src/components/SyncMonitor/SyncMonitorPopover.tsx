@@ -54,7 +54,7 @@ export function SyncMonitorPopover({ className }: SyncMonitorPopoverProps) {
 					</div>
 					<span>Sync</span>
 					{onlinePeerCount > 0 && (
-						<span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-white bg-accent rounded-full">
+						<span className="flex items-center justify-center min-w-[18px] h-[18px] px-1 text-[10px] font-bold text-on-primary bg-accent rounded-full">
 							{onlinePeerCount}
 						</span>
 					)}
@@ -109,9 +109,9 @@ function SyncMonitorContent({
 	const getStateColor = (state: string) => {
 		switch (state) {
 			case "Ready":
-				return "bg-green-500";
+				return "bg-success";
 			case "Backfilling":
-				return "bg-yellow-500";
+				return "bg-warning";
 			case "CatchingUp":
 				return "bg-accent";
 			case "Uninitialized":

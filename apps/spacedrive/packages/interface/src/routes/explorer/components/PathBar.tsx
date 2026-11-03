@@ -150,7 +150,7 @@ function StateChip({
 			className={clsx(
 				'border-app-line flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium',
 				tone === 'active' && 'text-accent',
-				tone === 'warning' && 'text-amber-400',
+				tone === 'warning' && 'text-warning',
 				tone === 'muted' && 'text-ink-faint',
 				tone === 'neutral' && 'text-ink-dull'
 			)}
@@ -345,7 +345,7 @@ function PathStatusButton({path}: {path: SdPath}) {
 					className={clsx(
 						context?.map_state === 'indexing' &&
 							'[&_svg]:animate-spin',
-						hasWarning && '!text-amber-400',
+						hasWarning && '!text-warning',
 						isRemote && '!text-ink-faint',
 						context?.source &&
 							context.storage.source_store &&
@@ -413,7 +413,7 @@ function PathStatusButton({path}: {path: SdPath}) {
 				<div className="border-app-line border-t">
 					{isError ? (
 						<div className="px-4 py-4 text-xs">
-							<div className="flex items-center gap-2 text-amber-400">
+							<div className="flex items-center gap-2 text-warning">
 								<WarningCircle size={16} />
 								Path status is unavailable
 							</div>
@@ -430,7 +430,7 @@ function PathStatusButton({path}: {path: SdPath}) {
 						<>
 							<div className="px-4 py-3">
 								{context.availability !== 'available' && (
-									<div className="mb-3 flex items-center gap-2 text-[11px] font-medium text-amber-400">
+									<div className="mb-3 flex items-center gap-2 text-[11px] font-medium text-warning">
 										<WarningCircle size={14} />
 										{statusLabel(context.availability)}
 									</div>

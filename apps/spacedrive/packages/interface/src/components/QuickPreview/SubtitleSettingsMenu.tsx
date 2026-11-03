@@ -93,7 +93,7 @@ export function SubtitleSettingsMenu({
 										}
 										className={`flex-1 rounded-md px-3 py-2 text-sm transition-colors ${
 											settings.position === 'bottom'
-												? 'bg-accent text-white'
+												? 'bg-accent text-on-primary'
 												: 'bg-sidebar-line/50 text-ink-dull hover:bg-sidebar-line'
 										}`}
 									>
@@ -108,7 +108,7 @@ export function SubtitleSettingsMenu({
 										}
 										className={`flex-1 rounded-md px-3 py-2 text-sm transition-colors ${
 											settings.position === 'top'
-												? 'bg-accent text-white'
+												? 'bg-accent text-on-primary'
 												: 'bg-sidebar-line/50 text-ink-dull hover:bg-sidebar-line'
 										}`}
 									>

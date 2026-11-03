@@ -15,7 +15,7 @@ export function planRowClass(change: ChangeKind | undefined): string | undefined
 		case "move":
 			return "opacity-70 [&_img]:opacity-70";
 		case "delete":
-			return "opacity-50 line-through decoration-red-500/70";
+			return "opacity-50 line-through decoration-error/70";
 		case "skip":
 			return "opacity-50";
 		default:
@@ -33,9 +33,9 @@ export function PlanBadge({
 	if (!change) return null;
 	const tone =
 		change.type === "conflict" || (change.type === "delete" && change.last_copy)
-			? "bg-red-500/15 text-red-500"
+			? "bg-error/15 text-error"
 			: change.type === "replace" || change.type === "delete"
-				? "bg-amber-500/15 text-amber-500"
+				? "bg-warning/15 text-warning"
 				: change.type === "skip"
 					? "bg-app-box text-ink-faint"
 					: "bg-accent/15 text-accent";

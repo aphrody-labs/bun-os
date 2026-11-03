@@ -153,7 +153,7 @@ export function KnowledgeInspector() {
             className={clsx(
               "p-2 rounded-lg transition-colors",
               message.trim()
-                ? "bg-accent hover:bg-accent/90 text-white"
+                ? "bg-accent hover:bg-accent/90 text-on-primary"
                 : "bg-app-box text-sidebar-inkDull cursor-not-allowed",
             )}
             title="Send message"

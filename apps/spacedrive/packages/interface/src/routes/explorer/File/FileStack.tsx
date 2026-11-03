@@ -34,7 +34,7 @@ export function FileStack({ files, size = 64 }: FileStackProps) {
 
 			{/* Show count badge if more than 3 files */}
 			{remainingCount > 0 && (
-				<div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-accent text-white text-xs font-bold flex items-center justify-center shadow-lg border-2 border-app z-10">
+				<div className="absolute -bottom-1 -right-1 size-6 rounded-full bg-accent text-on-primary text-xs font-bold flex items-center justify-center shadow-lg border-2 border-app z-10">
 					+{remainingCount}
 				</div>
 			)}

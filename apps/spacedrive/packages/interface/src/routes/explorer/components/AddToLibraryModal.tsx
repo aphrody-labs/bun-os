@@ -722,7 +722,7 @@ function PlacementPicker({
 							className={clsx(
 								"rounded px-2 py-1 text-xs font-medium transition-colors",
 								value === option.value
-									? "bg-accent text-white"
+									? "bg-accent text-on-primary"
 									: "text-ink-dull hover:text-ink",
 								!choice.available && "cursor-not-allowed opacity-40 hover:text-ink-dull",
 							)}
@@ -747,7 +747,7 @@ function Notice({ tone, children }: { tone: "info" | "warning"; children: ReactN
 			className={clsx(
 				"rounded-lg border px-3 py-2 text-xs leading-relaxed text-ink-dull",
 				tone === "warning"
-					? "border-yellow-500/40 bg-yellow-500/10"
+					? "border-warning/40 bg-warning/10"
 					: "border-accent/20 bg-accent/10",
 			)}
 		>
@@ -766,7 +766,7 @@ function RiskNotice({
 	return (
 		<Notice tone="warning">
 			<div className="flex items-start gap-2">
-				<Warning size={16} weight="fill" className="mt-px shrink-0 text-yellow-500" />
+				<Warning size={16} weight="fill" className="mt-px shrink-0 text-warning" />
 				<div className="flex-1 space-y-1.5">
 					<div className="font-medium text-ink">
 						{risk.validation.risk_level === "high"
@@ -857,7 +857,7 @@ function DoneDialog({
 			dialog={dialog}
 			title={result ? `Added ${result.name}` : "Drive tracked"}
 			description={result?.root ?? targetPath(target)}
-			icon={<CheckCircle size={20} weight="fill" className="text-green-500" />}
+			icon={<CheckCircle size={20} weight="fill" className="text-success" />}
 			onSubmit={onProgress}
 			ctaLabel={result?.job_id ? "View progress" : "View jobs"}
 			cancelLabel="Close"

@@ -142,7 +142,7 @@ export function ViewSettingsPanel({
 					)}
 				>
 					<motion.div
-						className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full"
+						className="absolute top-0.5 left-0.5 w-4 h-4 bg-ink rounded-full"
 						animate={{
 							x: viewSettings.showFileSize ? 16 : 0,
 						}}
@@ -164,7 +164,7 @@ export function ViewSettingsPanel({
 					)}
 				>
 					<motion.div
-						className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full"
+						className="absolute top-0.5 left-0.5 w-4 h-4 bg-ink rounded-full"
 						animate={{
 							x: viewSettings.foldersFirst ? 16 : 0,
 						}}

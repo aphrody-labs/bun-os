@@ -98,7 +98,7 @@ export function DuplicatesView() {
 								className={clsx(
 									"rounded-md px-2.5 py-1 text-xs transition-colors",
 									minSize === size.bytes
-										? "bg-accent text-white"
+										? "bg-accent text-on-primary"
 										: "bg-app-box text-ink hover:bg-app-hover",
 								)}
 							>
@@ -187,7 +187,7 @@ export function DuplicatesView() {
 													<span
 														className={clsx(
 															"w-14 flex-shrink-0 font-medium",
-															kept ? "text-accent" : "text-red-500",
+															kept ? "text-accent" : "text-error",
 														)}
 													>
 														{kept ? "keep" : "remove"}
@@ -195,7 +195,7 @@ export function DuplicatesView() {
 													<span
 														className={clsx(
 															"truncate",
-															kept ? "text-ink" : "text-ink-dull line-through decoration-red-500/60",
+															kept ? "text-ink" : "text-ink-dull line-through decoration-error/60",
 														)}
 														title={copy.path}
 													>

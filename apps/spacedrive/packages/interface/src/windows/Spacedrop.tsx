@@ -39,13 +39,13 @@ export function Spacedrop({ onClose, people = [] }: SpacedropProps) {
 	};
 
 	return (
-		<div className="relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-app-line bg-black">
+		<div className="relative flex h-full w-full flex-col overflow-hidden rounded-2xl border border-app-line bg-scrim">
 			{/* Animated Stars Background */}
 			<div className="absolute inset-0">
 				{stars.map((star) => (
 					<motion.div
 						key={star.id}
-						className="absolute rounded-full bg-white"
+						className="absolute rounded-full bg-ink"
 						style={{
 							left: `${star.x}%`,
 							top: `${star.y}%`,
@@ -138,7 +138,7 @@ export function Spacedrop({ onClose, people = [] }: SpacedropProps) {
 									<div className="absolute -bottom-1 -right-1">
 										{person.status === 'online' ? (
 											<div className="relative">
-												<div className="size-4 rounded-full border-2 border-sidebar-box bg-green-500" />
+												<div className="size-4 rounded-full border-2 border-sidebar-box bg-success" />
 												<motion.div
 													animate={{
 														scale: [1, 1.4, 1],
@@ -148,7 +148,7 @@ export function Spacedrop({ onClose, people = [] }: SpacedropProps) {
 														duration: 2,
 														repeat: Infinity
 													}}
-													className="absolute inset-0 rounded-full bg-green-500"
+													className="absolute inset-0 rounded-full bg-success"
 												/>
 											</div>
 										) : (

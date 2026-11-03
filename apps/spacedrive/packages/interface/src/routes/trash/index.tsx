@@ -82,7 +82,7 @@ export function TrashView() {
 								type="button"
 								size="sm"
 								variant="colored"
-								className="bg-red-500 text-white"
+								className="bg-error text-on-error"
 								disabled={empty.isPending}
 								onClick={() => void emptyTrash()}
 							>

@@ -200,8 +200,8 @@ export function SourceDetail() {
 	if (error || !source) {
 		return (
 			<div className="p-6">
-				<div className="rounded-lg border border-red-400/20 p-4">
-					<p className="text-sm text-red-400">
+				<div className="rounded-lg border border-error/20 p-4">
+					<p className="text-sm text-error">
 						Failed to load source:{" "}
 						{error ? String(error) : "Not found"}
 					</p>
@@ -328,15 +328,15 @@ export function SourceDetail() {
 						</div>
 					)}
 					{updateMutation.error && (
-						<div className="rounded-lg border border-red-400/20 p-3">
-							<p className="text-xs text-red-400">
+						<div className="rounded-lg border border-error/20 p-3">
+							<p className="text-xs text-error">
 								Update failed: {String(updateMutation.error)}
 							</p>
 						</div>
 					)}
 					{syncMutation.error && (
-						<div className="rounded-lg border border-red-400/20 p-3">
-							<p className="text-xs text-red-400">
+						<div className="rounded-lg border border-error/20 p-3">
+							<p className="text-xs text-error">
 								Sync failed: {String(syncMutation.error)}
 							</p>
 						</div>
@@ -401,7 +401,7 @@ export function SourceDetail() {
 
 			{/* Delete confirmation */}
 			{showDeleteConfirm && (
-				<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+				<div className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/40 backdrop-blur-sm">
 					<div className="border-app-line bg-app-box w-full max-w-sm rounded-xl border p-6 shadow-2xl">
 						<h3 className="text-ink text-base font-semibold">
 							Delete source
@@ -414,7 +414,7 @@ export function SourceDetail() {
 							and all its data.
 						</p>
 						{deleteMutation.error && (
-							<p className="mt-2 text-xs text-red-400">
+							<p className="mt-2 text-xs text-error">
 								{String(deleteMutation.error)}
 							</p>
 						)}
@@ -437,7 +437,7 @@ export function SourceDetail() {
 									)
 								}
 								disabled={deleteMutation.isPending}
-								className="rounded-lg bg-red-500 px-3.5 py-1.5 text-sm font-medium text-white transition-colors hover:bg-red-500/80 disabled:opacity-50"
+								className="rounded-lg bg-error px-3.5 py-1.5 text-sm font-medium text-on-error transition-colors hover:bg-error/80 disabled:opacity-50"
 							>
 								{deleteMutation.isPending
 									? "Deleting..."
@@ -484,7 +484,7 @@ function MoreActionsMenu({
 						disabled={isUpdating}
 						className="hover:bg-app-hover text-ink flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm disabled:opacity-40"
 					>
-						<ArrowSquareUp size={16} className="text-blue-400" />
+						<ArrowSquareUp size={16} className="text-accent" />
 						{isUpdating ? "Updating..." : "Update adapter"}
 					</button>
 				)}
@@ -493,7 +493,7 @@ function MoreActionsMenu({
 						onDelete();
 						popover.setOpen(false);
 					}}
-					className="hover:bg-app-hover flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm text-red-400"
+					className="hover:bg-app-hover flex w-full items-center gap-2 rounded-md px-2.5 py-1.5 text-left text-sm text-error"
 				>
 					<Trash size={16} />
 					Delete source

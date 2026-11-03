@@ -39,7 +39,7 @@ export function DaemonStartupOverlay({ show }: { show: boolean }) {
 						duration: 0.6,
 						ease: "easeInOut",
 					}}
-					className="fixed inset-0 z-[9999] flex items-center justify-center bg-black"
+					className="fixed inset-0 z-[9999] flex items-center justify-center bg-scrim"
 				>
 					{/* Animated orb with ball */}
 					<motion.div
@@ -79,14 +79,14 @@ export function DaemonStartupOverlay({ show }: { show: boolean }) {
 						className="fixed bottom-6 right-6 flex items-center gap-3"
 					>
 						<CircleNotch
-							className="size-5 animate-spin text-white"
+							className="size-5 animate-spin text-ink"
 							weight="bold"
 						/>
 						<div className="flex flex-col">
-							<p className="text-lg font-bold text-white">
+							<p className="text-lg font-bold text-ink">
 								Starting Spacedrive
 							</p>
-							<p className="text-sm text-white/50">
+							<p className="text-sm text-ink/50">
 								v{versionText}
 							</p>
 						</div>

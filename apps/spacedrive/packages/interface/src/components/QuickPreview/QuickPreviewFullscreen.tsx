@@ -88,17 +88,17 @@ export function QuickPreviewFullscreen({
 
 	// Get background style based on content type
 	const getBackgroundClass = () => {
-		if (!file) return "bg-black/90";
+		if (!file) return "bg-media-shade/90";
 
 		switch (getContentKind(file)) {
 			case "video":
-				return "bg-black";
+				return "bg-media-shade";
 			case "audio":
 				return "audio-gradient";
 			case "image":
-				return "bg-black/95";
+				return "bg-media-shade/95";
 			default:
-				return "bg-black/90";
+				return "bg-media-shade/90";
 		}
 	};
 
@@ -109,18 +109,18 @@ export function QuickPreviewFullscreen({
 				<button
 					onClick={onPrevious}
 					disabled={!hasPrevious}
-					className="rounded-md p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30"
+					className="rounded-md p-1.5 text-media-ink/70 transition-colors hover:bg-media-ink/10 hover:text-media-ink disabled:opacity-30"
 				>
 					<ArrowLeft size={16} weight="bold" />
 				</button>
 				<button
 					onClick={onNext}
 					disabled={!hasNext}
-					className="rounded-md p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-30"
+					className="rounded-md p-1.5 text-media-ink/70 transition-colors hover:bg-media-ink/10 hover:text-media-ink disabled:opacity-30"
 				>
 					<ArrowRight size={16} weight="bold" />
 				</button>
-				<div className="h-4 w-px bg-white/20 mx-1" />
+				<div className="h-4 w-px bg-media-ink/20 mx-1" />
 			</div>
 		),
 		[onPrevious, onNext, hasPrevious, hasNext]
@@ -128,7 +128,7 @@ export function QuickPreviewFullscreen({
 
 	const filenameDisplay = useMemo(
 		() => (
-			<div className="truncate text-sm font-medium text-white/90">
+			<div className="truncate text-sm font-medium text-media-ink/90">
 				{file?.name}
 			</div>
 		),
@@ -139,7 +139,7 @@ export function QuickPreviewFullscreen({
 		() => (
 			<button
 				onClick={onClose}
-				className="rounded-md p-1.5 text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+				className="rounded-md p-1.5 text-media-ink/70 transition-colors hover:bg-media-ink/10 hover:text-media-ink"
 			>
 				<X size={16} weight="bold" />
 			</button>
@@ -165,7 +165,7 @@ export function QuickPreviewFullscreen({
 							<div className="animate-pulse">Loading...</div>
 						</div>
 					) : !file && error ? (
-						<div className="flex h-full items-center justify-center text-red-400">
+						<div className="flex h-full items-center justify-center text-error">
 							<div>
 								<div className="mb-2 text-lg font-medium">
 									Error loading file
@@ -262,19 +262,19 @@ export function QuickPreviewFullscreen({
 
 							{/* Footer with keyboard hints */}
 							<div className="absolute bottom-0 z-10 px-6 py-3" style={{left: sidebarWidth, right: inspectorWidth}}>
-								<div className="text-center text-xs text-white/50">
-									<span className="text-white/70">ESC</span>{" "}
+								<div className="text-center text-xs text-media-ink/50">
+									<span className="text-media-ink/70">ESC</span>{" "}
 									or{" "}
-									<span className="text-white/70">Space</span>{" "}
+									<span className="text-media-ink/70">Space</span>{" "}
 									to close
 									{(hasPrevious || hasNext) && (
 										<>
 											{" · "}
-											<span className="text-white/70">
+											<span className="text-media-ink/70">
 												←
 											</span>{" "}
 											/{" "}
-											<span className="text-white/70">
+											<span className="text-media-ink/70">
 												→
 											</span>{" "}
 											to navigate

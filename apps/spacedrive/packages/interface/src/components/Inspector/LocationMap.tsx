@@ -8,51 +8,29 @@ interface LocationMapProps {
 	className?: string;
 }
 
-// Convert HSL string to hex color
-function hslToHex(hslString: string): string {
-	const [h, s, l] = hslString
-		.split(',')
-		.map((v) => parseFloat(v.replace(/[^\d.]/g, '')));
-
-	const lightness = l / 100;
-	const saturation = s / 100;
-	const a = saturation * Math.min(lightness, 1 - lightness);
-
-	const f = (n: number) => {
-		const k = (n + h / 30) % 12;
-		const color = lightness - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-		return Math.round(255 * color)
-			.toString(16)
-			.padStart(2, '0');
-	};
-
-	return `#${f(0)}${f(8)}${f(4)}`;
-}
-
 // Custom vector map style matching Spacedrive's color system
 function getMapStyle() {
 	const computedStyle = getComputedStyle(document.documentElement);
-	const getColor = (varName: string) => {
-		const hsl = computedStyle.getPropertyValue(varName).trim();
-		return hslToHex(`hsl(${hsl})`);
-	};
+	// MapLibre paints on a canvas, so it takes resolved colours: the active scheme's M3 roles
+	// (@aphrody/m3-theme/spaceui.css sets them on the root as plain values).
+	const role = (name: string) =>
+		computedStyle.getPropertyValue(`--md-sys-color-${name}`).trim();
 
-	// Map Spacedrive colors to map elements
 	const colors = {
-		background: getColor('--color-app'), // Base map background
-		water: getColor('--color-app-dark-box'), // Water bodies
-		waterway: getColor('--color-app-line'), // Rivers, streams
-		land: getColor('--color-app'), // Default land color
-		park: getColor('--color-app-box'), // Parks and green spaces
-		building: getColor('--color-app-box'), // Buildings
-		buildingOutline: getColor('--color-app-line'), // Building outlines
-		road: getColor('--color-app-line'), // Minor roads
-		roadMajor: getColor('--color-app-selected'), // Major roads
-		roadHighway: getColor('--color-app-hover'), // Highways
-		roadOutline: getColor('--color-app-darker-box'), // Road outlines
-		border: getColor('--color-app-line'), // Country/state borders
-		text: getColor('--color-ink-dull'), // Labels
-		textStroke: getColor('--color-app') // Text outline for readability
+		background: role('surface'), // Base map background
+		water: role('surface-container-low'), // Water bodies
+		waterway: role('outline-variant'), // Rivers, streams
+		land: role('surface'), // Default land color
+		park: role('surface-container'), // Parks and green spaces
+		building: role('surface-container'), // Buildings
+		buildingOutline: role('outline-variant'), // Building outlines
+		road: role('outline-variant'), // Minor roads
+		roadMajor: role('secondary-container'), // Major roads
+		roadHighway: role('surface-container-high'), // Highways
+		roadOutline: role('surface-container-lowest'), // Road outlines
+		border: role('outline-variant'), // Country/state borders
+		text: role('on-surface-variant'), // Labels
+		textStroke: role('surface') // Text outline for readability
 	};
 
 	return {
@@ -289,7 +267,7 @@ export function LocationMap({ latitude, longitude, className }: LocationMapProps
 				border: 3px solid var(--color-app);
 				border-radius: 50% 50% 50% 0;
 				transform: rotate(-45deg);
-				box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+				box-shadow: 0 4px 12px color-mix(in oklab, var(--md-sys-color-shadow) 40%, transparent);
 			`;
 
 			const innerDot = document.createElement('div');

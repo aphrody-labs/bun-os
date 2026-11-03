@@ -86,14 +86,14 @@ export const MediaViewItem = memo(function MediaViewItem({
 
 			{/* Video duration badge */}
 			{file.video_media_data?.duration_seconds && (
-				<div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-black/80 text-white text-[10px] font-medium backdrop-blur-sm tabular-nums">
+				<div className="absolute bottom-1 right-1 px-1.5 py-0.5 rounded bg-media-shade/80 text-media-ink text-[10px] font-medium backdrop-blur-sm tabular-nums">
 					{formatDuration(file.video_media_data.duration_seconds)}
 				</div>
 			)}
 
 			{/* Hover overlay with file name */}
-			<div className="absolute inset-x-0 bottom-0 px-2 py-1.5 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-				<div className="text-white text-xs font-medium truncate">
+			<div className="absolute inset-x-0 bottom-0 px-2 py-1.5 bg-gradient-to-t from-media-shade/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+				<div className="text-media-ink text-xs font-medium truncate">
 					{file.name}{file.extension && `.${file.extension}`}
 				</div>
 			</div>
@@ -102,7 +102,7 @@ export const MediaViewItem = memo(function MediaViewItem({
 			{selected && (
 				<div className="absolute top-1 left-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center">
 					<svg
-						className="w-3 h-3 text-white"
+						className="w-3 h-3 text-media-ink"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"

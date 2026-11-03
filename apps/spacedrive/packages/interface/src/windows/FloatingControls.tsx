@@ -16,23 +16,23 @@ export function FloatingControls() {
   return (
     <div className="h-full w-full flex items-center justify-center p-2">
       <div
-        className="bg-black/80 backdrop-blur-xl rounded-full px-4 py-3 shadow-2xl border border-white/10"
+        className="bg-scrim/80 backdrop-blur-xl rounded-full px-4 py-3 shadow-2xl border border-ink/10"
         style={{ WebkitAppRegion: "drag" } as any}
       >
         <div className="flex items-center gap-3">
           <button
-            className="w-8 h-8 rounded-full bg-red-500 hover:bg-red-600 transition-colors flex items-center justify-center"
+            className="w-8 h-8 rounded-full bg-error hover:bg-error transition-colors flex items-center justify-center"
             style={{ WebkitAppRegion: "no-drag" } as any}
             onClick={() => alert("Stop!")}
           >
-            <div className="w-3 h-3 bg-white rounded-sm" />
+            <div className="w-3 h-3 bg-ink rounded-sm" />
           </button>
           <button
-            className="w-8 h-8 rounded-full bg-gray-600 hover:bg-gray-500 transition-colors flex items-center justify-center"
+            className="w-8 h-8 rounded-full bg-app-light-box hover:bg-app-light-box transition-colors flex items-center justify-center"
             style={{ WebkitAppRegion: "no-drag" } as any}
             onClick={handleClose}
           >
-            <span className="text-white text-xl leading-none">×</span>
+            <span className="text-ink text-xl leading-none">×</span>
           </button>
         </div>
       </div>

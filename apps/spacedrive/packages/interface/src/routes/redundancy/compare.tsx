@@ -250,7 +250,7 @@ function ModeButton({
 		<button
 			onClick={onClick}
 			className={`flex-1 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ${
-				active ? 'bg-accent text-white' : 'text-ink-dull hover:text-ink'
+				active ? 'bg-accent text-on-primary' : 'text-ink-dull hover:text-ink'
 			}`}
 		>
 			{label}
