@@ -376,7 +376,7 @@ export const STACK_CURRENT_APPLICABILITY: Readonly<Record<string, string>> = {
   angular: "angular 22.x",
   "html-tailwind": "html-tailwind 4.3",
   shadcn: "shadcn cli 4",
-  m3: "m3 1.4.4",
+  m3: "m3 1.4.7",
   nuxtjs: "nuxtjs 4.5",
   "nuxt-ui": "nuxt-ui 4.11.1",
   "react-native": "react-native 0.86.x",
