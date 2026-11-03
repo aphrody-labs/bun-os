@@ -1,88 +1,6 @@
-:root {
-  --console-header-height: 3.5rem;
-}
-
-[hidden] {
-  display: none !important;
-}
-
-#console-header {
-  position: fixed;
-  z-index: 10;
-  top: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  min-height: var(--console-header-height);
-  box-sizing: border-box;
-  padding: 0.5rem 1rem;
-  background: #161b27;
-  color: #f5f7fb;
-
-  h1 {
-    margin: 0;
-    font-size: 1rem;
-    white-space: nowrap;
-  }
-
-  nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-  }
-
-  button {
-    border-radius: 0.4rem;
-    padding: 0.35rem 0.65rem;
-    color: inherit;
-    font-size: 0.9rem;
-  }
-
-  button[aria-pressed="true"] {
-    background: #385d9b;
-  }
-
-  button:focus-visible {
-    outline: 2px solid #f5f7fb;
-    outline-offset: 2px;
-  }
-}
-
-#menu {
-  padding-top: var(--console-header-height);
-}
-
-#console-status {
-  position: fixed;
-  inset: var(--console-header-height) 0 0;
-  display: grid;
-  place-content: center;
-  gap: 0.75rem;
-  box-sizing: border-box;
-  padding: 2rem;
-  color: #f5f7fb;
-  text-align: center;
-
-  h2,
-  p {
-    max-width: 42rem;
-    margin: 0;
-  }
-}
-
-@media (max-width: 640px) {
-  :root {
-    --console-header-height: 7rem;
-  }
-
-  #console-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
-}
+// Wii homebrew panel. Chrome roles only (surface, containers, on-surface, outline, primary);
+// the console header and status come from @aphrody/nie-ui/styles/consoles.less, and .state-layer()
+// from @aphrody/nie-ui/styles/menu.less.
 
 #wii-panel {
   position: fixed;
@@ -92,8 +10,8 @@
   overflow: auto;
   padding: clamp(1.25rem, 4vw, 4rem);
   box-sizing: border-box;
-  color: #f5f7fb;
-  background: radial-gradient(ellipse at 70% 0%, #29456d 0, #151c2a 48%, #0d1119 100%);
+  color: var(--md-sys-color-on-surface);
+  background: var(--md-sys-color-surface);
 }
 
 .wii-home {
@@ -104,9 +22,25 @@
 .wii-heading {
   max-width: 42rem;
 
-  h2 { margin: 0.25rem 0 0.5rem; font-size: clamp(2rem, 5vw, 3.5rem); }
-  p { margin: 0; line-height: 1.55; color: #c6d1e2; }
-  .wii-eyebrow { color: #9fbcdf; font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase; }
+  h2 {
+    margin: 0.25rem 0 0.5rem;
+    font-family: var(--md-ref-typeface-brand);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+  }
+
+  p {
+    margin: 0;
+    line-height: 1.55;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+
+  .wii-eyebrow {
+    color: var(--md-sys-color-primary);
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
 }
 
 .wii-channels {
@@ -119,25 +53,110 @@
 .wii-channel {
   min-height: 9rem;
   padding: 1.1rem;
-  border: 1px solid #ffffff2b;
-  border-radius: 1rem;
-  background: linear-gradient(145deg, #ffffff1b, #ffffff08);
-  box-shadow: 0 1rem 2rem #0003;
-  h3 { margin: 0.65rem 0 0.2rem; }
-  p { margin: 0; color: #c6d1e2; font-size: 0.9rem; }
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-large);
+  background: var(--md-sys-color-surface-container-low);
+  box-shadow: var(--md-sys-elevation-level1);
+
+  h3 {
+    margin: 0.65rem 0 0.2rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: 0.9rem;
+  }
 }
 
-.wii-channel-icon { font-size: 1.8rem; color: #9edaff; }
-.wii-launcher { display: grid; gap: 0.65rem; max-width: 34rem; }
-.wii-launcher input { max-width: 100%; padding: 0.55rem; border: 1px solid #ffffff38; border-radius: 0.5rem; background: #0b101a; color: inherit; }
-.wii-launcher button { justify-self: start; margin-top: 0.5rem; padding: 0.7rem 1rem; border-radius: 0.6rem; background: #8dd5ff; color: #102137; font-weight: 650; }
-.wii-launcher button:disabled { opacity: 0.5; }
-.wii-launcher p { min-height: 1.5rem; color: #c6d1e2; }
-#wii-runtime-host { width: min(100%, 960px); min-height: 1px; margin: 2rem auto; }
-#wii-runtime-host canvas { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: contain; }
-#wii-home { display: block; margin: 1rem auto; padding: 0.65rem 1rem; border: 1px solid #ffffff45; border-radius: 0.6rem; color: inherit; background: #ffffff16; }
+.wii-channel-icon {
+  font-size: 1.8rem;
+  color: var(--md-sys-color-primary);
+}
+
+.wii-launcher {
+  display: grid;
+  gap: 0.65rem;
+  max-width: 34rem;
+
+  input {
+    max-width: 100%;
+    padding: 0.55rem;
+    border: 1px solid var(--md-sys-color-outline);
+    border-radius: var(--md-sys-shape-corner-extra-small);
+    background: var(--md-sys-color-surface-container-highest);
+    color: inherit;
+  }
+
+  button {
+    justify-self: start;
+    margin-top: 0.5rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: var(--md-sys-shape-corner-full);
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
+    font-weight: 500;
+    transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+
+    &:enabled:hover {
+      .state-layer(--md-sys-color-on-primary; --md-sys-color-primary; --md-sys-state-hover-state-layer-opacity);
+    }
+
+    &:enabled:active {
+      .state-layer(--md-sys-color-on-primary; --md-sys-color-primary; --md-sys-state-pressed-state-layer-opacity);
+    }
+
+    &:disabled {
+      background: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+      color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+    }
+  }
+
+  p {
+    min-height: 1.5rem;
+    color: var(--md-sys-color-on-surface-variant);
+  }
+}
+
+#wii-runtime-host {
+  width: min(100%, 960px);
+  min-height: 1px;
+  margin: 2rem auto;
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: contain;
+  }
+}
+
+#wii-home {
+  display: block;
+  margin: 1rem auto;
+  padding: 0.65rem 1.5rem;
+  border: 1px solid var(--md-sys-color-outline);
+  border-radius: var(--md-sys-shape-corner-full);
+  color: var(--md-sys-color-primary);
+  background: transparent;
+  transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+
+  &:hover {
+    background: color-mix(
+      in srgb,
+      var(--md-sys-color-primary) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%),
+      transparent
+    );
+  }
+}
 
 @media (max-width: 680px) {
-  .wii-channels { grid-template-columns: 1fr; }
-  .wii-channel { min-height: 0; }
+  .wii-channels {
+    grid-template-columns: 1fr;
+  }
+
+  .wii-channel {
+    min-height: 0;
+  }
 }

@@ -1,7 +1,14 @@
-@controls-text-color: rgb(33, 33, 33);
-@controls-border-color: rgb(77, 77, 77);
-@controls-bg-color: rgb(127, 127, 127);
-@controls-pressed-bg-color: darken(@controls-bg-color, 10%);
+// On-screen touch controls drawn over the game: surface-container-highest buttons with outline
+// boundaries and on-surface labels; pressed is the 0.10 on-surface state layer, the interaction ring is primary.
+@controls-text-color: var(--md-sys-color-on-surface);
+@controls-border-color: var(--md-sys-color-outline);
+@controls-bg-color: var(--md-sys-color-surface-container-highest);
+@controls-pressed-bg-color: color-mix(
+  in srgb,
+  var(--md-sys-color-on-surface) calc(var(--md-sys-state-pressed-state-layer-opacity) * 100%),
+  var(--md-sys-color-surface-container-highest)
+);
+@controls-easing: var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized-decelerate);
 
 #controls {
   font-size: 1.5em;
@@ -23,7 +30,7 @@
 }
 
 .button-control {
-  transition: background-color 0.4s cubic-bezier(0, 0.9, 0.5, 1);
+  transition: background-color @controls-easing;
   box-sizing: border-box;
   border: 1px solid @controls-border-color;
   background-color: @controls-bg-color;
@@ -39,7 +46,7 @@
     height: 100%;
 
     & when (@box-shadows) {
-      box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--md-sys-elevation-level1);
     }
   }
 }
@@ -53,7 +60,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 5px solid #0c0;
+  border: 5px solid var(--md-sys-color-primary);
 }
 
 #btn-a,
@@ -76,7 +83,7 @@
   height: 2em;
   line-height: 2em;
   text-align: center;
-  border-radius: 0.2em;
+  border-radius: var(--md-sys-shape-corner-extra-small);
 }
 
 #btn-l {
@@ -117,7 +124,7 @@
 @dir-width: 1.75em;
 @line-length: 1em;
 @line-margin: 0.5em;
-@border-radius: 0.2em;
+@dpad-radius: var(--md-sys-shape-corner-extra-small);
 
 #dpad {
   width: 2 * @dir-length + @dir-width;
@@ -157,13 +164,13 @@
 #dpad-down,
 #dpad-left,
 #dpad-right {
-  transition: background-color 0.4s cubic-bezier(0, 0.9, 0.5, 1);
+  transition: background-color @controls-easing;
   display: flex;
   justify-content: center;
   border: 1px solid @controls-border-color;
 
   & when (@box-shadows) {
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--md-sys-elevation-level1);
   }
 
   &.pressed {
@@ -199,8 +206,8 @@
   border-bottom: none;
   top: 0;
   left: @dir-length;
-  border-top-left-radius: @border-radius;
-  border-top-right-radius: @border-radius;
+  border-top-left-radius: @dpad-radius;
+  border-top-right-radius: @dpad-radius;
 }
 
 #dpad-down {
@@ -208,8 +215,8 @@
   border-top: none;
   bottom: 0;
   left: @dir-length;
-  border-bottom-left-radius: @border-radius;
-  border-bottom-right-radius: @border-radius;
+  border-bottom-left-radius: @dpad-radius;
+  border-bottom-right-radius: @dpad-radius;
 }
 
 #dpad-left {
@@ -217,8 +224,8 @@
   border-right: none;
   left: 0;
   top: @dir-length;
-  border-top-left-radius: @border-radius;
-  border-bottom-left-radius: @border-radius;
+  border-top-left-radius: @dpad-radius;
+  border-bottom-left-radius: @dpad-radius;
 }
 
 #dpad-right {
@@ -226,6 +233,6 @@
   border-left: none;
   right: 0;
   top: @dir-length;
-  border-top-right-radius: @border-radius;
-  border-bottom-right-radius: @border-radius;
+  border-top-right-radius: @dpad-radius;
+  border-bottom-right-radius: @dpad-radius;
 }

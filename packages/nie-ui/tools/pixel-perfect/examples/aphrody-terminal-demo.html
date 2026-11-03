@@ -13,163 +13,16 @@
     <link rel="apple-touch-icon" href="aphrody.webp" />
     <meta property="og:image" content="aphrody.webp" />
 
+    <!-- Canonical M3 sheets (crates/aphrody-m3-tokens); serve from packages/ so the links resolve. -->
+    <link rel="stylesheet" href="../../../../m3-fonts/src/fonts.css" />
+    <link rel="stylesheet" href="../../../../m3-theme/tokens.css" />
+    <link rel="stylesheet" href="../../../../m3-theme/tailwind.css" />
+    <link rel="stylesheet" href="../../../../m3-tokens/src/m3-tokens.css" />
+
     <style>
-      /* -------------------------------------------------------------------------
-   M3 baseline color tokens (exported by crates/m3-tokens/src/color.rs)
-   --------------------------------------------------------------------- */
       :root {
-        --md-sys-color-primary: #6750a4;
-        --md-sys-color-on-primary: #ffffff;
-        --md-sys-color-primary-container: #eaddff;
-        --md-sys-color-on-primary-container: #21005d;
-        --md-sys-color-secondary: #625b71;
-        --md-sys-color-on-secondary: #ffffff;
-        --md-sys-color-secondary-container: #e8def8;
-        --md-sys-color-on-secondary-container: #1d192b;
-        --md-sys-color-tertiary: #7d5260;
-        --md-sys-color-on-tertiary: #ffffff;
-        --md-sys-color-tertiary-container: #ffd8e4;
-        --md-sys-color-on-tertiary-container: #31111d;
-        --md-sys-color-error: #b3261e;
-        --md-sys-color-on-error: #ffffff;
-        --md-sys-color-error-container: #f9dedc;
-        --md-sys-color-on-error-container: #410e0b;
-        --md-sys-color-surface: #fef7ff;
-        --md-sys-color-surface-dim: #ded8e1;
-        --md-sys-color-surface-bright: #fef7ff;
-        --md-sys-color-surface-variant: #e7e0ec;
-        --md-sys-color-surface-container-lowest: #ffffff;
-        --md-sys-color-surface-container-low: #f7f2fa;
-        --md-sys-color-surface-container: #f3edf7;
-        --md-sys-color-surface-container-high: #ece6f0;
-        --md-sys-color-surface-container-highest: #e6e0e9;
-        --md-sys-color-on-surface: #1d1b20;
-        --md-sys-color-on-surface-variant: #49454f;
-        --md-sys-color-outline: #79747e;
-        --md-sys-color-outline-variant: #cac4d0;
-        --md-sys-color-success: #2e7d32;
-        --md-sys-color-warning: #ef6c00;
-
-        /* M3 shape corner radii (crates/m3-tokens/src/shape.rs) */
-        --md-sys-shape-corner-none: 0px;
-        --md-sys-shape-corner-extra-small: 4px;
-        --md-sys-shape-corner-small: 8px;
-        --md-sys-shape-corner-medium: 12px;
-        --md-sys-shape-corner-large: 16px;
-        --md-sys-shape-corner-extra-large: 28px;
-        --md-sys-shape-corner-full: 9999px;
-
-        /* M3 elevation shadows (crates/m3-tokens/src/elevation.rs) */
-        --md-sys-elevation-level1: 0 1px 2px rgba(0, 0, 0, 0.1), 0 1px 3px 1px rgba(0, 0, 0, 0.06);
-        --md-sys-elevation-level2: 0 1px 2px rgba(0, 0, 0, 0.12), 0 2px 6px 2px rgba(0, 0, 0, 0.08);
-        --md-sys-elevation-level3: 0 1px 3px rgba(0, 0, 0, 0.14), 0 4px 8px 3px rgba(0, 0, 0, 0.1);
-        --md-sys-elevation-level4:
-          0 2px 3px rgba(0, 0, 0, 0.14), 0 6px 10px 4px rgba(0, 0, 0, 0.12);
-
-        /* M3 typography scale (crates/m3-tokens/src/typography.rs) */
-        --md-sys-typescale-display-medium-size: 45px;
-        --md-sys-typescale-display-medium-weight: 400;
-        --md-sys-typescale-headline-small-size: 24px;
-        --md-sys-typescale-title-large-size: 22px;
-        --md-sys-typescale-title-medium-size: 16px;
-        --md-sys-typescale-body-large-size: 16px;
-        --md-sys-typescale-body-medium-size: 14px;
-        --md-sys-typescale-label-large-size: 14px;
-        --md-sys-typescale-label-medium-size: 12px;
-        --md-sys-typescale-label-small-size: 11px;
-
-        /* M3 state-layer opacities (crates/m3-tokens/src/state.rs) */
-        --md-sys-state-hover-state-layer-opacity: 0.08;
-        --md-sys-state-focus-state-layer-opacity: 0.1;
-        --md-sys-state-pressed-state-layer-opacity: 0.1;
-
-        /* M3 motion (crates/m3-tokens/src/motion.rs) */
-        --md-sys-motion-duration-short3: 150ms;
-        --md-sys-motion-duration-medium2: 300ms;
-        --md-sys-motion-duration-long2: 500ms;
-        --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
-        --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
-
-        /* Aphrody brand tokens (extracted from crates/m3-tokens/src/gemini_brand.rs) */
-        --aphrody-brand-blue: #4285f4;
-        --aphrody-brand-purple: #9168c0;
-        --aphrody-brand-pink: #ec4899;
-        --aphrody-brand-yellow: #fae366;
-        --aphrody-brand-green: #bff28d;
-        --aphrody-brand-cyan: #00bcd4;
-        --aphrody-brand-orange: #ff7043;
-        --aphrody-brand-red: #e53935;
-
-        --aphrody-spectrum-shift: linear-gradient(
-          90deg,
-          var(--aphrody-brand-blue) 0%,
-          var(--aphrody-brand-purple) 50%,
-          var(--aphrody-brand-pink) 100%
-        );
-
-        --aphrody-warm-tone: linear-gradient(
-          45deg,
-          var(--aphrody-brand-yellow) 0%,
-          var(--aphrody-brand-pink) 100%
-        );
-
-        --aphrody-success-tone: linear-gradient(
-          135deg,
-          #34a853 0%,
-          var(--aphrody-brand-green) 100%
-        );
-
-        --aphrody-shimmer: linear-gradient(
-          90deg,
-          transparent 0%,
-          color-mix(in srgb, white 35%, transparent) 50%,
-          transparent 100%
-        );
-
-        /* Aphrody terminal-specific tokens */
-        --aphrody-mono-font:
-          "JetBrains Mono", "Cascadia Code", "SF Mono", "Menlo", "Consolas", "Liberation Mono",
-          monospace;
-        --aphrody-corner-card: 16px;
-        --aphrody-corner-pill: 9999px;
-        --aphrody-corner-chip: 12px;
-
-        /* -------------------------------------------------------------------
-     M3 BASELINE_DARK tokens (crates/m3-tokens/src/color.rs::BASELINE_DARK)
-     Exposed alongside the light baseline so the demo can preview
-     dark-mode contrast for any sub-pane that opts in via `data-theme="dark"`.
-     ------------------------------------------------------------------- */
-        --md-sys-color-dark-primary: #d0bcff;
-        --md-sys-color-dark-on-primary: #381e72;
-        --md-sys-color-dark-primary-container: #4f378b;
-        --md-sys-color-dark-on-primary-container: #eaddff;
-        --md-sys-color-dark-secondary: #ccc2dc;
-        --md-sys-color-dark-on-secondary: #332d41;
-        --md-sys-color-dark-tertiary: #efb8c8;
-        --md-sys-color-dark-on-tertiary: #492532;
-        --md-sys-color-dark-surface: #141218;
-        --md-sys-color-dark-on-surface: #e6e0e9;
-        --md-sys-color-dark-surface-variant: #49454f;
-        --md-sys-color-dark-on-surface-variant: #cac4d0;
-        --md-sys-color-dark-outline: #938f99;
-        --md-sys-color-dark-outline-variant: #49454f;
-      }
-
-      [data-theme="dark"] {
-        --md-sys-color-primary: var(--md-sys-color-dark-primary);
-        --md-sys-color-on-primary: var(--md-sys-color-dark-on-primary);
-        --md-sys-color-primary-container: var(--md-sys-color-dark-primary-container);
-        --md-sys-color-on-primary-container: var(--md-sys-color-dark-on-primary-container);
-        --md-sys-color-secondary: var(--md-sys-color-dark-secondary);
-        --md-sys-color-on-secondary: var(--md-sys-color-dark-on-secondary);
-        --md-sys-color-tertiary: var(--md-sys-color-dark-tertiary);
-        --md-sys-color-on-tertiary: var(--md-sys-color-dark-on-tertiary);
-        --md-sys-color-surface: var(--md-sys-color-dark-surface);
-        --md-sys-color-on-surface: var(--md-sys-color-dark-on-surface);
-        --md-sys-color-surface-variant: var(--md-sys-color-dark-surface-variant);
-        --md-sys-color-on-surface-variant: var(--md-sys-color-dark-on-surface-variant);
-        --md-sys-color-outline: var(--md-sys-color-dark-outline);
-        --md-sys-color-outline-variant: var(--md-sys-color-dark-outline-variant);
+        /* design:content: the Aphrody logotype gradient (brand artwork, not chrome). */
+        --aphrody-logotype: linear-gradient(90deg, #4285f4 0%, #9168c0 50%, #ec4899 100%); /* design:content */
       }
 
       * {
@@ -180,13 +33,7 @@
       body {
         height: 100%;
         margin: 0;
-        font-family:
-          "Google Sans Flex",
-          "Google Sans",
-          "Roboto",
-          system-ui,
-          -apple-system,
-          sans-serif;
+        font-family: var(--md-ref-typeface-plain);
         background: var(--md-sys-color-surface);
         color: var(--md-sys-color-on-surface);
         -webkit-font-smoothing: antialiased;
@@ -194,18 +41,7 @@
       }
 
       body {
-        background:
-          radial-gradient(
-            1200px 600px at 80% -10%,
-            color-mix(in srgb, var(--aphrody-brand-purple) 8%, transparent) 0%,
-            transparent 70%
-          ),
-          radial-gradient(
-            900px 500px at -10% 110%,
-            color-mix(in srgb, var(--aphrody-brand-blue) 8%, transparent) 0%,
-            transparent 70%
-          ),
-          var(--md-sys-color-surface);
+        background: var(--md-sys-color-surface);
         animation: app-fade-in var(--md-sys-motion-duration-long2)
           var(--md-sys-motion-easing-emphasized) both;
       }
@@ -256,7 +92,7 @@
       }
 
       .header__brand-mark {
-        background: var(--aphrody-spectrum-shift);
+        background: var(--aphrody-logotype);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
@@ -280,34 +116,34 @@
         padding: 8px 14px;
         background: color-mix(
           in srgb,
-          var(--md-sys-color-success) 12%,
+          var(--md-ext-color-success) 12%,
           var(--md-sys-color-surface)
         );
-        border: 1px solid color-mix(in srgb, var(--md-sys-color-success) 28%, transparent);
-        border-radius: var(--aphrody-corner-pill);
+        border: 1px solid color-mix(in srgb, var(--md-ext-color-success) 28%, transparent);
+        border-radius: var(--md-sys-shape-corner-full);
         font-size: 13px;
         font-weight: 500;
-        color: var(--md-sys-color-success);
+        color: var(--md-ext-color-success);
       }
 
       .header__status-dot {
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: var(--md-sys-color-success);
-        box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-sys-color-success) 60%, transparent);
+        background: var(--md-ext-color-success);
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-ext-color-success) 60%, transparent);
         animation: status-pulse 2s var(--md-sys-motion-easing-standard) infinite;
       }
 
       @keyframes status-pulse {
         0% {
-          box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-sys-color-success) 60%, transparent);
+          box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-ext-color-success) 60%, transparent);
         }
         70% {
-          box-shadow: 0 0 0 10px color-mix(in srgb, var(--md-sys-color-success) 0%, transparent);
+          box-shadow: 0 0 0 10px color-mix(in srgb, var(--md-ext-color-success) 0%, transparent);
         }
         100% {
-          box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-sys-color-success) 0%, transparent);
+          box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-ext-color-success) 0%, transparent);
         }
       }
 
@@ -315,10 +151,10 @@
         display: inline-flex;
         align-items: center;
         padding: 6px 12px;
-        border-radius: var(--aphrody-corner-pill);
+        border-radius: var(--md-sys-shape-corner-full);
         background: var(--md-sys-color-surface-container-high);
         border: 1px solid var(--md-sys-color-outline-variant);
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 12px;
         color: var(--md-sys-color-on-surface-variant);
       }
@@ -334,7 +170,7 @@
       .pane {
         background: var(--md-sys-color-surface-container-low);
         border: 1px solid var(--md-sys-color-outline-variant);
-        border-radius: var(--aphrody-corner-card);
+        border-radius: var(--md-sys-shape-corner-large);
         padding: 20px;
         box-shadow: var(--md-sys-elevation-level1);
         display: flex;
@@ -407,8 +243,8 @@
         color: var(--md-sys-color-on-surface-variant);
         background: var(--md-sys-color-surface-container);
         padding: 4px 10px;
-        border-radius: var(--aphrody-corner-pill);
-        font-family: var(--aphrody-mono-font);
+        border-radius: var(--md-sys-shape-corner-full);
+        font-family: var(--md-ref-typeface-code);
       }
 
       /* ============================== Sub-agent pane =================== */
@@ -441,21 +277,23 @@
         border-radius: var(--md-sys-shape-corner-full);
         display: inline-grid;
         place-items: center;
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-weight: 700;
         font-size: 14px;
-        color: white;
         letter-spacing: -0.5px;
       }
 
       .subagent__avatar--rust {
-        background: linear-gradient(135deg, #b7410e, #e94e1b);
+        background: var(--md-sys-color-tertiary-container);
+        color: var(--md-sys-color-on-tertiary-container);
       }
       .subagent__avatar--audit {
-        background: linear-gradient(135deg, #4285f4, #1a73e8);
+        background: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container);
       }
       .subagent__avatar--yolo {
-        background: linear-gradient(135deg, #9168c0, #ec4899);
+        background: var(--md-sys-color-secondary-container);
+        color: var(--md-sys-color-on-secondary-container);
       }
 
       .subagent__body {
@@ -475,7 +313,7 @@
       }
 
       .subagent__model {
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 11px;
         color: var(--md-sys-color-on-surface-variant);
         background: var(--md-sys-color-surface-container-high);
@@ -486,7 +324,7 @@
       .subagent__progress {
         position: relative;
         height: 4px;
-        border-radius: var(--aphrody-corner-pill);
+        border-radius: var(--md-sys-shape-corner-full);
         background: var(--md-sys-color-surface-container-highest);
         overflow: hidden;
       }
@@ -496,19 +334,8 @@
         top: 0;
         left: 0;
         bottom: 0;
-        border-radius: var(--aphrody-corner-pill);
-        background: var(--aphrody-spectrum-shift);
-        background-size: 200% 100%;
-        animation: shimmer-slide 1.6s linear infinite;
-      }
-
-      @keyframes shimmer-slide {
-        0% {
-          background-position: 200% 0;
-        }
-        100% {
-          background-position: -200% 0;
-        }
+        border-radius: var(--md-sys-shape-corner-full);
+        background: var(--md-sys-color-primary);
       }
 
       .subagent__state {
@@ -518,19 +345,19 @@
         font-size: 12px;
         font-weight: 500;
         padding: 4px 10px;
-        border-radius: var(--aphrody-corner-pill);
+        border-radius: var(--md-sys-shape-corner-full);
       }
 
       .subagent__state--running {
-        color: var(--aphrody-brand-blue);
-        background: color-mix(in srgb, var(--aphrody-brand-blue) 12%, var(--md-sys-color-surface));
+        color: var(--md-sys-color-on-primary-container);
+        background: var(--md-sys-color-primary-container);
       }
 
       .subagent__state--done {
-        color: var(--md-sys-color-success);
+        color: var(--md-ext-color-success);
         background: color-mix(
           in srgb,
-          var(--md-sys-color-success) 12%,
+          var(--md-ext-color-success) 12%,
           var(--md-sys-color-surface)
         );
       }
@@ -544,8 +371,8 @@
         width: 12px;
         height: 12px;
         border-radius: 50%;
-        border: 2px solid color-mix(in srgb, var(--aphrody-brand-blue) 25%, transparent);
-        border-top-color: var(--aphrody-brand-blue);
+        border: 2px solid var(--md-sys-color-secondary-container);
+        border-top-color: var(--md-sys-color-primary);
         animation: spinner-spin 0.9s linear infinite;
       }
 
@@ -564,14 +391,15 @@
         border-radius: 50%;
         font-size: 9px;
         font-weight: 900;
-        color: white;
       }
 
       .glyph-check {
-        background: var(--md-sys-color-success);
+        background: var(--md-ext-color-success);
+        color: var(--md-ext-color-on-success);
       }
       .glyph-x {
         background: var(--md-sys-color-error);
+        color: var(--md-sys-color-on-error);
       }
 
       /* ============================== MCP status pane ================== */
@@ -601,13 +429,13 @@
       }
 
       .mcp-row__dot--up {
-        background: var(--md-sys-color-success);
-        box-shadow: 0 0 8px color-mix(in srgb, var(--md-sys-color-success) 60%, transparent);
+        background: var(--md-ext-color-success);
+        box-shadow: 0 0 8px color-mix(in srgb, var(--md-ext-color-success) 60%, transparent);
       }
 
       .mcp-row__dot--degraded {
-        background: var(--md-sys-color-warning);
-        box-shadow: 0 0 8px color-mix(in srgb, var(--md-sys-color-warning) 60%, transparent);
+        background: var(--md-ext-color-warning);
+        box-shadow: 0 0 8px color-mix(in srgb, var(--md-ext-color-warning) 60%, transparent);
         animation: status-pulse 2.5s var(--md-sys-motion-easing-standard) infinite;
       }
 
@@ -624,7 +452,7 @@
       }
 
       .mcp-row__name {
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 14px;
         font-weight: 600;
         color: var(--md-sys-color-on-surface);
@@ -636,10 +464,10 @@
       }
 
       .mcp-row__tools {
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 12px;
         padding: 4px 10px;
-        border-radius: var(--aphrody-corner-pill);
+        border-radius: var(--md-sys-shape-corner-full);
         background: var(--md-sys-color-surface-container-high);
         color: var(--md-sys-color-on-surface-variant);
       }
@@ -655,7 +483,7 @@
         padding: 6px 10px;
         border-radius: var(--md-sys-shape-corner-small);
         font-size: 11px;
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         white-space: nowrap;
         pointer-events: none;
         transition: opacity var(--md-sys-motion-duration-short3)
@@ -699,20 +527,20 @@
       }
 
       .hook-event {
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 12px;
         color: var(--md-sys-color-on-surface);
         font-weight: 600;
       }
 
       .hook-target {
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 12px;
         color: var(--md-sys-color-on-surface-variant);
       }
 
       .hook-ts {
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 11px;
         color: var(--md-sys-color-on-surface-variant);
         white-space: nowrap;
@@ -723,16 +551,16 @@
         align-items: center;
         gap: 6px;
         padding: 3px 10px;
-        border-radius: var(--aphrody-corner-pill);
+        border-radius: var(--md-sys-shape-corner-full);
         font-size: 11px;
         font-weight: 600;
       }
 
       .hook-status--ok {
-        color: var(--md-sys-color-success);
+        color: var(--md-ext-color-success);
         background: color-mix(
           in srgb,
-          var(--md-sys-color-success) 12%,
+          var(--md-ext-color-success) 12%,
           var(--md-sys-color-surface)
         );
       }
@@ -743,8 +571,8 @@
       }
 
       .hook-status--pending {
-        color: var(--aphrody-brand-blue);
-        background: color-mix(in srgb, var(--aphrody-brand-blue) 12%, var(--md-sys-color-surface));
+        color: var(--md-sys-color-on-primary-container);
+        background: var(--md-sys-color-primary-container);
       }
 
       /* ============================== Skills pane ======================= */
@@ -790,7 +618,7 @@
         font-size: 14px;
         font-weight: 600;
         color: var(--md-sys-color-on-surface);
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
       }
 
       .skill__desc {
@@ -806,7 +634,7 @@
         font-size: 11px;
         font-weight: 600;
         padding: 4px 10px;
-        border-radius: var(--aphrody-corner-pill);
+        border-radius: var(--md-sys-shape-corner-full);
       }
 
       .skill__badge--active {
@@ -834,10 +662,7 @@
         font-weight: 700;
         margin: 0 0 10px;
         letter-spacing: -0.3px;
-        background: var(--aphrody-spectrum-shift);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
+        color: var(--md-sys-color-on-surface);
       }
 
       .markdown h2 {
@@ -864,7 +689,7 @@
       }
 
       .markdown code {
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 12px;
         padding: 2px 6px;
         border-radius: var(--md-sys-shape-corner-extra-small);
@@ -876,13 +701,13 @@
         margin: 12px 0 0;
         padding: 14px 16px;
         border-radius: var(--md-sys-shape-corner-medium);
-        background: #1d1b20;
-        color: #f3edf7;
-        font-family: var(--aphrody-mono-font);
+        background: var(--md-sys-color-inverse-surface);
+        color: var(--md-sys-color-inverse-on-surface);
+        font-family: var(--md-ref-typeface-code);
         font-size: 12px;
         line-height: 1.6;
         overflow-x: auto;
-        border: 1px solid color-mix(in srgb, white 10%, transparent);
+        border: 1px solid var(--md-sys-color-outline-variant);
       }
 
       .markdown pre code {
@@ -892,19 +717,19 @@
       }
 
       .markdown pre .tok-kw {
-        color: #c792ea;
+        color: var(--md-sys-color-tertiary-container);
       }
       .markdown pre .tok-fn {
-        color: #82aaff;
+        color: var(--md-sys-color-inverse-primary);
       }
       .markdown pre .tok-str {
-        color: #c3e88d;
+        color: var(--md-ext-color-success-container);
       }
       .markdown pre .tok-num {
-        color: #f78c6c;
+        color: var(--md-sys-color-error-container);
       }
       .markdown pre .tok-cm {
-        color: #546e7a;
+        color: color-mix(in srgb, var(--md-sys-color-inverse-on-surface) 70%, transparent);
         font-style: italic;
       }
 
@@ -919,38 +744,38 @@
 
       /* ============================== JSON pane ========================= */
       .json-out {
-        background: #1d1b20;
-        color: #f3edf7;
+        background: var(--md-sys-color-inverse-surface);
+        color: var(--md-sys-color-inverse-on-surface);
         border-radius: var(--md-sys-shape-corner-medium);
         padding: 16px 18px;
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 12px;
         line-height: 1.65;
         overflow-x: auto;
-        border: 1px solid color-mix(in srgb, white 10%, transparent);
+        border: 1px solid var(--md-sys-color-outline-variant);
         white-space: pre;
       }
 
       .json-out .j-key {
-        color: #82aaff;
+        color: var(--md-sys-color-inverse-primary);
       }
       .json-out .j-str {
-        color: #c3e88d;
+        color: var(--md-ext-color-success-container);
       }
       .json-out .j-num {
-        color: #f78c6c;
+        color: var(--md-sys-color-error-container);
       }
       .json-out .j-bool {
-        color: #c792ea;
+        color: var(--md-sys-color-tertiary-container);
       }
       .json-out .j-null {
-        color: #ff5370;
+        color: var(--md-sys-color-error-container);
       }
       .json-out .j-punc {
-        color: #89ddff;
+        color: var(--md-sys-color-secondary-container);
       }
       .json-out .j-ts {
-        color: #fae366;
+        color: var(--md-ext-color-warning-container);
       }
 
       .json-toolbar {
@@ -966,10 +791,10 @@
         align-items: center;
         gap: 6px;
         padding: 4px 10px;
-        border-radius: var(--aphrody-corner-pill);
+        border-radius: var(--md-sys-shape-corner-full);
         background: var(--md-sys-color-surface-container);
         color: var(--md-sys-color-on-surface-variant);
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 11px;
         font-weight: 500;
         border: 1px solid var(--md-sys-color-outline-variant);
@@ -979,7 +804,7 @@
         width: 6px;
         height: 6px;
         border-radius: 50%;
-        background: var(--md-sys-color-success);
+        background: var(--md-ext-color-success);
       }
 
       /* ============================== Footer ============================ */
@@ -1004,7 +829,7 @@
 
       .footer__brand-mark {
         font-weight: 700;
-        background: var(--aphrody-spectrum-shift);
+        background: var(--aphrody-logotype);
         -webkit-background-clip: text;
         background-clip: text;
         color: transparent;
@@ -1021,7 +846,7 @@
         padding: 3px 8px;
         border-radius: var(--md-sys-shape-corner-extra-small);
         background: var(--md-sys-color-surface-container);
-        font-family: var(--aphrody-mono-font);
+        font-family: var(--md-ref-typeface-code);
         font-size: 11px;
         color: var(--md-sys-color-on-surface-variant);
       }
@@ -1169,7 +994,7 @@
                 >
                   <span
                     class="subagent__progress-fill"
-                    style="width: 100%; animation: none; background: var(--aphrody-success-tone)"
+                    style="width: 100%; animation: none; background: var(--md-ext-color-success)"
                   ></span>
                 </div>
               </div>
@@ -1198,11 +1023,7 @@
                     style="
                       width: 35%;
                       animation: none;
-                      background: linear-gradient(
-                        90deg,
-                        var(--md-sys-color-error),
-                        var(--aphrody-brand-orange)
-                      );
+                      background: var(--md-sys-color-error);
                     "
                   ></span>
                 </div>

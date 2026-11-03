@@ -18,8 +18,9 @@
   min-height: var(--console-header-height);
   box-sizing: border-box;
   padding: 0.5rem 1rem;
-  background: #161b27;
-  color: #f5f7fb;
+  background: var(--md-sys-color-surface-container);
+  color: var(--md-sys-color-on-surface);
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
 
   h1 {
     margin: 0;
@@ -34,18 +35,36 @@
   }
 
   button {
-    border-radius: 0.4rem;
+    border-radius: var(--md-sys-shape-corner-small);
     padding: 0.35rem 0.65rem;
     color: inherit;
     font-size: 0.9rem;
+    transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+  }
+
+  button:hover {
+    background: color-mix(
+      in srgb,
+      var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%),
+      transparent
+    );
   }
 
   button[aria-pressed="true"] {
-    background: #385d9b;
+    background: var(--md-sys-color-primary-container);
+    color: var(--md-sys-color-on-primary-container);
+  }
+
+  button[aria-pressed="true"]:hover {
+    background: color-mix(
+      in srgb,
+      var(--md-sys-color-on-primary-container) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%),
+      var(--md-sys-color-primary-container)
+    );
   }
 
   button:focus-visible {
-    outline: 2px solid #f5f7fb;
+    outline: 2px solid var(--md-sys-color-secondary);
     outline-offset: 2px;
   }
 }
@@ -62,7 +81,8 @@
   gap: 0.75rem;
   box-sizing: border-box;
   padding: 2rem;
-  color: #f5f7fb;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
   text-align: center;
 
   h2,

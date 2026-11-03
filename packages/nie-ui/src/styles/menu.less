@@ -1,53 +1,49 @@
-@light-menu-bg-color: rgb(127, 127, 127);
-@light-menu-color: rgba(0, 0, 0, 0.75);
-
-@light-group-label-color: rgba(0, 0, 0, 0.5);
-@light-entry-label-color: rgba(0, 0, 0, 0.6);
-
-@light-button-disabled-color: rgba(0, 0, 0, 0.25);
-@light-button-bg-color: rgba(220, 220, 220, 0.5);
-@light-button-hover-bg-color: rgba(180, 180, 180, 0.5);
-
-@light-toggle-disabled-bg-color: rgba(60, 60, 60, 0.5);
-@light-toggle-disabled-fg-color: rgba(160, 160, 160, 0.5);
-@light-toggle-off-bg-color: rgba(0, 0, 0, 0.5);
-@light-toggle-off-fg-color: rgba(220, 220, 220, 0.5);
-@light-toggle-on-bg-color: rgba(110, 200, 95, 0.75);
-@light-toggle-on-fg-color: rgba(40, 40, 40, 0.75);
-@light-toggle-off-hover-bg-color: rgba(10, 10, 10, 0.5);
-@light-toggle-on-hover-bg-color: rgba(90, 165, 80, 0.5);
-
-@dark-menu-bg-color: rgb(70, 70, 70);
-@dark-menu-color: rgba(245, 245, 245, 0.75);
-
-@dark-group-label-color: rgba(255, 255, 255, 0.5);
-@dark-entry-label-color: rgba(255, 255, 255, 0.6);
-
-@dark-button-disabled-color: rgba(245, 245, 245, 0.25);
-@dark-button-bg-color: rgba(30, 30, 30, 0.5);
-@dark-button-hover-bg-color: rgba(60, 60, 60, 0.5);
-
-@dark-toggle-disabled-bg-color: rgba(160, 160, 160, 0.5);
-@dark-toggle-disabled-fg-color: rgba(60, 60, 60, 0.5);
-@dark-toggle-off-bg-color: rgba(245, 245, 245, 0.5);
-@dark-toggle-off-fg-color: rgba(30, 30, 30, 0.5);
-@dark-toggle-on-bg-color: rgba(100, 180, 90, 0.75);
-@dark-toggle-on-fg-color: rgba(220, 220, 220, 0.75);
-@dark-toggle-off-hover-bg-color: rgba(160, 160, 160, 0.5);
-@dark-toggle-on-hover-bg-color: rgba(60, 110, 50, 0.5);
+// Pause menu. Roles: surface-container (menu), surface-container-high (rows), on-surface (text),
+// on-surface-variant (labels), outline (boundaries). Interaction colour comes from M3 state layers only.
 
 @normal-bg-opacity: 80%;
 @blurred-bg-opacity: 60%;
 
-@border-radius: 0.15em;
+@easing: var(--md-sys-motion-easing-emphasized-decelerate);
+@effects: var(--md-sys-motion-duration-short4);
 
-.themed(@prop, @var-name) {
-  @light-var-name: "light-@{var-name}";
-  @dark-var-name: "dark-@{var-name}";
-  @{prop}: @@light-var-name;
-  @media (prefers-color-scheme: dark) {
-    @{prop}: @@dark-var-name;
+// An on-role state layer composited over its container (hover 0.08, focus/pressed 0.10).
+.state-layer(@on; @container; @opacity) {
+  background-color: color-mix(in srgb, var(@on) calc(var(@opacity) * 100%), var(@container));
+}
+
+.row() {
+  transition: background-color @effects @easing;
+  background-color: var(--md-sys-color-surface-container-high);
+}
+
+.row-hover() {
+  .state-layer(--md-sys-color-on-surface; --md-sys-color-surface-container-high; --md-sys-state-hover-state-layer-opacity);
+}
+
+.row-pressed() {
+  .state-layer(--md-sys-color-on-surface; --md-sys-color-surface-container-high; --md-sys-state-pressed-state-layer-opacity);
+}
+
+.row-disabled() {
+  color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
+}
+
+.elevated() {
+  & when (@box-shadows = true) {
+    box-shadow: var(--md-sys-elevation-level1);
   }
+}
+
+// Keeps a native input reachable by keyboard while its label draws the control.
+.visually-hidden() {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 #menu-container {
@@ -60,8 +56,8 @@
   pointer-events: none;
   opacity: 0;
   transition:
-    visibility 0.4s linear,
-    opacity 0.4s cubic-bezier(0, 0.9, 0.5, 1);
+    visibility var(--md-sys-motion-duration-medium4) @easing,
+    opacity var(--md-sys-motion-duration-medium4) @easing;
 
   body.paused & {
     visibility: visible;
@@ -70,37 +66,21 @@
   }
 
   & when (@blur = true) {
-    background-color: fade(@light-menu-bg-color, @blurred-bg-opacity);
-    @media (prefers-color-scheme: dark) {
-      background-color: fade(@dark-menu-bg-color, @blurred-bg-opacity);
-    }
+    background-color: color-mix(in oklab, var(--md-sys-color-surface-container) @blurred-bg-opacity, transparent);
   }
 
   & when (@blur = false) {
-    background-color: fade(@light-menu-bg-color, @normal-bg-opacity);
-    @media (prefers-color-scheme: dark) {
-      background-color: fade(@dark-menu-bg-color, @normal-bg-opacity);
-    }
+    background-color: color-mix(in oklab, var(--md-sys-color-surface-container) @normal-bg-opacity, transparent);
   }
-}
 
-.box-shadow() {
-  & when (@box-shadows = true) {
-    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+    background-color: var(--md-sys-color-surface-container);
   }
-}
 
-.menu-button-focus() {
-  .themed(background-color, button-hover-bg-color);
-}
-
-.menu-button-disabled() {
-  .themed(color, button-disabled-color);
-}
-
-.menu-button() {
-  transition: background-color 500ms;
-  .themed(background-color, button-bg-color);
+  @media (forced-colors: active) {
+    background-color: Canvas;
+    color: CanvasText;
+  }
 }
 
 #menu {
@@ -111,10 +91,10 @@
   width: 100%;
   height: 100%;
   font-size: 1.9em;
-  .themed(color, menu-color);
+  color: var(--md-sys-color-on-surface);
 
   input[type="file"] {
-    display: none;
+    .visually-hidden();
   }
 }
 
@@ -123,18 +103,18 @@
   overflow: auto;
 
   .group {
-    .box-shadow();
+    .elevated();
     display: grid;
     grid-template-columns: auto 1fr;
     overflow: hidden;
     margin: 0.4em;
-    border-radius: @border-radius;
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: var(--md-sys-shape-corner-medium);
   }
 
   .group-label,
   .entry-label {
-    transition: background-color 500ms;
-    .themed(background-color, button-bg-color);
+    .row();
   }
 
   .group-label {
@@ -143,12 +123,12 @@
     padding: 0.25em 0.75em;
     font-size: 0.8em;
     font-weight: normal;
-    .themed(color, group-label-color);
+    color: var(--md-sys-color-on-surface-variant);
 
     .arrow {
       position: relative;
       top: -0.06em;
-      transition: transform 0.4s cubic-bezier(0, 0.9, 0.5, 1);
+      transition: transform var(--md-sys-motion-duration-medium4) @easing;
       margin-right: 0.67em;
       font-size: 0.8em;
     }
@@ -163,7 +143,7 @@
     display: flex;
     align-items: center;
     padding: 0.4em 0.5em;
-    .themed(color, entry-label-color);
+    color: var(--md-sys-color-on-surface-variant);
   }
 
   .entry-label {
@@ -172,15 +152,17 @@
   }
 
   .entry-contents {
-    .menu-button();
+    .row();
     justify-content: center;
     margin-top: 1px;
     margin-left: 1px;
+    color: var(--md-sys-color-on-surface);
 
     .load-indicator {
       vertical-align: middle;
       width: 1em;
       height: 1em;
+      fill: currentColor;
     }
 
     .file-name:not(:empty) {
@@ -192,17 +174,25 @@
   .entry-contents.button:enabled,
   button:enabled + .entry-contents.label,
   input:enabled + .entry-contents.label {
-    &:focus,
-    &:hover,
-    &:active {
-      .menu-button-focus();
+    &:hover {
+      .row-hover();
     }
+
+    &:active {
+      .row-pressed();
+    }
+  }
+
+  input:enabled:focus-visible + .entry-contents.label {
+    .row-pressed();
+    outline: 2px solid var(--md-sys-color-secondary);
+    outline-offset: -2px;
   }
 
   .entry-contents.button:not(:enabled),
   button:not(:enabled) + .entry-contents.label,
   input:not(:enabled) + .entry-contents.label {
-    .menu-button-disabled();
+    .row-disabled();
   }
 
   .save {
@@ -215,22 +205,26 @@
   }
 }
 
+// M3 switch roles: off track surface-container-highest with outline handle; on track primary with
+// on-primary handle; disabled track on-surface 12 %, disabled handle on-surface 38 %.
 .toggle {
   input[type="checkbox"] {
-    display: none;
+    .visually-hidden();
   }
 
   label {
-    .box-shadow();
-
     position: relative;
     display: inline-block;
+    box-sizing: border-box;
     cursor: pointer;
-    .themed(background-color, toggle-off-bg-color);
-    transition: background-color 0.3s;
+    border: 1px solid var(--md-sys-color-outline);
+    background-color: var(--md-sys-color-surface-container-highest);
+    transition:
+      background-color @effects @easing,
+      border-color @effects @easing;
     width: 2em;
     height: 1em;
-    border-radius: 0.5em;
+    border-radius: var(--md-sys-shape-corner-full);
 
     &::after {
       content: "";
@@ -238,45 +232,56 @@
       position: absolute;
       left: 0.05em;
       bottom: 0.05em;
-      .themed(background-color, toggle-off-fg-color);
+      background-color: var(--md-sys-color-outline);
       transition:
-        background-color 0.3s,
-        left 0.3s;
-      width: 0.9em;
-      height: 0.9em;
-      border-radius: 50%;
+        background-color @effects @easing,
+        left var(--md-sys-motion-duration-medium2) @easing;
+      width: 0.8em;
+      height: 0.8em;
+      border-radius: var(--md-sys-shape-corner-full);
     }
   }
 
   input[type="checkbox"]:enabled:checked + label {
-    .themed(background-color, toggle-on-bg-color);
+    border-color: var(--md-sys-color-primary);
+    background-color: var(--md-sys-color-primary);
 
     &::after {
-      .themed(background-color, toggle-on-fg-color);
+      background-color: var(--md-sys-color-on-primary);
       left: 1.05em;
     }
 
-    &:focus,
-    &:hover,
+    &:hover {
+      .state-layer(--md-sys-color-on-primary; --md-sys-color-primary; --md-sys-state-hover-state-layer-opacity);
+    }
+
     &:active {
-      .themed(background-color, toggle-on-hover-bg-color);
+      .state-layer(--md-sys-color-on-primary; --md-sys-color-primary; --md-sys-state-pressed-state-layer-opacity);
     }
   }
 
   input[type="checkbox"]:enabled:not(:checked) + label {
-    &:focus,
-    &:hover,
-    &:active {
-      .themed(background-color, toggle-off-hover-bg-color);
+    &:hover {
+      .state-layer(--md-sys-color-on-surface; --md-sys-color-surface-container-highest; --md-sys-state-hover-state-layer-opacity);
     }
+
+    &:active {
+      .state-layer(--md-sys-color-on-surface; --md-sys-color-surface-container-highest; --md-sys-state-pressed-state-layer-opacity);
+    }
+  }
+
+  input[type="checkbox"]:focus-visible + label {
+    outline: 2px solid var(--md-sys-color-secondary);
+    outline-offset: 2px;
   }
 
   input[type="checkbox"]:not(:enabled) + label {
     cursor: default;
-    .themed(background-color, toggle-disabled-bg-color);
+    border-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
+    background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 12%, transparent);
 
     &::after {
-      .themed(background-color, toggle-disabled-fg-color);
+      background-color: color-mix(in srgb, var(--md-sys-color-on-surface) 38%, transparent);
     }
   }
 }
@@ -288,26 +293,30 @@
   padding: 0.2em;
 
   button {
-    .menu-button();
-    .box-shadow();
+    .row();
+    .elevated();
     flex: 1 0 auto;
     margin: 0.1em;
-    border-radius: (@border-radius / 2);
+    border-radius: var(--md-sys-shape-corner-small);
     height: 3em;
     max-height: 33vh;
     padding: 0.25em 0.5em;
     font-size: 2em;
+    color: var(--md-sys-color-on-surface);
 
     &:enabled {
-      &:focus,
-      &:hover,
+      &:hover {
+        .row-hover();
+      }
+
+      &:focus-visible,
       &:active {
-        .menu-button-focus();
+        .row-pressed();
       }
     }
 
     &:not(:enabled) {
-      .menu-button-disabled();
+      .row-disabled();
     }
   }
 }

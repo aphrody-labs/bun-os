@@ -1,4 +1,10 @@
-@import "normalize.css";
+// Emulator frontend styles. Every chrome colour, shape, type and motion value comes from the
+// canonical Material 3 sheets (crates/aphrody-m3-tokens via @aphrody/m3-theme and @aphrody/m3-tokens);
+// light and dark follow the generated sheet's prefers-color-scheme block.
+@import (less) "@aphrody/m3-fonts/fonts.css";
+@import (less) "@aphrody/m3-theme/tokens.css";
+@import (less) "@aphrody/m3-tokens/m3-tokens.css";
+@import (less) "normalize.css";
 @import "controls.less";
 @import "menu.less";
 @import "consoles.less";
@@ -6,15 +12,17 @@
 @blur: true;
 @box-shadows: true;
 
+// design:content: black bars around the emulated framebuffer; game pixels, not chrome.
+@letterbox: #000; // design:content
+
 body {
   position: absolute;
   overflow: hidden;
   width: 100%;
   height: 100%;
-  background-color: black;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
-    sans-serif;
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-ref-typeface-plain);
 
   -webkit-overflow-scrolling: auto;
   -webkit-tap-highlight-color: transparent;
@@ -36,12 +44,18 @@ button {
   padding: 0;
   background-color: transparent;
   color: inherit;
+  font-family: inherit;
 }
 
 button:enabled,
 button:enabled + label,
 input:enabled + label {
   cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--md-sys-color-secondary);
+  outline-offset: 2px;
 }
 
 h1 {
@@ -55,6 +69,7 @@ h1 {
   justify-content: center;
   width: 100%;
   height: 100%;
+  background-color: @letterbox;
 
   body.paused & {
     transform: scale(0.9);
@@ -62,8 +77,8 @@ h1 {
 
   & when (@blur = true) {
     transition:
-      filter 0.4s cubic-bezier(0, 0.6, 0.5, 1),
-      transform 0.4s cubic-bezier(0, 0.9, 0.5, 1);
+      filter var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized-decelerate),
+      transform var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized-decelerate);
     filter: blur(0);
     body.paused & {
       filter: blur(1em);
@@ -71,12 +86,25 @@ h1 {
   }
 
   & when (@blur = false) {
-    transition: transform 0.4s cubic-bezier(0, 0.9, 0.5, 1);
+    transition: transform var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-emphasized-decelerate);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: filter var(--md-sys-motion-duration-medium4) var(--md-sys-motion-easing-standard);
+    body.paused & {
+      transform: none;
+    }
+  }
+
+  @media (prefers-reduced-transparency: reduce), (prefers-contrast: more), (forced-colors: active) {
+    body.paused & {
+      filter: none;
+    }
   }
 }
 
 #canvas {
-  background-color: black;
+  background-color: @letterbox;
   image-rendering: optimizeSpeed;
   image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-optimize-contrast;
