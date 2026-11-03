@@ -16,7 +16,7 @@ web/source consumers explicitly run `git submodule update --init --recursive
 --checkout`. Cargo consumer roots must patch `aphrody-m3-tokens` to the same
 Material Git URL and exact revision as their other Material dependencies.
 
-Use native Windows on the owner workstation; never start WSL. Resolve checkout
+Use native Windows on the owner workstation; WSL there runs only the Bun OS bundle (docs/WSL.md). Resolve checkout
 paths from configuration or the selected workspace. Type checks, lint and format
 must run through the Bun runtime's built-in commands:
 `bun check`, `bun lint` and `bun fmt`, invoked directly (the fork-only n2b command no longer exists). Do not route

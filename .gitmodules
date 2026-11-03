@@ -1718,3 +1718,14 @@
 	path = vendor/wil
 	url = https://github.com/aphrody-labs/wil.git
 	shallow = true
+[submodule "vendor/gtk-themes/whitesur"]
+	path = vendor/gtk-themes/whitesur
+	url = https://github.com/aphrody-labs/WhiteSur-gtk-theme.git
+	shallow = true
+[submodule "vendor/gtk-themes/mactahoe"]
+	path = vendor/gtk-themes/mactahoe
+	url = https://github.com/aphrody-labs/MacTahoe-gtk-theme.git
+	shallow = true
+[submodule "vendor/hyprland/hyprland-plugins"]
+	path = vendor/hyprland/hyprland-plugins
+	url = https://github.com/aphrody-labs/hyprland-plugins.git

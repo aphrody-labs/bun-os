@@ -33,7 +33,7 @@ Gemini at the centre), shipped as a bootable image and as the WebOS session on a
   live on as Bun OS plugins (`packages/bun-os-plugins`) running on upstream Bun.
 - Quality: `bun check`, `bun lint`, `bun format` (repo wrapper with `bun-format.json`), `cargo check --workspace --locked`.
 - Tools: Bun, the Bun OS plugins and CLIs, and Rust tools (`rg`, `fd`, `sd`, `nu`, `bat`, `eza`, `dust`, `procs`,
-  `hyperfine`, `just`, `tokei`). PowerShell only where a Windows-only API needs it. Do not start WSL on the workstation.
+  `hyperfine`, `just`, `tokei`). PowerShell only where a Windows-only API needs it. WSL on the workstation runs only the Bun OS bundle (docs/WSL.md).
 
 ## Code
 
