@@ -1,0 +1,36 @@
+# SPDX-License-Identifier: Apache-2.0
+# The Bun OS desktop session that aphrody.com streams (docs/UNIFIED-IMAGE.md, session container contract):
+# cage hosts a nested cosmic-comp and aphrody-remote-desktop streams its output on the container's :8794.
+# Published on the loopback only (127.0.0.1:18794; 8794 on the host is taken by another service), behind the
+# aphrody-webos bridge, which is owner-gated. The access token lives in ~/apps/webos/secrets/session/session.token
+# (created once, mode 640, never printed); the bridge reads the same file (WEBOS_SESSION_TOKEN_FILE).
+# Installed as /etc/systemd/system/aphrody-webos-session.service.
+[Unit]
+Description=Bun OS desktop session container (aphrody.com stream source)
+After=docker.service network-online.target
+Requires=docker.service
+
+[Service]
+Type=simple
+User=ubuntu
+Restart=always
+RestartSec=5
+TimeoutStopSec=30
+ExecStartPre=-/usr/bin/docker rm -f bunos-webos-session
+ExecStart=/usr/bin/docker run --rm --name bunos-webos-session --init \
+  --cgroup-parent=interactive.slice --cpus 4 --memory 8g --pids-limit 8192 \
+  --cap-add SYS_ADMIN --cap-add NET_ADMIN --cap-add NET_RAW --cap-add SETUID --cap-add SETGID --cap-add CHOWN \
+  --cap-add DAC_OVERRIDE --cap-add FOWNER --cap-add KILL --cap-add MKNOD --cap-add SYS_CHROOT --cap-add SETPCAP \
+  --cap-add AUDIT_WRITE \
+  --security-opt apparmor=unconfined --security-opt seccomp=unconfined --security-opt no-new-privileges \
+  --cgroupns private --read-only --shm-size 1g \
+  --tmpfs /run --tmpfs /tmp --tmpfs /var/lib/waydroid --tmpfs /var/lib/misc --tmpfs /var/log \
+  -v /home/ubuntu/apps/webos/secrets/session/session.token:/run/secrets/session.token:ro \
+  -v aphrody-home-owner:/home/aphrody \
+  -e BUNOS_SESSION_SIZE=1600x900 \
+  -p 127.0.0.1:18794:8794 \
+  bunos-unified:session
+ExecStop=/usr/bin/docker stop -t 20 bunos-webos-session
+
+[Install]
+WantedBy=multi-user.target
