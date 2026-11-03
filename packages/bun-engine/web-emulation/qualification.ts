@@ -17,7 +17,7 @@ export interface QualificationResult {
   gpu3d_submitted_frames: number;
 }
 export interface WasmQualificationReceipt {
-  schemaVersion: 1;
+  schemaVersion: 2;
   kind: "bun-engine-wasm-qualification";
   core: string;
   variant: "single" | "threads";
@@ -31,6 +31,28 @@ export interface WasmQualificationReceipt {
 }
 const defaultRoot = resolve(import.meta.dir, "../../..");
 const digestPattern = /^[a-f0-9]{64}$/;
+const harnessPaths = [
+  "packages/bun-engine/web-emulation/smoke.ts",
+  "packages/bun-engine/web-emulation/smoke.html",
+  "packages/bun-engine/web-emulation/serve.ts",
+  "packages/bun-engine/web-emulation/png.ts",
+  "packages/bun-engine/web-emulation/qualification.ts",
+  "packages/bun-engine/web-emulation/web-emulation.lock.json",
+  "packages/bun-engine/plugins/consoles/roms.json",
+  "packages/bun-engine/plugins/consoles/free-firmware.json",
+];
+
+export function qualificationHarnessRevision(root: string): string {
+  const revision = Bun.spawnSync(["git", "-C", root, "rev-parse", "HEAD"]);
+  const value = revision.stdout.toString().trim();
+  if (revision.exitCode !== 0 || !/^[a-f0-9]{40}$/.test(value))
+    throw new Error("Cannot resolve qualification harness revision");
+  const tracked = Bun.spawnSync(["git", "-C", root, "ls-files", "--error-unmatch", "--", ...harnessPaths]);
+  if (tracked.exitCode !== 0) throw new Error("Qualification harness files are not all tracked");
+  const diff = Bun.spawnSync(["git", "-C", root, "diff", "--quiet", "HEAD", "--", ...harnessPaths]);
+  if (diff.exitCode !== 0) throw new Error("Qualification harness has uncommitted changes or cannot be checked");
+  return value;
+}
 function safePath(path: string): string {
   if (
     !path ||
@@ -154,17 +176,16 @@ export async function createQualificationSnapshot(
     if (!pin || !fixtures.some(f => f.path === `firmware/${pin.file}` && f.sha256 === pin.sha256))
       throw new Error(`${core}: qualification is missing required firmware ${id}`);
   }
-  const revision = Bun.spawnSync(["git", "-C", root, "rev-parse", "HEAD"]);
-  const sourceRevision = revision.stdout.toString().trim();
-  if (revision.exitCode !== 0 || !/^[a-f0-9]{40}$/.test(sourceRevision))
-    throw new Error("Cannot resolve qualification source revision");
+  const sourceRevision = qualificationHarnessRevision(root);
   const files = await snapshotFiles(dist, core, fixtures);
   for (const path of [selected.module, selected.wasm])
     if (!files[`${core}/${path}`]) throw new Error(`${core}: selected variant input is not in qualification files`);
   if (manifest.firmware?.length)
     files["firmware/firmware.json"] = await qualificationSHA256(join(dist, "firmware/firmware.json"));
+  if (qualificationHarnessRevision(root) !== sourceRevision)
+    throw new Error("Qualification harness revision changed during setup");
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     kind: "bun-engine-wasm-qualification",
     core,
     variant,
@@ -178,15 +199,21 @@ export async function writeQualification(
   dist: string,
   snapshot: Omit<WasmQualificationReceipt, "testedAt" | "result">,
   result: QualificationResult,
+  options: { root?: string } = {},
 ): Promise<WasmQualificationReceipt> {
+  const root = options.root ?? defaultRoot;
   checkResult(result);
   if (snapshot.core === "dust-nds" && result.renderer !== "wgpu30-dust")
     throw new Error("Dust distribution qualification must exercise its GPU renderer");
+  if (qualificationHarnessRevision(root) !== snapshot.sourceRevision)
+    throw new Error("Qualification harness revision changed during browser run");
   const current = await snapshotFiles(dist, snapshot.core, snapshot.fixtures);
   if (snapshot.files["firmware/firmware.json"])
     current["firmware/firmware.json"] = await qualificationSHA256(join(dist, "firmware/firmware.json"));
   if (JSON.stringify(current) !== JSON.stringify(snapshot.files))
     throw new Error("WASM qualification inputs changed during browser run");
+  if (qualificationHarnessRevision(root) !== snapshot.sourceRevision)
+    throw new Error("Qualification harness revision changed before receipt creation");
   const receipt: WasmQualificationReceipt = { ...snapshot, testedAt: new Date().toISOString(), result };
   await Bun.write(join(dist, snapshot.core, "qualification.json"), `${JSON.stringify(receipt, null, 2)}\n`);
   return receipt;
@@ -200,7 +227,7 @@ export async function verifyQualification(
   const root = options.root ?? defaultRoot;
   const receipt = (await Bun.file(join(dist, core, "qualification.json")).json()) as WasmQualificationReceipt;
   if (
-    receipt.schemaVersion !== 1 ||
+    receipt.schemaVersion !== 2 ||
     receipt.kind !== "bun-engine-wasm-qualification" ||
     receipt.core !== core ||
     !/^[a-f0-9]{40}$/.test(receipt.sourceRevision) ||

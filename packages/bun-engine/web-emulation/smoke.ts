@@ -96,6 +96,8 @@ export async function smoke(
   options: { rom?: string; renderer?: "gpu" | "software" } = {},
 ) {
   const comparison = options.renderer === "software";
+  if (!options.rom && !comparison && resolve(import.meta.path) !== join(root, "packages/bun-engine/web-emulation/smoke.ts"))
+    throw new Error("Distribution qualification must run the checked-in smoke harness");
   if (!Number.isInteger(timeoutMs) || timeoutMs < 30_000 || timeoutMs > 900_000)
     throw new Error("Smoke timeout must be 30000..900000 milliseconds");
   // Invalidate old claims before setup too: missing browser/content must not retain qualification.
