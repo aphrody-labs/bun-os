@@ -1,8 +1,8 @@
 {
   "$schema": "https://aphrody.dev/schemas/tool-migration-v1.json",
   "catalog": "src/tools.json",
-  "catalog_sha256": "02e784a5cd460b8e9899914c06dfb919d299d7754d36a5af1251aad3f381694c",
-  "catalog_tool_count": 187,
+  "catalog_sha256": "521b8226e704874a1c4f1a5db1db813466207328f4117152bcd958634221655c",
+  "catalog_tool_count": 193,
   "state": "complete",
   "tools": [
     "analyze_pe",
@@ -191,7 +191,13 @@
     "tweak_plan",
     "tweak_apply",
     "tweak_verify",
-    "tweak_undo"
+    "tweak_undo",
+    "nt_status",
+    "nt_events_start",
+    "nt_events_read",
+    "nt_events_stop",
+    "nt_handles",
+    "nt_kernel_modules"
   ],
   "owner_rules": [
     {
@@ -440,7 +446,13 @@
     "tweak_plan": "rust",
     "tweak_apply": "rust",
     "tweak_verify": "rust",
-    "tweak_undo": "rust"
+    "tweak_undo": "rust",
+    "nt_status": "rust",
+    "nt_events_start": "rust",
+    "nt_events_read": "rust",
+    "nt_events_stop": "rust",
+    "nt_handles": "rust",
+    "nt_kernel_modules": "rust"
   },
   "native_rust_tools": [
     "winml_get_version",
@@ -448,5 +460,5 @@
     "winml_list_providers",
     "winml_run_float32"
   ],
-  "note": "The catalog is frozen for compatibility. Ownership is selected by the first matching rule; all 187 tools are implemented and dispatched by the Rust owner. dispatch_overrides and native_rust_tools remain as explicit migration evidence for compatibility tooling."
+  "note": "The catalog is frozen for compatibility. Ownership is selected by the first matching rule; all 193 tools are implemented and dispatched by the Rust owner. dispatch_overrides and native_rust_tools remain as explicit migration evidence for compatibility tooling."
 }

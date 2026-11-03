@@ -16,6 +16,7 @@ pub mod gaming;
 mod generated;
 pub mod memory;
 mod notification;
+pub mod nt;
 pub mod ocr;
 pub mod record;
 pub mod registry;

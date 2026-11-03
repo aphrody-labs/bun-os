@@ -1861,6 +1861,9 @@ pub fn call_rust(tool: &str, arguments: Value) -> Result<Value, SubsystemError> 
             if let Some(result) = crate::tweaks::dispatch::call(other, &arguments) {
                 return result;
             }
+            if let Some(result) = crate::nt::call(other, &arguments) {
+                return result;
+            }
             Err(SubsystemError::UnknownTool(tool.to_owned()))
         }
     }

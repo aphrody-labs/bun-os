@@ -3933,4 +3933,97 @@ export const TOOL_CATALOG: ReadonlyArray<{
       },
     },
   },
+  {
+    name: "nt_status",
+    description:
+      "Reports the Bun OS NT layer: whether the bunos.sys kernel driver is loaded (loaded | access-denied when not elevated | absent), its version, ABI and capabilities (event sources supported and active, ring capacity, counters), and the active event session. Every nt_* tool falls back to user-mode Win32/NT APIs when the driver is absent. Read-only.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+  },
+  {
+    name: "nt_events_start",
+    description:
+      "Starts a low-level Windows event session. With bunos.sys loaded (elevated): kernel notification callbacks for the chosen sources (process create/exit with image path, thread create/exit, image load, registry set/delete value and delete key; monitor only, never blocks an operation). Without the driver: user-mode process create/exit polling. Replaces any previous session.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        sources: {
+          type: "string",
+          description:
+            "Comma list of process, thread, image, registry, or all (default process,image).",
+          default: "process,image",
+        },
+        userMode: {
+          type: "boolean",
+          description:
+            "Force the user-mode fallback even when the driver is loaded.",
+          default: false,
+        },
+      },
+    },
+  },
+  {
+    name: "nt_events_read",
+    description:
+      "Drains queued events of the session started by nt_events_start, oldest first: kind, FILETIME time, pid, a0/a1 (parent pid, thread id, user image base and size, registry value type and size), name (image or registry path, tail kept when truncated), plus dropped and pending counts. Kernel image addresses are never reported.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        max: {
+          type: "integer",
+          description: "Maximum events to return (1-512, default 256).",
+          default: 256,
+        },
+      },
+    },
+  },
+  {
+    name: "nt_events_stop",
+    description:
+      "Stops the event session: disables every kernel source (or the user-mode poll) and releases the device.",
+    inputSchema: {
+      type: "object",
+      properties: {},
+    },
+  },
+  {
+    name: "nt_handles",
+    description:
+      "Enumerates the system handle table from user mode (NtQuerySystemInformation SystemExtendedHandleInformation) with object type names: pid, handle value, type, granted access, attributes, and a per-type summary. Kernel object addresses are omitted. Elevation shows every process. Read-only.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        pid: {
+          type: "integer",
+          description: "Only handles owned by this process id.",
+        },
+        limit: {
+          type: "integer",
+          description: "Maximum handle rows (default 500, max 100000).",
+          default: 500,
+        },
+      },
+    },
+  },
+  {
+    name: "nt_kernel_modules",
+    description:
+      "Lists loaded kernel images (drivers, ntoskrnl, hal) from user mode (NtQuerySystemInformation SystemModuleInformation): name, path, size, load order, and whether bunos.sys is loaded. Base addresses are omitted. Read-only.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        name: {
+          type: "string",
+          description: "Case-insensitive substring filter on the file name.",
+        },
+        limit: {
+          type: "integer",
+          description: "Maximum rows (default 500).",
+          default: 500,
+        },
+      },
+    },
+  },
 ];

@@ -191,6 +191,12 @@ export const TOOL_NAMES = [
   "tweak_apply",
   "tweak_verify",
   "tweak_undo",
+  "nt_status",
+  "nt_events_start",
+  "nt_events_read",
+  "nt_events_stop",
+  "nt_handles",
+  "nt_kernel_modules",
 ] as const;
 export type ToolName = (typeof TOOL_NAMES)[number];
 
@@ -2666,6 +2672,61 @@ export interface TweakUndoArgs {
   journalPath?: string;
 }
 
+/** Arguments for `nt_status`. */
+export interface NtStatusArgs {}
+
+/** Arguments for `nt_events_start`. */
+export interface NtEventsStartArgs {
+  /**
+   * Comma list of process, thread, image, registry, or all (default process,image).
+   * @default "process,image"
+   */
+  sources?: string;
+  /**
+   * Force the user-mode fallback even when the driver is loaded.
+   * @default false
+   */
+  userMode?: boolean;
+}
+
+/** Arguments for `nt_events_read`. */
+export interface NtEventsReadArgs {
+  /**
+   * Maximum events to return (1-512, default 256).
+   * @default 256
+   */
+  max?: number;
+}
+
+/** Arguments for `nt_events_stop`. */
+export interface NtEventsStopArgs {}
+
+/** Arguments for `nt_handles`. */
+export interface NtHandlesArgs {
+  /**
+   * Only handles owned by this process id.
+   */
+  pid?: number;
+  /**
+   * Maximum handle rows (default 500, max 100000).
+   * @default 500
+   */
+  limit?: number;
+}
+
+/** Arguments for `nt_kernel_modules`. */
+export interface NtKernelModulesArgs {
+  /**
+   * Case-insensitive substring filter on the file name.
+   */
+  name?: string;
+  /**
+   * Maximum rows (default 500).
+   * @default 500
+   */
+  limit?: number;
+}
+
 export type ToolArgsMap = {
   analyze_pe: AnalyzePeArgs;
   aob_scan: AobScanArgs;
@@ -2854,6 +2915,12 @@ export type ToolArgsMap = {
   tweak_apply: TweakApplyArgs;
   tweak_verify: TweakVerifyArgs;
   tweak_undo: TweakUndoArgs;
+  nt_status: NtStatusArgs;
+  nt_events_start: NtEventsStartArgs;
+  nt_events_read: NtEventsReadArgs;
+  nt_events_stop: NtEventsStopArgs;
+  nt_handles: NtHandlesArgs;
+  nt_kernel_modules: NtKernelModulesArgs;
 };
 
 /** One typed async method per WinClean tool. */
@@ -4182,5 +4249,47 @@ export abstract class GeneratedTools {
    */
   tweakUndo(args?: TweakUndoArgs): Promise<ToolResult> {
     return this.call("tweak_undo", args);
+  }
+
+  /**
+   * Reports the Bun OS NT layer: whether the bunos.sys kernel driver is loaded (loaded | access-denied when not elevated | absent), its version, ABI and capabilities (event sources supported and active, ring capacity, counters), and the active event session. Every nt_* tool falls back to user-mode Win32/NT APIs when the driver is absent. Read-only.
+   */
+  ntStatus(args?: NtStatusArgs): Promise<ToolResult> {
+    return this.call("nt_status", args);
+  }
+
+  /**
+   * Starts a low-level Windows event session. With bunos.sys loaded (elevated): kernel notification callbacks for the chosen sources (process create/exit with image path, thread create/exit, image load, registry set/delete value and delete key; monitor only, never blocks an operation). Without the driver: user-mode process create/exit polling. Replaces any previous session.
+   */
+  ntEventsStart(args?: NtEventsStartArgs): Promise<ToolResult> {
+    return this.call("nt_events_start", args);
+  }
+
+  /**
+   * Drains queued events of the session started by nt_events_start, oldest first: kind, FILETIME time, pid, a0/a1 (parent pid, thread id, user image base and size, registry value type and size), name (image or registry path, tail kept when truncated), plus dropped and pending counts. Kernel image addresses are never reported.
+   */
+  ntEventsRead(args?: NtEventsReadArgs): Promise<ToolResult> {
+    return this.call("nt_events_read", args);
+  }
+
+  /**
+   * Stops the event session: disables every kernel source (or the user-mode poll) and releases the device.
+   */
+  ntEventsStop(args?: NtEventsStopArgs): Promise<ToolResult> {
+    return this.call("nt_events_stop", args);
+  }
+
+  /**
+   * Enumerates the system handle table from user mode (NtQuerySystemInformation SystemExtendedHandleInformation) with object type names: pid, handle value, type, granted access, attributes, and a per-type summary. Kernel object addresses are omitted. Elevation shows every process. Read-only.
+   */
+  ntHandles(args?: NtHandlesArgs): Promise<ToolResult> {
+    return this.call("nt_handles", args);
+  }
+
+  /**
+   * Lists loaded kernel images (drivers, ntoskrnl, hal) from user mode (NtQuerySystemInformation SystemModuleInformation): name, path, size, load order, and whether bunos.sys is loaded. Base addresses are omitted. Read-only.
+   */
+  ntKernelModules(args?: NtKernelModulesArgs): Promise<ToolResult> {
+    return this.call("nt_kernel_modules", args);
   }
 }

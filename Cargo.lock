@@ -8182,6 +8182,7 @@ dependencies = [
  "base64 0.23.1",
  "bun-re",
  "bun-steam",
+ "bunos-nt-client",
  "dirs 7.0.0",
  "image",
  "libloading 0.8.9",
@@ -8613,6 +8614,14 @@ version = "0.1.0"
 dependencies = [
  "aphrody-m3-tokens",
  "flutter_rust_bridge",
+]
+
+[[package]]
+name = "bunos-nt-client"
+version = "1.4.7"
+dependencies = [
+ "bunos-nt-proto",
+ "windows 0.62.2",
 ]
 
 [[package]]

@@ -7,7 +7,7 @@ use serde::Serialize;
 use crate::{Result, ToolResult, Winclean};
 
 /// Every tool name exposed by the Rust WinClean compatibility surface.
-pub const TOOL_NAMES: [&str; 187] = [
+pub const TOOL_NAMES: [&str; 193] = [
     "analyze_pe",
     "aob_scan",
     "asar_list",
@@ -195,6 +195,12 @@ pub const TOOL_NAMES: [&str; 187] = [
     "tweak_apply",
     "tweak_verify",
     "tweak_undo",
+    "nt_status",
+    "nt_events_start",
+    "nt_events_read",
+    "nt_events_stop",
+    "nt_handles",
+    "nt_kernel_modules",
 ];
 
 /// Arguments for [`Winclean::analyze_pe`] (`analyze_pe`).
@@ -6648,6 +6654,146 @@ impl TweakUndoArgs {
     }
 }
 
+/// Arguments for [`Winclean::nt_status`] (`nt_status`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct NtStatusArgs {}
+
+/// Arguments for [`Winclean::nt_events_start`] (`nt_events_start`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct NtEventsStartArgs {
+    /// Comma list of process, thread, image, registry, or all (default process,image).
+    ///
+    /// Default: `"process,image"`.
+    #[serde(rename = "sources", skip_serializing_if = "Option::is_none")]
+    pub sources: Option<String>,
+    /// Force the user-mode fallback even when the driver is loaded.
+    ///
+    /// Default: `false`.
+    #[serde(rename = "userMode", skip_serializing_if = "Option::is_none")]
+    pub user_mode: Option<bool>,
+}
+
+impl NtEventsStartArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `sources`.
+    #[must_use]
+    pub fn sources(mut self, value: impl Into<String>) -> Self {
+        self.sources = Some(value.into());
+        self
+    }
+
+    /// Sets `userMode`.
+    #[must_use]
+    pub fn user_mode(mut self, value: bool) -> Self {
+        self.user_mode = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::nt_events_read`] (`nt_events_read`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct NtEventsReadArgs {
+    /// Maximum events to return (1-512, default 256).
+    ///
+    /// Default: `256`.
+    #[serde(rename = "max", skip_serializing_if = "Option::is_none")]
+    pub max: Option<i64>,
+}
+
+impl NtEventsReadArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `max`.
+    #[must_use]
+    pub fn max(mut self, value: i64) -> Self {
+        self.max = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::nt_events_stop`] (`nt_events_stop`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct NtEventsStopArgs {}
+
+/// Arguments for [`Winclean::nt_handles`] (`nt_handles`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct NtHandlesArgs {
+    /// Only handles owned by this process id.
+    #[serde(rename = "pid", skip_serializing_if = "Option::is_none")]
+    pub pid: Option<i64>,
+    /// Maximum handle rows (default 500, max 100000).
+    ///
+    /// Default: `500`.
+    #[serde(rename = "limit", skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+impl NtHandlesArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `pid`.
+    #[must_use]
+    pub fn pid(mut self, value: i64) -> Self {
+        self.pid = Some(value);
+        self
+    }
+
+    /// Sets `limit`.
+    #[must_use]
+    pub fn limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
+/// Arguments for [`Winclean::nt_kernel_modules`] (`nt_kernel_modules`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct NtKernelModulesArgs {
+    /// Case-insensitive substring filter on the file name.
+    #[serde(rename = "name", skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
+    /// Maximum rows (default 500).
+    ///
+    /// Default: `500`.
+    #[serde(rename = "limit", skip_serializing_if = "Option::is_none")]
+    pub limit: Option<i64>,
+}
+
+impl NtKernelModulesArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `name`.
+    #[must_use]
+    pub fn name(mut self, value: impl Into<String>) -> Self {
+        self.name = Some(value.into());
+        self
+    }
+
+    /// Sets `limit`.
+    #[must_use]
+    pub fn limit(mut self, value: i64) -> Self {
+        self.limit = Some(value);
+        self
+    }
+}
+
 impl Winclean {
     /// Performs static analysis and symbol recovery on a target Windows PE binary (.exe or .dll).
     /// Recovers sections, imports, entry point disassembly, and maps symbols using heuristics (no
@@ -10160,5 +10306,117 @@ impl Winclean {
     /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
     pub async fn tweak_undo_async(&self, args: &TweakUndoArgs) -> Result<ToolResult> {
         self.call_async("tweak_undo", args).await
+    }
+
+    /// Reports the Bun OS NT layer: whether the bunos.sys kernel driver is loaded (loaded |
+    /// access-denied when not elevated | absent), its version, ABI and capabilities (event sources
+    /// supported and active, ring capacity, counters), and the active event session. Every nt_*
+    /// tool falls back to user-mode Win32/NT APIs when the driver is absent. Read-only.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn nt_status(&self, args: &NtStatusArgs) -> Result<ToolResult> {
+        self.call("nt_status", args)
+    }
+
+    /// Async variant of [`Winclean::nt_status`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn nt_status_async(&self, args: &NtStatusArgs) -> Result<ToolResult> {
+        self.call_async("nt_status", args).await
+    }
+
+    /// Starts a low-level Windows event session. With bunos.sys loaded (elevated): kernel
+    /// notification callbacks for the chosen sources (process create/exit with image path, thread
+    /// create/exit, image load, registry set/delete value and delete key; monitor only, never
+    /// blocks an operation). Without the driver: user-mode process create/exit polling. Replaces
+    /// any previous session.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn nt_events_start(&self, args: &NtEventsStartArgs) -> Result<ToolResult> {
+        self.call("nt_events_start", args)
+    }
+
+    /// Async variant of [`Winclean::nt_events_start`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn nt_events_start_async(&self, args: &NtEventsStartArgs) -> Result<ToolResult> {
+        self.call_async("nt_events_start", args).await
+    }
+
+    /// Drains queued events of the session started by nt_events_start, oldest first: kind, FILETIME
+    /// time, pid, a0/a1 (parent pid, thread id, user image base and size, registry value type and
+    /// size), name (image or registry path, tail kept when truncated), plus dropped and pending
+    /// counts. Kernel image addresses are never reported.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn nt_events_read(&self, args: &NtEventsReadArgs) -> Result<ToolResult> {
+        self.call("nt_events_read", args)
+    }
+
+    /// Async variant of [`Winclean::nt_events_read`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn nt_events_read_async(&self, args: &NtEventsReadArgs) -> Result<ToolResult> {
+        self.call_async("nt_events_read", args).await
+    }
+
+    /// Stops the event session: disables every kernel source (or the user-mode poll) and releases
+    /// the device.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn nt_events_stop(&self, args: &NtEventsStopArgs) -> Result<ToolResult> {
+        self.call("nt_events_stop", args)
+    }
+
+    /// Async variant of [`Winclean::nt_events_stop`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn nt_events_stop_async(&self, args: &NtEventsStopArgs) -> Result<ToolResult> {
+        self.call_async("nt_events_stop", args).await
+    }
+
+    /// Enumerates the system handle table from user mode (NtQuerySystemInformation
+    /// SystemExtendedHandleInformation) with object type names: pid, handle value, type, granted
+    /// access, attributes, and a per-type summary. Kernel object addresses are omitted. Elevation
+    /// shows every process. Read-only.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn nt_handles(&self, args: &NtHandlesArgs) -> Result<ToolResult> {
+        self.call("nt_handles", args)
+    }
+
+    /// Async variant of [`Winclean::nt_handles`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn nt_handles_async(&self, args: &NtHandlesArgs) -> Result<ToolResult> {
+        self.call_async("nt_handles", args).await
+    }
+
+    /// Lists loaded kernel images (drivers, ntoskrnl, hal) from user mode (NtQuerySystemInformation
+    /// SystemModuleInformation): name, path, size, load order, and whether bunos.sys is loaded.
+    /// Base addresses are omitted. Read-only.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn nt_kernel_modules(&self, args: &NtKernelModulesArgs) -> Result<ToolResult> {
+        self.call("nt_kernel_modules", args)
+    }
+
+    /// Async variant of [`Winclean::nt_kernel_modules`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn nt_kernel_modules_async(&self, args: &NtKernelModulesArgs) -> Result<ToolResult> {
+        self.call_async("nt_kernel_modules", args).await
     }
 }

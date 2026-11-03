@@ -17,6 +17,7 @@ name = "bun_windows_winclean"
 aphrody-capture = { path = "../../crates/aphrody-capture", version = "1.4.7" }
 aphrody-proc = { path = "../../crates/aphrody-proc", version = "1.4.7" }
 bun-steam = { workspace = true }
+bunos-nt-client = { path = "../../crates/bunos-nt-client", version = "1.4.7" }
 aphrody-re = { package = "bun-re", path = "../../crates/re", version = "1.4.7" }
 base64 = "0.23.1"
 image = { version = "0.25.10", features = ["png", "bmp"] }
@@ -79,6 +80,7 @@ windows = { version = "0.62.2", features = [
   "Win32_UI_Shell",
   "Win32_UI_WindowsAndMessaging",
   "Win32_UI_Input_XboxController",
+  "Wdk_Foundation",
   "Wdk_System_SystemInformation",
   "Graphics_Capture",
 ] }
