@@ -1803,6 +1803,72 @@ dependencies = [
 ]
 
 [[package]]
+name = "aphrody-hayro"
+version = "0.7.1"
+dependencies = [
+ "aphrody-hayro-interpret",
+ "bytemuck",
+ "image",
+ "kurbo 0.13.1",
+ "log",
+ "pic-scale",
+ "vello_cpu 0.0.8",
+]
+
+[[package]]
+name = "aphrody-hayro-interpret"
+version = "0.7.0"
+dependencies = [
+ "aphrody-hayro-syntax",
+ "bitflags 2.13.2",
+ "hayro-cmap",
+ "image",
+ "kurbo 0.13.1",
+ "log",
+ "moxcms 0.8.1",
+ "phf 0.13.1",
+ "rustc-hash 2.1.3",
+ "siphasher 1.0.4",
+ "skrifa 0.47.0",
+ "smallvec 1.16.3",
+ "yoke 0.8.3",
+]
+
+[[package]]
+name = "aphrody-hayro-jbig2"
+version = "0.3.0"
+dependencies = [
+ "criterion 0.5.1",
+ "fearless_simd 0.4.1",
+ "hayro-ccitt 0.3.0",
+ "image",
+ "indicatif 0.17.11",
+ "rayon",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
+name = "aphrody-hayro-syntax"
+version = "0.7.2"
+dependencies = [
+ "aes 0.8.4",
+ "aphrody-hayro-jbig2",
+ "cbc 0.1.2",
+ "flate2",
+ "hayro-ccitt 0.3.0",
+ "hayro-jpeg2000",
+ "log",
+ "md5",
+ "memchr",
+ "rustc-hash 2.1.3",
+ "sha2 0.10.9",
+ "smallvec 1.16.3",
+ "stringprep",
+ "zune-jpeg 0.5.15",
+]
+
+[[package]]
 name = "aphrody-homebrew"
 version = "0.1.1"
 
@@ -2024,6 +2090,46 @@ dependencies = [
  "aphrody-bindgen",
  "libc",
  "libloading 0.9.0",
+]
+
+[[package]]
+name = "aphrody-lopdf"
+version = "0.45.0"
+dependencies = [
+ "aes 0.9.3",
+ "bitflags 2.13.2",
+ "brotli-decompressor 5.0.3",
+ "cbc 0.2.1",
+ "chrono",
+ "clap",
+ "criterion 0.8.2",
+ "ecb 0.2.1",
+ "encoding_rs",
+ "env_logger",
+ "flate2",
+ "getrandom 0.4.3",
+ "image",
+ "indexmap 2.14.2",
+ "itoa",
+ "jiff",
+ "log",
+ "md-5 0.11.0",
+ "nom 8.0.0",
+ "rand 0.10.3",
+ "rangemap",
+ "rayon",
+ "serde",
+ "serde_json",
+ "sha2 0.11.1",
+ "shellexpand",
+ "skrifa 0.45.1",
+ "stringprep",
+ "tempfile",
+ "thiserror 2.0.21",
+ "time",
+ "tokio",
+ "wasm-bindgen-test",
+ "weezl 0.2.1",
 ]
 
 [[package]]
@@ -3211,7 +3317,7 @@ dependencies = [
 name = "aphrody-pdfcraft-forms"
 version = "0.7.1"
 dependencies = [
- "hayro-syntax",
+ "aphrody-hayro-syntax",
  "pdfcraft-content",
  "pdfcraft-cos",
  "pdfcraft-fonts",
@@ -3848,7 +3954,7 @@ dependencies = [
  "aphrody-webos-protocol",
  "image",
  "js-sys",
- "libcosmic 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
+ "libcosmic 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
  "serde",
  "serde_json",
  "wasm-bindgen",
@@ -3872,6 +3978,7 @@ dependencies = [
  "aphrody-m3-tokens",
  "aphrody-webos-protocol",
  "axum",
+ "base64 0.23.1",
  "bun-ui-web",
  "futures-util",
  "getrandom 0.4.3",
@@ -4064,7 +4171,7 @@ dependencies = [
  "futures-util",
  "gpapi",
  "hex",
- "indicatif",
+ "indicatif 0.18.4",
  "regex",
  "reqwest 0.13.5",
  "ring",
@@ -7925,7 +8032,7 @@ checksum = "832133bbabbbaa9fbdba793456a2827627a7d2b8fb96032fa1e7666d7895832b"
 [[package]]
 name = "build_helpers"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6#7f715bc5d2d383a070fd8c760aa52c5627df96b6"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
  "cfg_aliases",
 ]
@@ -7933,7 +8040,7 @@ dependencies = [
 [[package]]
 name = "build_helpers"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6#7f715bc5d2d383a070fd8c760aa52c5627df96b6"
 dependencies = [
  "cfg_aliases",
 ]
@@ -10263,6 +10370,19 @@ checksum = "b46dec724fd22199ebde05033a0cbae453bc3b1ecff11eb6a6bb3eec4b90c6a4"
 
 [[package]]
 name = "console"
+version = "0.15.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "054ccb5b10f9f2cbf51eb355ca1d05c2d279ce1804688d0db74b4733a5aeafd8"
+dependencies = [
+ "encode_unicode",
+ "libc",
+ "once_cell",
+ "unicode-width 0.2.2",
+ "windows-sys 0.59.0",
+]
+
+[[package]]
+name = "console"
 version = "0.16.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e96a4956774c13c126a8b5af4daa79384f4d826534c95a02d76afb39e2ab64e3"
@@ -10641,6 +10761,26 @@ dependencies = [
 [[package]]
 name = "cosmic-config"
 version = "1.0.0"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
+dependencies = [
+ "atomicwrites 0.4.2",
+ "cosmic-config-derive 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "cosmic-settings-daemon",
+ "dirs 6.0.0",
+ "futures-util",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "known-folders",
+ "notify",
+ "ron",
+ "serde",
+ "tracing",
+ "xdg",
+ "zbus",
+]
+
+[[package]]
+name = "cosmic-config"
+version = "1.0.0"
 source = "git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6#7f715bc5d2d383a070fd8c760aa52c5627df96b6"
 dependencies = [
  "atomicwrites 0.4.2",
@@ -10660,29 +10800,9 @@ dependencies = [
 ]
 
 [[package]]
-name = "cosmic-config"
-version = "1.0.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
-dependencies = [
- "atomicwrites 0.4.2",
- "cosmic-config-derive 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "cosmic-settings-daemon",
- "dirs 6.0.0",
- "futures-util",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "known-folders",
- "notify",
- "ron",
- "serde",
- "tracing",
- "xdg",
- "zbus",
-]
-
-[[package]]
 name = "cosmic-config-derive"
 version = "1.0.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6#7f715bc5d2d383a070fd8c760aa52c5627df96b6"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
  "quote 1.0.47",
  "syn 2.0.119",
@@ -10691,7 +10811,7 @@ dependencies = [
 [[package]]
 name = "cosmic-config-derive"
 version = "1.0.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6#7f715bc5d2d383a070fd8c760aa52c5627df96b6"
 dependencies = [
  "quote 1.0.47",
  "syn 2.0.119",
@@ -10760,11 +10880,11 @@ dependencies = [
 [[package]]
 name = "cosmic-theme"
 version = "1.0.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6#7f715bc5d2d383a070fd8c760aa52c5627df96b6"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
  "almost",
  "configparser",
- "cosmic-config 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6)",
+ "cosmic-config 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
  "csscolorparser 0.8.4",
  "dirs 6.0.0",
  "hex_color",
@@ -10778,11 +10898,11 @@ dependencies = [
 [[package]]
 name = "cosmic-theme"
 version = "1.0.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6#7f715bc5d2d383a070fd8c760aa52c5627df96b6"
 dependencies = [
  "almost",
  "configparser",
- "cosmic-config 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
+ "cosmic-config 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6)",
  "csscolorparser 0.8.4",
  "dirs 6.0.0",
  "hex_color",
@@ -11417,6 +11537,8 @@ dependencies = [
  "num-traits",
  "once_cell",
  "oorandom",
+ "plotters",
+ "rayon",
  "regex",
  "serde",
  "serde_derive",
@@ -13047,6 +13169,8 @@ dependencies = [
 name = "designcraft-engine"
 version = "0.7.1"
 dependencies = [
+ "aphrody-hayro-interpret",
+ "aphrody-hayro-syntax",
  "caseless",
  "craft-print",
  "designcraft-color",
@@ -13061,8 +13185,6 @@ dependencies = [
  "designcraft-textimport",
  "designcraft-tools",
  "hayro-cmap",
- "hayro-interpret",
- "hayro-syntax",
  "kurbo 0.13.1",
  "log",
  "quick-xml 0.38.4",
@@ -13141,6 +13263,8 @@ dependencies = [
 name = "designcraft-pdf"
 version = "0.7.1"
 dependencies = [
+ "aphrody-hayro-interpret",
+ "aphrody-hayro-syntax",
  "designcraft-color",
  "designcraft-compose",
  "designcraft-doc",
@@ -13148,7 +13272,6 @@ dependencies = [
  "designcraft-geom",
  "designcraft-images",
  "hayro-cmap",
- "hayro-interpret",
  "hayro-syntax",
  "image",
  "krilla",
@@ -13163,13 +13286,13 @@ dependencies = [
 name = "designcraft-render"
 version = "0.7.1"
 dependencies = [
+ "aphrody-hayro",
  "designcraft-color",
  "designcraft-compose",
  "designcraft-doc",
  "designcraft-fonts",
  "designcraft-geom",
  "designcraft-images",
- "hayro",
  "image",
  "log",
  "serde",
@@ -13286,7 +13409,7 @@ version = "0.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25f104b501bf2364e78d0d3974cbc774f738f5865306ed128e1e0d7499c0ad96"
 dependencies = [
- "console",
+ "console 0.16.6",
  "shell-words",
  "tempfile",
  "zeroize",
@@ -13612,7 +13735,7 @@ dependencies = [
  "bzip2 0.6.1",
  "clap",
  "fs-err",
- "indicatif",
+ "indicatif 0.18.4",
  "regex",
  "semver",
  "serde",
@@ -15469,6 +15592,12 @@ name = "fearless_simd"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b97b65636e5b9ef369943878ac74335ba1c55c1cb6adbf1e2c293c624248d693"
+
+[[package]]
+name = "fearless_simd"
+version = "1.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "629c9d6b6f30b5604089e0980f4d924a013aacb1654a6cdf5d3d852224f68651"
 
 [[package]]
 name = "ff"
@@ -20422,23 +20551,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "hayro"
-version = "0.7.1"
-dependencies = [
- "bytemuck",
- "hayro-interpret",
- "image",
- "kurbo 0.13.1",
- "log",
- "pic-scale",
- "vello_cpu 0.0.8",
-]
-
-[[package]]
 name = "hayro-ccitt"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f4d0e94ddd48749f06bbe4e5389fb9799a0c45bcaf00495042076ef05e3241a"
+
+[[package]]
+name = "hayro-ccitt"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2866f0d976e76497480b853d5e258dab6e4b89ecfe991124e08f15dfa8fd03ad"
 
 [[package]]
 name = "hayro-cmap"
@@ -20451,28 +20573,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "hayro-interpret"
-version = "0.7.0"
-dependencies = [
- "bitflags 2.13.2",
- "hayro-cmap",
- "hayro-syntax",
- "kurbo 0.13.1",
- "moxcms 0.8.1",
- "phf 0.13.1",
- "rustc-hash 2.1.3",
- "siphasher 1.0.4",
- "skrifa 0.47.0",
- "smallvec 1.16.3",
- "yoke 0.8.3",
-]
-
-[[package]]
 name = "hayro-jbig2"
-version = "0.3.0"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "000e025850f4592ddcaee85640db70704151f2bafd43b6f431aa5b6a2c6a35a9"
 dependencies = [
- "fearless_simd",
- "hayro-ccitt",
+ "fearless_simd 1.2.0",
+ "hayro-ccitt 0.4.0",
 ]
 
 [[package]]
@@ -20481,7 +20588,8 @@ version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c75ab947623ef4ccaa7acf0579edf7cbb5a73838e3839a7be73335e522f433a1"
 dependencies = [
- "fearless_simd",
+ "fearless_simd 0.4.1",
+ "log",
 ]
 
 [[package]]
@@ -20493,15 +20601,16 @@ checksum = "885c5ef0654933139a9b9546fc2c69e18d37f38aa2520f079092b1be18f1fcaa"
 [[package]]
 name = "hayro-syntax"
 version = "0.7.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0edeafd70aa2db743de8ede8637d07ec87db05efe69cde371d03f1b185fcef27"
 dependencies = [
  "flate2",
- "hayro-ccitt",
+ "hayro-ccitt 0.3.0",
  "hayro-jbig2",
  "hayro-jpeg2000",
  "memchr",
  "rustc-hash 2.1.3",
  "smallvec 1.16.3",
- "stringprep",
  "zune-jpeg 0.5.15",
 ]
 
@@ -20637,7 +20746,7 @@ checksum = "aef3982638978efa195ff11b305f51f1f22f4f0a6cabee7af79b383ebee6a213"
 dependencies = [
  "dirs 6.0.0",
  "http",
- "indicatif",
+ "indicatif 0.18.4",
  "libc",
  "log",
  "rand 0.9.5",
@@ -21258,6 +21367,28 @@ dependencies = [
 [[package]]
 name = "iced"
 version = "0.14.0"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
+dependencies = [
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "dnd",
+ "iced_accessibility 0.1.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_program 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_widget 0.14.2 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_winit 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "image",
+ "mime 0.1.0",
+ "thiserror 2.0.21",
+ "window_clipboard",
+]
+
+[[package]]
+name = "iced"
+version = "0.14.0"
 source = "git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6#7f715bc5d2d383a070fd8c760aa52c5627df96b6"
 dependencies = [
  "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6)",
@@ -21278,34 +21409,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced"
-version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
-dependencies = [
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "dnd",
- "iced_accessibility 0.1.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_program 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_widget 0.14.2 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_winit 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "image",
- "mime 0.1.0",
- "thiserror 2.0.21",
- "window_clipboard",
-]
-
-[[package]]
 name = "iced-x86"
 version = "1.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c447cff8c7f384a7d4f741cfcff32f75f3ad02b406432e8d6c878d56b1edf6b"
 dependencies = [
  "lazy_static",
+]
+
+[[package]]
+name = "iced_accessibility"
+version = "0.1.0"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
+dependencies = [
+ "accesskit 0.22.0",
+ "accesskit_winit 0.30.0",
 ]
 
 [[package]]
@@ -21318,12 +21436,28 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_accessibility"
-version = "0.1.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+name = "iced_core"
+version = "0.14.0"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
- "accesskit 0.22.0",
- "accesskit_winit 0.30.0",
+ "bitflags 2.13.2",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "bytes",
+ "dnd",
+ "glam 0.25.0",
+ "lilt",
+ "log",
+ "mime 0.1.0",
+ "num-traits",
+ "palette",
+ "raw-window-handle",
+ "rustc-hash 2.1.3",
+ "serde",
+ "smol_str 0.3.2",
+ "thiserror 2.0.21",
+ "unicode-segmentation",
+ "web-time",
+ "window_clipboard",
 ]
 
 [[package]]
@@ -21354,28 +21488,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_core"
+name = "iced_debug"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
- "bitflags 2.13.2",
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "bytes",
- "dnd",
- "glam 0.25.0",
- "lilt",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
  "log",
- "mime 0.1.0",
- "num-traits",
- "palette",
- "raw-window-handle",
- "rustc-hash 2.1.3",
- "serde",
- "smol_str 0.3.2",
- "thiserror 2.0.21",
- "unicode-segmentation",
- "web-time",
- "window_clipboard",
 ]
 
 [[package]]
@@ -21389,13 +21508,16 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_debug"
+name = "iced_futures"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
+ "futures",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
  "log",
+ "rustc-hash 2.1.3",
+ "wasm-bindgen-futures",
+ "wasmtimer",
 ]
 
 [[package]]
@@ -21413,16 +21535,24 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_futures"
+name = "iced_graphics"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
- "futures",
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
+ "bitflags 2.13.2",
+ "bytemuck",
+ "cosmic-text",
+ "half",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "image",
+ "kamadak-exif",
  "log",
+ "lyon_path",
+ "raw-window-handle",
  "rustc-hash 2.1.3",
- "wasm-bindgen-futures",
- "wasmtimer",
+ "thiserror 2.0.21",
+ "unicode-segmentation",
 ]
 
 [[package]]
@@ -21447,24 +21577,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_graphics"
+name = "iced_program"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
- "bitflags 2.13.2",
- "bytemuck",
- "cosmic-text",
- "half",
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "image",
- "kamadak-exif",
- "log",
- "lyon_path",
- "raw-window-handle",
- "rustc-hash 2.1.3",
- "thiserror 2.0.21",
- "unicode-segmentation",
+ "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
 ]
 
 [[package]]
@@ -21477,12 +21595,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_program"
+name = "iced_renderer"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
- "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
+ "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_tiny_skia 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_wgpu 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "log",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -21498,15 +21619,18 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_renderer"
+name = "iced_runtime"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
- "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_tiny_skia 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_wgpu 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "log",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "bytes",
+ "dnd",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "raw-window-handle",
  "thiserror 2.0.21",
+ "window_clipboard",
 ]
 
 [[package]]
@@ -21527,18 +21651,20 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_runtime"
+name = "iced_tiny_skia"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "bytes",
- "dnd",
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "raw-window-handle",
- "thiserror 2.0.21",
- "window_clipboard",
+ "bytemuck",
+ "cosmic-text",
+ "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "kurbo 0.10.4",
+ "log",
+ "resvg 0.45.1",
+ "rustc-hash 2.1.3",
+ "softbuffer 0.4.1",
+ "tiny-skia 0.11.4",
 ]
 
 [[package]]
@@ -21559,20 +21685,34 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_tiny_skia"
+name = "iced_wgpu"
 version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
+ "as-raw-xcb-connection",
+ "bitflags 2.13.2",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
  "bytemuck",
- "cosmic-text",
- "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "kurbo 0.10.4",
+ "cryoglyph",
+ "futures",
+ "glam 0.25.0",
+ "guillotiere 0.6.2",
+ "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
  "log",
+ "lyon",
+ "raw-window-handle",
  "resvg 0.45.1",
  "rustc-hash 2.1.3",
- "softbuffer 0.4.1",
- "tiny-skia 0.11.4",
+ "rustix 0.38.44",
+ "thiserror 2.0.21",
+ "tiny-xlib",
+ "wayland-backend",
+ "wayland-client",
+ "wayland-protocols",
+ "wayland-sys",
+ "wgpu 28.0.0",
+ "x11rb",
 ]
 
 [[package]]
@@ -21608,34 +21748,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_wgpu"
-version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+name = "iced_widget"
+version = "0.14.2"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
- "as-raw-xcb-connection",
- "bitflags 2.13.2",
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "bytemuck",
- "cryoglyph",
- "futures",
- "glam 0.25.0",
- "guillotiere 0.6.2",
- "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "dnd",
+ "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
  "log",
- "lyon",
- "raw-window-handle",
- "resvg 0.45.1",
+ "num-traits",
+ "ouroboros",
  "rustc-hash 2.1.3",
- "rustix 0.38.44",
  "thiserror 2.0.21",
- "tiny-xlib",
- "wayland-backend",
- "wayland-client",
- "wayland-protocols",
- "wayland-sys",
- "wgpu 28.0.0",
- "x11rb",
+ "unicode-segmentation",
+ "window_clipboard",
 ]
 
 [[package]]
@@ -21659,21 +21786,29 @@ dependencies = [
 ]
 
 [[package]]
-name = "iced_widget"
-version = "0.14.2"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
+name = "iced_winit"
+version = "0.14.0"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
 dependencies = [
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "cursor-icon",
  "dnd",
- "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
+ "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_program 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
  "log",
- "num-traits",
- "ouroboros",
  "rustc-hash 2.1.3",
+ "rustix 0.38.44",
  "thiserror 2.0.21",
- "unicode-segmentation",
+ "wasm-bindgen-futures",
+ "wayland-client",
+ "web-sys",
+ "winapi",
  "window_clipboard",
+ "winit 0.31.0-beta.2",
+ "winit-core 0.31.0-beta.2",
 ]
 
 [[package]]
@@ -21708,32 +21843,6 @@ dependencies = [
  "xkbcommon 0.7.0",
  "xkbcommon-dl",
  "xkeysym",
-]
-
-[[package]]
-name = "iced_winit"
-version = "0.14.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
-dependencies = [
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "cursor-icon",
- "dnd",
- "iced_debug 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_graphics 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_program 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "log",
- "rustc-hash 2.1.3",
- "rustix 0.38.44",
- "thiserror 2.0.21",
- "wasm-bindgen-futures",
- "wayland-client",
- "web-sys",
- "winapi",
- "window_clipboard",
- "winit 0.31.0-beta.2",
- "winit-core 0.31.0-beta.2",
 ]
 
 [[package]]
@@ -22271,11 +22380,25 @@ dependencies = [
 
 [[package]]
 name = "indicatif"
+version = "0.17.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "183b3088984b400f4cfac3620d5e076c84da5364016b4f49473de574b2586235"
+dependencies = [
+ "console 0.15.11",
+ "number_prefix",
+ "portable-atomic",
+ "rayon",
+ "unicode-width 0.2.2",
+ "web-time",
+]
+
+[[package]]
+name = "indicatif"
 version = "0.18.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25470f23803092da7d239834776d653104d551bc4d7eacaf31e6837854b8e9eb"
 dependencies = [
- "console",
+ "console 0.16.6",
  "portable-atomic",
  "unicode-width 0.2.2",
  "unit-prefix",
@@ -23837,6 +23960,51 @@ checksum = "65cd87c9a6d60536580b316ad985726104730a5151c99845f2490428ef91240a"
 [[package]]
 name = "libcosmic"
 version = "1.0.0"
+source = "git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07#3abe177e5cb6522e4b905260da56451bc8084c07"
+dependencies = [
+ "apply",
+ "auto_enums",
+ "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "cosmic-config 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "cosmic-freedesktop-icons",
+ "cosmic-settings-daemon",
+ "cosmic-theme 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "css-color",
+ "derive_setters",
+ "enumflags2",
+ "float-cmp 0.10.0",
+ "futures",
+ "i18n-embed",
+ "i18n-embed-fl",
+ "iced 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_tiny_skia 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_wgpu 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_widget 0.14.2 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "iced_winit 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=3abe177e5cb6522e4b905260da56451bc8084c07)",
+ "image",
+ "jiff",
+ "log",
+ "palette",
+ "phf 0.13.1",
+ "roxmltree 0.20.0",
+ "rust-embed",
+ "serde",
+ "slotmap",
+ "taffy 0.9.2",
+ "thiserror 2.0.21",
+ "tracing",
+ "unicode-segmentation",
+ "url",
+ "zbus",
+]
+
+[[package]]
+name = "libcosmic"
+version = "1.0.0"
 source = "git+https://github.com/aphrody-labs/libcosmic?rev=7f715bc5d2d383a070fd8c760aa52c5627df96b6#7f715bc5d2d383a070fd8c760aa52c5627df96b6"
 dependencies = [
  "apply",
@@ -23878,51 +24046,6 @@ dependencies = [
  "taffy 0.9.2",
  "thiserror 2.0.21",
  "tokio",
- "tracing",
- "unicode-segmentation",
- "url",
- "zbus",
-]
-
-[[package]]
-name = "libcosmic"
-version = "1.0.0"
-source = "git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b#97e6e36ffc6da18e44d964aa611e77fcb914c24b"
-dependencies = [
- "apply",
- "auto_enums",
- "build_helpers 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "cosmic-config 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "cosmic-freedesktop-icons",
- "cosmic-settings-daemon",
- "cosmic-theme 1.0.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "css-color",
- "derive_setters",
- "enumflags2",
- "float-cmp 0.10.0",
- "futures",
- "i18n-embed",
- "i18n-embed-fl",
- "iced 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_core 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_futures 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_renderer 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_runtime 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_tiny_skia 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_wgpu 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_widget 0.14.2 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "iced_winit 0.14.0 (git+https://github.com/aphrody-labs/libcosmic?rev=97e6e36ffc6da18e44d964aa611e77fcb914c24b)",
- "image",
- "jiff",
- "log",
- "palette",
- "phf 0.13.1",
- "roxmltree 0.20.0",
- "rust-embed",
- "serde",
- "slotmap",
- "taffy 0.9.2",
- "thiserror 2.0.21",
  "tracing",
  "unicode-segmentation",
  "url",
@@ -24853,33 +24976,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0fae87c125b03c1d2c0150c90365d7d6bcc53fb73a9acaef207d2d065860f062"
 dependencies = [
  "imgref",
-]
-
-[[package]]
-name = "lopdf"
-version = "0.45.0"
-dependencies = [
- "aes 0.9.3",
- "bitflags 2.13.2",
- "brotli-decompressor 5.0.3",
- "cbc 0.2.1",
- "chrono",
- "ecb 0.2.1",
- "encoding_rs",
- "flate2",
- "getrandom 0.4.3",
- "indexmap 2.14.2",
- "itoa",
- "log",
- "md-5 0.11.0",
- "nom 8.0.0",
- "rand 0.10.3",
- "rangemap",
- "rayon",
- "sha2 0.11.1",
- "stringprep",
- "thiserror 2.0.21",
- "weezl 0.2.1",
 ]
 
 [[package]]
@@ -28944,7 +29040,7 @@ dependencies = [
 name = "pdfcraft-annot"
 version = "0.7.1"
 dependencies = [
- "hayro-syntax",
+ "aphrody-hayro-syntax",
  "pdfcraft-cos",
  "pdfcraft-fonts",
  "pdfcraft-model",
@@ -28997,7 +29093,7 @@ dependencies = [
 name = "pdfcraft-cos"
 version = "0.7.1"
 dependencies = [
- "hayro-syntax",
+ "aphrody-hayro-syntax",
  "pdfcraft-crypt",
  "pdfcraft-filters",
  "proptest",
@@ -29009,8 +29105,8 @@ dependencies = [
 name = "pdfcraft-create"
 version = "0.7.1"
 dependencies = [
+ "aphrody-hayro-syntax",
  "encoding_rs",
- "hayro-syntax",
  "image",
  "pdfcraft-cos",
  "pdfcraft-fonts",
@@ -29037,7 +29133,7 @@ dependencies = [
 name = "pdfcraft-edit"
 version = "0.7.1"
 dependencies = [
- "hayro-syntax",
+ "aphrody-hayro-syntax",
  "kurbo 0.13.1",
  "pdfcraft-annot",
  "pdfcraft-content",
@@ -29071,6 +29167,7 @@ dependencies = [
  "pdfcraft-model",
  "pdfcraft-optimize",
  "pdfcraft-organize",
+ "pdfcraft-preflight",
  "pdfcraft-print",
  "pdfcraft-redact",
  "pdfcraft-render",
@@ -29153,7 +29250,7 @@ dependencies = [
 name = "pdfcraft-organize"
 version = "0.7.1"
 dependencies = [
- "hayro-syntax",
+ "aphrody-hayro-syntax",
  "pdfcraft-content",
  "pdfcraft-cos",
  "thiserror 2.0.21",
@@ -29166,6 +29263,14 @@ dependencies = [
  "async-channel",
  "futures-lite",
  "zbus",
+]
+
+[[package]]
+name = "pdfcraft-preflight"
+version = "0.7.1"
+dependencies = [
+ "pdfcraft-cos",
+ "pdfcraft-model",
 ]
 
 [[package]]
@@ -29197,14 +29302,14 @@ dependencies = [
 name = "pdfcraft-render"
 version = "0.7.1"
 dependencies = [
+ "aphrody-hayro",
+ "aphrody-hayro-syntax",
+ "aphrody-lopdf",
  "bytemuck",
  "flate2",
  "getrandom 0.4.3",
- "hayro",
- "hayro-syntax",
  "kurbo 0.13.1",
  "log",
- "lopdf",
  "pdfcraft-cos",
  "pdfcraft-fonts",
  "serde",
@@ -29331,7 +29436,7 @@ name = "pdfcraft-xtask"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "lopdf",
+ "aphrody-lopdf",
  "png 0.18.1",
  "serde",
  "serde_json",
@@ -32095,6 +32200,17 @@ name = "read-fonts"
 version = "0.41.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "046a7d674daf459825b32f5062056d6882db0d2f5a479fbd76ccfc870ac18709"
+dependencies = [
+ "bytemuck",
+ "font-types 0.12.6",
+ "once_cell",
+]
+
+[[package]]
+name = "read-fonts"
+version = "0.42.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2c69341f5f744623061a258e9d06a0213783a89ec23b6efb88a1c0c4ed285559"
 dependencies = [
  "bytemuck",
  "font-types 0.12.6",
@@ -35384,6 +35500,16 @@ checksum = "819ab7d62b1d3e72d9d9dea5650bac30424f9111364bb94928dbf5ecad1baa68"
 dependencies = [
  "bytemuck",
  "read-fonts 0.41.0",
+]
+
+[[package]]
+name = "skrifa"
+version = "0.45.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd5b090b1690f1c63a8659574ea987c557f1cc571e24dedcba89458f32d0ccb5"
+dependencies = [
+ "bytemuck",
+ "read-fonts 0.42.1",
 ]
 
 [[package]]
@@ -40426,7 +40552,7 @@ dependencies = [
  "clap",
  "filetime",
  "fluent",
- "indicatif",
+ "indicatif 0.18.4",
  "libc",
  "nix 0.31.3",
  "rustix 1.1.5",
@@ -40968,7 +41094,7 @@ version = "0.13.0"
 dependencies = [
  "clap",
  "fluent",
- "indicatif",
+ "indicatif 0.18.4",
  "nix 0.31.3",
  "rustc-hash 2.1.3",
  "rustix 1.1.5",
@@ -41258,7 +41384,7 @@ version = "0.13.0"
 dependencies = [
  "clap",
  "fluent",
- "indicatif",
+ "indicatif 0.18.4",
  "libc",
  "thiserror 2.0.21",
  "uucore 0.13.0",
@@ -42391,9 +42517,9 @@ name = "vectorcraft-pdf"
 version = "0.10.0"
 dependencies = [
  "aes 0.8.4",
+ "aphrody-hayro-interpret",
+ "aphrody-hayro-syntax",
  "flate2",
- "hayro-interpret",
- "hayro-syntax",
  "image",
  "jpeg-encoder 0.6.1",
  "krilla",
@@ -42623,7 +42749,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3361bff7f7d82c0c496b92048db83846691f0e844cc28dee92b1c824291b55ee"
 dependencies = [
  "bytemuck",
- "fearless_simd",
+ "fearless_simd 0.4.1",
  "guillotiere 0.7.0",
  "hashbrown 0.17.1",
  "log",
@@ -42640,7 +42766,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19d672facaa2d697285a786cd9d44d614cd2ce54cdc022504bf339f8fff3b750"
 dependencies = [
  "bytemuck",
- "fearless_simd",
+ "fearless_simd 0.4.1",
  "guillotiere 0.7.0",
  "hashbrown 0.17.1",
  "log",
@@ -42657,7 +42783,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b2e9aed918117e8152c9eddfd8362d73c465c23f26c44786aa331707b8a64fa2"
 dependencies = [
  "bytemuck",
- "fearless_simd",
+ "fearless_simd 0.4.1",
  "guillotiere 0.7.0",
  "log",
  "peniko",
@@ -42672,7 +42798,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "bbb2141a2bca6e6d598e471fd4d1d7eed8e020aad6a28187edda07f091a325dd"
 dependencies = [
  "bytemuck",
- "fearless_simd",
+ "fearless_simd 0.4.1",
  "guillotiere 0.7.0",
  "log",
  "peniko",
@@ -45932,10 +46058,10 @@ dependencies = [
 name = "wordcraft-pdf"
 version = "0.6.1"
 dependencies = [
+ "aphrody-hayro-interpret",
+ "aphrody-hayro-syntax",
  "craft-metafile",
  "hayro-cmap",
- "hayro-interpret",
- "hayro-syntax",
  "image",
  "js-sys",
  "krilla",
