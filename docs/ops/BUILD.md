@@ -7,9 +7,13 @@ stage consumes its output. The model follows three references:
   pins first (LFS ch. 3), a toolchain checked before anything is built with it (ch. 5 sanity checks), then the
   system, its configuration and the bootable image as separate steps (ch. 8–10); packages install into a staging
   root (`DESTDIR`), never straight onto the build host.
-- **COSMIC** ([pop-os/cosmic-epoch](https://github.com/pop-os/cosmic-epoch)): every desktop component is its own
-  repository with a `justfile` (`just vendor`, `just build-release`, `just install`) and a `debian/` directory; the
-  distribution consumes `.deb` packages, not loose binaries.
+- **COSMIC** ([pop-os/cosmic-epoch](https://github.com/pop-os/cosmic-epoch)) and **Arch Linux**
+  ([PKGBUILD](https://wiki.archlinux.org/title/PKGBUILD), [makepkg](https://wiki.archlinux.org/title/Makepkg),
+  [pacman repositories](https://wiki.archlinux.org/title/Pacman/Tips_and_tricks#Custom_local_repository)): every
+  desktop component is its own repository with a `justfile` (`just vendor`, `just build-release`); Bun OS packages
+  each one with a PKGBUILD pointing at our fork, builds it with `makepkg` in a clean `archlinux:base-devel`
+  container and ships it through signed pacman repositories (rolling release, [RELEASES.md](RELEASES.md)). The
+  distribution consumes packages, not loose binaries.
 - **Google engineering practice** ([Software Engineering at Google](https://abseil.io/resources/swe-book),
   [SRE release engineering](https://sre.google/sre-book/release-engineering/),
   [third-party code](https://opensource.google/documentation/reference/thirdparty)): one repository and one
@@ -21,16 +25,20 @@ All stages run on `vps` ([FLEET.md](FLEET.md)). The workstation edits and pushes
 
 ## Stages
 
-| Stage | What                                                         | Inputs (pinned)                                                           | Entry point                                                               | Gate                                         |
-| ----- | ------------------------------------------------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------- |
-| 0     | Toolchain: Bun canary, Rust, wasm tools                      | `package.json` (`bun` pin), `rust-toolchain.toml`, `buncc.toolchain.json` | `bun scripts/setup.ts`                                                    | `bun --revision`, `rustc -V` match pins      |
-| 1     | Sources: forks and upstreams                                 | `sources.lock.json`, `.gitmodules` gitlinks                               | `bun scripts/setup-submodules.ts`                                         | every gitlink at its pin                     |
-| 2     | Workspace: Rust crates, Bun packages, WASM                   | `Cargo.lock`, `bun.lock`                                                  | `cargo check --workspace --locked`, `bun check`, `bun lint`, `bun format` | presubmit (sync gate, `vps-gate/*`)          |
-| 3     | Packages: COSMIC forks, Rust base, native apps as `.deb`     | fork pins, `factory/rustbase/forks.json`                                  | `factory/native-apps/build.ts`, `bun factory/rustbase/rust-base.ts all`   | each deb builds and installs in a clean root |
-| 4     | Image: unified rootfs, session container, disk image and ISO | `factory/images/manifest.json`, the stage 3 debs                          | `bun factory/images/build.ts bunos-unified --target session` / `unified`  | image plan resolves; payload verified        |
-| 5     | Qualification: boot, session, Android, screenshots           | the stage 4 image                                                         | nightly (`bunos-auto-nightly.timer`), `container/qualify-image.ts`        | qualified receipt with screenshots           |
+| Stage | What                                                             | Inputs (pinned)                                                                                    | Entry point                                                                  | Gate                                                                           |
+| ----- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| 0     | Toolchain: Bun canary, Rust, wasm tools                          | `package.json` (`bun` pin), `rust-toolchain.toml`, `buncc.toolchain.json`                          | `bun scripts/setup.ts`                                                       | `bun --revision`, `rustc -V` match pins                                        |
+| 1     | Sources: forks and upstreams                                     | `sources.lock.json`, `.gitmodules` gitlinks                                                        | `bun scripts/setup-submodules.ts`                                            | every gitlink at its pin                                                       |
+| 2     | Workspace: Rust crates, Bun packages, WASM                       | `Cargo.lock`, `bun.lock`                                                                           | `cargo check --workspace --locked`, `bun check`, `bun lint`, `bun format`    | presubmit (sync gate, `vps-gate/*`)                                            |
+| 3a    | Kernel: `linux-bun` (stable), `linux-bun-lts`, WSL kernel        | kernel.org tarball + signature, `factory/kernel/linux-bun/PKGBUILD`, `factory/wsl/kernel/*.config` | `factory/kernel/build.sh`, `factory/wsl/kernel/build-wsl-kernel.sh`          | `factory/kernel/boot-bun-init.sh`: Bun boots as PID 1 under QEMU/KVM (receipt) |
+| 3b    | Packages: COSMIC, Hyprland/Omarchy, GNOME, Mesa d3d12, Rust CLIs | fork gitlinks, `factory/desktop/{recipes,cli}.json`, PKGBUILDs                                     | `factory/desktop/build.sh`, `factory/wsl/build-gpu.sh`                       | each package installs in a clean Arch root                                     |
+| 3c    | Repository: `[bunos-testing]` → `[bunos]`                        | the stage 3a/3b packages, the Store signing key                                                    | `repo-add`, `factory/wsl/publish-testing.sh`                                 | signed db; `pacman -Sy` from a clean client                                    |
+| 4     | Images: WSL distro bundle, disk image and ISO                    | `factory/wsl/packages.*`, the stage 3c repository                                                  | `factory/wsl/build-rootfs.sh`, `bun factory/images/build.ts …`               | image plan resolves; payload verified                                          |
+| 5     | Qualification: boot, sessions, Android, screenshots              | the stage 4 image                                                                                  | nightly (`bunos-auto-nightly.timer`), `factory/wsl/windows/session-probe.ts` | qualified receipt with screenshots                                             |
 
-A stage never reaches back: a stage 4 image consumes stage 3 debs, not a cargo target directory.
+A stage never reaches back: a stage 4 image installs stage 3 packages from the repository, not a cargo target
+directory. Heavy stage 3 builds take `~/build/locks/heavy.lock` (a second lane uses `heavy-2.lock`) inside
+`build.slice` and check free memory before starting.
 
 ## Resources
 

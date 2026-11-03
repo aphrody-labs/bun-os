@@ -80,7 +80,7 @@ infra/config/host/systemd/slices/apply.sh  # interactive.slice / build.slice pri
   accepts 0-RTT; early POST, PUT, PATCH and DELETE requests get `425`, and upstreams see the `Early-Data` header.
   There is no OCSP stapling: Let's Encrypt ended OCSP in 2025.
 - HTTP/3: aphrody.com listens on `443 quic` (play.aphrody.app owns `reuseport`), with `quic_gso on` and
-  `Alt-Svc: h3=":443"`. UFW allows 443/udp.
+  `Alt-Svc: h3=":443"`. The fleet firewall (`table inet fleet`, [FLEET.md](FLEET.md)) allows 443/udp.
 - Compression: zstd (level 3), then brotli (5), then gzip (5). The brotli modules come from Ubuntu. zstd is
   tokers/zstd-nginx-module, pinned, and built against the packaged nginx by
   `/usr/local/libexec/aphrody-nginx-zstd build`. An APT hook disables zstd before an nginx package upgrade and
