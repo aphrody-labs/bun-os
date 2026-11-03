@@ -1262,7 +1262,7 @@ aphrody-nie-play = { path = "crates/aphrody-nie-play", version = "1.4.7" }
 aphrody-nie-queue = { default-features = false, path = "crates/aphrody-nie-queue", version = "1.4.7" }
 aphrody-nie-render = { path = "crates/aphrody-nie-render", version = "1.4.7" }
 aphrody-nie-render3d = { default-features = false, path = "crates/aphrody-nie-render3d", version = "1.4.7" }
-aphrody-nie-ui = { path = "crates/aphrody-nie-ui", version = "1.0.1",  }
+aphrody-nie-ui = { path = "crates/aphrody-nie-ui", version = "1.0.1" }
 aphrody-nie-runtime = { default-features = false, path = "crates/aphrody-nie-runtime", version = "1.4.7" }
 aphrody-nie-save = { default-features = false, path = "crates/aphrody-nie-save", version = "1.4.7" }
 aphrody-nie-seed = { default-features = false, path = "crates/aphrody-nie-seed", version = "1.4.7" }
