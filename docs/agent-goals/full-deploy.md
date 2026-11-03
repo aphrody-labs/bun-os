@@ -12,7 +12,7 @@ the owner (listed under "Owner-only").
       published signed in `[bunos-testing]`, 7.3.1 archived.
 - [x] ISO `bunos-2026.11.03-x86_64`: built, booted under QEMU/OVMF to the COSMIC greeter, published at
       aphrody.com/downloads/os/ with sha256, b2sum, signature, receipt and screenshot.
-- [ ] craft.aphrody.app redeployed (needs a native `aphrody-ffi` build on the VPS; `/llms.txt` and
+- [x] craft.aphrody.app redeployed (aphrody-ffi built on the VPS: `APHRODY_FFI_DEV=1 APHRODY_FFI_LIB=/var/cache/aphrody-target/lane-0/release/libaphrody_ffi.so`; `/llms.txt` and
       `/site.webmanifest` return 200).
 - [ ] Gate green on main: `bun check`, `bun lint`, `bun format`, `cargo check --workspace --locked` (format debt
       is the blocker: about 6700 files; fix with the repo wrapper once the design-system migration in the other
