@@ -16,6 +16,7 @@ pub mod language_detect;
 pub mod languages;
 #[cfg(all(not(target_arch = "wasm32"), feature = "search"))]
 pub mod search;
+pub mod wga;
 use serde::{Deserialize, Serialize};
 
 /// Cloud target for a workload.
