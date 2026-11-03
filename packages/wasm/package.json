@@ -12,7 +12,9 @@
   "exports": {
     ".": "./src/index.ts",
     "./buncc": "./src/buncc.ts",
-    "./plugin": "./src/plugin.ts"
+    "./plugin": "./src/plugin.ts",
+    "./bun-plugin": "./src/bun-plugin.ts",
+    "./fork": "./src/fork.ts"
   },
   "bin": {
     "aphrody-wasm": "./src/cli.ts"
@@ -35,5 +37,8 @@
   "homepage": "https://github.com/aphrody-labs/bun-os/tree/os/packages/wasm",
   "engines": {
     "bun": "1.4.4-canary.20261028.1"
+  },
+  "dependencies": {
+    "@aphrody/bun-os-plugins": "workspace:*"
   }
 }

@@ -9,6 +9,7 @@
 import chromium from "@aphrody/chromium/bun-plugin";
 import google from "@aphrody/google/bun-plugin";
 import python from "@aphrody/runtime-sdk/bun-plugin";
+import wasm from "@aphrody/wasm/bun-plugin";
 import windows from "@aphrody/windows/bun-plugin";
 import commands from "./commands/plugin.ts";
 import compat from "./compat/plugin.ts";
@@ -22,6 +23,7 @@ export const plugins: readonly BunOsPlugin[] = [
   google,
   chromium,
   windows,
+  wasm,
   python,
   dotnet,
   compat,

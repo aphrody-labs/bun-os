@@ -615,6 +615,9 @@
         "bunos-search": "./src/bin/bunos-search.ts",
         "bunos-crawl": "./src/bin/bunos-crawl.ts",
         "bunos-ssh": "./src/bin/bunos-ssh.ts",
+        "bunos-docker": "./src/bin/bunos-docker.ts",
+        "bunos-vpn": "./src/bin/bunos-vpn.ts",
+        "bunos-winmd": "./src/bin/bunos-winmd.ts",
         "bunos-just": "./src/bin/bunos-just.ts",
         "bunos-uv": "./src/bin/bunos-uv.ts",
         "bunos-msvc": "./src/bin/bunos-msvc.ts",
@@ -623,6 +626,8 @@
         "bunos-env": "./src/bin/bunos-env.ts",
         "bunos-cookie": "./src/bin/bunos-cookie.ts",
         "bunos-host": "./src/bin/bunos-host.ts",
+        "bunos-python": "./src/bin/bunos-python.ts",
+        "bunos-dotnet": "./src/bin/bunos-dotnet.ts",
       },
     },
     "packages/bun-steam": {
@@ -1621,6 +1626,9 @@
       "version": "1.4.7",
       "bin": {
         "aphrody-wasm": "./src/cli.ts",
+      },
+      "dependencies": {
+        "@aphrody/bun-os-plugins": "workspace:*",
       },
       "devDependencies": {
         "@types/bun": "catalog:",
