@@ -17,7 +17,7 @@ the owner (listed under "Owner-only").
 - [ ] Gate green on main: `bun check`, `bun lint`, `bun format`, `cargo check --workspace --locked` (format debt
       is the blocker: about 6700 files; fix with the repo wrapper once the design-system migration in the other
       session has landed). Auto-deliver then runs by itself.
-- [ ] Every public host answers (no 502, timeout or 404 at the root). Diagnosed by the agy sub-agent
+- [x] Every public host answers (no 502, timeout or 404 at the root). Diagnosed by the agy sub-agent
       (read-only, 2026-11-03), repository decisions already taken:
       - control.aphrody.app: decommissioned on purpose (eef485d3b8, no DNS record): not a target.
       - store.aphrody.com: ghost CORS origin, removed from infra/fleet/api.toml and the generated gateway.conf.
@@ -26,12 +26,12 @@ the owner (listed under "Owner-only").
       - omar.aphrody.com: DONE 2026-11-03: proxied CNAME to aphrody.com (was A 10.200.77.10), vhost enabled,
         403 from the VPS and prod.
       - api.aphrody.com/ and cdn.aphrody.com/: DONE: 302 to /v1/ and /s/manifest.json (fcbd61a866).
-      - nie.aphrody.app: owner decision (game depot missing on the VPS, RG_CORE_MODELES=0): decommission or restore.
+      - nie.aphrody.app: DONE 2026-11-04, decided: decommissioned, 410 Gone (9b53d2fd7f); restore steps in the vhost.
       - `user@1001.service` on the VPS: DONE (reset-failed; `systemctl --failed` is empty).
-- [ ] Komodo (deploy.aphrody.app): Mongo data directory backed up, repaired or recreated, service healthy.
-      Needs the owner's decision on the 248 GB WiredTiger data (see Owner-only).
-
-### Product (docs/PRODUCT.md rows still not done)
+- [x] Komodo (deploy.aphrody.app): DONE 2026-11-04. The Mongo data directory was corrupt (WiredTiger) and the crash
+      loop had filled 249 GB of journal files; the directory was quarantined (data/mongo.corrupt-20261103, journal
+      removed, small data files kept), Komodo restarted on an empty database; deploy.aphrody.app answers 200.
+      Its old state (stacks, servers) is not restored: re-declare from infra/config/host/apps/vps/komodo if needed.
 - [ ] #12 aphrody.com serves the desktop session. Done 2026-11-04 (8427e3456c): the unified COSMIC session runs as
       `aphrody-webos-session.service` (container `bunos-webos-session`, ready marker present, cage + cosmic-comp +
       aphrody-remote-desktop; loopback :18794, token file ~/apps/webos/secrets/session/session.token) and the
