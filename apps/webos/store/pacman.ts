@@ -140,7 +140,7 @@ const PREBUILD: Record<string, Prebuild> = {
     compile: (ctx) => must("cargo build bun-waydroid", cargoSerial(ctx, ["build", "--release", "--locked", "-p", "bun-waydroid", "--bin", "bun-waydroid"])),
     tree: {
       name: "bun-os",
-      files: () => ["target/release/bun-waydroid", "packages/waydroid/src", "packages/waydroid/package.json", "factory/wsl/kernel/wsl-android.config", "crates/bun-waydroid/LICENSE", "docs/android/PROVENANCE.md"],
+      files: () => ["target/release/bun-waydroid", "packages/waydroid/src", "packages/waydroid/package.json", "factory/kernel/linux-bun/android.config", "crates/bun-waydroid/LICENSE", "docs/android/PROVENANCE.md"],
     },
   },
   "bun-os-server": {

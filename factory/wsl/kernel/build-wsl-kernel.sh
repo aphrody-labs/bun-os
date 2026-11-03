@@ -55,9 +55,10 @@ export LLVM=1
 # component); check it first so a missing component fails here with the real reason, not as a dropped line.
 make rustavailable || { echo "Rust toolchain unusable for the kernel (rustup component add rust-src?)" >&2; exit 1; }
 make olddefconfig
-# Fragments in order: Rust + identity, Android binder (Waydroid), Docker/Waydroid networking, desktop (vkms), Hyper-V latency.
-frags=(wsl-rust wsl-android wsl-docker wsl-desktop wsl-latency)
-fragfiles=(); for f in "${frags[@]}"; do fragfiles+=("$repo/factory/wsl/kernel/$f.config"); done
+# Fragments in order: Rust + identity, Android 17 (the linux-bun fragment, shared: Rust binder for Waydroid, AOSP
+# requirements), Docker/Waydroid networking, desktop (vkms), Hyper-V latency.
+fragfiles=("$repo/factory/wsl/kernel/wsl-rust.config" "$repo/factory/kernel/linux-bun/android.config")
+for f in wsl-docker wsl-desktop wsl-latency; do fragfiles+=("$repo/factory/wsl/kernel/$f.config"); done
 scripts/kconfig/merge_config.sh -m .config "${fragfiles[@]}"
 make olddefconfig
 # Fail when a fragment line did not survive olddefconfig. A "# CONFIG_X is not set" line may vanish when X's

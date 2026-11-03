@@ -6,6 +6,10 @@
 //
 // Kernel command line: bunos.init=selftest   mount, report, write BUNOS-INIT-OK, power off (qualification)
 //                      bunos.init=serve      as above, then serve http://0.0.0.0:80/ (health and /proc data)
+//                      bunos.init=android    as selftest, plus the Android kernel check: mount binderfs, require the
+//                                            binder, hwbinder and vndbinder nodes, BINDER_VERSION through ioctl(2),
+//                                            allocate a node through binder-control, read binderfs features; reports
+//                                            BUNOS-ANDROID-OK with a JSON line
 import { dlopen, FFIType, ptr } from "bun:ffi";
 
 const libc = dlopen("libc.so.6", {
@@ -14,6 +18,7 @@ const libc = dlopen("libc.so.6", {
   reboot: { args: [FFIType.i32], returns: FFIType.i32 },
   sync: { args: [], returns: FFIType.void },
   sethostname: { args: [FFIType.cstring, FFIType.u64], returns: FFIType.i32 },
+  ioctl: { args: [FFIType.i32, FFIType.u64, FFIType.ptr], returns: FFIType.i32 },
 });
 
 const MS_NOSUID = 2;
@@ -97,6 +102,51 @@ const child = Bun.spawnSync([process.execPath], { env: { ...process.env, BUNOS_I
 log(`child process exit ${child.exitCode}, stdout ${child.stdout.toString().trim()}`);
 const ok = facts.kernel !== "" && child.exitCode === 0;
 console.log(ok ? "BUNOS-INIT-OK" : "BUNOS-INIT-FAILED");
+
+// Android: binderfs (Rust binder, drivers/android/binder/rust_binderfs.c) as Waydroid and Android's init use it.
+// ioctl numbers from include/uapi/linux/android/binder.h and binderfs.h: _IOWR('b', 9, struct binder_version) and
+// _IOWR('b', 1, struct binderfs_device { char name[256]; __u32 major, minor; }).
+const BINDER_VERSION = 0xc0046209;
+const BINDER_CTL_ADD = 0xc1086201;
+let androidOk = true;
+if (mode === "android") {
+  const dir = "/dev/binderfs";
+  const report: Record<string, unknown> = { mounted: mount("binder", dir, "binder", MS_NOSUID | MS_NODEV | MS_NOEXEC) };
+  const nodes = (() => {
+    try {
+      return fs.readdirSync(dir).sort();
+    } catch {
+      return [];
+    }
+  })();
+  report.nodes = nodes;
+  report.devices = ["binder", "hwbinder", "vndbinder"].every(n => nodes.includes(n));
+  const version = new Int32Array(1);
+  const fd = fs.openSync(`${dir}/binder`, fs.constants.O_RDWR);
+  report.versionIoctl = libc.symbols.ioctl(fd, BINDER_VERSION, ptr(version));
+  report.protocolVersion = version[0];
+  fs.closeSync(fd);
+  const dev = Buffer.alloc(264);
+  dev.write("bunos-test");
+  const ctl = fs.openSync(`${dir}/binder-control`, fs.constants.O_RDWR);
+  report.ctlAdd = libc.symbols.ioctl(ctl, BINDER_CTL_ADD, ptr(dev));
+  report.allocated = { major: dev.readUInt32LE(256), minor: dev.readUInt32LE(260), node: fs.existsSync(`${dir}/bunos-test`) };
+  fs.closeSync(ctl);
+  const features = `${dir}/features`;
+  report.features = Object.fromEntries(
+    (fs.existsSync(features) ? fs.readdirSync(features) : []).map(n => [n, read(`${features}/${n}`)]),
+  );
+  // binder protocol 8 is the 64-bit protocol (BINDER_CURRENT_PROTOCOL_VERSION on 64-bit kernels).
+  androidOk =
+    report.mounted === true &&
+    report.devices === true &&
+    report.versionIoctl === 0 &&
+    version[0] === 8 &&
+    report.ctlAdd === 0 &&
+    (report.allocated as { node: boolean }).node;
+  console.log(`BUNOS-ANDROID ${JSON.stringify(report)}`);
+  console.log(androidOk ? "BUNOS-ANDROID-OK" : "BUNOS-ANDROID-FAILED");
+}
 
 if (mode === "serve") {
   Bun.serve({

@@ -82,7 +82,7 @@ to `/opt/android-sdk`. Why API 37: see [GOOGLEBOOK.md](GOOGLEBOOK.md).
   SHA-256 `id` from the same HTTPS channel, no detached signature (upstream behaviour, kept).
 - Linux v7.3 source: `ANDROID_BINDER_IPC` is bool, binderfs depends on it, Rust binder excludes it; ashmem is gone (memfd fallback).
   `factory/kernel/linux-bun/config.x86_64` selects the Rust binder, which Waydroid's binderfs allocation cannot use.
-- Microsoft config-wsl (a989171) has everything Waydroid needs except binder: fragment `factory/wsl/kernel/wsl-android.config` (unbuilt).
+- Kernel: one fragment, `factory/kernel/linux-bun/android.config` (Android 17 requirements from AOSP kernel/configs, Rust binder), merged into linux-bun and the WSL kernel.
 - Tests: `crates/bun-waydroid` 17 unit tests pass (Windows host); `packages/waydroid` 13 tests pass (fake scrcpy server: every frame
   forwarded byte for byte, touch bytes reach the control socket, auth, APK signature check, path allow-list); `tsc --noEmit` clean.
 - Not measured: fps, latency, RAM. `packages/waydroid/scripts/e2e.ts` produces them against any adb target
