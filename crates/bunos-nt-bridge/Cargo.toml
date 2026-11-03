@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: Apache-2.0
+# bunos-winbridge: serves the WinClean tool catalog (and the bunos.sys event streams through the nt_* tools) to the
+# Bun OS WSL guest over hvsocket (AF_HYPERV on Windows, AF_VSOCK in the guest), with a token and an allow-list.
+# The protocol and policy are portable and tested everywhere; the listeners and the service glue are Windows-only.
+[package]
+name = "bunos-nt-bridge"
+version = "1.4.7"
+edition = "2024"
+license = "Apache-2.0"
+description = "Bun OS Windows bridge: WinClean tools served to the WSL guest over hvsocket (allow-list, token, JSON lines)."
+publish = false
+
+[[bin]]
+name = "bunos-winbridge"
+path = "src/main.rs"
+
+[dependencies]
+bun-windows-winclean = { path = "../../packages/bun-windows-winclean", version = "1.4.7" }
+serde_json = "1.0.151"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", features = [
+  "Win32_Foundation",
+  "Win32_Networking_WinSock",
+  "Win32_System_Services",
+] }
