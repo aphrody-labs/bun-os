@@ -108,10 +108,7 @@ ${proxyCommon(!!s.realtime)}${cors}    }`;
     # API catalogue (docs/generated/openapi, written by scripts/service-map.ts and installed by \`api.ts apply\`):
     # /v1/ the index, /v1/openapi.json the merged document, /v1/openapi/<service>.json the committed documents.
     location = /v1/ {
-        alias ${api.catalogue_root}/index.json;
-        default_type application/json;
-        add_header Access-Control-Allow-Origin * always;
-        add_header Cache-Control "public, max-age=60" always;
+        rewrite ^ /v1/openapi/index.json last;
     }
 
     location = /v1/openapi.json {
