@@ -6,7 +6,8 @@
   "license": "Apache-2.0",
   "type": "commonjs",
   "scripts": {
-    "test": "bun test",
+    "test": "bun tools/build-css.ts --check && bun test",
+    "css": "bun tools/build-css.ts",
     "icons": "bun tools/make-icons.ts"
   }
 }

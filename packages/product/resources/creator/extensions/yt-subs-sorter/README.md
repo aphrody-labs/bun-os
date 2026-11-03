@@ -99,7 +99,10 @@ bun test                                  # logique pure
 bun lint -c ../../../../../.oxlintrc.json .
 bun fmt --check .
 bun tools/make-icons.ts                   # régénère icons/*.png
+bun tools/build-css.ts                    # régénère src/yss-tokens.css et popup/tokens.css (--check : vérifie)
 ```
 
 Structure : `manifest.json`, `src/core.js` (logique pure, export global `YSS` et CommonJS), `src/content.js` et
-`src/content.css` (glue DOM), `popup/`, `icons/`, `test/core.test.js`.
+`src/content.css` (glue DOM), `popup/`, `icons/`, `test/core.test.js`. Les couleurs de l'interface sont les rôles M3 de
+la marque Aphrody (`packages/app-ui/src/brand.css`), copiés par `tools/build-css.ts` dans `src/yss-tokens.css`
+(variables `--yss-*`, clair et `html[dark]` de YouTube) et `popup/tokens.css` (rôles `--md-sys-color-*`).

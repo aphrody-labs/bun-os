@@ -22,6 +22,7 @@
     channelName: 120,
     importBytes: 8 * 1024 * 1024,
   });
+  // design:content - default group colours offered by the colour picker (user data, not UI chrome).
   const PALETTE = Object.freeze([
     "#e53935",
     "#fb8c00",

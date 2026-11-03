@@ -1,28 +1,6 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-:root {
-  --fg: #0f0f0f;
-  --dim: #606060;
-  --bg: #ffffff;
-  --line: rgba(0, 0, 0, 0.15);
-  --chip: rgba(0, 0, 0, 0.06);
-  --accent: #0f0f0f;
-  --on-accent: #ffffff;
-  --danger: #d93025;
-  color-scheme: light dark;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --fg: #f1f1f1;
-    --dim: #aaaaaa;
-    --bg: #212121;
-    --line: rgba(255, 255, 255, 0.2);
-    --chip: rgba(255, 255, 255, 0.1);
-    --accent: #f1f1f1;
-    --on-accent: #0f0f0f;
-    --danger: #ff8a80;
-  }
-}
+/* Roles from tokens.css (generated from the Aphrody brand sheet by tools/build-css.ts). */
+@import "tokens.css";
 
 * {
   box-sizing: border-box;
@@ -32,12 +10,11 @@ body {
   margin: 0;
   width: 380px;
   max-width: 100%;
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
   font:
-    14px/20px system-ui,
-    Roboto,
-    Arial,
+    14px/20px "Google Sans Flex",
+    "Roboto Flex",
     sans-serif;
 }
 
@@ -53,17 +30,17 @@ h1 {
 h2 {
   margin: 16px 0 6px;
   padding-top: 12px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--md-sys-color-outline-variant);
   font-size: 14px;
 }
 
 .dim {
-  color: var(--dim);
+  color: var(--md-sys-color-on-surface-variant);
   margin: 6px 0;
 }
 
 .error {
-  color: var(--danger);
+  color: var(--md-sys-color-error);
   margin: 6px 0;
 }
 
@@ -108,10 +85,10 @@ select,
 textarea {
   min-width: 0;
   padding: 4px 8px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--md-sys-color-outline);
   border-radius: 6px;
-  background: var(--bg);
-  color: var(--fg);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
   font: inherit;
 }
 
@@ -122,7 +99,8 @@ textarea {
 textarea {
   width: 100%;
   font:
-    12px/16px ui-monospace,
+    12px/16px "Google Sans Code",
+    "Roboto Mono",
     monospace;
   resize: vertical;
 }
@@ -141,26 +119,30 @@ button,
   padding: 4px 12px;
   border: 0;
   border-radius: 6px;
-  background: var(--chip);
-  color: var(--fg);
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
   font: inherit;
   cursor: pointer;
 }
 
 button:hover,
 .file:hover {
-  background: var(--line);
+  background: color-mix(
+    in srgb,
+    var(--md-sys-color-on-surface) 8%,
+    var(--md-sys-color-surface-container-highest)
+  );
 }
 
 button[type="submit"],
 #import {
-  background: var(--accent);
-  color: var(--on-accent);
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
 }
 
 button[data-armed] {
-  background: var(--danger);
-  color: #fff;
+  background: var(--md-sys-color-error);
+  color: var(--md-sys-color-on-error);
 }
 
 .file input {
@@ -169,11 +151,11 @@ button[data-armed] {
 
 .count {
   min-width: 70px;
-  color: var(--dim);
+  color: var(--md-sys-color-on-surface-variant);
   text-align: right;
 }
 
 :focus-visible {
-  outline: 2px solid #3ea6ff;
-  outline-offset: 1px;
+  outline: 2px solid var(--md-sys-color-secondary);
+  outline-offset: 2px;
 }

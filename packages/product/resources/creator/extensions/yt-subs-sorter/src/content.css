@@ -1,32 +1,17 @@
 /* SPDX-License-Identifier: Apache-2.0 */
-/* YouTube Subs Sorter - everything is prefixed yss- / data-yss- to stay out of YouTube's way. */
+/* YouTube Subs Sorter - everything is prefixed yss- / data-yss- to stay out of YouTube's way.
+   The --yss-* values are the Aphrody brand roles, generated into yss-tokens.css (tools/build-css.ts);
+   the hover state layer is on-surface at 8 % over the chip. */
 
 .yss-ui {
-  --yss-fg: #0f0f0f;
-  --yss-fg-dim: #606060;
-  --yss-bg: #ffffff;
-  --yss-chip: rgba(0, 0, 0, 0.05);
-  --yss-chip-hover: rgba(0, 0, 0, 0.1);
-  --yss-on: #0f0f0f;
-  --yss-on-fg: #ffffff;
-  --yss-line: rgba(0, 0, 0, 0.12);
+  --yss-chip-hover: color-mix(in srgb, var(--yss-fg) 8%, var(--yss-chip));
   font:
-    500 14px/20px Roboto,
-    Arial,
+    500 14px/20px "Google Sans Flex",
+    "Roboto Flex",
+    Roboto,
     sans-serif;
   color: var(--yss-fg);
   box-sizing: border-box;
-}
-
-html[dark] .yss-ui {
-  --yss-fg: #f1f1f1;
-  --yss-fg-dim: #aaaaaa;
-  --yss-bg: #282828;
-  --yss-chip: rgba(255, 255, 255, 0.1);
-  --yss-chip-hover: rgba(255, 255, 255, 0.2);
-  --yss-on: #f1f1f1;
-  --yss-on-fg: #0f0f0f;
-  --yss-line: rgba(255, 255, 255, 0.2);
 }
 
 .yss-ui *,
@@ -77,8 +62,9 @@ html[dark] .yss-ui {
   background: var(--yss-chip);
   color: var(--yss-fg);
   font:
-    500 14px/20px Roboto,
-    Arial,
+    500 14px/20px "Google Sans Flex",
+    "Roboto Flex",
+    Roboto,
     sans-serif;
   cursor: pointer;
   white-space: nowrap;
@@ -93,8 +79,8 @@ html[dark] .yss-ui {
 .yss-btn:focus-visible,
 .yss-select:focus-visible,
 .yss-input:focus-visible {
-  outline: 2px solid #3ea6ff;
-  outline-offset: 1px;
+  outline: 2px solid var(--yss-focus);
+  outline-offset: 2px;
 }
 
 .yss-chip[aria-pressed="true"] {
@@ -117,8 +103,9 @@ html[dark] .yss-ui {
   background: var(--yss-bg);
   color: var(--yss-fg);
   font:
-    500 14px/20px Roboto,
-    Arial,
+    500 14px/20px "Google Sans Flex",
+    "Roboto Flex",
+    Roboto,
     sans-serif;
   padding: 0 8px;
 }
@@ -134,7 +121,7 @@ html[dark] .yss-ui {
   border: 1px solid var(--yss-line);
   border-radius: 12px;
   background: var(--yss-bg);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--yss-shadow) 30%, transparent);
 }
 
 /* channel list row (/feed/channels) */
@@ -148,7 +135,7 @@ html[dark] .yss-ui {
   right: 16px;
   bottom: 16px;
   z-index: 2100;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--yss-shadow) 30%, transparent);
   background: var(--yss-bg);
   border: 1px solid var(--yss-line);
 }
@@ -186,12 +173,14 @@ html[dark] .yss-ui {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: #fff;
+  /* design:content - white label with a dark halo over the user's group colour on the thumbnail */
+  color: white; /* design:content */
   font:
-    500 11px/18px Roboto,
-    Arial,
+    500 11px/18px "Google Sans Flex",
+    "Roboto Flex",
+    Roboto,
     sans-serif;
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 1px 1px rgb(0 0 0 / 0.45); /* design:content */
 }
 
 /* popover */
@@ -205,7 +194,7 @@ html[dark] .yss-ui {
   border: 1px solid var(--yss-line);
   border-radius: 12px;
   background: var(--yss-bg);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 24px color-mix(in oklab, var(--yss-shadow) 30%, transparent);
 }
 
 .yss-pop-title {
@@ -250,13 +239,14 @@ html[dark] .yss-ui {
   min-width: 0;
   height: 28px;
   padding: 0 8px;
-  border: 1px solid var(--yss-line);
+  border: 1px solid var(--yss-field);
   border-radius: 6px;
   background: var(--yss-bg);
   color: var(--yss-fg);
   font:
-    500 14px/20px Roboto,
-    Arial,
+    500 14px/20px "Google Sans Flex",
+    "Roboto Flex",
+    Roboto,
     sans-serif;
 }
 
@@ -272,5 +262,5 @@ html[dark] .yss-ui {
 .yss-pop-error {
   margin-top: 6px;
   padding: 0 8px;
-  color: #d93025;
+  color: var(--yss-error);
 }
