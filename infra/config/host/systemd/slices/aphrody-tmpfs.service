@@ -1,0 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# Caps the RAM tmpfs mounts so /tmp and /dev/shm together can never take more than 16 GiB of the host.
+[Unit]
+Description=Bun OS tmpfs size caps
+After=local-fs.target tmp.mount
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/mount -o remount,size=10G /tmp
+ExecStart=/usr/bin/mount -o remount,size=6G /dev/shm
+
+[Install]
+WantedBy=multi-user.target
