@@ -8,7 +8,8 @@ Gemini at the centre), shipped as a bootable image and as the WebOS session on a
 
 - `main` on GitHub `aphrody-labs/bun-os` is the only branch. Normal `git push origin HEAD:main`, never forced.
 - One checkout per host (VPS `~/src/bun-os`, workstation `C:\src\bun-os`): no extra clones, copies or worktrees.
-  Commit and push each coherent change as soon as it compiles; never leave uncommitted work behind. The sync saves
+  Commit and push each coherent change as soon as it compiles; never leave uncommitted work behind. In a shared
+  checkout commit with `bun scripts/git-commit-paths.ts -m <msg> <paths>` and never `reset --hard` or `clean`. The sync saves
   leftover dirty state to `refs/wip/*` and fast-forwards. Details: [docs/ops/SYNC.md](docs/ops/SYNC.md).
 - Commit as `aphrody-dev <contact@aphrody.com>`, without co-authors.
 - Agents coordinate and help each other through `aphrody a2a` ([docs/A2A-AGENTS.md](docs/A2A-AGENTS.md)).

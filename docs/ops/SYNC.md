@@ -34,3 +34,17 @@ The installer registers a persistent systemd user timer and configures the VPS r
 - The installer configures `.githooks` for matching clones under `~/work`; the pre-push hook runs the main gate. GitHub remains the only source of truth, and pushes are fast-forward only.
 
 The status file contains the last result, source revisions, and any recovery ref. Do not infer deployment or release qualification from a successful synchronization pass.
+
+## Committing from a shared checkout
+
+Several agents work in the one checkout of a host at the same time. `git add` + `git commit` there can sweep in
+another agent's staged files, and `git pull --rebase` (or a `reset --hard` to recover from one) stalls on their dirty
+submodules and can discard their uncommitted edits. Commit with the path-scoped helper instead:
+
+```sh
+bun scripts/git-commit-paths.ts -m "message" <path>...
+```
+
+It builds the commit in a temporary index from `origin/main` plus exactly those paths as they are in the working tree,
+pushes it (retrying when `origin` moved), and leaves the shared index, `HEAD` and every other file untouched. Never run
+`git reset --hard`, `git checkout -- .`, `git stash` without a message, or `git clean` in a shared checkout.
