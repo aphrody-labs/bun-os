@@ -64,7 +64,7 @@ export def "win events" [log: string, --max: int = 50] {
 
 # WMI/CIM: a class name (all properties) or a full WQL query.
 export def "win cim" [what: string, --namespace: string = "ROOT\\CIMV2", --limit: int] {
-  let query = if ($what | str upcase | str starts-with "SELECT") { $what } else { $"SELECT * FROM ($what)" }
+  let query = if ($what | str uppercase | str starts-with "SELECT") { $what } else { $"SELECT * FROM ($what)" }
   win wmi-query $query --namespace $namespace --limit $limit
 }
 
