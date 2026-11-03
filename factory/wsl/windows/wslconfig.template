@@ -1,6 +1,7 @@
 # Bun OS for Windows: %USERPROFILE%\.wslconfig (keys from Learn "wsl-config", .wslconfig section).
 # install.ts merges these keys into an existing file (a backup is kept as .wslconfig.bunos-backup) and fills
-# {{KERNEL}} / {{MODULES}} with the installed paths, backslashes escaped as .wslconfig requires.
+# {{KERNEL}} / {{MODULES}} with the installed paths, backslashes escaped as .wslconfig requires, and
+# {{PROCESSORS}} / {{MEMORY}} / {{SWAP}} from this machine (all logical CPUs, half the RAM, a quarter of it as swap).
 # Applies to every WSL 2 distro of the user after `wsl --shutdown`.
 
 [wsl2]
@@ -8,6 +9,11 @@
 kernel={{KERNEL}}
 # Modules VHD built from the same kernel (vermagic match; CONFIG_MODVERSIONS is off for Rust).
 kernelModules={{MODULES}}
+# Sizing for latency: every logical CPU (idle vCPUs cost the host nothing; Hyper-V schedules them like threads),
+# half the RAM (Learn default; autoMemoryReclaim below hands cache back to Windows).
+processors={{PROCESSORS}}
+memory={{MEMORY}}
+swap={{SWAP}}
 # WSLg: Wayland, X11 and PulseAudio through the WSLg system distro; windows appear as Win32 windows.
 guiApplications=true
 # No separation from Windows: share the host network stack (localhost both ways, same IPs).
@@ -16,7 +22,12 @@ dnsTunneling=true
 autoProxy=true
 nestedVirtualization=true
 
+[general]
+# Keep the distro (and with it the VM, Docker and Waydroid) running: no 3-4 s cold boot on the next wsl.exe.
+instanceIdleTimeout=-1
+
 [experimental]
+# gradual: cache is returned slowly, so file-cache hits survive idle periods (dropCache empties it at once).
 autoMemoryReclaim=gradual
 sparseVhd=true
 hostAddressLoopback=true

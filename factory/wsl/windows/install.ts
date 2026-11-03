@@ -3,14 +3,19 @@
 // Bun OS for Windows installer: our WSL2 kernel + modules VHD, the bunos-wsl distro, WSLg settings and (opt-in)
 // the bunos.sys driver package. Runs on the target Windows 11 machine with Bun; no PowerShell needed.
 //
-//   bun install.ts [--bundle <dir>] [--dest <dir>] [--name bunos] [--dry-run] [--driver]
+//   bun install.ts [--bundle <dir>] [--dest <dir>] [--no-copy] [--location <dir>] [--name bunos] [--native] [--dry-run] [--driver]
 //
 // --dry-run prints every action and the resulting .wslconfig/.wslgconfig without touching anything (safe anywhere).
-// Without it: copies the artifacts to <dest> (default %LOCALAPPDATA%\BunOS\wsl), merges .wslconfig/.wslgconfig in
-// %USERPROFILE% (backups *.bunos-backup), `wsl --shutdown` so the kernel applies, installs the distro and checks
-// `uname -r`. --driver adds `pnputil /add-driver bunos.inf /install` (admin + test signing: Windows 11 test VM only).
+// Without it: copies the artifacts to <dest> (default %LOCALAPPDATA%\BunOS\wsl; --no-copy when setup-elevated.ps1
+// already placed them in %SystemRoot%\BunOS\wsl), merges .wslconfig/.wslgconfig in %USERPROFILE% (the first run keeps
+// the user's originals as *.bunos-backup, later runs never overwrite that backup), `wsl --shutdown` so the kernel
+// applies, installs the distro unless it is already registered (its ext4.vhdx lives in --location, default
+// %LOCALAPPDATA%\BunOS\wsl\<name>: per-user data, not a system file) and checks `uname -r`. --native provisions
+// Docker + Waydroid in the distro (bunos-wsl-native.sh); a docker.exe gets a `bunos` context.
+// --driver adds `pnputil /add-driver bunos.inf /install` (admin + test signing: Windows 11 test VM only).
 import { createHash } from "node:crypto";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { cpus, totalmem } from "node:os";
 import { dirname, join, resolve } from "node:path";
 
 export type Ini = Map<string, Map<string, string>>;
@@ -76,6 +81,16 @@ export function parseIni(text: string): Ini {
   return ini;
 }
 
+/** All logical CPUs, half the RAM and a quarter of it as swap, in whole GB (.wslconfig size syntax). */
+export function sizing(logical = cpus().length, bytes = totalmem()) {
+  const gb = Math.max(2, Math.round(bytes / 2 ** 30));
+  return {
+    processors: String(logical),
+    memory: `${Math.max(2, Math.floor(gb / 2))}GB`,
+    swap: `${Math.max(1, Math.floor(gb / 4))}GB`,
+  };
+}
+
 /** .wslconfig wants Windows paths with escaped backslashes. */
 export const wslPath = (path: string) => path.replace(/\//g, "\\").replace(/\\/g, "\\\\");
 
@@ -90,8 +105,14 @@ function args(argv: string[]) {
   const here = dirname(Bun.main === import.meta.path ? import.meta.path : process.argv[1]!);
   return {
     bundle: resolve(value("--bundle") ?? here),
-    dest: resolve(value("--dest") ?? join(process.env.LOCALAPPDATA ?? join(process.env.HOME ?? ".", "AppData", "Local"), "BunOS", "wsl")),
+    dest: resolve(
+      value("--dest") ??
+        join(process.env.LOCALAPPDATA ?? join(process.env.HOME ?? ".", "AppData", "Local"), "BunOS", "wsl"),
+    ),
     name: value("--name") ?? "bunos",
+    location: value("--location"),
+    copy: !flag("--no-copy"),
+    native: flag("--native"),
     dryRun: flag("--dry-run"),
     driver: flag("--driver"),
     profile: process.env.USERPROFILE ?? process.env.HOME ?? ".",
@@ -103,7 +124,8 @@ function run(cmd: string[], dryRun: boolean): string {
   if (dryRun) return "";
   const p = Bun.spawnSync(cmd, { stdout: "pipe", stderr: "pipe" });
   // wsl.exe writes UTF-16LE when not attached to a console.
-  const decode = (b: Uint8Array) => (b.length > 1 && b[1] === 0 ? Buffer.from(b).toString("utf16le") : Buffer.from(b).toString());
+  const decode = (b: Uint8Array) =>
+    b.length > 1 && b[1] === 0 ? Buffer.from(b).toString("utf16le") : Buffer.from(b).toString();
   const out = decode(p.stdout) + decode(p.stderr);
   if (p.exitCode !== 0) throw new Error(`${cmd[0]} exited ${p.exitCode}: ${out.trim()}`);
   return out;
@@ -111,7 +133,8 @@ function run(cmd: string[], dryRun: boolean): string {
 
 export function main(argv = process.argv.slice(2)) {
   const o = args(argv);
-  if (process.platform !== "win32" && !o.dryRun) throw new Error("install.ts installs on Windows; use --dry-run elsewhere");
+  if (process.platform !== "win32" && !o.dryRun)
+    throw new Error("install.ts installs on Windows; use --dry-run elsewhere");
   const files = { kernel: "bzImage", modules: "modules.vhdx", distro: "bunos-wsl.wsl" } as const;
   // SHA256SUMS (sha256sum format) is written by bundle.sh; every listed file must match.
   const sums = join(o.bundle, "SHA256SUMS");
@@ -124,11 +147,20 @@ export function main(argv = process.argv.slice(2)) {
       console.log(`ok ${name}`);
     }
   }
-  for (const f of Object.values(files)) if (!existsSync(join(o.bundle, f)) && !o.dryRun) throw new Error(`missing ${f} in ${o.bundle}`);
+  const source = o.copy ? o.bundle : o.dest;
+  for (const f of Object.values(files))
+    if (!existsSync(join(source, f)) && !o.dryRun) throw new Error(`missing ${f} in ${source}`);
 
   const kernel = join(o.dest, files.kernel);
   const modules = join(o.dest, files.modules);
-  const fill = (t: string) => t.replaceAll("{{KERNEL}}", wslPath(kernel)).replaceAll("{{MODULES}}", wslPath(modules));
+  const size = sizing();
+  const fill = (t: string) =>
+    t
+      .replaceAll("{{KERNEL}}", wslPath(kernel))
+      .replaceAll("{{MODULES}}", wslPath(modules))
+      .replaceAll("{{PROCESSORS}}", size.processors)
+      .replaceAll("{{MEMORY}}", size.memory)
+      .replaceAll("{{SWAP}}", size.swap);
   const template = (n: string) => readFileSync(join(import.meta.dir, n), "utf8");
   const configs = [
     [join(o.profile, ".wslconfig"), fill(template("wslconfig.template"))],
@@ -136,17 +168,22 @@ export function main(argv = process.argv.slice(2)) {
   ] as const;
 
   console.log(`${o.dryRun ? "[dry-run] " : ""}Bun OS for Windows -> ${o.dest} (distro ${o.name})`);
-  if (!o.dryRun) mkdirSync(o.dest, { recursive: true });
-  for (const f of Object.values(files)) {
-    console.log(`copy ${join(o.bundle, f)} -> ${join(o.dest, f)}`);
-    if (!o.dryRun) copyFileSync(join(o.bundle, f), join(o.dest, f));
+  if (o.copy) {
+    if (!o.dryRun) mkdirSync(o.dest, { recursive: true });
+    for (const f of Object.values(files)) {
+      console.log(`copy ${join(o.bundle, f)} -> ${join(o.dest, f)}`);
+      if (!o.dryRun) copyFileSync(join(o.bundle, f), join(o.dest, f));
+    }
   }
   for (const [path, tpl] of configs) {
     const current = existsSync(path) ? readFileSync(path, "utf8") : "";
     const merged = mergeIni(current, tpl);
     console.log(`--- ${path}\n${merged}`);
     if (o.dryRun) continue;
-    if (current) writeFileSync(`${path}.bunos-backup`, current);
+    // The backup is the user's file from before the first Bun OS install; a re-run must not replace it with ours.
+    // *.bunos-absent records that there was no file, so undo knows to delete instead of restore.
+    if (!existsSync(`${path}.bunos-backup`) && !existsSync(`${path}.bunos-absent`))
+      writeFileSync(current ? `${path}.bunos-backup` : `${path}.bunos-absent`, current);
     writeFileSync(path, merged);
   }
 
@@ -160,18 +197,95 @@ export function main(argv = process.argv.slice(2)) {
   run([wsl, "--shutdown"], o.dryRun);
   // --from-file honours /etc/wsl-distribution.conf (Start-menu shortcut, Terminal profile; WSL >= 2.4.4);
   // `--import` of the same gzip tar is the fallback for older WSL.
-  const location = join(o.dest, o.name);
-  try {
-    run([wsl, "--install", "--from-file", join(o.dest, files.distro), "--name", o.name, "--location", location, "--no-launch"], o.dryRun);
-  } catch (e) {
-    console.log(`--from-file failed (${(e as Error).message}); falling back to --import`);
-    run([wsl, "--import", o.name, location, join(o.dest, files.distro), "--version", "2"], false);
-  }
+  const location = resolve(
+    o.location ?? join(process.env.LOCALAPPDATA ?? join(o.profile, "AppData", "Local"), "BunOS", "wsl", o.name),
+  );
+  const registered =
+    !o.dryRun &&
+    run([wsl, "--list", "--quiet"], false)
+      .split(/\r?\n/)
+      .some(l => l.trim().toLowerCase() === o.name.toLowerCase());
+  if (registered) console.log(`distro ${o.name} already registered: kept as is`);
+  else
+    try {
+      run(
+        [
+          wsl,
+          "--install",
+          "--from-file",
+          join(o.dest, files.distro),
+          "--name",
+          o.name,
+          "--location",
+          location,
+          "--no-launch",
+        ],
+        o.dryRun,
+      );
+    } catch (e) {
+      console.log(`--from-file failed (${(e as Error).message}); falling back to --import`);
+      run([wsl, "--import", o.name, location, join(o.dest, files.distro), "--version", "2"], false);
+    }
   const release = run([wsl, "-d", o.name, "--", "uname", "-r"], o.dryRun).trim();
   if (!o.dryRun) {
-    if (!release.includes("microsoft-standard-WSL2") || !release.startsWith("7.")) throw new Error(`unexpected kernel: ${release}`);
+    if (!release.includes("microsoft-standard-WSL2") || !release.startsWith("7."))
+      throw new Error(`unexpected kernel: ${release}`);
     console.log(`kernel ${release}`);
-    run([wsl, "-d", o.name, "--", "sh", "-c", "test -S /mnt/wslg/runtime-dir/wayland-0 && test -e /dev/dxg && echo wslg+dxg ok"], false);
+    run(
+      [
+        wsl,
+        "-d",
+        o.name,
+        "--",
+        "sh",
+        "-c",
+        "test -S /mnt/wslg/runtime-dir/wayland-0 && test -e /dev/dxg && echo wslg+dxg ok",
+      ],
+      false,
+    );
+  }
+  // --native: Docker Engine + Waydroid inside the distro (factory/wsl/bunos-wsl-native.sh, as root).
+  const native = join(source, "bunos-wsl-native.sh");
+  if (o.native && existsSync(native)) {
+    const waydroid = join(source, "waydroid-src.tar.gz");
+    const guest = (p: string) => `/mnt/${p[0]!.toLowerCase()}/${p.slice(3).replace(/\\/g, "/")}`;
+    console.log(
+      run(
+        [
+          wsl,
+          "-d",
+          o.name,
+          "-u",
+          "root",
+          "--",
+          "bash",
+          guest(native),
+          "all",
+          ...(existsSync(waydroid) ? [guest(waydroid)] : []),
+        ],
+        o.dryRun,
+      ),
+    );
+  }
+  // docker.exe (bin\ next to wsl\, or PATH) talks to dockerd on the mirrored loopback: one `bunos` context.
+  const docker = [join(dirname(o.dest), "bin", "docker.exe")].find(existsSync) ?? Bun.which("docker");
+  if (docker) {
+    const contexts = o.dryRun ? "" : run([docker, "context", "ls", "--format", "{{.Name}}"], false);
+    if (!contexts.split(/\r?\n/).includes("bunos"))
+      run(
+        [
+          docker,
+          "context",
+          "create",
+          "bunos",
+          "--description",
+          "Bun OS WSL (dockerd on 127.0.0.1:2375)",
+          "--docker",
+          "host=tcp://127.0.0.1:2375",
+        ],
+        o.dryRun,
+      );
+    run([docker, "context", "use", "bunos"], o.dryRun);
   }
   if (o.driver) {
     const inf = join(o.bundle, "driver", "bunos.inf");
