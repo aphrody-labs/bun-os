@@ -327,6 +327,8 @@ export interface DesignSystem {
   };
   motion_snippet: Row;
   spacing_scale: Spacing | null;
+  /** `m3` when every value is an M3 system token (`--stack m3`), otherwise null. */
+  token_set: "m3" | null;
 }
 
 export interface GenerateOptions {
@@ -336,7 +338,45 @@ export interface GenerateOptions {
   density?: number | null;
   /** Brand ID from brands.csv (e.g. m3-baseline-light): its real tokens replace the palette and fonts. */
   brand?: string | null;
+  /**
+   * Target stack. `m3` binds every colour to a `--md-sys-color-*` role and the type to the M3 typefaces,
+   * so the scheme comes from the canonical engine at runtime instead of a catalogue palette.
+   */
+  stack?: string | null;
 }
+
+/** shadcn-style roles of the catalogue onto M3 colour roles, as bridged by `@aphrody/m3-theme/tokens.css`. */
+const M3_ROLE_PALETTE: Row = {
+  "Product Type": "m3 roles",
+  Primary: "var(--md-sys-color-primary)",
+  "On Primary": "var(--md-sys-color-on-primary)",
+  Secondary: "var(--md-sys-color-secondary-container)",
+  "On Secondary": "var(--md-sys-color-on-secondary-container)",
+  Accent: "var(--md-sys-color-tertiary-container)",
+  "On Accent": "var(--md-sys-color-on-tertiary-container)",
+  Background: "var(--md-sys-color-surface)",
+  Foreground: "var(--md-sys-color-on-surface)",
+  Card: "var(--md-sys-color-surface-container-low)",
+  "Card Foreground": "var(--md-sys-color-on-surface)",
+  Muted: "var(--md-sys-color-surface-variant)",
+  "Muted Foreground": "var(--md-sys-color-on-surface-variant)",
+  Border: "var(--md-sys-color-outline-variant)",
+  Destructive: "var(--md-sys-color-error)",
+  "On Destructive": "var(--md-sys-color-on-error)",
+  Ring: "var(--md-sys-color-primary)",
+  Notes:
+    "Roles only: the values come from the active scheme (@aphrody/m3-theme/tokens.css at build time, @aphrody/m3-tokens/wasm dynamic colour at runtime), both computed by crates/aphrody-m3-tokens. Never copy a resolved colour into a stylesheet.",
+};
+
+/** M3 typefaces of `@aphrody/m3-tokens/m3-tokens.css` (`--md-ref-typeface-brand/plain/code`), served by `@aphrody/m3-fonts`. */
+const M3_TYPOGRAPHY: Row = {
+  "Font Pairing Name": "Material 3 typefaces",
+  "Heading Font": "Google Sans Flex",
+  "Body Font": "Google Sans Flex",
+  "Mood/Style Keywords": "material 3, expressive, variable optical size and width",
+  "CSS Import":
+    '@import "@aphrody/m3-fonts/fonts.css";\n@import "@aphrody/m3-theme/tokens.css";\n@import "@aphrody/m3-tokens/m3-tokens.css";',
+};
 
 // ============ DESIGN SYSTEM GENERATOR ============
 export class DesignSystemGenerator {
@@ -547,8 +587,13 @@ export class DesignSystemGenerator {
       (brandScheme === "dark" || brandScheme === "light" ? brandScheme : null) ??
       reasoning.preferred_mode ??
       resolveColorMode(query, bestStyle);
-    const bestColor = brand ? brandPalette(brand) : selectPaletteForMode(colorResults, colorMode, category);
-    const bestTypography: Row = brand ? brandTypography(brand) : (typographyResults[0] ?? {});
+    const m3 = options.stack === "m3";
+    const bestColor = m3
+      ? M3_ROLE_PALETTE
+      : brand
+        ? brandPalette(brand)
+        : selectPaletteForMode(colorResults, colorMode, category);
+    const bestTypography: Row = m3 ? M3_TYPOGRAPHY : brand ? brandTypography(brand) : (typographyResults[0] ?? {});
     const bestLanding =
       landingResults.find(row => row["Pattern Name"] === reasoning.pattern) ?? landingResults[0] ?? {};
 
@@ -604,10 +649,10 @@ export class DesignSystemGenerator {
         on_destructive: bestColor["On Destructive"] ?? "",
         ring: bestColor["Ring"] ?? "",
         notes: bestColor["Notes"] ?? "",
-        // Legacy keys kept for MASTER.md backward compatibility.
-        cta: bestColor["Accent"] ?? "#F97316",
+        // Legacy keys kept for MASTER.md backward compatibility. The M3 call to action is the filled button.
+        cta: (m3 ? bestColor["Primary"] : bestColor["Accent"]) ?? "#F97316",
         text: bestColor["Foreground"] ?? "#1E293B",
-        on_cta: bestColor["On Accent"] ?? "",
+        on_cta: (m3 ? bestColor["On Primary"] : bestColor["On Accent"]) ?? "",
       },
       typography: {
         heading: bestTypography["Heading Font"] ?? "Inter",
@@ -616,7 +661,7 @@ export class DesignSystemGenerator {
         best_for: bestTypography["Best For"] ?? "",
         google_fonts_url: bestTypography["Google Fonts URL"] ?? "",
         css_import: bestTypography["CSS Import"] ?? "",
-        ...(brand?.["Mono Font"] ? { mono: brand["Mono Font"] } : {}),
+        ...(m3 ? { mono: "Google Sans Code" } : brand?.["Mono Font"] ? { mono: brand["Mono Font"] } : {}),
       },
       brand: brand
         ? {
@@ -642,8 +687,8 @@ export class DesignSystemGenerator {
         product: productResults.length ? category : null,
         reasoning: reasoning.is_default ? null : category,
         style: bestStyle["Style ID"] || bestStyle["Style Category"] || null,
-        color: brand ? null : (bestColor["Product Type"] ?? null),
-        typography: brand ? null : (bestTypography["Font Pairing Name"] ?? null),
+        color: brand && !m3 ? null : (bestColor["Product Type"] ?? null),
+        typography: brand && !m3 ? null : (bestTypography["Font Pairing Name"] ?? null),
         landing: bestLanding["Pattern Name"] ?? null,
         ...(brand ? { brand: brand["Brand ID"] ?? null } : {}),
       },
@@ -662,6 +707,7 @@ export class DesignSystemGenerator {
       },
       motion_snippet: motionSnippet,
       spacing_scale: densityInfo?.spacing ?? null,
+      token_set: m3 ? "m3" : null,
     };
   }
 }
@@ -926,7 +972,7 @@ export function formatMarkdown(designSystem: DesignSystem): string {
     lines.push(`- **Performance:** ${style.performance} | **Accessibility:** ${style.accessibility}`);
   lines.push("");
 
-  lines.push("### Colors", "| Role | Hex | CSS Variable |", "|------|-----|--------------|");
+  lines.push("### Colors", "| Role | Value | CSS Variable |", "|------|-------|--------------|");
   for (const [label, key, cssVar] of SEMANTIC_COLOR_ENTRIES) {
     if (colors[key]) lines.push(`| ${label} | \`${colors[key]}\` | \`${cssVar}\` |`);
   }
@@ -1117,6 +1163,38 @@ function timestamp(): string {
 }
 
 /** Format the design system as MASTER.md with hierarchical override logic. */
+/** Non-colour values of the MASTER.md snippets: M3 system tokens for `--stack m3`, literal defaults otherwise. */
+function snippetTokens(tokenSet: DesignSystem["token_set"]) {
+  if (tokenSet === "m3") {
+    return {
+      shadow: [1, 2, 3, 4].map(level => `var(--md-sys-elevation-level${level})`),
+      radius: {
+        small: "var(--md-sys-shape-corner-small)",
+        medium: "var(--md-sys-shape-corner-medium)",
+        large: "var(--md-sys-shape-corner-large)",
+      },
+      transition: "var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard)",
+      overlay: "color-mix(in srgb, var(--md-sys-color-scrim) 32%, transparent)",
+      overlayBlur: "",
+      /** M3 outlined button: primary label on an outline-role border. */
+      outlined: "var(--md-sys-color-outline)",
+    };
+  }
+  return {
+    shadow: [
+      "0 1px 2px rgba(0,0,0,0.05)",
+      "0 4px 6px rgba(0,0,0,0.1)",
+      "0 10px 15px rgba(0,0,0,0.1)",
+      "0 20px 25px rgba(0,0,0,0.15)",
+    ],
+    radius: { small: "8px", medium: "12px", large: "16px" },
+    transition: "200ms ease",
+    overlay: "rgba(0, 0, 0, 0.5)",
+    overlayBlur: "4px",
+    outlined: "",
+  };
+}
+
 export function formatMasterMd(designSystem: DesignSystem): string {
   const { project_name: project, pattern, style, colors, typography, dials, brand } = designSystem;
   const effects = designSystem.key_effects;
@@ -1146,7 +1224,7 @@ export function formatMasterMd(designSystem: DesignSystem): string {
   lines.push("", "---", "", "## Global Rules", "");
   if (brand) lines.push(...brandMarkdown(brand), "");
 
-  lines.push("### Color Palette", "", "| Role | Hex | CSS Variable |", "|------|-----|--------------|");
+  lines.push("### Color Palette", "", "| Role | Value | CSS Variable |", "|------|-------|--------------|");
   for (const [label, key, cssVar] of SEMANTIC_COLOR_ENTRIES) {
     if (colors[key]) lines.push(`| ${label} | \`${colors[key]}\` | \`${cssVar}\` |`);
   }
@@ -1186,15 +1264,16 @@ export function formatMasterMd(designSystem: DesignSystem): string {
   }
   lines.push("");
 
+  const tokens = snippetTokens(designSystem.token_set);
   lines.push(
     "### Shadow Depths",
     "",
     "| Level | Value | Usage |",
     "|-------|-------|-------|",
-    "| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |",
-    "| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |",
-    "| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |",
-    "| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |",
+    `| \`--shadow-sm\` | \`${tokens.shadow[0]}\` | Subtle lift |`,
+    `| \`--shadow-md\` | \`${tokens.shadow[1]}\` | Cards, buttons |`,
+    `| \`--shadow-lg\` | \`${tokens.shadow[2]}\` | Modals, dropdowns |`,
+    `| \`--shadow-xl\` | \`${tokens.shadow[3]}\` | Hero images, featured cards |`,
     "",
   );
 
@@ -1212,9 +1291,9 @@ export function formatMasterMd(designSystem: DesignSystem): string {
     `  background: ${colors["cta"] || "#F97316"};`,
     `  color: ${colors["on_cta"] || "white"};`,
     "  padding: 12px 24px;",
-    "  border-radius: 8px;",
+    `  border-radius: ${tokens.radius.small};`,
     "  font-weight: 600;",
-    "  transition: all 200ms ease;",
+    `  transition: all ${tokens.transition};`,
     "  cursor: pointer;",
     "}",
     "",
@@ -1226,12 +1305,12 @@ export function formatMasterMd(designSystem: DesignSystem): string {
     "/* Secondary Button */",
     ".btn-secondary {",
     "  background: transparent;",
-    `  color: ${buttonOutlineTextColor(colors)};`,
-    `  border: 2px solid ${primary};`,
+    `  color: ${tokens.outlined ? primary : buttonOutlineTextColor(colors)};`,
+    `  border: ${tokens.outlined ? `1px solid ${tokens.outlined}` : `2px solid ${primary}`};`,
     "  padding: 12px 24px;",
-    "  border-radius: 8px;",
+    `  border-radius: ${tokens.radius.small};`,
     "  font-weight: 600;",
-    "  transition: all 200ms ease;",
+    `  transition: all ${tokens.transition};`,
     "  cursor: pointer;",
     "}",
     "",
@@ -1251,11 +1330,11 @@ export function formatMasterMd(designSystem: DesignSystem): string {
     "",
     "```css",
     ".card {",
-    `  background: ${colors["background"] || "#FFFFFF"};`,
-    "  border-radius: 12px;",
+    `  background: ${colors["card"] || colors["background"] || "#FFFFFF"};`,
+    `  border-radius: ${tokens.radius.medium};`,
     "  padding: 24px;",
     "  box-shadow: var(--shadow-md);",
-    "  transition: all 200ms ease;",
+    `  transition: all ${tokens.transition};`,
     "  cursor: pointer;",
     "}",
     "",
@@ -1270,16 +1349,16 @@ export function formatMasterMd(designSystem: DesignSystem): string {
     "```css",
     ".input {",
     "  padding: 12px 16px;",
-    "  border: 1px solid #E2E8F0;",
-    "  border-radius: 8px;",
+    `  border: 1px solid ${colors["border"] || "#E2E8F0"};`,
+    `  border-radius: ${tokens.radius.small};`,
     "  font-size: 16px;",
-    "  transition: border-color 200ms ease;",
+    `  transition: border-color ${tokens.transition};`,
     "}",
     "",
     ".input:focus {",
     `  border-color: ${primary};`,
     "  outline: none;",
-    `  box-shadow: 0 0 0 3px ${primary}20;`,
+    `  box-shadow: 0 0 0 3px color-mix(in srgb, ${colors["ring"] || primary} 12%, transparent);`,
     "}",
     "```",
     "",
@@ -1287,13 +1366,13 @@ export function formatMasterMd(designSystem: DesignSystem): string {
     "",
     "```css",
     ".modal-overlay {",
-    "  background: rgba(0, 0, 0, 0.5);",
-    "  backdrop-filter: blur(4px);",
+    `  background: ${tokens.overlay};`,
+    ...(tokens.overlayBlur ? [`  backdrop-filter: blur(${tokens.overlayBlur});`] : []),
     "}",
     "",
     ".modal {",
-    "  background: white;",
-    "  border-radius: 16px;",
+    `  background: ${colors["card"] || colors["background"] || "white"};`,
+    `  border-radius: ${tokens.radius.large};`,
     "  padding: 32px;",
     "  box-shadow: var(--shadow-xl);",
     "  max-width: 500px;",

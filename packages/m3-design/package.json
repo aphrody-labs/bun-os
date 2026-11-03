@@ -4,12 +4,12 @@
   "description": "Automated design engine for Material Design 3 and Google Design",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aphrody-labs/bun-distribution.git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
     "directory": "packages/m3-design"
   },
-  "homepage": "https://github.com/aphrody-labs/bun-distribution/tree/os/packages/m3-design#readme",
+  "homepage": "https://github.com/aphrody-labs/bun-os/tree/main/packages/m3-design#readme",
   "bugs": {
-    "url": "https://github.com/aphrody-labs/bun-distribution/issues"
+    "url": "https://github.com/aphrody-labs/bun-os/issues"
   },
   "license": "Apache-2.0 AND MIT",
   "author": "aphrody-code",

@@ -13,7 +13,7 @@ m3-design compile --prompt "Responsive M3 monitoring dashboard" --color "#6750a4
 m3-design search "minimalism dark mode" --domain style
 ```
 
-License: Apache-2.0 AND MIT (`LICENSE`, `LICENSES/`). Install guide: [docs/material/m3/INSTALL.md](https://github.com/aphrody-labs/bun-distribution/blob/os/docs/material/m3/INSTALL.md).
+License: Apache-2.0 AND MIT (`LICENSE`, `LICENSES/`). Install guide: [docs/material/m3/INSTALL.md](https://github.com/aphrody-labs/bun-os/blob/main/docs/material/m3/INSTALL.md).
 
 ## Product design intelligence
 

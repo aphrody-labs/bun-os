@@ -1,6 +1,6 @@
 # Bun OS / Aphrody UI ecosystem
 
-Map of the UI owners in the Bun OS workspace (`aphrody-labs/bun-distribution`, branch `os`). Paths are
+Map of the UI owners in the Bun OS workspace (`aphrody-labs/bun-os`, branch `main`). Paths are
 repository-relative. Search the matching data with `--stack m3`, `--stack nextjs`,
 `--stack html-tailwind`, `--stack shadcn` and the `brands.csv` palette rows.
 

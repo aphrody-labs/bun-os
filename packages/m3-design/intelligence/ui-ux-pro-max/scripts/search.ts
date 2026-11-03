@@ -5,6 +5,7 @@
  *   bun scripts/search.ts "<query>" [--domain <domain>] [--stack <stack>] [-n 3] [--json] [--full]
  *   bun scripts/search.ts "<query>" --design-system [-p "Project Name"] [-f ascii|markdown]
  *   bun scripts/search.ts "<query>" --design-system --brand m3-baseline-light
+ *   bun scripts/search.ts "<query>" --design-system --stack m3   (M3 roles and typefaces, no catalogue palette)
  *   bun scripts/search.ts "<query>" --design-system --persist -p "Project" --output-dir "<project-root>" [--page dashboard] [--force]
  *   bun scripts/search.ts "<query>" --design-system --variance 8 --motion 9 --density 7
  *
@@ -101,7 +102,8 @@ options:
   -ds, --design-system  Generate complete design system recommendation
   -p, --project-name    Project name for design system output
   -f, --format          Output format for design system: ascii (default) or markdown (ignored with --json)
-  -b, --brand BRAND     Use a real brand theme from brands.csv (e.g. m3-baseline-light, azalee-light)
+  -b, --brand BRAND     Use a real brand theme from brands.csv (e.g. m3-baseline-light, m3-baseline-dark)
+                        With --stack m3, colours are --md-sys-color-* roles and type is the M3 typefaces
   --persist             Save to design-system/<project-slug>/MASTER.md
   --page PAGE           Also create design-system/<project-slug>/pages/<page>.md
   -o, --output-dir DIR  Directory the design-system/ folder is created under (pass the project root)
@@ -178,9 +180,9 @@ export async function main(argv: string[]): Promise<number> {
   const density = intInRange("--density", values.density, 1, 10);
 
   if (values["design-system"]) {
-    if (stack) {
+    if (stack && stack !== "m3") {
       console.error(
-        `note: --stack ${stack} is ignored in --design-system mode; run a separate --stack query for stack-specific guidelines`,
+        `note: --stack ${stack} is ignored in --design-system mode (only m3 shapes it); run a separate --stack query for stack-specific guidelines`,
       );
     }
     let result;
@@ -196,6 +198,7 @@ export async function main(argv: string[]): Promise<number> {
         density,
         force: values.force ?? false,
         brand: values.brand ?? null,
+        stack: stack ?? null,
       });
     } catch (error) {
       console.error(`Error: ${(error as Error).message}`);

@@ -7,7 +7,7 @@
 ---
 
 **Project:** Bun OS Play
-**Generated:** 2026-10-17 16:52:26
+**Generated:** 2026-11-03 22:50:01
 **Category:** Gaming
 **Design Dials:** Variance 6/10 (Balanced / Modern) | Motion 6/10 (Standard) | Density 6/10 (Standard)
 
@@ -15,43 +15,42 @@
 
 ## Global Rules
 
-### Brand
-- **Brand:** Material 3 (Aphrody) — M3 baseline dark (tonal spot, seed #6750A4) (`m3-baseline-dark`)
-- **Package:** `@aphrody/m3-theme`
-- **Selector:** `.dark (also :root under @media (prefers-color-scheme: dark))`
-- **Color scheme:** dark
-- **Radius:** `12px (--md-sys-shape-corner-medium, packages/m3-tokens/src/m3-tokens.css)`
-- **Source:** `packages/m3-theme/tokens.css` (tokens extracted verbatim; use the CSS custom properties, not raw hex)
-
 ### Color Palette
 
-| Role | Hex | CSS Variable |
-|------|-----|--------------|
-| Primary | `#CFBDFE` | `--color-primary` |
-| On Primary | `#36275D` | `--color-on-primary` |
-| Secondary | `#4A4458` | `--color-secondary` |
-| On Secondary | `#E8DEF8` | `--color-on-secondary` |
-| Accent/CTA | `#633B48` | `--color-accent` |
-| On Accent/CTA | `#FFD9E3` | `--color-on-accent` |
-| Background | `#141218` | `--color-background` |
-| Foreground | `#E6E0E9` | `--color-foreground` |
-| Card | `#1D1B20` | `--color-card` |
-| Card Foreground | `#E6E0E9` | `--color-card-foreground` |
-| Muted | `#49454E` | `--color-muted` |
-| Muted Foreground | `#CAC4CF` | `--color-muted-foreground` |
-| Border | `#49454E` | `--color-border` |
-| Destructive | `#FFB4AB` | `--color-destructive` |
-| On Destructive | `#690005` | `--color-on-destructive` |
-| Ring | `#CFBDFE` | `--color-ring` |
+| Role | Value | CSS Variable |
+|------|-------|--------------|
+| Primary | `var(--md-sys-color-primary)` | `--color-primary` |
+| On Primary | `var(--md-sys-color-on-primary)` | `--color-on-primary` |
+| Secondary | `var(--md-sys-color-secondary-container)` | `--color-secondary` |
+| On Secondary | `var(--md-sys-color-on-secondary-container)` | `--color-on-secondary` |
+| Accent/CTA | `var(--md-sys-color-tertiary-container)` | `--color-accent` |
+| On Accent/CTA | `var(--md-sys-color-on-tertiary-container)` | `--color-on-accent` |
+| Background | `var(--md-sys-color-surface)` | `--color-background` |
+| Foreground | `var(--md-sys-color-on-surface)` | `--color-foreground` |
+| Card | `var(--md-sys-color-surface-container-low)` | `--color-card` |
+| Card Foreground | `var(--md-sys-color-on-surface)` | `--color-card-foreground` |
+| Muted | `var(--md-sys-color-surface-variant)` | `--color-muted` |
+| Muted Foreground | `var(--md-sys-color-on-surface-variant)` | `--color-muted-foreground` |
+| Border | `var(--md-sys-color-outline-variant)` | `--color-border` |
+| Destructive | `var(--md-sys-color-error)` | `--color-destructive` |
+| On Destructive | `var(--md-sys-color-on-error)` | `--color-on-destructive` |
+| Ring | `var(--md-sys-color-primary)` | `--color-ring` |
 
-**Color Notes:** The dark palette re-declares only --md-sys-color-*; the shadcn aliases follow. Fonts as m3-baseline-light. Every text pair reaches 4.5:1 and the ring 3:1 against the background (computed from the hex values). Hex = Bun.color(original value, "hex") after resolving var() (oklch lightness written as a percentage for Bun.color). Original CSS: --primary: var(--md-sys-color-primary) = #cfbdfe; --primary-foreground: var(--md-sys-color-on-primary) = #36275d; --secondary: var(--md-sys-color-secondary-container) = #4a4458; --secondary-foreground: var(--md-sys-color-on-secondary-container) = #e8def8; --accent: var(--md-sys-color-tertiary-container) = #633b48; --accent-foreground: var(--md-sys-color-on-tertiary-container) = #ffd9e3; --background: var(--md-sys-color-surface) = #141218; --foreground: var(--md-sys-color-on-surface) = #e6e0e9; --card: var(--md-sys-color-surface-container-low) = #1d1b20; --card-foreground: var(--md-sys-color-on-surface) = #e6e0e9; --muted: var(--md-sys-color-surface-variant) = #49454e; --muted-foreground: var(--md-sys-color-on-surface-variant) = #cac4cf; --border: var(--md-sys-color-outline-variant) = #49454e; --destructive: var(--md-sys-color-error) = #ffb4ab; --destructive-foreground: var(--md-sys-color-on-error) = #690005; --ring: var(--md-sys-color-primary) = #cfbdfe.
+**Color Notes:** Roles only: the values come from the active scheme (@aphrody/m3-theme/tokens.css at build time, @aphrody/m3-tokens/wasm dynamic colour at runtime), both computed by crates/aphrody-m3-tokens. Never copy a resolved colour into a stylesheet.
 
 ### Typography
 
 - **Heading Font:** Google Sans Flex
 - **Body Font:** Google Sans Flex
 - **Mono Font:** Google Sans Code
-- **Mood:** material 3, m3, material you, baseline, purple, dark, default seed, shadcn bridge
+- **Mood:** material 3, expressive, variable optical size and width
+
+**CSS Import:**
+```css
+@import "@aphrody/m3-fonts/fonts.css";
+@import "@aphrody/m3-theme/tokens.css";
+@import "@aphrody/m3-tokens/m3-tokens.css";
+```
 
 ### Spacing Variables
 
@@ -71,10 +70,10 @@
 
 | Level | Value | Usage |
 |-------|-------|-------|
-| `--shadow-sm` | `0 1px 2px rgba(0,0,0,0.05)` | Subtle lift |
-| `--shadow-md` | `0 4px 6px rgba(0,0,0,0.1)` | Cards, buttons |
-| `--shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Modals, dropdowns |
-| `--shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Hero images, featured cards |
+| `--shadow-sm` | `var(--md-sys-elevation-level1)` | Subtle lift |
+| `--shadow-md` | `var(--md-sys-elevation-level2)` | Cards, buttons |
+| `--shadow-lg` | `var(--md-sys-elevation-level3)` | Modals, dropdowns |
+| `--shadow-xl` | `var(--md-sys-elevation-level4)` | Hero images, featured cards |
 
 ---
 
@@ -85,12 +84,12 @@
 ```css
 /* Primary Button */
 .btn-primary {
-  background: #633B48;
-  color: #FFD9E3;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: var(--md-sys-shape-corner-small);
   font-weight: 600;
-  transition: all 200ms ease;
+  transition: all var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
   cursor: pointer;
 }
 
@@ -102,19 +101,19 @@
 /* Secondary Button */
 .btn-secondary {
   background: transparent;
-  color: #CFBDFE;
-  border: 2px solid #CFBDFE;
+  color: var(--md-sys-color-primary);
+  border: 1px solid var(--md-sys-color-outline);
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: var(--md-sys-shape-corner-small);
   font-weight: 600;
-  transition: all 200ms ease;
+  transition: all var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
   cursor: pointer;
 }
 
 /* Keyboard focus, including Windows High Contrast (forced colors) */
 .btn-primary:focus-visible,
 .btn-secondary:focus-visible {
-  outline: 2px solid #CFBDFE;
+  outline: 2px solid var(--md-sys-color-primary);
   outline-offset: 2px;
 }
 
@@ -127,11 +126,11 @@
 
 ```css
 .card {
-  background: #141218;
-  border-radius: 12px;
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-corner-medium);
   padding: 24px;
   box-shadow: var(--shadow-md);
-  transition: all 200ms ease;
+  transition: all var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
   cursor: pointer;
 }
 
@@ -146,16 +145,16 @@
 ```css
 .input {
   padding: 12px 16px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: var(--md-sys-shape-corner-small);
   font-size: 16px;
-  transition: border-color 200ms ease;
+  transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
 .input:focus {
-  border-color: #CFBDFE;
+  border-color: var(--md-sys-color-primary);
   outline: none;
-  box-shadow: 0 0 0 3px #CFBDFE20;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent);
 }
 ```
 
@@ -163,13 +162,12 @@
 
 ```css
 .modal-overlay {
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: color-mix(in srgb, var(--md-sys-color-scrim) 32%, transparent);
 }
 
 .modal {
-  background: white;
-  border-radius: 16px;
+  background: var(--md-sys-color-surface-container-low);
+  border-radius: var(--md-sys-shape-corner-large);
   padding: 32px;
   box-shadow: var(--shadow-xl);
   max-width: 500px;
