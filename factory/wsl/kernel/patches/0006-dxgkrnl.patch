@@ -1,12 +1,10 @@
-WSL2 patchset port to mainline v7.3: DirectX (dxgkrnl) /dev/dxg driver, uapi d3dkmthk.h, Kconfig/Makefile wiring
-Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3 (gregkh/linux tag v7.3).
-Build/boot: NOT verified (no Linux host). SPDX of the touched files is preserved.
+WSL2 patchset port to mainline v7.4-rc1: DirectX (dxgkrnl) /dev/dxg driver, uapi d3dkmthk.h, Kconfig/Makefile wiring
+Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3, refreshed on v7.4-rc1 (Linus Torvalds signed tag, 2026-11-01; applied with line offsets only, no fuzz).
+Build: compiled on v7.4-rc1 with LLVM=1 (factory/wsl/kernel/build-wsl-kernel.sh).
 
-diff --git a/drivers/hv/Kconfig b/drivers/hv/Kconfig
-index aa11bcefddf2c0f7a4a2395fb3618d627b04b894..b6b1ec76dd48ce1688b325b1e0718e70e3de9082 100644
 --- a/drivers/hv/Kconfig
 +++ b/drivers/hv/Kconfig
-@@ -41,7 +41,7 @@ config HYPERV_VTL_MODE
+@@ -40,7 +40,7 @@
  	  If unsure, say N
  
  config HYPERV_TIMER
@@ -15,18 +13,16 @@ index aa11bcefddf2c0f7a4a2395fb3618d627b04b894..b6b1ec76dd48ce1688b325b1e0718e70
  
  config HYPERV_UTILS
  	tristate "Microsoft Hyper-V Utilities driver"
-@@ -109,5 +109,6 @@ config MSHV_VTL
+@@ -108,5 +108,6 @@
  	  events in VTL2.
  
  	  If unsure, say N.
 +source "drivers/hv/dxgkrnl/Kconfig"
  
  endmenu
-diff --git a/drivers/hv/Makefile b/drivers/hv/Makefile
-index 888a748cc7cb9269d72ef3421fcd1e9538aac3df..ac0d34672348789a41b77e27e0d8dde616f30f9e 100644
 --- a/drivers/hv/Makefile
 +++ b/drivers/hv/Makefile
-@@ -4,6 +4,7 @@ obj-$(CONFIG_HYPERV_UTILS)	+= hv_utils.o
+@@ -4,6 +4,7 @@
  obj-$(CONFIG_HYPERV_BALLOON)	+= hv_balloon.o
  obj-$(CONFIG_MSHV_ROOT)		+= mshv_root.o
  obj-$(CONFIG_MSHV_VTL)          += mshv_vtl.o
@@ -34,9 +30,6 @@ index 888a748cc7cb9269d72ef3421fcd1e9538aac3df..ac0d34672348789a41b77e27e0d8dde6
  
  CFLAGS_hv_trace.o = -I$(src)
  CFLAGS_hv_balloon.o = -I$(src)
-diff --git a/drivers/hv/dxgkrnl/Kconfig b/drivers/hv/dxgkrnl/Kconfig
-new file mode 100644
-index 0000000000000000000000000000000000000000..782692610887b109a64a643802f0b2d6bcba2fcd
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/Kconfig
 @@ -0,0 +1,28 @@
@@ -68,9 +61,6 @@ index 0000000000000000000000000000000000000000..782692610887b109a64a643802f0b2d6
 +	  to the driver IOCTLs. The virtual GPU devices are paravirtualized,
 +	  which means that access to the hardware is done in the host. The driver
 +	  communicates with the host using Hyper-V VM bus communication channels.
-diff --git a/drivers/hv/dxgkrnl/Makefile b/drivers/hv/dxgkrnl/Makefile
-new file mode 100644
-index 0000000000000000000000000000000000000000..89824cda670a392a5fc54f4caa8cf9ee3213565e
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/Makefile
 @@ -0,0 +1,5 @@
@@ -79,9 +69,6 @@ index 0000000000000000000000000000000000000000..89824cda670a392a5fc54f4caa8cf9ee
 +
 +obj-$(CONFIG_DXGKRNL)	+= dxgkrnl.o
 +dxgkrnl-y := dxgmodule.o hmgr.o misc.o dxgadapter.o ioctl.o dxgvmbus.o dxgprocess.o  dxgsyncfile.o
-diff --git a/drivers/hv/dxgkrnl/dxgadapter.c b/drivers/hv/dxgkrnl/dxgadapter.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..7b44d5b5f86a69df823770aa94fc876377802861
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/dxgadapter.c
 @@ -0,0 +1,1375 @@
@@ -1460,9 +1447,6 @@ index 0000000000000000000000000000000000000000..7b44d5b5f86a69df823770aa94fc8763
 +	hwqueue = container_of(refcount, struct dxghwqueue, hwqueue_kref);
 +	kfree(hwqueue);
 +}
-diff --git a/drivers/hv/dxgkrnl/dxgkrnl.h b/drivers/hv/dxgkrnl/dxgkrnl.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..09d54bbea93aa79e7ed77063c8bc46b6bb2817a2
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/dxgkrnl.h
 @@ -0,0 +1,1074 @@
@@ -2540,9 +2524,6 @@ index 0000000000000000000000000000000000000000..09d54bbea93aa79e7ed77063c8bc46b6
 +} while (0)
 +
 +#endif
-diff --git a/drivers/hv/dxgkrnl/dxgmodule.c b/drivers/hv/dxgkrnl/dxgmodule.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..9ab63b2a9ceffb9d361446c9941cfd5c0702083b
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/dxgmodule.c
 @@ -0,0 +1,972 @@
@@ -3518,9 +3499,6 @@ index 0000000000000000000000000000000000000000..9ab63b2a9ceffb9d361446c9941cfd5c
 +MODULE_LICENSE("GPL");
 +MODULE_DESCRIPTION("Microsoft Dxgkrnl virtual compute device Driver");
 +MODULE_VERSION("2.0.3");
-diff --git a/drivers/hv/dxgkrnl/dxgprocess.c b/drivers/hv/dxgkrnl/dxgprocess.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..9bfd53df1a54f1f2057ef955fb0fa5b9e872276c
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/dxgprocess.c
 @@ -0,0 +1,348 @@
@@ -3872,9 +3850,6 @@ index 0000000000000000000000000000000000000000..9bfd53df1a54f1f2057ef955fb0fa5b9
 +{
 +	hmgrtable_unlock(&process->handle_table, DXGLOCK_EXCL);
 +}
-diff --git a/drivers/hv/dxgkrnl/dxgsyncfile.c b/drivers/hv/dxgkrnl/dxgsyncfile.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..1e7fe3e070ea72ce5b36d1346e25c2a4e9f25f6c
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/dxgsyncfile.c
 @@ -0,0 +1,477 @@
@@ -4355,9 +4330,6 @@ index 0000000000000000000000000000000000000000..1e7fe3e070ea72ce5b36d1346e25c2a4
 +	.signaled = dxgdmafence_signaled,
 +	.release = dxgdmafence_release,
 +};
-diff --git a/drivers/hv/dxgkrnl/dxgsyncfile.h b/drivers/hv/dxgkrnl/dxgsyncfile.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..292b7f718987db1687c0d38744e21fc21032ee5e
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/dxgsyncfile.h
 @@ -0,0 +1,33 @@
@@ -4394,9 +4366,6 @@ index 0000000000000000000000000000000000000000..292b7f718987db1687c0d38744e21fc2
 +};
 +
 +#endif	 /* _DXGSYNCFILE_H */
-diff --git a/drivers/hv/dxgkrnl/dxgvmbus.c b/drivers/hv/dxgkrnl/dxgvmbus.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..5a699a61d8f177dff1c3f38622fa18d8611d3fb8
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/dxgvmbus.c
 @@ -0,0 +1,4400 @@
@@ -8800,9 +8769,6 @@ index 0000000000000000000000000000000000000000..5a699a61d8f177dff1c3f38622fa18d8
 +		DXG_TRACE("err: %d", ret);
 +	return ret;
 +}
-diff --git a/drivers/hv/dxgkrnl/dxgvmbus.h b/drivers/hv/dxgkrnl/dxgvmbus.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..8b3db2947b40165064f0759d8e1215ad031f3798
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/dxgvmbus.h
 @@ -0,0 +1,955 @@
@@ -9761,9 +9727,6 @@ index 0000000000000000000000000000000000000000..8b3db2947b40165064f0759d8e1215ad
 +		     u32 result_size);
 +
 +#endif /* _DXGVMBUS_H */
-diff --git a/drivers/hv/dxgkrnl/hmgr.c b/drivers/hv/dxgkrnl/hmgr.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..1a56b3abf4e018cae35a1b1374eb1af1d3e8e7b0
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/hmgr.c
 @@ -0,0 +1,569 @@
@@ -10336,9 +10299,6 @@ index 0000000000000000000000000000000000000000..1a56b3abf4e018cae35a1b1374eb1af1
 +	}
 +	return false;
 +}
-diff --git a/drivers/hv/dxgkrnl/hmgr.h b/drivers/hv/dxgkrnl/hmgr.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..23eec301137f2f554a9fed1c8a3e2af8c20520b4
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/hmgr.h
 @@ -0,0 +1,112 @@
@@ -10454,9 +10414,6 @@ index 0000000000000000000000000000000000000000..23eec301137f2f554a9fed1c8a3e2af8
 +			  void **object);
 +
 +#endif
-diff --git a/drivers/hv/dxgkrnl/ioctl.c b/drivers/hv/dxgkrnl/ioctl.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..31bfdcd40c5db0046bd0750031d10b2f82a891cd
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/ioctl.c
 @@ -0,0 +1,6127 @@
@@ -16587,9 +16544,6 @@ index 0000000000000000000000000000000000000000..31bfdcd40c5db0046bd0750031d10b2f
 +	}
 +}
 +#endif
-diff --git a/drivers/hv/dxgkrnl/misc.c b/drivers/hv/dxgkrnl/misc.c
-new file mode 100644
-index 0000000000000000000000000000000000000000..4bf6fe80d22a6a6b01dc9bfb5fc493ffad1cacca
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/misc.c
 @@ -0,0 +1,38 @@
@@ -16631,9 +16585,6 @@ index 0000000000000000000000000000000000000000..4bf6fe80d22a6a6b01dc9bfb5fc493ff
 +	return dest;
 +}
 +
-diff --git a/drivers/hv/dxgkrnl/misc.h b/drivers/hv/dxgkrnl/misc.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..9fcab4ae2c0cd1a9c78fc87d2f0945c168b70c03
 --- /dev/null
 +++ b/drivers/hv/dxgkrnl/misc.h
 @@ -0,0 +1,96 @@
@@ -16733,9 +16684,6 @@ index 0000000000000000000000000000000000000000..9fcab4ae2c0cd1a9c78fc87d2f0945c1
 +#endif /* DEBUG */
 +
 +#endif /* _MISC_H_ */
-diff --git a/include/uapi/misc/d3dkmthk.h b/include/uapi/misc/d3dkmthk.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..16e51d07fd6aa2bef05a9c20f653c0ca552daf49
 --- /dev/null
 +++ b/include/uapi/misc/d3dkmthk.h
 @@ -0,0 +1,1878 @@

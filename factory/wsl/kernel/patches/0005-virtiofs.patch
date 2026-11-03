@@ -1,12 +1,10 @@
-WSL2 patchset port to mainline v7.3: fuse/virtio_fs changes
-Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3 (gregkh/linux tag v7.3).
-Build/boot: NOT verified (no Linux host). SPDX of the touched files is preserved.
+WSL2 patchset port to mainline v7.4-rc1: fuse/virtio_fs changes
+Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3, refreshed on v7.4-rc1 (Linus Torvalds signed tag, 2026-11-01; applied with line offsets only, no fuzz).
+Build: compiled on v7.4-rc1 with LLVM=1 (factory/wsl/kernel/build-wsl-kernel.sh).
 
-diff --git a/fs/fuse/virtio_fs.c b/fs/fuse/virtio_fs.c
-index f15e516ebcb5c74d2d8d31629be2926b1a560c43..cb7f821e91ed30911f55ebeb53e131aa9a177514 100644
 --- a/fs/fuse/virtio_fs.c
 +++ b/fs/fuse/virtio_fs.c
-@@ -1730,6 +1730,15 @@ static int virtio_fs_get_tree(struct fs_context *fsc)
+@@ -1763,6 +1763,15 @@
  	fc->max_pages_limit = min_t(unsigned int, fc->max_pages_limit,
  				    virtqueue_size - FUSE_HEADER_OVERHEAD);
  

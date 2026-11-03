@@ -1,17 +1,13 @@
-WSL2 patchset port to mainline v7.3: x86/arm64 mshyperv, hyperv_timer, vmbus channel/connection, hyperv.h
-Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3 (gregkh/linux tag v7.3).
-Build/boot: NOT verified (no Linux host). SPDX of the touched files is preserved.
+WSL2 patchset port to mainline v7.4-rc1: x86/arm64 mshyperv, hyperv_timer, vmbus channel/connection, hyperv.h
+Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3, refreshed on v7.4-rc1 (Linus Torvalds signed tag, 2026-11-01; applied with line offsets only, no fuzz).
+Build: compiled on v7.4-rc1 with LLVM=1 (factory/wsl/kernel/build-wsl-kernel.sh).
 
-diff --git a/arch/arm64/hyperv/Makefile b/arch/arm64/hyperv/Makefile
-index 87c31c001da995a6db8a626fe9108b2d50265dc6..4cbeaa36d189ebbe37a17483655b429169db0b39 100644
 --- a/arch/arm64/hyperv/Makefile
 +++ b/arch/arm64/hyperv/Makefile
 @@ -1,2 +1,2 @@
  # SPDX-License-Identifier: GPL-2.0
 -obj-y		:= hv_core.o mshyperv.o
 +obj-y		:= hv_core.o mshyperv.o hv_hvc.o
-diff --git a/arch/arm64/hyperv/hv_core.c b/arch/arm64/hyperv/hv_core.c
-index e33a9e3c366a1dd368225e27e425de17198fe27f..5c51c42408a256be97e2cd5b589bda4e672f000f 100644
 --- a/arch/arm64/hyperv/hv_core.c
 +++ b/arch/arm64/hyperv/hv_core.c
 @@ -22,16 +22,13 @@
@@ -32,7 +28,7 @@ index e33a9e3c366a1dd368225e27e425de17198fe27f..5c51c42408a256be97e2cd5b589bda4e
  }
  EXPORT_SYMBOL_GPL(hv_do_hypercall);
  
-@@ -40,19 +37,25 @@ EXPORT_SYMBOL_GPL(hv_do_hypercall);
+@@ -40,19 +37,25 @@
   * with arguments in registers instead of physical memory.
   * Avoids the overhead of virt_to_phys for simple hypercalls.
   */
@@ -63,7 +59,7 @@ index e33a9e3c366a1dd368225e27e425de17198fe27f..5c51c42408a256be97e2cd5b589bda4e
  /*
   * hv_do_fast_hypercall16 -- Invoke the specified hypercall
   * with arguments in registers instead of physical memory.
-@@ -75,9 +78,9 @@ EXPORT_SYMBOL_GPL(hv_do_fast_hypercall16);
+@@ -75,9 +78,9 @@
   */
  void hv_set_vpreg(u32 msr, u64 value)
  {
@@ -75,7 +71,7 @@ index e33a9e3c366a1dd368225e27e425de17198fe27f..5c51c42408a256be97e2cd5b589bda4e
  		HVCALL_SET_VP_REGISTERS | HV_HYPERCALL_FAST_BIT |
  			HV_HYPERCALL_REP_COMP_1,
  		HV_PARTITION_ID_SELF,
-@@ -85,15 +88,14 @@ void hv_set_vpreg(u32 msr, u64 value)
+@@ -85,15 +88,14 @@
  		msr,
  		0,
  		value,
@@ -93,7 +89,7 @@ index e33a9e3c366a1dd368225e27e425de17198fe27f..5c51c42408a256be97e2cd5b589bda4e
  }
  EXPORT_SYMBOL_GPL(hv_set_vpreg);
  
-@@ -106,31 +108,22 @@ EXPORT_SYMBOL_GPL(hv_set_vpreg);
+@@ -106,31 +108,22 @@
  
  void hv_get_vpreg_128(u32 msr, struct hv_get_vp_registers_output *result)
  {
@@ -134,9 +130,6 @@ index e33a9e3c366a1dd368225e27e425de17198fe27f..5c51c42408a256be97e2cd5b589bda4e
  }
  EXPORT_SYMBOL_GPL(hv_get_vpreg_128);
  
-diff --git a/arch/arm64/hyperv/hv_hvc.S b/arch/arm64/hyperv/hv_hvc.S
-new file mode 100644
-index 0000000000000000000000000000000000000000..c22d34ccd0aa844401ff9db51da5da68c696594a
 --- /dev/null
 +++ b/arch/arm64/hyperv/hv_hvc.S
 @@ -0,0 +1,61 @@
@@ -201,11 +194,9 @@ index 0000000000000000000000000000000000000000..c22d34ccd0aa844401ff9db51da5da68
 +	ldr x19, [sp], #16
 +	ret
 +SYM_FUNC_END(hv_do_hvc_fast_get)
-diff --git a/arch/arm64/hyperv/mshyperv.c b/arch/arm64/hyperv/mshyperv.c
-index 4fdc26ade1d74372aa74853be0a2beb51ee86ab9..3301768226f9f09a00becaeb8e89e77b0ea64bb8 100644
 --- a/arch/arm64/hyperv/mshyperv.c
 +++ b/arch/arm64/hyperv/mshyperv.c
-@@ -70,20 +70,19 @@ static bool __init hyperv_detect_via_smccc(void)
+@@ -70,20 +70,19 @@
  	return arm_smccc_hypervisor_has_uuid(&hyperv_uuid);
  }
  
@@ -229,7 +220,7 @@ index 4fdc26ade1d74372aa74853be0a2beb51ee86ab9..3301768226f9f09a00becaeb8e89e77b
  
  	/* Setup the guest ID */
  	guest_id = hv_generate_guest_id(LINUX_VERSION_CODE);
-@@ -104,6 +103,13 @@ static int __init hyperv_init(void)
+@@ -104,6 +103,13 @@
  
  	hv_identify_partition_type();
  
@@ -243,7 +234,7 @@ index 4fdc26ade1d74372aa74853be0a2beb51ee86ab9..3301768226f9f09a00becaeb8e89e77b
  	ret = hv_common_init();
  	if (ret)
  		return ret;
-@@ -123,7 +129,6 @@ static int __init hyperv_init(void)
+@@ -123,7 +129,6 @@
  
  	ms_hyperv_late_init();
  
@@ -251,9 +242,6 @@ index 4fdc26ade1d74372aa74853be0a2beb51ee86ab9..3301768226f9f09a00becaeb8e89e77b
  	return 0;
  }
  
-diff --git a/arch/arm64/include/asm/hyperv_timer.h b/arch/arm64/include/asm/hyperv_timer.h
-new file mode 100644
-index 0000000000000000000000000000000000000000..f8b8220c6ed09a4f5a43113cd05186365017ba4b
 --- /dev/null
 +++ b/arch/arm64/include/asm/hyperv_timer.h
 @@ -0,0 +1,7 @@
@@ -264,8 +252,6 @@ index 0000000000000000000000000000000000000000..f8b8220c6ed09a4f5a43113cd0518636
 +#include <asm/mshyperv.h>
 +
 +#endif
-diff --git a/arch/arm64/include/asm/mshyperv.h b/arch/arm64/include/asm/mshyperv.h
-index b721d3134ab66616bbff4008592711d6be2ce083..8231cb3338e11c1b225efe80c123a644a878dfb6 100644
 --- a/arch/arm64/include/asm/mshyperv.h
 +++ b/arch/arm64/include/asm/mshyperv.h
 @@ -20,6 +20,17 @@
@@ -286,7 +272,7 @@ index b721d3134ab66616bbff4008592711d6be2ce083..8231cb3338e11c1b225efe80c123a644
  
  /*
   * Declare calls to get and set Hyper-V VP register values on ARM64, which
-@@ -53,6 +64,17 @@ static inline u64 hv_get_non_nested_msr(unsigned int reg)
+@@ -53,6 +64,17 @@
  	return hv_get_msr(reg);
  }
  
@@ -304,8 +290,6 @@ index b721d3134ab66616bbff4008592711d6be2ce083..8231cb3338e11c1b225efe80c123a644
  /* SMCCC hypercall parameters */
  #define HV_SMCCC_FUNC_NUMBER	1
  #define HV_FUNC_ID	ARM_SMCCC_CALL_VAL(			\
-diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
-index 29c6100f0c50b283cb4beb32d56c4e45894872b2..a68412200aa5df3fd1c8a514af704e69c5f51b76 100644
 --- a/arch/arm64/kernel/setup.c
 +++ b/arch/arm64/kernel/setup.c
 @@ -53,6 +53,7 @@
@@ -316,7 +300,7 @@ index 29c6100f0c50b283cb4beb32d56c4e45894872b2..a68412200aa5df3fd1c8a514af704e69
  #include <asm/mmu_context.h>
  
  static int num_standard_resources;
-@@ -341,6 +342,9 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
+@@ -341,6 +342,9 @@
  	if (acpi_disabled)
  		unflatten_device_tree();
  
@@ -326,11 +310,9 @@ index 29c6100f0c50b283cb4beb32d56c4e45894872b2..a68412200aa5df3fd1c8a514af704e69
  	bootmem_init();
  
  	kasan_init();
-diff --git a/arch/x86/kernel/cpu/mshyperv.c b/arch/x86/kernel/cpu/mshyperv.c
-index b4af7c0a70ac8db4b414498c97b1d934307e18c3..1b4b4cb5763a9ba17cda51d969be223eebc426bf 100644
 --- a/arch/x86/kernel/cpu/mshyperv.c
 +++ b/arch/x86/kernel/cpu/mshyperv.c
-@@ -532,6 +532,8 @@ static void hv_reserve_irq_vectors(void)
+@@ -517,6 +517,8 @@
  
  static void __init ms_hyperv_init_platform(void)
  {
@@ -339,7 +321,7 @@ index b4af7c0a70ac8db4b414498c97b1d934307e18c3..1b4b4cb5763a9ba17cda51d969be223e
  	int hv_max_functions_eax, eax;
  
  #ifdef CONFIG_PARAVIRT
-@@ -560,6 +562,18 @@ static void __init ms_hyperv_init_platform(void)
+@@ -545,6 +547,18 @@
  	pr_debug("Hyper-V: max %u virtual processors, %u logical processors\n",
  		 ms_hyperv.max_vp_index, ms_hyperv.max_lp_index);
  
@@ -358,11 +340,9 @@ index b4af7c0a70ac8db4b414498c97b1d934307e18c3..1b4b4cb5763a9ba17cda51d969be223e
  	hv_identify_partition_type();
  
  	if (hv_root_partition())
-diff --git a/drivers/clocksource/hyperv_timer.c b/drivers/clocksource/hyperv_timer.c
-index dddfff458ebfbaa7b2e87c99ebeb5653859baa37..cdf0e4256915663a035c347d0e0ef4e270352275 100644
 --- a/drivers/clocksource/hyperv_timer.c
 +++ b/drivers/clocksource/hyperv_timer.c
-@@ -278,11 +278,15 @@ static __always_inline u64 read_hv_clock_msr(void)
+@@ -278,11 +278,15 @@
  	 * is set to 0 when the partition is created and is incremented in 100
  	 * nanosecond units.
  	 *
@@ -381,7 +361,7 @@ index dddfff458ebfbaa7b2e87c99ebeb5653859baa37..cdf0e4256915663a035c347d0e0ef4e2
  }
  
  /*
-@@ -296,7 +300,12 @@ static __always_inline u64 read_hv_clock_msr(void)
+@@ -296,7 +300,12 @@
  static union {
  	struct ms_hyperv_tsc_page page;
  	u8 reserved[PAGE_SIZE];
@@ -395,7 +375,7 @@ index dddfff458ebfbaa7b2e87c99ebeb5653859baa37..cdf0e4256915663a035c347d0e0ef4e2
  
  static struct ms_hyperv_tsc_page *tsc_page = &tsc_pg.page;
  static unsigned long tsc_pfn;
-@@ -556,3 +565,17 @@ void __init hv_remap_tsc_clocksource(void)
+@@ -556,3 +565,17 @@
  	if (!tsc_page)
  		pr_err("Failed to remap Hyper-V TSC page.\n");
  }
@@ -413,11 +393,9 @@ index dddfff458ebfbaa7b2e87c99ebeb5653859baa37..cdf0e4256915663a035c347d0e0ef4e2
 +	return 0;
 +}
 +TIMER_ACPI_DECLARE(hyperv, ACPI_SIG_GTDT, hyperv_timer_init);
-diff --git a/drivers/hv/channel.c b/drivers/hv/channel.c
-index a0883ddf32e2fe4fcc46f5f31fc26c0ab74ef1f0..1a3038a0635dd6f9710340b09864b0737ebba58d 100644
 --- a/drivers/hv/channel.c
 +++ b/drivers/hv/channel.c
-@@ -1159,6 +1159,33 @@ static int vmbus_close_internal(struct vmbus_channel *channel)
+@@ -1159,6 +1159,33 @@
  	return ret;
  }
  
@@ -451,7 +429,7 @@ index a0883ddf32e2fe4fcc46f5f31fc26c0ab74ef1f0..1a3038a0635dd6f9710340b09864b073
  /* disconnect ring - close all channels */
  int vmbus_disconnect_ring(struct vmbus_channel *channel)
  {
-@@ -1168,20 +1195,52 @@ int vmbus_disconnect_ring(struct vmbus_channel *channel)
+@@ -1168,21 +1195,53 @@
  	if (channel->primary_channel != NULL)
  		return -EINVAL;
  
@@ -489,7 +467,7 @@ index a0883ddf32e2fe4fcc46f5f31fc26c0ab74ef1f0..1a3038a0635dd6f9710340b09864b073
  		mutex_unlock(&vmbus_connection.channel_mutex);
  	}
  
-+	/*
+ 	/*
 +	 * Release the claim on the sub channels still listed.  A rescind
 +	 * arriving from here on has to be free to tear them down itself; one
 +	 * that arrived while they were claimed only completed rescind_event,
@@ -507,14 +485,13 @@ index a0883ddf32e2fe4fcc46f5f31fc26c0ab74ef1f0..1a3038a0635dd6f9710340b09864b073
 +	}
 +	mutex_unlock(&vmbus_connection.channel_mutex);
 +
- 	/*
++	/*
  	 * Now close the primary.
  	 */
-diff --git a/drivers/hv/channel_mgmt.c b/drivers/hv/channel_mgmt.c
-index c42def04ac417b67b9a01bafb62718bac0f01a0f..800da63f3824f74c47673993169315ee04ae43bd 100644
+ 	mutex_lock(&vmbus_connection.channel_mutex);
 --- a/drivers/hv/channel_mgmt.c
 +++ b/drivers/hv/channel_mgmt.c
-@@ -377,7 +377,14 @@ static struct vmbus_channel *alloc_channel(void)
+@@ -377,7 +377,14 @@
  static void free_channel(struct vmbus_channel *channel)
  {
  	tasklet_kill(&channel->callback_event);
@@ -530,7 +507,7 @@ index c42def04ac417b67b9a01bafb62718bac0f01a0f..800da63f3824f74c47673993169315ee
  
  	kobject_put(&channel->kobj);
  }
-@@ -577,6 +584,20 @@ err_deq_chan:
+@@ -577,6 +584,20 @@
  	 */
  	newchannel->probe_done = true;
  
@@ -551,7 +528,7 @@ index c42def04ac417b67b9a01bafb62718bac0f01a0f..800da63f3824f74c47673993169315ee
  	if (primary_channel == NULL)
  		list_del(&newchannel->listentry);
  	else
-@@ -1284,7 +1305,14 @@ static void vmbus_onoffer_rescind(struct vmbus_channel_message_header *hdr)
+@@ -1284,7 +1305,14 @@
  		 * 2. Then close the primary channel.
  		 */
  		mutex_lock(&vmbus_connection.channel_mutex);
@@ -567,11 +544,9 @@ index c42def04ac417b67b9a01bafb62718bac0f01a0f..800da63f3824f74c47673993169315ee
  			/*
  			 * The channel is currently not open;
  			 * it is safe for us to cleanup the channel.
-diff --git a/drivers/hv/connection.c b/drivers/hv/connection.c
-index 818667ef9c74dc3d1e78ca0b8c7fc8c007bc514c..ea6d74d34514150adc88ae6e43392733b3c9c5d7 100644
 --- a/drivers/hv/connection.c
 +++ b/drivers/hv/connection.c
-@@ -199,8 +199,15 @@ int vmbus_connect(void)
+@@ -199,8 +199,15 @@
  		goto cleanup;
  	}
  
@@ -588,11 +563,9 @@ index 818667ef9c74dc3d1e78ca0b8c7fc8c007bc514c..ea6d74d34514150adc88ae6e43392733
  	if (!vmbus_connection.rescind_work_queue) {
  		ret = -ENOMEM;
  		goto cleanup;
-diff --git a/drivers/hv/vmbus_drv.c b/drivers/hv/vmbus_drv.c
-index 4692687cdbf3b5cb4b66efc83b62eddc507c0e72..7320dcf12649c8e14ee3febe168dc0207c443166 100644
 --- a/drivers/hv/vmbus_drv.c
 +++ b/drivers/hv/vmbus_drv.c
-@@ -2098,7 +2098,10 @@ int vmbus_add_channel_kobj(struct hv_device *dev, struct vmbus_channel *channel)
+@@ -2099,7 +2099,10 @@
  	ret = kobject_init_and_add(kobj, &vmbus_chan_ktype, NULL,
  				   "%u", relid);
  	if (ret) {
@@ -604,7 +577,7 @@ index 4692687cdbf3b5cb4b66efc83b62eddc507c0e72..7320dcf12649c8e14ee3febe168dc020
  		return ret;
  	}
  
-@@ -2106,10 +2109,10 @@ int vmbus_add_channel_kobj(struct hv_device *dev, struct vmbus_channel *channel)
+@@ -2107,10 +2110,10 @@
  
  	if (ret) {
  		/*
@@ -618,11 +591,9 @@ index 4692687cdbf3b5cb4b66efc83b62eddc507c0e72..7320dcf12649c8e14ee3febe168dc020
  		dev_err(device, "Unable to set up channel sysfs files\n");
  		return ret;
  	}
-diff --git a/include/linux/hyperv.h b/include/linux/hyperv.h
-index 9e109d91aa1430d83aaf37984f9d484641805873..7371b5759189cf8235cded3dea7aeca2686c6eeb 100644
 --- a/include/linux/hyperv.h
 +++ b/include/linux/hyperv.h
-@@ -801,6 +801,13 @@ struct vmbus_channel {
+@@ -833,6 +833,13 @@
  
  	bool rescind; /* got rescind msg */
  	bool rescind_ref; /* got rescind msg, got channel reference */
@@ -636,11 +607,10 @@ index 9e109d91aa1430d83aaf37984f9d484641805873..7371b5759189cf8235cded3dea7aeca2
  	struct completion rescind_event;
  
  	struct vmbus_gpadl ringbuffer_gpadlhandle;
-@@ -1448,6 +1455,22 @@ void vmbus_set_skip_unload(bool skip);
- 	.guid = GUID_INIT(0xda0a7802, 0xe377, 0x4aac, 0x8e, 0x77, \
+@@ -1489,6 +1496,22 @@
  			  0x05, 0x58, 0xeb, 0x10, 0x73, 0xf8)
  
-+/*
+ /*
 + * GPU paravirtualization global DXGK channel
 + * {DDE9CBC0-5060-4436-9448-EA1254A5D177}
 + */
@@ -656,6 +626,7 @@ index 9e109d91aa1430d83aaf37984f9d484641805873..7371b5759189cf8235cded3dea7aeca2
 +	.guid = GUID_INIT(0x6e382d18, 0x3336, 0x4f4b, 0xac, 0xc4, \
 +			  0x2b, 0x77, 0x3, 0xd4, 0xdf, 0x4a)
 +
- /*
++/*
   * Synthetic FC GUID
   * {2f9bcc4a-0069-4af3-b76b-6fd0be528cda}
+  */

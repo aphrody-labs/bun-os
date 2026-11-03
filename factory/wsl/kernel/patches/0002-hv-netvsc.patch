@@ -1,12 +1,10 @@
-WSL2 patchset port to mainline v7.3: hv_netvsc: rescind-aware NVSP wait, rndis_filter changes
-Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3 (gregkh/linux tag v7.3).
-Build/boot: NOT verified (no Linux host). SPDX of the touched files is preserved.
+WSL2 patchset port to mainline v7.4-rc1: hv_netvsc: rescind-aware NVSP wait, rndis_filter changes
+Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3, refreshed on v7.4-rc1 (Linus Torvalds signed tag, 2026-11-01; applied with line offsets only, no fuzz).
+Build: compiled on v7.4-rc1 with LLVM=1 (factory/wsl/kernel/build-wsl-kernel.sh).
 
-diff --git a/drivers/net/hyperv/hyperv_net.h b/drivers/net/hyperv/hyperv_net.h
-index 4841367fdab2fccc8dd974cce754bc71f25a9ea3..e834c6ba1eb5bde2e3d9b9b1eb5893a27191686a 100644
 --- a/drivers/net/hyperv/hyperv_net.h
 +++ b/drivers/net/hyperv/hyperv_net.h
-@@ -1136,6 +1136,7 @@ struct netvsc_channel {
+@@ -1136,6 +1136,7 @@
  	void *recv_buf; /* buffer to copy packets out from the receive buffer */
  	const struct vmpacket_descriptor *desc;
  	struct napi_struct napi;
@@ -14,7 +12,7 @@ index 4841367fdab2fccc8dd974cce754bc71f25a9ea3..e834c6ba1eb5bde2e3d9b9b1eb5893a2
  	struct multi_send_data msd;
  	struct multi_recv_comp mrc;
  	atomic_t queue_sends;
-@@ -1149,6 +1150,23 @@ struct netvsc_channel {
+@@ -1149,6 +1150,23 @@
  	struct netvsc_stats_rx rx_stats;
  };
  
@@ -38,7 +36,7 @@ index 4841367fdab2fccc8dd974cce754bc71f25a9ea3..e834c6ba1eb5bde2e3d9b9b1eb5893a2
  /* Per netvsc device */
  struct netvsc_device {
  	u32 nvsp_version;
-@@ -1189,6 +1207,8 @@ struct netvsc_device {
+@@ -1189,6 +1207,8 @@
  	u32 netvsc_gso_max_size;
  
  	atomic_t open_chn;
@@ -47,8 +45,6 @@ index 4841367fdab2fccc8dd974cce754bc71f25a9ea3..e834c6ba1eb5bde2e3d9b9b1eb5893a2
  	struct work_struct subchan_work;
  	wait_queue_head_t subchan_open;
  
-diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-index 5cd084e5696cd1683694ba1c8b5d0362b0428887..6cd5f9553feed262d6de6389cc8fd0bd2f1ce811 100644
 --- a/drivers/net/hyperv/netvsc.c
 +++ b/drivers/net/hyperv/netvsc.c
 @@ -31,6 +31,23 @@
@@ -75,7 +71,7 @@ index 5cd084e5696cd1683694ba1c8b5d0362b0428887..6cd5f9553feed262d6de6389cc8fd0bd
  /*
   * Switch the data path from the synthetic interface to the VF
   * interface.
-@@ -87,7 +104,10 @@ again:
+@@ -87,7 +104,10 @@
  		}
  	}
  
@@ -87,7 +83,7 @@ index 5cd084e5696cd1683694ba1c8b5d0362b0428887..6cd5f9553feed262d6de6389cc8fd0bd
  	net_device_ctx->data_path_is_vf = vf;
  
  	return 0;
-@@ -113,12 +133,24 @@ static void netvsc_subchan_work(struct work_struct *w)
+@@ -113,12 +133,24 @@
  	rdev = nvdev->extension;
  	if (rdev) {
  		ret = rndis_set_subchannel(rdev->ndev, nvdev, NULL);
@@ -114,7 +110,7 @@ index 5cd084e5696cd1683694ba1c8b5d0362b0428887..6cd5f9553feed262d6de6389cc8fd0bd
  
  			nvdev->max_chn = 1;
  			nvdev->num_chn = 1;
-@@ -429,7 +461,9 @@ static int netvsc_init_buf(struct hv_device *device,
+@@ -429,7 +461,9 @@
  		goto cleanup;
  	}
  
@@ -125,7 +121,7 @@ index 5cd084e5696cd1683694ba1c8b5d0362b0428887..6cd5f9553feed262d6de6389cc8fd0bd
  
  	/* Check the response */
  	resp = &init_packet->msg.v1_msg.send_recv_buf_complete;
-@@ -535,7 +569,9 @@ static int netvsc_init_buf(struct hv_device *device,
+@@ -535,7 +569,9 @@
  		goto cleanup;
  	}
  
@@ -136,7 +132,7 @@ index 5cd084e5696cd1683694ba1c8b5d0362b0428887..6cd5f9553feed262d6de6389cc8fd0bd
  
  	/* Check the response */
  	if (init_packet->msg.v1_msg.
-@@ -609,7 +645,9 @@ static int negotiate_nvsp_ver(struct hv_device *device,
+@@ -609,7 +645,9 @@
  	if (ret != 0)
  		return ret;
  
@@ -147,7 +143,7 @@ index 5cd084e5696cd1683694ba1c8b5d0362b0428887..6cd5f9553feed262d6de6389cc8fd0bd
  
  	if (init_packet->msg.init_msg.init_complete.status !=
  	    NVSP_STAT_SUCCESS)
-@@ -735,17 +773,24 @@ void netvsc_device_remove(struct hv_device *device)
+@@ -732,17 +770,24 @@
  
  	/* Disable NAPI and disassociate its context from the device. */
  	for (i = 0; i < net_device->num_chn; i++) {
@@ -176,7 +172,7 @@ index 5cd084e5696cd1683694ba1c8b5d0362b0428887..6cd5f9553feed262d6de6389cc8fd0bd
  	}
  
  	/*
-@@ -1842,6 +1887,7 @@ struct netvsc_device *netvsc_device_add(struct hv_device *device,
+@@ -1836,6 +1881,7 @@
  	/* Enable NAPI handler before init callbacks */
  	netif_napi_add(ndev, &net_device->chan_table[0].napi, netvsc_poll);
  	napi_enable(&net_device->chan_table[0].napi);
@@ -184,7 +180,7 @@ index 5cd084e5696cd1683694ba1c8b5d0362b0428887..6cd5f9553feed262d6de6389cc8fd0bd
  	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_RX,
  			     &net_device->chan_table[0].napi);
  	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_TX,
-@@ -1889,7 +1935,7 @@ close:
+@@ -1883,7 +1929,7 @@
  cleanup:
  	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_TX, NULL);
  	netif_queue_set_napi(ndev, 0, NETDEV_QUEUE_TYPE_RX, NULL);
@@ -193,11 +189,9 @@ index 5cd084e5696cd1683694ba1c8b5d0362b0428887..6cd5f9553feed262d6de6389cc8fd0bd
  	netif_napi_del(&net_device->chan_table[0].napi);
  
  cleanup2:
-diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
-index 1d43c73fd73f10200ee0c69c9221a2a44971b08a..b0a9dc6900324efc3b766d1a69b3dd9d280789ea 100644
 --- a/drivers/net/hyperv/netvsc_drv.c
 +++ b/drivers/net/hyperv/netvsc_drv.c
-@@ -1031,6 +1031,7 @@ static int netvsc_attach(struct net_device *ndev,
+@@ -1031,6 +1031,7 @@
  
  	if (nvdev->num_chn > 1) {
  		ret = rndis_set_subchannel(ndev, nvdev, dev_info);
@@ -205,7 +199,7 @@ index 1d43c73fd73f10200ee0c69c9221a2a44971b08a..b0a9dc6900324efc3b766d1a69b3dd9d
  
  		/* if unavailable, just proceed with one queue */
  		if (ret) {
-@@ -2677,8 +2678,16 @@ static void netvsc_remove(struct hv_device *dev)
+@@ -2677,8 +2678,16 @@
  	if (vf_netdev)
  		netvsc_unregister_vf(vf_netdev);
  
@@ -223,11 +217,9 @@ index 1d43c73fd73f10200ee0c69c9221a2a44971b08a..b0a9dc6900324efc3b766d1a69b3dd9d
  
  	unregister_netdevice(net);
  	list_del(&ndev_ctx->list);
-diff --git a/drivers/net/hyperv/rndis_filter.c b/drivers/net/hyperv/rndis_filter.c
-index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d697b9b4e 100644
 --- a/drivers/net/hyperv/rndis_filter.c
 +++ b/drivers/net/hyperv/rndis_filter.c
-@@ -127,6 +127,39 @@ static void put_rndis_request(struct rndis_device *dev,
+@@ -127,6 +127,39 @@
  	kfree(req);
  }
  
@@ -267,7 +259,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  static void dump_rndis_message(struct net_device *netdev,
  			       const struct rndis_message *rndis_msg,
  			       const void *data)
-@@ -695,7 +728,9 @@ static int rndis_filter_query_device(struct rndis_device *dev,
+@@ -695,7 +728,9 @@
  	if (ret != 0)
  		goto cleanup;
  
@@ -278,7 +270,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  
  	/* Copy the response back */
  	query_complete = &request->response_msg.msg.query_complete;
-@@ -835,7 +870,9 @@ int rndis_filter_set_device_mac(struct netvsc_device *nvdev,
+@@ -835,7 +870,9 @@
  	if (ret != 0)
  		goto cleanup;
  
@@ -289,7 +281,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  
  	set_complete = &request->response_msg.msg.set_complete;
  	if (set_complete->status != RNDIS_STATUS_SUCCESS)
-@@ -891,7 +928,10 @@ rndis_filter_set_offload_params(struct net_device *ndev,
+@@ -891,7 +928,10 @@
  	if (ret != 0)
  		goto cleanup;
  
@@ -301,7 +293,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  	set_complete = &request->response_msg.msg.set_complete;
  	if (set_complete->status != RNDIS_STATUS_SUCCESS) {
  		netdev_err(ndev, "Fail to set offload on host side:0x%x\n",
-@@ -958,7 +998,10 @@ static int rndis_set_rss_param_msg(struct rndis_device *rdev,
+@@ -958,7 +998,10 @@
  	if (ret != 0)
  		goto cleanup;
  
@@ -313,7 +305,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  	set_complete = &request->response_msg.msg.set_complete;
  	if (set_complete->status == RNDIS_STATUS_SUCCESS) {
  		if (!(flag & NDIS_RSS_PARAM_FLAG_DISABLE_RSS) &&
-@@ -1046,8 +1089,9 @@ static int rndis_filter_set_packet_filter(struct rndis_device *dev,
+@@ -1046,8 +1089,9 @@
  
  	ret = rndis_filter_send_request(dev, request);
  	if (ret == 0) {
@@ -325,7 +317,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  	}
  
  	put_rndis_request(dev, request);
-@@ -1111,7 +1155,11 @@ static int rndis_filter_init_device(struct rndis_device *dev,
+@@ -1111,7 +1155,11 @@
  		goto cleanup;
  	}
  
@@ -338,7 +330,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  
  	init_complete = &request->response_msg.msg.init_complete;
  	status = init_complete->status;
-@@ -1176,8 +1224,21 @@ cleanup:
+@@ -1176,8 +1224,21 @@
  	/* Force flag to be ordered before waiting */
  	wmb();
  
@@ -362,7 +354,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  
  	if (request)
  		put_rndis_request(dev, request);
-@@ -1257,21 +1318,33 @@ static void netvsc_sc_open(struct vmbus_channel *new_sc)
+@@ -1257,21 +1318,33 @@
  	 * out if napi was not enabled.
  	 */
  	napi_enable(&nvchan->napi);
@@ -405,7 +397,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  	}
  
  	if (atomic_inc_return(&nvscdev->open_chn) == nvscdev->num_chn)
-@@ -1294,6 +1367,8 @@ int rndis_set_subchannel(struct net_device *ndev,
+@@ -1294,6 +1367,8 @@
  
  	ASSERT_RTNL();
  
@@ -414,7 +406,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  	memset(init_packet, 0, sizeof(struct nvsp_message));
  	init_packet->hdr.msg_type = NVSP_MSG5_TYPE_SUBCHANNEL;
  	init_packet->msg.v5_msg.subchn_req.op = NVSP_SUBCHANNEL_ALLOCATE;
-@@ -1311,7 +1386,18 @@ int rndis_set_subchannel(struct net_device *ndev,
+@@ -1311,7 +1386,18 @@
  		return ret;
  	}
  
@@ -434,7 +426,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  	if (init_packet->msg.v5_msg.subchn_comp.status != NVSP_STAT_SUCCESS) {
  		netdev_err(ndev, "sub channel request failed\n");
  		return -EIO;
-@@ -1325,9 +1411,32 @@ int rndis_set_subchannel(struct net_device *ndev,
+@@ -1325,9 +1411,32 @@
  	nvdev->num_chn = 1 +
  		init_packet->msg.v5_msg.subchn_comp.num_subchannels;
  
@@ -470,7 +462,7 @@ index 9b6c44979b4ea6dac84987d4671feb281ec6c39e..7528156fd04c7e4ce1568a4ecb1ab28d
  
  	for (i = 0; i < VRSS_SEND_TAB_SIZE; i++)
  		ndev_ctx->tx_table[i] = i % nvdev->num_chn;
-@@ -1577,6 +1686,7 @@ struct netvsc_device *rndis_filter_device_add(struct hv_device *dev,
+@@ -1577,6 +1686,7 @@
  	}
  
  	atomic_set(&net_device->open_chn, 1);

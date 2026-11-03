@@ -1,9 +1,7 @@
-WSL2 patchset port to mainline v7.3: pci-hyperv changes
-Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3 (gregkh/linux tag v7.3).
-Build/boot: NOT verified (no Linux host). SPDX of the touched files is preserved.
+WSL2 patchset port to mainline v7.4-rc1: pci-hyperv changes
+Source: microsoft/WSL2-Linux-Kernel linux-msft-wsl-6.18.y @ a989171929bed4ea681be8d77333845ce1c1732a (v6.18.58 + WSL), 3-way merged onto v7.3, refreshed on v7.4-rc1 (Linus Torvalds signed tag, 2026-11-01; applied with line offsets only, no fuzz).
+Build: compiled on v7.4-rc1 with LLVM=1 (factory/wsl/kernel/build-wsl-kernel.sh).
 
-diff --git a/drivers/pci/controller/pci-hyperv.c b/drivers/pci/controller/pci-hyperv.c
-index 85d826f8f68dbaca889a1e68e6f8245a0d5099a7..64ea797fe126bb9aa8196470368109cdfa90c16b 100644
 --- a/drivers/pci/controller/pci-hyperv.c
 +++ b/drivers/pci/controller/pci-hyperv.c
 @@ -52,6 +52,7 @@
@@ -14,7 +12,7 @@ index 85d826f8f68dbaca889a1e68e6f8245a0d5099a7..64ea797fe126bb9aa8196470368109cd
  #include <asm/mshyperv.h>
  
  /*
-@@ -468,6 +469,42 @@ struct pci_eject_response {
+@@ -468,6 +469,42 @@
  
  static int pci_ring_size = VMBUS_RING_SIZE(SZ_16K);
  
@@ -57,11 +55,10 @@ index 85d826f8f68dbaca889a1e68e6f8245a0d5099a7..64ea797fe126bb9aa8196470368109cd
  /*
   * Driver specific state.
   */
-@@ -2531,6 +2568,25 @@ static void hv_pci_assign_numa_node(struct hv_pcibus_device *hbus)
- 	}
+@@ -2529,6 +2566,25 @@
  }
  
-+/**
+ /**
 + * hv_pci_assign_swiotlb() - assign dedicated swiotlb pool to bus devices
 + * @bus:	PCI bus whose devices should use the pool
 + *
@@ -80,10 +77,11 @@ index 85d826f8f68dbaca889a1e68e6f8245a0d5099a7..64ea797fe126bb9aa8196470368109cd
 +		dev->dev.dma_io_tlb_mem = hv_pci_swiotlb_pool;
 +}
 +
- /**
++/**
   * create_root_hv_pci_bus() - Expose a new root PCI bus
   * @hbus:	Root PCI bus, as understood by this driver
-@@ -2554,6 +2610,7 @@ static int create_root_hv_pci_bus(struct hv_pcibus_device *hbus)
+  *
+@@ -2551,6 +2607,7 @@
  	hv_pci_assign_numa_node(hbus);
  	pci_bus_assign_resources(bridge->bus);
  	hv_pci_assign_slots(hbus);
@@ -91,7 +89,7 @@ index 85d826f8f68dbaca889a1e68e6f8245a0d5099a7..64ea797fe126bb9aa8196470368109cd
  	pci_bus_add_devices(bridge->bus);
  	pci_unlock_rescan_remove();
  	hbus->state = hv_pcibus_installed;
-@@ -2825,6 +2882,7 @@ static void pci_devices_present_work(struct work_struct *work)
+@@ -2822,6 +2879,7 @@
  		pci_scan_child_bus(hbus->bridge->bus);
  		hv_pci_assign_numa_node(hbus);
  		hv_pci_assign_slots(hbus);
@@ -99,7 +97,7 @@ index 85d826f8f68dbaca889a1e68e6f8245a0d5099a7..64ea797fe126bb9aa8196470368109cd
  		pci_unlock_rescan_remove();
  		break;
  
-@@ -4186,10 +4244,52 @@ static struct hv_driver hv_pci_drv = {
+@@ -4197,10 +4255,52 @@
  	},
  };
  
@@ -152,7 +150,7 @@ index 85d826f8f68dbaca889a1e68e6f8245a0d5099a7..64ea797fe126bb9aa8196470368109cd
  	hvpci_block_ops.read_block = NULL;
  	hvpci_block_ops.write_block = NULL;
  	hvpci_block_ops.reg_blk_invalidate = NULL;
-@@ -4214,9 +4314,86 @@ static int __init init_hv_pci_drv(void)
+@@ -4225,9 +4325,86 @@
  	hvpci_block_ops.write_block = hv_write_config_block;
  	hvpci_block_ops.reg_blk_invalidate = hv_register_block_invalidate;
  
