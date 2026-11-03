@@ -23,11 +23,11 @@ the owner (listed under "Owner-only").
       - store.aphrody.com: ghost CORS origin, removed from infra/fleet/api.toml and the generated gateway.conf.
       - aphrody.com/store: not a promise anywhere in docs/apps; the Store is served at /repo/, /npm/, /cargo/,
         /downloads/os/ and /api/store/: not a target.
-      - omar.aphrody.com: public A record points at the private mesh IP 10.200.77.10; the catalog says it must
-        resolve to the VPS and answer 403 (vhost exists, not enabled): fix DNS via the Cloudflare MCP and enable it.
-      - api.aphrody.com/ and cdn.aphrody.com/ return 404 at the root: add an index or redirect through the repo.
+      - omar.aphrody.com: DONE 2026-11-03: proxied CNAME to aphrody.com (was A 10.200.77.10), vhost enabled,
+        403 from the VPS and prod.
+      - api.aphrody.com/ and cdn.aphrody.com/: DONE: 302 to /v1/ and /s/manifest.json (fcbd61a866).
       - nie.aphrody.app: owner decision (game depot missing on the VPS, RG_CORE_MODELES=0): decommission or restore.
-      - `user@1001.service` on the VPS clean (drop-in lists controllers this systemd rejects).
+      - `user@1001.service` on the VPS: DONE (reset-failed; `systemctl --failed` is empty).
 - [ ] Komodo (deploy.aphrody.app): Mongo data directory backed up, repaired or recreated, service healthy.
       Needs the owner's decision on the 248 GB WiredTiger data (see Owner-only).
 
