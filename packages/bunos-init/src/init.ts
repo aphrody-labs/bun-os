@@ -108,42 +108,43 @@ console.log(ok ? "BUNOS-INIT-OK" : "BUNOS-INIT-FAILED");
 // _IOWR('b', 1, struct binderfs_device { char name[256]; __u32 major, minor; }).
 const BINDER_VERSION = 0xc0046209;
 const BINDER_CTL_ADD = 0xc1086201;
-let androidOk = true;
 if (mode === "android") {
   const dir = "/dev/binderfs";
-  const report: Record<string, unknown> = { mounted: mount("binder", dir, "binder", MS_NOSUID | MS_NODEV | MS_NOEXEC) };
-  const nodes = (() => {
-    try {
-      return fs.readdirSync(dir).sort();
-    } catch {
-      return [];
-    }
-  })();
-  report.nodes = nodes;
-  report.devices = ["binder", "hwbinder", "vndbinder"].every(n => nodes.includes(n));
-  const version = new Int32Array(1);
-  const fd = fs.openSync(`${dir}/binder`, fs.constants.O_RDWR);
-  report.versionIoctl = libc.symbols.ioctl(fd, BINDER_VERSION, ptr(version));
-  report.protocolVersion = version[0];
-  fs.closeSync(fd);
-  const dev = Buffer.alloc(264);
-  dev.write("bunos-test");
-  const ctl = fs.openSync(`${dir}/binder-control`, fs.constants.O_RDWR);
-  report.ctlAdd = libc.symbols.ioctl(ctl, BINDER_CTL_ADD, ptr(dev));
-  report.allocated = { major: dev.readUInt32LE(256), minor: dev.readUInt32LE(260), node: fs.existsSync(`${dir}/bunos-test`) };
-  fs.closeSync(ctl);
-  const features = `${dir}/features`;
-  report.features = Object.fromEntries(
-    (fs.existsSync(features) ? fs.readdirSync(features) : []).map(n => [n, read(`${features}/${n}`)]),
-  );
-  // binder protocol 8 is the 64-bit protocol (BINDER_CURRENT_PROTOCOL_VERSION on 64-bit kernels).
-  androidOk =
-    report.mounted === true &&
-    report.devices === true &&
-    report.versionIoctl === 0 &&
-    version[0] === 8 &&
-    report.ctlAdd === 0 &&
-    (report.allocated as { node: boolean }).node;
+  // No MS_NODEV: binderfs exists to hold device nodes (Android's init mounts it the same way).
+  const report: Record<string, unknown> = { mounted: mount("binder", dir, "binder", MS_NOSUID | MS_NOEXEC) };
+  let androidOk = false;
+  try {
+    const nodes = fs.readdirSync(dir).sort();
+    report.nodes = nodes;
+    report.devices = ["binder", "hwbinder", "vndbinder"].every(n => nodes.includes(n));
+    const version = new Int32Array(1);
+    const fd = fs.openSync(`${dir}/binder`, fs.constants.O_RDWR);
+    report.versionIoctl = libc.symbols.ioctl(fd, BINDER_VERSION, ptr(version));
+    // Protocol 8 is the 64-bit binder protocol (BINDER_CURRENT_PROTOCOL_VERSION on 64-bit kernels).
+    report.protocolVersion = version[0];
+    fs.closeSync(fd);
+    const dev = Buffer.alloc(264);
+    dev.write("bunos-test");
+    const ctl = fs.openSync(`${dir}/binder-control`, fs.constants.O_RDWR);
+    report.ctlAdd = libc.symbols.ioctl(ctl, BINDER_CTL_ADD, ptr(dev));
+    const node = fs.existsSync(`${dir}/bunos-test`);
+    report.allocated = { major: dev.readUInt32LE(256), minor: dev.readUInt32LE(260), node };
+    fs.closeSync(ctl);
+    const features = `${dir}/features`;
+    report.features = Object.fromEntries(
+      (fs.existsSync(features) ? fs.readdirSync(features) : []).map(n => [n, read(`${features}/${n}`)]),
+    );
+    androidOk =
+      report.mounted === true &&
+      report.devices === true &&
+      report.versionIoctl === 0 &&
+      version[0] === 8 &&
+      report.ctlAdd === 0 &&
+      node;
+  } catch (e) {
+    // PID 1 must not die on a failed check: report it and power off normally.
+    report.error = String(e);
+  }
   console.log(`BUNOS-ANDROID ${JSON.stringify(report)}`);
   console.log(androidOk ? "BUNOS-ANDROID-OK" : "BUNOS-ANDROID-FAILED");
 }
