@@ -101,6 +101,54 @@ fn satd_strip<const N: usize, const H: usize>(a: &[u8], sa: usize, b: &[u8], sb:
     total
 }
 
+/// [`satd_strip`] for 8 and 4 columns, where its pairwise sums across neighbouring lanes do not
+/// vectorise: the same sums are formed lane by lane against copies of the rows shifted by one and
+/// two lanes, and only every fourth lane (the first column of a 4x4 block) is counted.
+#[inline(always)]
+fn satd_strip_narrow<const N: usize>(a: &[u8], sa: usize, b: &[u8], sb: usize) -> u32 {
+    let mut d = [[0i16; N]; 4];
+    for r in 0..4 {
+        let ra = &a[r * sa..r * sa + N];
+        let rb = &b[r * sb..r * sb + N];
+        for i in 0..N {
+            d[r][i] = ra[i] as i16 - rb[i] as i16;
+        }
+    }
+    let mut v = [[0i16; N]; 4];
+    for i in 0..N {
+        let s01 = d[0][i] + d[1][i];
+        let d01 = d[0][i] - d[1][i];
+        let s23 = d[2][i] + d[3][i];
+        let d23 = d[2][i] - d[3][i];
+        v[0][i] = s01 + s23;
+        v[1][i] = s01 - s23;
+        v[2][i] = d01 + d23;
+        v[3][i] = d01 - d23;
+    }
+    // per lane at most 4 rows x 2 x 2040: fits u16
+    let mut acc = [0u16; N];
+    for row in &v {
+        let mut p = [0i16; N];
+        let mut m = [0i16; N];
+        p[..N - 1].copy_from_slice(&row[1..]);
+        m[..N - 1].copy_from_slice(&row[1..]);
+        for i in 0..N {
+            p[i] += row[i];
+            m[i] = row[i] - m[i];
+        }
+        let mut p2 = [0i16; N];
+        let mut m2 = [0i16; N];
+        p2[..N - 2].copy_from_slice(&p[2..]);
+        m2[..N - 2].copy_from_slice(&m[2..]);
+        for i in 0..N {
+            let t = p[i].unsigned_abs().max(p2[i].unsigned_abs())
+                + m[i].unsigned_abs().max(m2[i].unsigned_abs());
+            acc[i] += if i % 4 == 0 { t } else { 0 };
+        }
+    }
+    acc.iter().map(|&x| x as u32).sum()
+}
+
 /// Sum of absolute 4x4 Hadamard-transformed differences (halved), for w, h multiples of 4.
 pub fn satd(a: &[u8], sa: usize, b: &[u8], sb: usize, w: usize, h: usize) -> u32 {
     let mut total = 0;
@@ -108,11 +156,11 @@ pub fn satd(a: &[u8], sa: usize, b: &[u8], sb: usize, w: usize, h: usize) -> u32
         let (ao, bo) = (by * sa, by * sb);
         match w {
             16 => total += satd_strip::<16, 8>(&a[ao..], sa, &b[bo..], sb),
-            8 => total += satd_strip::<8, 4>(&a[ao..], sa, &b[bo..], sb),
-            4 => total += satd_strip::<4, 2>(&a[ao..], sa, &b[bo..], sb),
+            8 => total += satd_strip_narrow::<8>(&a[ao..], sa, &b[bo..], sb),
+            4 => total += satd_strip_narrow::<4>(&a[ao..], sa, &b[bo..], sb),
             _ => {
                 for bx in (0..w).step_by(4) {
-                    total += satd_strip::<4, 2>(&a[ao + bx..], sa, &b[bo + bx..], sb);
+                    total += satd_strip_narrow::<4>(&a[ao + bx..], sa, &b[bo + bx..], sb);
                 }
             }
         }
@@ -150,6 +198,37 @@ pub fn block_var(a: &[u8], sa: usize, w: usize, h: usize) -> u32 {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn narrow_satd_matches_reference_across_strides_and_extremes() {
+        for stride in [16, 21] {
+            for seed in 0..128u32 {
+                let mut state = seed;
+                let mut next = || {
+                    state = state.wrapping_mul(1664525).wrapping_add(1013904223);
+                    (state >> 24) as u8
+                };
+                let a: Vec<u8> = (0..stride * 16).map(|_| next()).collect();
+                let b: Vec<u8> = (0..stride * 16).map(|_| next()).collect();
+                for (w, h) in [(4, 4), (8, 8), (8, 16), (12, 16)] {
+                    let mut expected = 0;
+                    for y in (0..h).step_by(4) {
+                        for x in (0..w).step_by(4) {
+                            let mut diff = [0i32; 16];
+                            for row in 0..4 {
+                                for col in 0..4 {
+                                    let i = (y + row) * stride + x + col;
+                                    diff[row * 4 + col] = a[i] as i32 - b[i] as i32;
+                                }
+                            }
+                            expected += hadamard4x4_sum(&diff) / 2;
+                        }
+                    }
+                    assert_eq!(satd(&a, stride, &b, stride, w, h), expected);
+                }
+            }
+            assert_eq!(satd(&[0; 336], stride, &[255; 336], stride, 8, 16), 16320);
+        }
+    }
     #[test]
     fn satd_of_dc_difference() {
         let a = [10u8; 16];
