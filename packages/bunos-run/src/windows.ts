@@ -4,6 +4,7 @@
 //   bunos windows status [--json] [--deep]       components (manifests), services, autostart, resident processes, orphans
 //   bunos windows uninstall [<component>..|--all] [--yes]   plan (default) or run each component's own uninstall
 //   bunos windows identity <file.exe>..           icon / VERSIONINFO / manifest present (exit 1 when icon or version lack)
+//   bunos windows register [--yes] | unregister [--yes]   the Apps > Installed apps entry (DisplayIcon, Publisher, version, uninstall command)
 //   bunos windows replace [<app> [on|off|status|record <key>=<value>]] [--force]   gated, reversible default switches
 //
 // Read-only except `uninstall --yes`, `replace on|off` and `replace record`. In-process (no checkout needed) except the
@@ -291,6 +292,54 @@ export function identity(file: string) {
   return { ...r, ok: r.icon && r.version };
 }
 
+// ------------------------------------------------------------------------------------------------ uninstall entry
+
+const UNINSTALL_KEY = "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\BunOS";
+
+/** The values of the Apps > Installed apps entry; the uninstall command is this very tool. */
+export function uninstallEntry(version: string, root = bunosRoot): Record<string, { type: "REG_SZ" | "REG_DWORD" | "REG_EXPAND_SZ"; value: string }> {
+  const exe = join(root, "bin", "bunos.exe");
+  return {
+    DisplayName: { type: "REG_SZ", value: "Bun OS" },
+    Publisher: { type: "REG_SZ", value: "Aphrody" },
+    DisplayVersion: { type: "REG_SZ", value: version },
+    DisplayIcon: { type: "REG_SZ", value: `${exe},0` },
+    InstallLocation: { type: "REG_SZ", value: root },
+    UninstallString: { type: "REG_SZ", value: `"${exe}" windows uninstall --all --yes` },
+    URLInfoAbout: { type: "REG_SZ", value: "https://aphrody.com" },
+    NoModify: { type: "REG_DWORD", value: "1" },
+    NoRepair: { type: "REG_DWORD", value: "1" },
+  };
+}
+
+function winExe(): string | null {
+  const p = join(bunosRoot, "bin", "win.exe");
+  return existsSync(p) ? p : null;
+}
+
+function register(on: boolean, yes: boolean): number {
+  const version = repo ? (JSON.parse(readFileSync(join(repo, "package.json"), "utf8")) as { version: string }).version : "0.0.0";
+  const entry = uninstallEntry(version);
+  if (!on) {
+    console.log(`${yes ? "delete" : "would delete"} ${UNINSTALL_KEY}`);
+    if (!yes) return 0;
+    return sh([join(systemRoot, "System32", "sudo.exe"), "reg.exe", "delete", UNINSTALL_KEY, "/f"]).code;
+  }
+  for (const [name, v] of Object.entries(entry)) console.log(`${yes ? "set" : "would set"} ${UNINSTALL_KEY}\\${name} (${v.type}) = ${v.value}`);
+  if (!yes) return 0;
+  const win = winExe();
+  if (!win) {
+    console.error("win.exe not installed (run the shell installer first)");
+    return 3;
+  }
+  // One elevated process writes every value through the WinClean registry tool (no reg.exe quoting of the command line).
+  const script = Object.entries(entry)
+    .map(([name, v]) => [win, "call", "set_registry_value", JSON.stringify({ path: UNINSTALL_KEY, name, value: v.value, type: v.type }), "--raw"])
+    .map(a => a.map(x => (/[\s"]/.test(x) ? `"${x.replaceAll('"', '\\"')}"` : x)).join(" "))
+    .join(" && ");
+  return sh([join(systemRoot, "System32", "sudo.exe"), "cmd.exe", "/c", script]).code;
+}
+
 // ------------------------------------------------------------------------------------------------ replace
 
 interface Gate {
@@ -479,10 +528,14 @@ export async function main(argv: string[]): Promise<number> {
       }
       return bad ? 1 : 0;
     }
+    case "register":
+      return register(true, yes);
+    case "unregister":
+      return register(false, yes);
     case "replace":
       return replace(rest, force);
     default:
-      console.error("usage: bunos windows status|uninstall|identity|replace (docs/WINDOWS-ARCHITECTURE.md)");
+      console.error("usage: bunos windows status|uninstall|identity|register|unregister|replace (docs/WINDOWS-ARCHITECTURE.md)");
       return 2;
   }
 }

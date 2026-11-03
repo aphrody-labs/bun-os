@@ -582,6 +582,54 @@ registry = [
   { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "VirtualDesktopAltTabFilter", type = "dword", value = 1 },
 ]
 
+[[tweak]]
+id = "look.animations"
+module = "look"
+title = "Window and taskbar animations on (Windows' own; minimize/maximize, taskbar, Aero Peek)"
+level = "standard"
+registry = [
+  { hive = "user", key = 'Control Panel\Desktop\WindowMetrics', name = "MinAnimate", type = "sz", value = "1" },
+  { hive = "user", key = 'Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced', name = "TaskbarAnimations", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\Windows\DWM', name = "EnableAeroPeek", type = "dword", value = 1 },
+]
+
+# ------------------------------------------------------------------------------------------------- gaming and latency
+# Windows' own scheduler knobs, documented on Microsoft Learn (docs/WINDOWS-ARCHITECTURE.md, "Native mechanisms").
+# Not set on purpose: a global timer resolution (Windows 10 2004+ makes timeBeginPeriod per-process and Windows 11
+# ignores it for occluded processes, so a machine-wide tick only costs power), Win32PrioritySeparation (no Learn
+# reference for client values), NetworkThrottlingIndex (undocumented folklore).
+
+[[tweak]]
+id = "performance.game-mode"
+module = "performance"
+title = "Game Mode on (Windows prioritises the foreground game and holds back background work)"
+level = "standard"
+registry = [
+  { hive = "user", key = 'Software\Microsoft\GameBar', name = "AutoGameModeEnabled", type = "dword", value = 1 },
+  { hive = "user", key = 'Software\Microsoft\GameBar', name = "AllowAutoGameMode", type = "dword", value = 1 },
+]
+
+[[tweak]]
+id = "performance.hags"
+module = "performance"
+title = "Hardware-accelerated GPU scheduling on (HwSchMode 2; takes effect at the next boot)"
+level = "standard"
+registry = [
+  { hive = "machine", key = 'SYSTEM\CurrentControlSet\Control\GraphicsDrivers', name = "HwSchMode", type = "dword", value = 2 },
+]
+
+[[tweak]]
+id = "performance.mmcss"
+module = "performance"
+title = "Multimedia Class Scheduler: 10 % reserved for low-priority work, Games task at high priority"
+level = "standard"
+registry = [
+  { hive = "machine", key = 'SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile', name = "SystemResponsiveness", type = "dword", value = 10 },
+  { hive = "machine", key = 'SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games', name = "Scheduling Category", type = "sz", value = "High" },
+  { hive = "machine", key = 'SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games', name = "Priority", type = "dword", value = 6 },
+  { hive = "machine", key = 'SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games', name = "SFIO Priority", type = "sz", value = "High" },
+]
+
 # --------------------------------------------------------------------------------------------------------- devtools
 
 [[tweak]]
