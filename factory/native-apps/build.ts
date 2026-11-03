@@ -476,7 +476,15 @@ async function craftCli() {
 /** Build LU from an isolated export. A candidate is not added to the image or apt feed. */
 async function lu() {
   const rev = Bun.env.BUNOS_REV;
-  if (!IN_BUILDER || !rev || !/^[0-9a-f]{40}$/.test(rev) || Bun.env.BUNOS_LU_EXPORT !== "1")
+  const reaRev = Bun.env.BUNOS_LU_REA_REV;
+  if (
+    !IN_BUILDER ||
+    !rev ||
+    !/^[0-9a-f]{40}$/.test(rev) ||
+    !reaRev ||
+    !/^[0-9a-f]{40}$/.test(reaRev) ||
+    Bun.env.BUNOS_LU_EXPORT !== "1"
+  )
     throw new Error("LU requires an isolated published-source export in the native builder");
   const app = join(ROOT, "apps/lu");
   const target = join(ROOT, ".lu-target");
@@ -516,6 +524,7 @@ async function lu() {
     JSON.stringify(
       {
         sourceCommit: rev,
+        reaCommit: reaRev,
         package: fields[0],
         version: fields[1],
         architecture: fields[2],
@@ -558,6 +567,8 @@ async function container(args: string[]) {
     if (head !== rev || clean.trim()) throw new Error("WordCraft requires the clean published canonical checkout");
   }
   const pin = (await $`git -C ${ROOT} rev-parse ${rev}:vendor/cosmic-epoch`.text()).trim();
+  const reaPin = luExport ? (await $`git -C ${ROOT} rev-parse ${rev}:vendor/rea`.text()).trim() : "";
+  if (luExport && !/^[0-9a-f]{40}$/.test(reaPin)) throw new Error("LU source has no pinned REA workspace");
   // One export tree and container name per invocation: lanes may run side by side.
   const exp = join(WORK, `root-${process.pid}`);
   await rm(exp, { recursive: true, force: true });
@@ -576,8 +587,16 @@ async function container(args: string[]) {
   ).trim();
   if (patch) paths.push(patch);
   try {
-    if (luExport) await $`git -C ${ROOT} archive ${rev} | tar -x -C ${exp}`;
-    else await $`git -C ${ROOT} archive ${rev} ${paths} | tar -x -C ${exp}`;
+    if (luExport) {
+      await $`git -C ${ROOT} archive ${rev} | tar -x -C ${exp}`;
+      // Git archives contain only gitlinks, not the workspace files at that
+      // pinned revision. Export REA without changing its shared checkout.
+      const rea = join(ROOT, "vendor/rea");
+      const reaOut = join(exp, "vendor/rea");
+      await $`git -C ${rea} cat-file -e ${`${reaPin}^{commit}`}`;
+      await mkdir(reaOut, { recursive: true });
+      await $`git -C ${rea} archive ${reaPin} | tar -x -C ${reaOut}`;
+    } else await $`git -C ${ROOT} archive ${rev} ${paths} | tar -x -C ${exp}`;
     await $`docker build -q -t ${image} -f ${join(exp, "factory/native-apps/builder.Dockerfile")} ${join(exp, "factory/native-apps")}`.quiet();
     const proc = Bun.spawn(
       [
@@ -612,6 +631,8 @@ async function container(args: string[]) {
         `BUNOS_REV=${rev}`,
         "-e",
         `BUNOS_LU_EXPORT=${luExport ? "1" : "0"}`,
+        "-e",
+        `BUNOS_LU_REA_REV=${reaPin}`,
         "-e",
         `COSMIC_EPOCH_PIN=${pin}`,
         "-e",
