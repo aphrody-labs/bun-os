@@ -129,6 +129,7 @@
     "packages/storyteller-ui-viewer-3d",
     "packages/tauri-themes-bridge",
     "packages/update",
+    "packages/viz3d",
     "packages/wasm",
     "packages/waydroid",
     "packages/web-to-tauri",

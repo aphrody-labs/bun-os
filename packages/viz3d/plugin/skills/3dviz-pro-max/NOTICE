@@ -1,0 +1,12 @@
+3Dviz Pro Max
+Copyright (c) 2026 Viettranx. MIT License (LICENSE). https://github.com/viettranx/3dviz-pro-max
+Data, references, templates, schemas and agents/ are upstream's, from the aphrody-labs/3dviz-pro-max fork at
+d077e0e68915c25be8e71d74684d3144fd1c2aca.
+
+Bun OS port: scripts/*.js (bundled from packages/viz3d/src of https://github.com/aphrody-labs/bun-os), runtime/,
+templates/scaffold-bun-threejs/, templates/rigs/post-stack-webgpu.js and the "Bun OS" section of SKILL.md.
+Copyright (c) 2026 aphrody-dev <contact@aphrody.com>. MIT License, same terms as LICENSE.
+
+The bundled scripts include code from @aphrody/chromium (Apache-2.0 and MIT), @aphrody/bun-blender (MIT),
+@aphrody/m3-design's difflib port (Apache-2.0), Ajv and ajv-formats (MIT). The study meshes fetched on demand
+are BodyParts3D, (c) The Database Center for Life Science, CC BY-SA 2.1 Japan.

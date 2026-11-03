@@ -1,0 +1,8 @@
+{
+  "fork": "https://github.com/aphrody-labs/3dviz-pro-max",
+  "upstream": "https://github.com/viettranx/3dviz-pro-max",
+  "license": "MIT",
+  "commit": "d077e0e68915c25be8e71d74684d3144fd1c2aca",
+  "committed": "2026-09-11T08:01:10+07:00",
+  "subject": "fix(examples): keep readout chips where the study has room"
+}

@@ -1,0 +1,20 @@
+<!doctype html>
+<!-- kit.html - the Bun OS blueprint page served by `viz3d serve --kit` (src/server.ts). The server replaces the
+     inject line with the Three.js import map and the meta tags that name the blueprint, its module, parameters,
+     tier and renderer backend. Chrome colours come from the Bun OS M3 sheet; only the scene draws its own. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{title}} - 3Dviz Pro Max kit</title>
+    <!-- viz3d:inject -->
+    <link rel="stylesheet" href="/__viz3d/m3.css" />
+    <link rel="stylesheet" href="/__viz3d/kit.css" />
+  </head>
+  <body>
+    <canvas id="world" aria-label="Blueprint view"></canvas>
+    <p id="hud" role="status"></p>
+    <p id="error" role="alert" hidden></p>
+    <script type="module" src="/__viz3d/kit-viewer.js"></script>
+  </body>
+</html>

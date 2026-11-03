@@ -1,0 +1,90 @@
+/* SPDX-License-Identifier: MIT */
+/* kit.css - chrome around a kit scene. Every colour, corner and type value is a Bun OS M3 role from m3.css. */
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--md-ref-typeface-plain, system-ui, sans-serif);
+}
+
+#world {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+#hud {
+  position: fixed;
+  left: 12px;
+  bottom: 12px;
+  margin: 0;
+  padding: 6px 12px;
+  border-radius: var(--md-sys-shape-corner-small);
+  background: color-mix(in srgb, var(--md-sys-color-surface-container) 88%, transparent);
+  color: var(--md-sys-color-on-surface);
+  font-size: var(--md-sys-typescale-label-medium-size);
+  line-height: var(--md-sys-typescale-label-medium-line-height);
+  font-weight: var(--md-sys-typescale-label-medium-weight);
+  font-variant-numeric: tabular-nums;
+}
+
+#hud:empty {
+  display: none;
+}
+
+#error {
+  position: fixed;
+  inset: 12px auto auto 12px;
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: var(--md-sys-shape-corner-small);
+  background: var(--md-sys-color-error-container);
+  color: var(--md-sys-color-on-error-container);
+  font-size: var(--md-sys-typescale-body-medium-size);
+}
+
+body.index main {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+body.index h1 {
+  font-size: var(--md-sys-typescale-headline-medium-size);
+  line-height: var(--md-sys-typescale-headline-medium-line-height);
+  font-weight: var(--md-sys-typescale-headline-medium-weight);
+}
+
+body.index ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+}
+
+body.index li {
+  padding: 12px 16px;
+  border-radius: var(--md-sys-shape-corner-medium);
+  background: var(--md-sys-color-surface-container-low);
+}
+
+body.index a {
+  color: var(--md-sys-color-primary);
+  font-weight: var(--md-sys-typescale-title-small-weight);
+}
+
+body.index a.tier {
+  margin-left: 8px;
+  color: var(--md-sys-color-tertiary);
+  font-size: var(--md-sys-typescale-label-small-size);
+}
+
+body.index p {
+  margin: 4px 0 0;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--md-sys-typescale-body-small-size);
+  line-height: var(--md-sys-typescale-body-small-line-height);
+}

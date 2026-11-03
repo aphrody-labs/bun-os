@@ -1,0 +1,52 @@
+{
+  "name": "@aphrody/viz3d",
+  "version": "1.4.7",
+  "description": "3D scene design intelligence of Bun OS: the 3Dviz Pro Max catalog (recipes, knowledge, kit blueprints, studies) with Bun-native search, design context, quality brief, host probe, Blender hero tier, a Bun.serve kit and study server on Three.js WebGPU (WebGL2 fallback) and CDP capture.",
+  "license": "MIT",
+  "author": "aphrody-dev <contact@aphrody.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
+    "directory": "packages/viz3d"
+  },
+  "type": "module",
+  "main": "src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./cli": "./src/cli.ts",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "viz3d": "./src/cli.ts"
+  },
+  "files": [
+    "LICENSE",
+    "README.md",
+    "UPSTREAM.md",
+    "bunos",
+    "plugin",
+    "runtime",
+    "src",
+    "studies",
+    "upstream"
+  ],
+  "scripts": {
+    "test": "bun test",
+    "typecheck": "bun check --noEmit -p tsconfig.json",
+    "sync": "bun scripts/sync-upstream.ts && bun scripts/build-skill.ts",
+    "build": "bun scripts/build-skill.ts",
+    "golden": "bun scripts/golden.ts"
+  },
+  "dependencies": {
+    "@aphrody/bun-blender": "workspace:*",
+    "@aphrody/chromium": "workspace:*",
+    "@aphrody/m3-design": "workspace:*",
+    "@aphrody/m3-os-themes": "workspace:*",
+    "ajv": "^8.0.0",
+    "ajv-formats": "^3.0.0",
+    "three": "catalog:"
+  },
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
+}

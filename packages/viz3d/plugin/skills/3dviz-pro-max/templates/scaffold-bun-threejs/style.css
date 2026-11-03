@@ -1,0 +1,44 @@
+/* style.css (Bun OS scaffold) - the panel is Bun OS chrome: every colour, corner and type size is an M3 role from
+   m3.css (generated from the Bun OS product theme). Scene colours live in LOOK, not here. Keep the viewport sized
+   by its container: main.js reads that box in the ResizeObserver. */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font: var(--md-sys-typescale-body-large-weight) var(--md-sys-typescale-body-large-size) / var(--md-sys-typescale-body-large-line-height) system-ui, sans-serif;
+}
+.layout { display: grid; grid-template-columns: 1fr 20rem; min-height: 100vh; }
+.viewport { position: relative; min-width: 0; }
+#world { display: block; width: 100%; height: 100%; }
+#error {
+  position: absolute; inset: auto 1rem 1rem; margin: 0; padding: 0.75rem 1rem;
+  background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container);
+  border-radius: var(--md-sys-shape-corner-small);
+}
+.panel { padding: 1.5rem; background: var(--md-sys-color-surface-container-low); border-left: 1px solid var(--md-sys-color-outline-variant); }
+.eyebrow {
+  margin: 0; color: var(--md-sys-color-on-surface-variant);
+  font-size: var(--md-sys-typescale-label-medium-size); letter-spacing: 0.12em; text-transform: uppercase;
+}
+h1 {
+  margin: 0.25rem 0 0.5rem;
+  font-size: var(--md-sys-typescale-headline-medium-size); line-height: var(--md-sys-typescale-headline-medium-line-height);
+  font-weight: var(--md-sys-typescale-headline-medium-weight);
+}
+.lede { margin: 0 0 1.5rem; color: var(--md-sys-color-on-surface-variant); }
+#views, .controls { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0 0 1rem; }
+button {
+  padding: 0.45rem 1rem; color: var(--md-sys-color-on-secondary-container); background: var(--md-sys-color-secondary-container);
+  border: 0; border-radius: var(--md-sys-shape-corner-full); cursor: pointer;
+  font-size: var(--md-sys-typescale-label-large-size); font-weight: var(--md-sys-typescale-label-large-weight);
+}
+button:hover { background: color-mix(in srgb, var(--md-sys-color-secondary-container), var(--md-sys-color-on-secondary-container) 8%); }
+button[aria-pressed="true"] { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+button:focus-visible { outline: 2px solid var(--md-sys-color-primary); outline-offset: 2px; }
+@media (forced-colors: active) { button:focus-visible { outline-color: Highlight; } }
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+  .viewport { height: 60vh; }
+  .panel { border-left: 0; border-top: 1px solid var(--md-sys-color-outline-variant); }
+}

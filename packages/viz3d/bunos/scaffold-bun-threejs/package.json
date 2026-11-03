@@ -1,0 +1,12 @@
+{
+  "name": "scene",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun serve.ts",
+    "build": "bun build.ts"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  }
+}

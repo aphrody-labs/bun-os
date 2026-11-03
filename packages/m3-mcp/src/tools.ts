@@ -22,6 +22,8 @@ const symbols = () => import("@aphrody/material-design-icons");
 
 export interface ToolResult {
   content: { type: "text"; text: string }[];
+  /** MCP structured result (an object); the text content carries the same value as JSON. */
+  structuredContent?: Record<string, unknown>;
   isError?: boolean;
 }
 
@@ -35,6 +37,37 @@ export interface M3Tool {
 const text = (t: string): ToolResult => ({
   content: [{ type: "text", text: t || "(no result)" }],
 });
+
+/** A structured result: the object as structuredContent and as JSON text for clients that read text only. */
+const structured = (value: object, isError = false): ToolResult => ({
+  content: [{ type: "text", text: JSON.stringify(value) }],
+  structuredContent: value as Record<string, unknown>,
+  ...(isError ? { isError: true } : {}),
+});
+
+// 3Dviz Pro Max (@aphrody/viz3d): loaded by the viz3d tools only, so listing never reads the catalog.
+const viz3d = () => import("@aphrody/viz3d");
+const KNOWLEDGE_KIND = z.enum([
+  "object-archetype",
+  "material-profile",
+  "physical-behavior",
+  "tool-adapter",
+  "inspection-pattern",
+  "validation-profile",
+  "style-profile",
+  "theme-profile",
+  "presentation-profile",
+  "composition-profile",
+  "motion-profile",
+  "interaction-profile",
+  "reasoning-rule",
+  "domain-validation",
+  "geometry-profile",
+  "lighting-profile",
+  "output-profile",
+  "blueprint",
+]);
+const DELIVERY = z.enum(["web-desktop", "web-mobile", "offline-still", "presentation"]);
 
 const themeInput = {
   seed: z.string().describe("Seed colour #rrggbb"),
@@ -266,6 +299,139 @@ export const M3_TOOLS: M3Tool[] = [
       if (out) args.push("--out", out);
       if (json) args.push("--json");
       return designCli(args, signal, [0, 1]);
+    },
+  ),
+  tool(
+    "viz3d_search",
+    "Search the 3Dviz Pro Max 3D design catalog of @aphrody/viz3d (223 recipes, 440 knowledge records: looks, lighting, materials, physical behaviour, reasoning rules, 22 kit blueprints) with weighted-field BM25. Lexical candidates, not a design: resolve the chosen IDs with viz3d_resolve.",
+    {
+      query: z.string().min(1).describe("Plain words: subject and the unresolved decision"),
+      collection: z.enum(["all", "recipes", "knowledge"]).default("all"),
+      kind: KNOWLEDGE_KIND.optional().describe("Narrow knowledge to one kind, e.g. lighting-profile"),
+      direction: z.string().optional().describe("Direction ID, e.g. linear-algebra"),
+      exclude_ids: z.array(z.string()).default([]),
+      algorithm: z.enum(["weighted-field-bm25", "overlap"]).optional(),
+      limit: z.number().int().min(1).max(20).default(5),
+    },
+    async ({ query, collection, kind, direction, exclude_ids, algorithm, limit: maximum }) => {
+      const { loadCatalog, search } = await viz3d();
+      const { manifest, records } = loadCatalog(undefined, collection);
+      return structured(
+        search(query, manifest, records, {
+          limit: maximum,
+          collection,
+          kind: kind ?? null,
+          direction: direction ?? null,
+          excludeIds: exclude_ids,
+          algorithm: algorithm ?? null,
+        }),
+      );
+    },
+  ),
+  tool(
+    "viz3d_resolve",
+    "Return the complete 3Dviz Pro Max records for the given IDs with their cited sources, the bundle hash and, for kit blueprints, the module, parameters, sockets and an import snippet. related adds one hop of linked records.",
+    { ids: z.array(z.string().min(1)).min(1), related: z.boolean().default(false) },
+    async ({ ids, related }) => {
+      const { loadCatalog, resolveRecords } = await viz3d();
+      const { manifest, records, sources } = loadCatalog(undefined, "all");
+      return structured(resolveRecords(ids, manifest, records, sources, related));
+    },
+  ),
+  tool(
+    "viz3d_design_context",
+    "Gather 3D design context for an objective: recipe candidates, chosen knowledge kinds, resolved records and sources; with blueprints, the kit blueprints compatible with the chosen looks; with host_ceiling, a per-blueprint quality brief (tier and reason) for the delivery target and hero IDs.",
+    {
+      objective: z.string().min(1),
+      kinds: z.array(KNOWLEDGE_KIND).default([]),
+      direction: z.string().optional(),
+      exclude_ids: z.array(z.string()).default([]),
+      blueprints: z.boolean().default(false),
+      looks: z.array(z.string()).default([]).describe("Style, theme or lighting record IDs (with blueprints)"),
+      host_ceiling: z
+        .enum(["T0", "T1", "T2", "T3", "T4"])
+        .optional()
+        .describe("quality_ceiling of viz3d_host_probe; adds the quality brief (with blueprints)"),
+      delivery: DELIVERY.default("web-desktop"),
+      heroes: z.array(z.string()).default([]).describe("Blueprint IDs built at the host ceiling"),
+    },
+    async args => {
+      const { gather, loadCatalog } = await viz3d();
+      return structured(
+        gather(args.objective, loadCatalog(undefined, "all"), {
+          kinds: args.kinds,
+          direction: args.direction ?? null,
+          excludeIds: args.exclude_ids,
+          blueprints: args.blueprints,
+          looks: args.looks,
+          host: args.host_ceiling ? { quality_ceiling: args.host_ceiling, quality_ceiling_reason: "given by the caller" } : null,
+          delivery: args.delivery,
+          heroes: args.heroes,
+        }),
+      );
+    },
+  ),
+  tool(
+    "viz3d_blueprints",
+    "List the 3Dviz Pro Max kit blueprints (Three.js modules and glTF heroes) compatible with the given look IDs, or all 22 when looks is empty: asset, footprint, poly budget, sockets, detail ladder and default parameters.",
+    { looks: z.array(z.string()).default([]) },
+    async ({ looks }) => {
+      const { blueprintsFor, loadCatalog } = await viz3d();
+      const { records } = loadCatalog(undefined, "knowledge");
+      return structured({ looks, blueprints: blueprintsFor(records, looks) });
+    },
+  ),
+  tool(
+    "viz3d_host_probe",
+    "Probe this host for the 3D pipeline: OS, CPU, memory, GPU, a runnable Blender (version, >= 4.2 LTS), the CDP browser used for capture, and the shipped-kit quality ceiling (T3 with Blender, else T2). Read-only.",
+    {},
+    async () => structured(await (await viz3d()).probeHost()),
+  ),
+  tool(
+    "viz3d_validate",
+    "Validate the 3Dviz Pro Max dataset: manifest contract, record layout, JSON Schema 2020-12 of every recipe, knowledge record, source and direction, relationships, source references and the catalog-summary hashes.",
+    {},
+    async () => {
+      const report = (await viz3d()).validateDataset();
+      return structured(report, !report.ok);
+    },
+  ),
+  tool(
+    "viz3d_capture",
+    "Serve a 3D scene on loopback and capture it through headless Chrome, Chromium or Edge (CDP): a kit blueprint (kit, tier, params) on Three.js WebGPU with WebGL2 fallback, a built scene directory (dir), or a running local URL. Writes PNGs and capture-log.json to out and returns the log: views, per-view usability, motion check, console errors, renderer and scene backend.",
+    {
+      kit: z.string().optional().describe("Blueprint record ID, e.g. knowledge.blueprint-timber-cottage"),
+      tier: z.enum(["T1", "T2", "T3"]).optional(),
+      params: z.record(z.string(), z.unknown()).optional(),
+      dir: z.string().optional().describe("Built scene directory with index.html"),
+      url: z.string().url().optional(),
+      out: z.string().default("captures"),
+      views: z.array(z.string()).default([]),
+      all_views: z.boolean().default(true),
+      clicks: z.array(z.string()).default([]),
+      width: z.number().int().min(64).max(4096).default(1280),
+      height: z.number().int().min(64).max(4096).default(720),
+      motion_check_ms: z.number().int().min(0).max(30_000).default(0),
+      ready_flag: z.string().regex(/^(none|[A-Za-z_$][\w$]*)$/).default("__sceneReady"),
+      gpu: z.boolean().default(false),
+      timeout_s: z.number().int().min(1).max(170).default(60),
+    },
+    async args => {
+      const { capture, parseCaptureArgs } = await viz3d();
+      const argv: string[] = ["--out", args.out, "--width", String(args.width), "--height", String(args.height)];
+      argv.push("--timeout-s", String(args.timeout_s), "--ready-flag", args.ready_flag);
+      if (args.kit) argv.push("--kit", args.kit);
+      if (args.tier) argv.push("--tier", args.tier);
+      if (args.params) argv.push("--params", JSON.stringify(args.params));
+      if (args.dir) argv.push("--dir", args.dir);
+      if (args.url) argv.push("--url", args.url);
+      for (const view of args.views) argv.push("--view", view);
+      if (args.all_views) argv.push("--all-views");
+      for (const selector of args.clicks) argv.push("--click", selector);
+      if (args.motion_check_ms) argv.push("--motion-check", String(args.motion_check_ms));
+      if (args.gpu) argv.push("--gpu");
+      const result = await capture(parseCaptureArgs(argv)!);
+      return structured({ status: result.status, message: result.message, log: result.log }, result.status !== 0);
     },
   ),
 ];
