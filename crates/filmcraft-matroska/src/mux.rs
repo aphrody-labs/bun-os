@@ -561,6 +561,40 @@ mod tests {
     use crate::{Demuxer, TrackKind};
     use std::io::Cursor;
 
+    #[test]
+    fn display_and_hdr_metadata_round_trip() {
+        let mut track = TrackSpec::new(TrackKind::Video, "V_VP9");
+        track.video_size = Some((64, 48));
+        track.display_size = Some((80, 48));
+        let colour = crate::track::Colour {
+            matrix_coefficients: Some(9),
+            transfer_characteristics: Some(16),
+            primaries: Some(9),
+            max_cll: Some(1000),
+            max_fall: Some(400),
+            mastering: Some(crate::track::MasteringMetadata {
+                primaries: [(0.68, 0.32), (0.265, 0.69), (0.15, 0.06)],
+                white_point: (0.3127, 0.329),
+                luminance_max: 1000.0,
+                luminance_min: 0.005,
+            }),
+            ..Default::default()
+        };
+        track.colour = Some(colour.clone());
+        let mut writer =
+            MkvWriter::new(Cursor::new(Vec::new()), vec![track], MuxOptions::default()).unwrap();
+        writer.write_frame(0, 0, true, &[0], None).unwrap();
+        let bytes = writer.finish().unwrap().into_inner();
+        let demuxer = Demuxer::from_slice(&bytes).unwrap();
+        let video = demuxer.tracks()[0].video.as_ref().unwrap();
+        assert_eq!((video.pixel_width, video.pixel_height), (64, 48));
+        assert_eq!(
+            (video.display_width, video.display_height),
+            (Some(80), Some(48))
+        );
+        assert_eq!(video.colour.as_ref(), Some(&colour));
+    }
+
     fn roundtrip(lacing: LacingMode) {
         let mut v = TrackSpec::new(TrackKind::Video, "V_MJPEG");
         v.video_size = Some((16, 16));
