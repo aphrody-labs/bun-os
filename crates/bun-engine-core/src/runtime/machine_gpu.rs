@@ -51,9 +51,13 @@ pub(super) fn register(app: &mut App) {
 }
 
 fn gpu_image(frame: GpuFrame, image: &Image, device: &RenderDevice) -> GpuImage {
+    let view = frame.texture.create_view(&wgpu::TextureViewDescriptor {
+        format: Some(wgpu::TextureFormat::Rgba8UnormSrgb),
+        ..Default::default()
+    });
     GpuImage {
         texture: frame.texture.into(),
-        texture_view: frame.view.into(),
+        texture_view: view.into(),
         sampler: device.create_sampler(&ImageSamplerDescriptor::nearest().as_wgpu()),
         texture_descriptor: image.texture_descriptor.clone(),
         texture_view_descriptor: None,
@@ -76,7 +80,7 @@ pub(super) fn install(world: &mut World, machine: &mut dyn Machine, spawn_view: 
             depth_or_array_layers: 1,
         },
         TextureDimension::D2,
-        TextureFormat::Rgba8Unorm,
+        TextureFormat::Rgba8UnormSrgb,
         RenderAssetUsages::MAIN_WORLD,
     );
     image.texture_descriptor.usage = frame.texture.usage();
@@ -122,8 +126,12 @@ fn present(
     }
     screen.presented = status.frames;
     gpu.submitted_frames = frame.submitted_frames;
+    let view = frame.texture.create_view(&wgpu::TextureViewDescriptor {
+        format: Some(wgpu::TextureFormat::Rgba8UnormSrgb),
+        ..Default::default()
+    });
     gpu.gpu.texture = frame.texture.into();
-    gpu.gpu.texture_view = frame.view.into();
+    gpu.gpu.texture_view = view.into();
 }
 
 fn extract(mut commands: Commands, source: Extract<Option<Res<MachineGpuImage>>>) {

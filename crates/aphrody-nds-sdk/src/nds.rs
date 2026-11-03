@@ -491,7 +491,7 @@ impl Handheld for Nds {
         self.keys = now;
         match input.touch {
             Some((x, y)) => {
-                self.emu.set_touch_pos([x, y]);
+                self.emu.set_touch_pos(touch_to_adc(x, y));
                 self.touching = true;
             }
             None if self.touching => {
@@ -581,5 +581,23 @@ impl Handheld for Nds {
 impl Drop for Nds {
     fn drop(&mut self) {
         let _ = self.flush_save();
+    }
+}
+
+/// Dust's touchscreen controller uses 12-bit ADC coordinates, while `Input` uses DS pixels.
+fn touch_to_adc(x: u16, y: u16) -> [u16; 2] {
+    [x.min(255) << 4, y.min(191) << 4]
+}
+
+#[cfg(test)]
+mod touch_tests {
+    use super::touch_to_adc;
+
+    #[test]
+    fn bottom_screen_pixels_are_scaled_and_clamped_for_dust() {
+        assert_eq!(touch_to_adc(0, 0), [0, 0]);
+        assert_eq!(touch_to_adc(80, 165), [1280, 2640]);
+        assert_eq!(touch_to_adc(255, 191), [4080, 3056]);
+        assert_eq!(touch_to_adc(u16::MAX, u16::MAX), [4080, 3056]);
     }
 }

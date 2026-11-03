@@ -101,7 +101,9 @@ impl OutputAttachments {
             format: crate::wgpu::TextureFormat::Rgba8Unorm,
             usage: crate::wgpu::TextureUsages::RENDER_ATTACHMENT
                 | crate::wgpu::TextureUsages::TEXTURE_BINDING,
-            view_formats: &[],
+            // The renderer writes console-encoded RGB values. Presenters may sample the
+            // same bytes as sRGB so the display pipeline does not encode them twice.
+            view_formats: &[crate::wgpu::TextureFormat::Rgba8UnormSrgb],
         });
         let color_view = color.create_view(&crate::wgpu::TextureViewDescriptor {
             label: Some("2D renderer color view"),
