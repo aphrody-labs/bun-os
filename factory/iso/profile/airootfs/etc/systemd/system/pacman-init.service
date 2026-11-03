@@ -1,0 +1,16 @@
+[Unit]
+Description=Initializes Pacman keyring (Arch Linux and Bun OS store keys)
+Requires=etc-pacman.d-gnupg.mount
+After=etc-pacman.d-gnupg.mount time-sync.target
+BindsTo=etc-pacman.d-gnupg.mount
+Before=archlinux-keyring-wkd-sync.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/pacman-key --init
+# Every keyring under /usr/share/pacman/keyrings: archlinux and bunos (the aphrody-store key of [bunos-testing]).
+ExecStart=/usr/bin/pacman-key --populate
+
+[Install]
+WantedBy=multi-user.target

@@ -60,6 +60,11 @@ try {
       } else {
         // `git add` on the temporary index: honours .gitattributes (eol) and recurses into directories.
         must(["add", "--", p]);
+        // core.filemode=false (Windows) adds every new file as 100644: give new scripts (#!) their executable bit.
+        for (const f of must(["ls-files", "--", p]).split("\n").filter(Boolean)) {
+          if (git(["cat-file", "-e", `${base}:${f}`]).code === 0) continue;
+          if ((await Bun.file(join(root, f)).slice(0, 2).text()) === "#!") must(["update-index", "--chmod=+x", "--", f]);
+        }
       }
     }
     const tree = must(["write-tree"]);

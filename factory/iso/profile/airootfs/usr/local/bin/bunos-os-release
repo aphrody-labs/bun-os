@@ -1,0 +1,20 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# Bun OS os-release (docs/ops/RELEASES.md): Arch-style rolling, no VERSION_ID, the image snapshot date in IMAGE_VERSION.
+# IMAGE_VERSION comes from /usr/lib/bunos/image-version (written by factory/iso/build.sh), else today's date.
+v=$(cat /usr/lib/bunos/image-version 2>/dev/null || date -u +%Y.%m.%d)
+cat >/usr/lib/os-release <<OS
+NAME="Bun OS"
+PRETTY_NAME="Bun OS"
+ID=bunos
+ID_LIKE=arch
+BUILD_ID=rolling
+IMAGE_ID=bunos-live
+IMAGE_VERSION=$v
+ANSI_COLOR="38;2;251;240;223"
+HOME_URL="https://aphrody.com/"
+DOCUMENTATION_URL="https://github.com/aphrody-labs/bun-os/tree/main/docs"
+SUPPORT_URL="https://aphrody.com/status"
+BUG_REPORT_URL="https://github.com/aphrody-labs/bun-os/issues"
+LOGO=bunos
+OS

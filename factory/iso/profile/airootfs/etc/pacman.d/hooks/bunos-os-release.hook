@@ -1,0 +1,12 @@
+# Bun OS identity (docs/ops/RELEASES.md "Version strings"): rewrites /usr/lib/os-release, which Arch's filesystem
+# package installs, whenever that package is installed or upgraded.
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Path
+Target = usr/lib/os-release
+
+[Action]
+Description = Writing the Bun OS os-release...
+When = PostTransaction
+Exec = /usr/local/bin/bunos-os-release

@@ -1,0 +1,15 @@
+# Qualification report on the serial console (factory/iso/qualify.sh); only when booted with bunos.qualify=1.
+[Unit]
+Description=Bun OS live boot report
+ConditionKernelCommandLine=bunos.qualify=1
+After=graphical.target pacman-init.service network-online.target
+Wants=graphical.target network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/bunos-boot-report
+StandardOutput=tty
+TTYPath=/dev/ttyS0
+
+[Install]
+WantedBy=graphical.target

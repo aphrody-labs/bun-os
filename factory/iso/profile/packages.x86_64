@@ -1,0 +1,16 @@
+# Bun OS live medium: added to factory/wsl/packages.base (the base set) by factory/iso/build.sh.
+# Kernel and live boot
+linux-bun
+linux-firmware
+mkinitcpio
+mkinitcpio-archiso
+archlinux-keyring
+arch-install-scripts
+dosfstools
+e2fsprogs
+btrfs-progs
+# Bun OS userland and desktop ([bunos-testing])
+bunos-cli
+bunos-desktop
+cosmic-session
+cosmic-greeter

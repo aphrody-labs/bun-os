@@ -1,0 +1,13 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+# One machine-readable report on the serial console for factory/iso/qualify.sh (bunos-boot-report.service).
+for _ in $(seq 120); do
+  s=$(systemctl is-system-running 2>/dev/null)
+  [ "$s" = running ] || [ "$s" = degraded ] && break
+  sleep 1
+done
+. /usr/lib/os-release
+echo "BUNOS-BOOT-REPORT id=$ID id_like=$ID_LIKE build_id=$BUILD_ID image_version=$IMAGE_VERSION kernel=$(uname -r) system=$s target=$(systemctl get-default) multi_user=$(systemctl is-active multi-user.target) graphical=$(systemctl is-active graphical.target) greeter=$(systemctl is-active cosmic-greeter.service) failed=$(systemctl --failed --no-legend --plain | awk '{print $1}' | paste -sd, -)"
+# [bunos-testing] with SigLevel Required: a sync proves the database signature verifies against the Store key.
+if pacman -Sy --noconfirm >/tmp/pacman-sy.log 2>&1; then n=$(pacman -Sl bunos-testing | wc -l); else n="sync-failed:$(tail -1 /tmp/pacman-sy.log)"; fi
+echo "BUNOS-BOOT-REPORT repo=bunos-testing packages=$n store_key=$(pacman-key --list-keys A4B3EFE520B09C8184ACF571BFCB340002617BD7 >/dev/null 2>&1 && echo present || echo missing)"
