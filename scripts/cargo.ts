@@ -17,7 +17,11 @@ if (action === "metadata") {
     ),
   );
 } else if (action === "fmt" || action === "check" || action === "test") {
-  process.exitCode = (await runCargo(cargoArgs(action, { packages: [] }), { root, timeoutMs: 1_800_000 })).code;
+  // `-p <crate>` / `--package <crate>` narrow the run; without them the whole workspace is checked.
+  const packages = args.flatMap((arg, i) =>
+    (arg === "-p" || arg === "--package") && args[i + 1] ? [args[i + 1]!] : [],
+  );
+  process.exitCode = (await runCargo(cargoArgs(action, { packages }), { root, timeoutMs: 1_800_000 })).code;
 } else if (action === "exec") {
   if (args[0] !== "--" || args.length < 2) throw new Error("Usage: bun scripts/cargo.ts exec -- <cargo arguments>");
   process.exitCode = (await runCargo(args.slice(1), { root, cwd: process.cwd(), timeoutMs: 1_800_000 })).code;
