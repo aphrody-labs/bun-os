@@ -25,6 +25,8 @@ import { homedir } from "node:os";
 import { basename, dirname, extname, isAbsolute, join, resolve, sep } from "node:path";
 import type { PublicIndexSearch, PublicIndexSdkOptions } from "./public-index.ts";
 import { defineApi, healthResponse, problem } from "../../../bun-os-platform/src/api/index.ts";
+// @ts-expect-error TS2307: Bun text import of the generated sheet (inlined by bun build); TypeScript has no .css text type.
+import brandSheet from "../../../app-ui/src/brand.css" with { type: "text" };
 
 const fileContent = (description: string, type: string) => ({ description, type, schema: { type: "string" } });
 /** The download routes: the single source of the OpenAPI document of the downloads service. */
@@ -175,6 +177,12 @@ const petKeyframes = (): string => {
     .join("");
 };
 
+// The generated Aphrody brand roles (packages/app-ui/src/brand.css, product seed), switched by the system scheme
+// because the page runs no script before first paint.
+const brandRoles = (brandSheet as string)
+  .replace(/:root\.light,\s*\.light\s*\{([^}]*)\}/g, "@media (prefers-color-scheme: light) {\n:root {$1}\n}")
+  .replace(/:root,\s*\.dark\s*\{([^}]*)\}/g, "@media (prefers-color-scheme: dark) {\n:root {$1}\n}");
+
 const cmd = (label: string, text: string) =>
   `<button class="cmd" data-copy="${text}" aria-label="Copy ${label} command"><span>${label}</span><code>${text}</code></button>`;
 
@@ -189,24 +197,22 @@ export function renderIndex(manifest: Manifest | null): string {
 <title>Aphrody</title>
 <link rel="icon" type="image/svg+xml" href="/icon.svg">
 <style>
-/* M3 tonal-spot roles from the Aphrody pet seed #8c6c88 (m3/packages/identity PET_COLORS). */
-:root{--md-sys-color-background:#fff7fa;--md-sys-color-on-background:#201a1e;--md-sys-color-primary:#7e4d7c;--md-sys-color-on-primary:#fff;--md-sys-color-surface-container:#f7ebf1;--md-sys-color-on-surface-variant:#4e444b;--md-sys-color-outline-variant:#d1c3cc}
-@media (prefers-color-scheme:dark){:root{--md-sys-color-background:#171216;--md-sys-color-on-background:#ebdfe6;--md-sys-color-primary:#efb4e9;--md-sys-color-on-primary:#4b1f4b;--md-sys-color-surface-container:#241e22;--md-sys-color-on-surface-variant:#d1c3cc;--md-sys-color-outline-variant:#4e444b}}
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--md-sys-color-background);color:var(--md-sys-color-on-background);font:16px/1.5 Roboto,system-ui,sans-serif}
+${brandRoles}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--md-sys-color-background);color:var(--md-sys-color-on-background);font:16px/1.5 "Google Sans Flex","Roboto Flex",sans-serif}
 main{width:min(100% - 2rem,26rem);display:grid;gap:1rem;justify-items:center;padding:2rem 0}
 .pet{width:96px;height:104px;background:url(/pet.webp) 0 0/768px 1144px no-repeat;animation:idle 1.1s step-end infinite}
 @keyframes idle{${petKeyframes()}}
 @media (prefers-reduced-motion:reduce){.pet{animation:none}}
-h1{font:400 2.25rem/2.75rem Roboto,system-ui,sans-serif;margin:0;letter-spacing:0}
-.btn{position:relative;display:inline-flex;align-items:center;height:40px;padding:0 24px;border-radius:20px;background:var(--md-sys-color-primary);color:var(--md-sys-color-on-primary);text-decoration:none;font:500 .875rem/1.25rem Roboto,system-ui,sans-serif;letter-spacing:.1px;overflow:hidden}
+h1{font:400 2.25rem/2.75rem "Google Sans Flex","Roboto Flex",sans-serif;margin:0;letter-spacing:0}
+.btn{position:relative;display:inline-flex;align-items:center;height:40px;padding:0 24px;border-radius:20px;background:var(--md-sys-color-primary);color:var(--md-sys-color-on-primary);text-decoration:none;font:500 .875rem/1.25rem "Google Sans Flex","Roboto Flex",sans-serif;letter-spacing:.1px;overflow:hidden}
 .btn::after{content:"";position:absolute;inset:0;background:currentColor;opacity:0;transition:opacity .15s}
 .btn:hover::after{opacity:.08}.btn:focus-visible::after,.btn:active::after{opacity:.12}
 .btn.off{opacity:.38;pointer-events:none}
 .cmd{display:grid;gap:.25rem;width:100%;min-height:48px;box-sizing:border-box;text-align:left;padding:.75rem 1rem;border:1px solid var(--md-sys-color-outline-variant);border-radius:12px;background:var(--md-sys-color-surface-container);color:inherit;cursor:pointer;font:inherit;transition:background .15s}
 .cmd:hover{background:color-mix(in srgb,var(--md-sys-color-on-background) 8%,var(--md-sys-color-surface-container))}
-:is(.btn,.cmd):focus-visible{outline:3px solid var(--md-sys-color-primary);outline-offset:2px}
+:is(.btn,.cmd):focus-visible{outline:2px solid var(--md-sys-color-secondary);outline-offset:2px}
 .cmd span{font-size:.75rem;letter-spacing:.5px;color:var(--md-sys-color-on-surface-variant)}
-.cmd code{font:13px/1.4 ui-monospace,monospace;word-break:break-all}
+.cmd code{font:13px/1.4 "Google Sans Code","Roboto Mono",monospace;word-break:break-all}
 .cmd.ok span::after{content:" \u00B7 copied";color:var(--md-sys-color-primary)}
 </style></head><body><main>
 <div class="pet" role="img" aria-label="Aphrody"></div>

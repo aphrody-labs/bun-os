@@ -11,6 +11,8 @@ import { mkdir, open, rename, rm } from "node:fs/promises";
 import { basename, join } from "node:path";
 import { inboxDir, processInboxEntry } from "./inbox";
 import { describe, listOwned } from "./store";
+// @ts-expect-error TS2307: Bun text import of the generated sheet (inlined by bun build); TypeScript has no .css text type.
+import brandSheet from "../../../app-ui/src/brand.css" with { type: "text" };
 
 export const uploadChunkBytes = 8 * 1024 * 1024;
 
@@ -109,19 +111,27 @@ export function ownedRoutes(): Record<string, Record<string, Handler>> {
   };
 }
 
+// The generated Aphrody brand roles (packages/app-ui/src/brand.css, product seed), switched by the system scheme
+// because this page loads no script before first paint.
+const brandRoles = (brandSheet as string)
+  .replace(/:root\.light,\s*\.light\s*\{([^}]*)\}/g, "@media (prefers-color-scheme: light) {\n:root {$1}\n}")
+  .replace(/:root,\s*\.dark\s*\{([^}]*)\}/g, "@media (prefers-color-scheme: dark) {\n:root {$1}\n}");
+
 const dropPage = `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Owned dumps</title>
 <style>
-:root{color-scheme:dark;font:15px/1.45 system-ui,sans-serif;background:#111318;color:#e2e2e9}
+${brandRoles}
+body{margin:0;font:15px/1.45 "Google Sans Flex","Roboto Flex",sans-serif;background:var(--md-sys-color-surface);color:var(--md-sys-color-on-surface)}
 main{max-width:960px;margin:0 auto;padding:24px}
-h1{font-size:22px;margin:0 0 4px}p{color:#c4c6d0;margin:0 0 16px}
-#drop{border:2px dashed #8e9099;border-radius:16px;padding:40px;text-align:center;cursor:pointer}
-#drop.over{border-color:#aac7ff;background:#1d2024}
+h1{font-size:22px;margin:0 0 4px}p{color:var(--md-sys-color-on-surface-variant);margin:0 0 16px}
+#drop{border:2px dashed var(--md-sys-color-outline);border-radius:16px;padding:40px;text-align:center;cursor:pointer}
+#drop.over{border-color:var(--md-sys-color-primary);background:var(--md-sys-color-surface-container)}
+#drop:focus-visible,select:focus-visible{outline:2px solid var(--md-sys-color-secondary);outline-offset:2px}
 table{width:100%;border-collapse:collapse;margin-top:20px;font-size:13px}
-th,td{text-align:left;padding:6px 8px;border-bottom:1px solid #2a2d33;vertical-align:top}
-.verified{color:#9cd67d}.bad-dump{color:#ffb4ab}.unverified-good-dump{color:#e6c26b}
-select{background:#1d2024;color:inherit;border:1px solid #44474e;border-radius:8px;padding:4px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--md-sys-color-outline-variant);vertical-align:top}
+.verified{color:var(--md-sys-color-primary)}.bad-dump{color:var(--md-sys-color-error)}.unverified-good-dump{color:var(--md-sys-color-tertiary)}
+select{background:var(--md-sys-color-surface-container);color:inherit;border:1px solid var(--md-sys-color-outline);border-radius:8px;padding:4px}
 </style></head><body><main>
 <h1>Owned dumps</h1>
 <p>Private: BIOS, firmware and keys dumped from consoles you own, ROMs and disc images dumped from games you bought.

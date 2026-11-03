@@ -16,6 +16,8 @@
 
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
+// @ts-expect-error TS2307: Bun text import of the generated sheet (inlined by bun build); TypeScript has no .css text type.
+import brandSheet from "../../../app-ui/src/brand.css" with { type: "text" };
 
 const PORT = 3456;
 const ASSET_BASE = "/assets";
@@ -27,6 +29,12 @@ const layout = JSON.parse(readFileSync(LAYOUT_PATH, "utf-8"));
 // Dossier d'assets locaux (chemin absolu vers les PNG G4TX exportés)
 const ASSETS_DIR = resolve(import.meta.dir, "public");
 
+// R\u00F4les g\u00E9n\u00E9r\u00E9s de la marque Aphrody (packages/app-ui/src/brand.css, graine produit), bascul\u00E9s par le th\u00E8me
+// syst\u00E8me : la page n'ex\u00E9cute aucun script avant le premier rendu.
+const brandRoles = (brandSheet as string)
+  .replace(/:root\.light,\s*\.light\s*\{([^}]*)\}/g, "@media (prefers-color-scheme: light) {\n:root {$1}\n}")
+  .replace(/:root,\s*\.dark\s*\{([^}]*)\}/g, "@media (prefers-color-scheme: dark) {\n:root {$1}\n}");
+
 const HTML = /* html */ `<!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -34,18 +42,19 @@ const HTML = /* html */ `<!DOCTYPE html>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GameMenu Demo — ${layout.screen} (${layout.locale})</title>
   <style>
+${brandRoles}
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body { background: #111; color: #eee; font-family: sans-serif; min-height: 100vh; }
+    html, body { background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); font-family: "Google Sans Flex", "Roboto Flex", sans-serif; min-height: 100vh; }
     body { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 24px; }
-    h1 { font-size: 14px; opacity: 0.6; letter-spacing: 0.08em; text-transform: uppercase; }
+    h1 { font-size: 14px; color: var(--md-sys-color-on-surface-variant); letter-spacing: 0.08em; text-transform: uppercase; }
     #root { width: 100%; max-width: 1280px; }
     .game-menu-outer {
       position: relative;
       width: 100%;
       aspect-ratio: 1280 / 720;
       overflow: hidden;
-      background: #000;
-      border: 1px solid #333;
+      background: black; /* design:content - letterbox of the 1280x720 game canvas */
+      border: 1px solid var(--md-sys-color-outline-variant);
     }
     .game-menu-canvas {
       position: absolute;
@@ -78,7 +87,7 @@ const HTML = /* html */ `<!DOCTYPE html>
     .menu-text.align-center { justify-content: center; }
     .menu-text.align-left   { justify-content: flex-start; }
     .menu-text.align-right  { justify-content: flex-end; }
-    footer { font-size: 11px; opacity: 0.4; }
+    footer { font-size: 12px; color: var(--md-sys-color-on-surface-variant); }
   </style>
 </head>
 <body>
@@ -141,11 +150,11 @@ const HTML = /* html */ `<!DOCTYPE html>
           img.onerror = () => {
             // Sprite absent → placeholder coloré (debug)
             img.style.display = "none";
-            el.style.background = "rgba(255,100,100,0.25)";
-            el.style.border = "1px dashed rgba(255,100,100,0.5)";
+            el.style.background = "color-mix(in oklab, var(--md-sys-color-error) 25%, transparent)";
+            el.style.border = "1px dashed color-mix(in oklab, var(--md-sys-color-error) 50%, transparent)";
             el.style.outline = "none";
             const lbl = document.createElement("div");
-            lbl.style.cssText = "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,100,100,0.8);overflow:hidden;white-space:nowrap;padding:2px";
+            lbl.style.cssText = "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--md-sys-color-error);overflow:hidden;white-space:nowrap;padding:2px";
             lbl.textContent = obj.sprite.pngUrl.split("/").pop() ?? obj.name;
             el.appendChild(lbl);
           };
