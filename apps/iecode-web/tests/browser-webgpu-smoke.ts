@@ -7,9 +7,14 @@ import { join } from "node:path";
 const browser = process.env.IECODE_BROWSER;
 if (!browser) throw new Error("Set IECODE_BROWSER to a Chromium executable");
 const pkg = new URL("../pkg/", import.meta.url);
-type BrowserReport = { frames?: string; top?: number[]; bottom?: number[]; error?: string };
+type BrowserReport = {
+  frames?: string;
+  top?: number[];
+  bottom?: number[];
+  error?: string;
+};
 let resolveReport!: (value: BrowserReport) => void;
-const report = new Promise<BrowserReport>(resolve => {
+const report = new Promise<BrowserReport>((resolve) => {
   resolveReport = resolve;
 });
 // Original ARM homebrew configures red engine-A and blue engine-B backdrops.
@@ -56,7 +61,8 @@ program.push(0xe1c120b0);
 program.push(0xe3a00000, 0xe2800001, 0xeafffffd);
 for (const literal of literals) {
   const displacement = program.length * 4 - (literal.instruction * 4 + 8);
-  program[literal.instruction] = 0xe59f0000 | (literal.register << 12) | displacement;
+  program[literal.instruction] =
+    0xe59f0000 | (literal.register << 12) | displacement;
   program.push(literal.value);
 }
 words.setUint32(0x2c, program.length * 4, true);
@@ -80,20 +86,12 @@ self.onmessage = async event => {
     stage = 'renderer';
     await emu.enable_webgpu(event.data);
     stage = 'frames';
-    let top, bottom;
-    const probe = new OffscreenCanvas(256, 384).getContext('2d');
     for (let i = 0; i < 3; i++) {
       emu.run_frame_webgpu();
-      if (i === 2) {
-        // Test-only readback, never part of production DS presentation.
-        probe.drawImage(event.data, 0, 0);
-        top = Array.from(probe.getImageData(128, 96, 1, 1).data);
-        bottom = Array.from(probe.getImageData(128, 288, 1, 1).data);
-      }
       await new Promise(resolve => setTimeout(resolve, 20));
     }
     await new Promise(resolve => setTimeout(resolve, 100));
-    postMessage({frames: emu.finished_frames().toString(), top, bottom});
+    postMessage({frames: emu.finished_frames().toString()});
   } catch (error) { fail(error); }
 };`;
 const server = Bun.serve({
@@ -110,7 +108,10 @@ const server = Bun.serve({
       return new Response(worker, {
         headers: { "Content-Type": "text/javascript" },
       });
-    if (path === "/pkg/aphrody_dust_web.js" || path === "/pkg/aphrody_dust_web_bg.wasm") {
+    if (
+      path === "/pkg/aphrody_dust_web.js" ||
+      path === "/pkg/aphrody_dust_web_bg.wasm"
+    ) {
       return new Response(Bun.file(new URL(path.slice(5), pkg)));
     }
     if (path !== "/") return new Response("Not found", { status: 404 });
@@ -119,7 +120,19 @@ const server = Bun.serve({
       <script type="module">
       const worker = new Worker('/worker.js', {type:'module'});
       const report = data => fetch('/report', {method:'POST', body:JSON.stringify(data)});
-      worker.onmessage = event => report(event.data);
+      worker.onmessage = async event => {
+        if (event.data.error) return report(event.data);
+        try {
+          // Read the presented HTML canvas after the browser's rendering opportunity.
+          // Reading the WebGPU OffscreenCanvas in the worker can return transparent pixels.
+          await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+          const probe = new OffscreenCanvas(256, 384).getContext('2d');
+          probe.drawImage(document.querySelector('canvas'), 0, 0);
+          report({...event.data,
+            top: Array.from(probe.getImageData(128, 96, 1, 1).data),
+            bottom: Array.from(probe.getImageData(128, 288, 1, 1).data)});
+        } catch (error) { report({error: String(error)}); }
+      };
       worker.onerror = event => report({error:event.message});
       const canvas = document.querySelector('canvas').transferControlToOffscreen();
       worker.postMessage(canvas, [canvas]);
@@ -138,8 +151,17 @@ const child = Bun.spawn(
     "--disable-dev-shm-usage",
     "--enable-unsafe-webgpu",
     ...(process.platform === "win32"
-      ? ["--use-angle=d3d11", "--use-webgpu-adapter=d3d12", "--force-high-performance-gpu"]
-      : ["--enable-features=Vulkan", "--use-angle=vulkan", "--use-vulkan=swiftshader", "--disable-vulkan-surface"]),
+      ? [
+          "--use-angle=d3d11",
+          "--use-webgpu-adapter=d3d12",
+          "--force-high-performance-gpu",
+        ]
+      : [
+          "--enable-features=Vulkan",
+          "--use-angle=vulkan",
+          "--use-vulkan=swiftshader",
+          "--disable-vulkan-surface",
+        ]),
     "--disable-background-networking",
     String(server.url),
   ],
@@ -147,17 +169,31 @@ const child = Bun.spawn(
 );
 const stderr = new Response(child.stderr).text();
 try {
-  const result = await Promise.race([report, child.exited.then((code): BrowserReport => ({ error: `Browser exited: ${code}` }))]);
+  const result = await Promise.race([
+    report,
+    child.exited.then((code): BrowserReport => ({
+      error: `Browser exited: ${code}`,
+    })),
+  ]);
   if (result.error) throw new Error(result.error);
-  if (result.frames !== "3") throw new Error(`Expected 3 core frames: ${JSON.stringify(result)}`);
+  if (result.frames !== "3")
+    throw new Error(`Expected 3 core frames: ${JSON.stringify(result)}`);
   // Independent native soft-renderer test verifies RGB6 62 for RGB5 maximum.
   // The WGPU shader normalizes by 63, producing RGBA8 round(62 / 63 * 255)=251.
-  if (JSON.stringify(result.top) !== "[251,0,0,255]" || JSON.stringify(result.bottom) !== "[0,0,251,255]") {
-    throw new Error(`Guest-programmed DS backdrop mismatch: ${JSON.stringify(result)}`);
+  if (
+    JSON.stringify(result.top) !== "[251,0,0,255]" ||
+    JSON.stringify(result.bottom) !== "[0,0,251,255]"
+  ) {
+    throw new Error(
+      `Guest-programmed DS backdrop mismatch: ${JSON.stringify(result)}`,
+    );
   }
   console.log(
     JSON.stringify({
-      backend: process.platform === "win32" ? "Chromium D3D12 WebGPU" : "Chromium SwiftShader WebGPU",
+      backend:
+        process.platform === "win32"
+          ? "Chromium D3D12 WebGPU"
+          : "Chromium SwiftShader WebGPU",
       ...result,
     }),
   );
