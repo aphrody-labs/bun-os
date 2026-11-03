@@ -399,6 +399,22 @@ impl PresenterMsg {
     }
 }
 
+/// Encodes an argv as hex of the NUL-joined arguments (safe in any environment variable and through WSLENV).
+pub fn hex_args(args: &[String]) -> String {
+    args.join(" ").bytes().map(|b| format!("{b:02x}")).collect()
+}
+
+/// Inverse of [`hex_args`].
+pub fn unhex_args(s: &str) -> Option<Vec<String>> {
+    if s.is_empty() {
+        return Some(Vec::new());
+    }
+    let bytes: Option<Vec<u8>> =
+        (0..s.len()).step_by(2).map(|i| s.get(i..i + 2).and_then(|h| u8::from_str_radix(h, 16).ok())).collect();
+    let text = String::from_utf8(bytes?).ok()?;
+    Some(text.split(' ').map(String::from).collect())
+}
+
 /// Reads one framed message body (tag + payload). `Ok(None)` on a clean end of stream.
 pub fn read_message(r: &mut impl Read, buf: &mut Vec<u8>) -> io::Result<Option<()>> {
     let mut len = [0u8; 4];
@@ -558,6 +574,12 @@ mod tests {
             }
         }
         assert_eq!(dst[0], 0, "outside the rectangles stays untouched");
+    }
+
+    #[test]
+    fn args_roundtrip_through_hex() {
+        let a: Vec<String> = ["--stats", "--", "foot", "sh", "-c", "while :; do ls 'x y'; done", "é"].map(String::from).to_vec();
+        assert_eq!(unhex_args(&hex_args(&a)).unwrap(), a);
     }
 
     #[test]

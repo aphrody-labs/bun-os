@@ -172,7 +172,7 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
         opts.backdrop = Backdrop::None;
     }
 
-    let mut host_args = vec![host_bin];
+    let mut host_args: Vec<String> = vec![host_bin];
     if host_stats {
         host_args.push("--stats".into());
     }
@@ -181,6 +181,7 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
         host_args.push("--".into());
         host_args.extend(app);
     }
+    let mut wsl_env: Option<String> = None;
     let argv: Vec<String> = match kind {
         "ssh" => {
             let mut v = vec![find_ssh(), "-T".into(), "-o".into(), "Compression=no".into(), "-o".into(), "BatchMode=yes".into(), target];
@@ -189,9 +190,11 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
             v
         }
         "wsl" => {
-            let mut v = vec!["wsl.exe".into(), "-d".into(), target, "--exec".into()];
-            v.extend(host_args);
-            v
+            // wsl.exe re-splits --exec arguments on spaces: the host argv travels hex-encoded in an environment
+            // variable forwarded by WSLENV, so app command lines arrive byte-exact.
+            let bin = host_args.remove(0);
+            wsl_env = Some(crate::wire::hex_args(&host_args));
+            vec!["wsl.exe".into(), "-d".into(), target, "--exec".into(), bin, "--args-env".into(), "BUNOS_WLHOST_ARGS".into()]
         }
         _ => transport.unwrap_or_default(),
     };
@@ -199,8 +202,14 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
         return Err("empty transport command".into());
     }
     eprintln!("bunos-wayland-win: transport: {}", argv.join(" "));
-    let mut child: Child = Command::new(&argv[0])
-        .args(&argv[1..])
+    let mut cmd = Command::new(&argv[0]);
+    cmd.args(&argv[1..]);
+    if let Some(v) = &wsl_env {
+        let wslenv = std::env::var("WSLENV").unwrap_or_default();
+        cmd.env("BUNOS_WLHOST_ARGS", v)
+            .env("WSLENV", if wslenv.is_empty() { "BUNOS_WLHOST_ARGS".to_string() } else { format!("{wslenv}:BUNOS_WLHOST_ARGS") });
+    }
+    let mut child: Child = cmd
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::inherit())

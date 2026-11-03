@@ -19,10 +19,10 @@ use std::{
 
 use smithay::{
     backend::{
-        allocator::Fourcc,
+        allocator::{Fourcc, dmabuf::Dmabuf},
         input::{ButtonState, InputTime, KeyState},
         renderer::{
-            Bind, Offscreen,
+            Bind, ImportDma, Offscreen,
             damage::OutputDamageTracker,
             element::{AsRenderElements, surface::WaylandSurfaceRenderElement},
             pixman::PixmanRenderer,
@@ -67,6 +67,7 @@ use smithay::{
         },
         background_effect::{BackgroundEffectState, ExtBackgroundEffectHandler},
         cursor_shape::CursorShapeManagerState,
+        dmabuf::{DmabufFeedbackBuilder, DmabufGlobal, DmabufHandler, DmabufState, ImportNotifier},
         fractional_scale::{FractionalScaleHandler, FractionalScaleManagerState, with_fractional_scale},
         shm::{ShmHandler, ShmState},
         socket::ListeningSocketSource,
@@ -160,6 +161,8 @@ pub struct Host {
     seat: Seat<Host>,
     output: Output,
     renderer: PixmanRenderer,
+    dmabuf_state: DmabufState,
+    _dmabuf_global: Option<DmabufGlobal>,
     windows: Vec<Toplevel>,
     next_id: u32,
     out: mpsc::Sender<Vec<u8>>,
@@ -221,17 +224,31 @@ fn sink_presenter(rx: mpsc::Receiver<Vec<u8>>, ack: channel::Sender<PresenterMsg
     }
 }
 
+fn sh_quote(s: &str) -> String {
+    if !s.is_empty() && s.chars().all(|c| c.is_ascii_alphanumeric() || "-_./=:,+@%".contains(c)) {
+        s.to_string()
+    } else {
+        format!("'{}'", s.replace('\'', "'\\''"))
+    }
+}
+
 fn origin(id: u32) -> Point<i32, smithay::utils::Logical> {
     (id as i32 * STRIDE_X, 0).into()
 }
 
-pub fn run(args: Vec<String>) -> Result<(), Box<dyn Error>> {
+pub fn run(mut args: Vec<String>) -> Result<(), Box<dyn Error>> {
+    if args.first().map(String::as_str) == Some("--args-env") {
+        let name = args.get(1).cloned().ok_or("--args-env needs a variable name")?;
+        let v = std::env::var(&name).map_err(|_| format!("{name} is not set"))?;
+        args = crate::wire::unhex_args(&v).ok_or_else(|| format!("{name} is not hex-encoded arguments"))?;
+    }
     let mut stats_enabled = false;
     let mut compress = true;
     let mut socket: Option<String> = None;
     let mut sink = false;
     let mut xwayland = true;
     let mut max_inflight = 2u32;
+    let mut dmabuf = false;
     let mut command: Vec<String> = Vec::new();
     let mut it = args.into_iter();
     while let Some(a) = it.next() {
@@ -242,6 +259,7 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn Error>> {
             // Benchmark: an in-process presenter decodes every frame (lz4 included) and acknowledges it at once.
             "--sink" => sink = true,
             "--no-xwayland" => xwayland = false,
+            "--dmabuf" => dmabuf = true,
             // Frames in flight before the client is throttled: 1 = stop-and-wait (lowest latency on a local link),
             // 2-3 hide a WAN round trip.
             "--inflight" => max_inflight = it.next().and_then(|v| v.parse().ok()).unwrap_or(2).clamp(1, 8),
@@ -251,7 +269,7 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn Error>> {
                 break;
             }
             "-h" | "--help" => {
-                eprintln!("usage: bunos-wlhost [--stats] [--no-compress] [--sink] [--no-xwayland] [--inflight N] [--socket NAME] [-- COMMAND...]");
+                eprintln!("usage: bunos-wlhost [--stats] [--no-compress] [--sink] [--no-xwayland] [--dmabuf] [--inflight N] [--socket NAME] [-- COMMAND...]");
                 return Ok(());
             }
             other => return Err(format!("unknown argument {other}").into()),
@@ -339,12 +357,28 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn Error>> {
         }
     })?;
 
-    let compositor_state = CompositorState::new::<Host>(&dh);
+    let compositor_state = CompositorState::new_v6::<Host>(&dh);
     let xdg_shell_state = XdgShellState::new::<Host>(&dh);
     let xdg_decoration_state = XdgDecorationState::new::<Host>(&dh);
     let shm_state = ShmState::new::<Host>(&dh, vec![]);
     let output_manager_state = OutputManagerState::new_with_xdg_output::<Host>(&dh);
     let data_device_state = DataDeviceState::new::<Host>(&dh);
+    // linux-dmabuf: pixman maps linear dmabufs, so GBM-based clients (Hyprland/aquamarine, wlroots, Chromium) can
+    // allocate on the render node (WSL2: vgem) and hand their buffers over. v4 with default feedback names that node.
+    let renderer = PixmanRenderer::new()?;
+    let formats = renderer.dmabuf_formats();
+    let mut dmabuf_state = DmabufState::new();
+    let render_node = ["/dev/dri/renderD128", "/dev/dri/renderD129"]
+        .iter()
+        .find_map(|p| std::fs::metadata(p).ok().map(|m| std::os::unix::fs::MetadataExt::rdev(&m)));
+    let feedback = render_node.and_then(|dev| DmabufFeedbackBuilder::new(dev as _, formats.clone()).build().ok());
+    // Opt-in: with linux-dmabuf advertised, Mesa's WSI prefers it, and on WSL2 the d3d12/Dozen drivers cannot export
+    // dmabufs (vkcube hangs), so GPU clients stay on wl_shm unless --dmabuf asks for GBM clients.
+    let dmabuf_global = match (dmabuf, &feedback) {
+        (false, _) => None,
+        (true, Some(fb)) => Some(dmabuf_state.create_global_with_default_feedback::<Host>(&dh, fb)),
+        (true, None) => Some(dmabuf_state.create_global::<Host>(&dh, formats.clone())),
+    };
     let globals = (
         FractionalScaleManagerState::new::<Host>(&dh),
         ViewporterState::new::<Host>(&dh),
@@ -387,7 +421,9 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn Error>> {
         popups: PopupManager::default(),
         seat,
         output,
-        renderer: PixmanRenderer::new()?,
+        renderer,
+        dmabuf_state,
+        _dmabuf_global: dmabuf_global,
         windows: Vec::new(),
         next_id: 1,
         out: out_tx,
@@ -413,7 +449,12 @@ pub fn run(args: Vec<String>) -> Result<(), Box<dyn Error>> {
     });
     eprintln!("bunos-wlhost: WAYLAND_DISPLAY={}", socket_name.to_string_lossy());
 
-    let command = (!command.is_empty()).then(|| command.join(" "));
+    // One argument is a shell line ("weston-terminal & xterm"); several are an argv, quoted for /bin/sh -c.
+    let command = match command.len() {
+        0 => None,
+        1 => command.into_iter().next(),
+        _ => Some(command.iter().map(|w| sh_quote(w)).collect::<Vec<_>>().join(" ")),
+    };
     host.xwayland_pending = xwayland && host.start_xwayland();
     host.pending_command = command;
     host.spawn_pending();
@@ -903,6 +944,20 @@ impl CompositorHandler for Host {
 
 impl BufferHandler for Host {
     fn buffer_destroyed(&mut self, _buffer: &wl_buffer::WlBuffer) {}
+}
+
+impl DmabufHandler for Host {
+    fn dmabuf_state(&mut self) -> &mut DmabufState {
+        &mut self.dmabuf_state
+    }
+
+    fn dmabuf_imported(&mut self, _global: &DmabufGlobal, dmabuf: Dmabuf, notifier: ImportNotifier) {
+        if self.renderer.import_dmabuf(&dmabuf, None).is_ok() {
+            let _ = notifier.successful::<Host>();
+        } else {
+            notifier.failed();
+        }
+    }
 }
 
 impl ShmHandler for Host {

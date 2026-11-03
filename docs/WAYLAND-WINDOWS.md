@@ -111,7 +111,12 @@ bunos-wayland-win --desktop --host-arg --inflight --host-arg 3 -- weston --backe
 Chrome: `%LOCALAPPDATA%\BunOS\design\windows\bunos-win11-chrome.<mode>.json` (copy of the design artifact
 `~/build/storage/artifacts/design/current/windows/`), or `BUNOS_CHROME=<file|artifact dir>`. `BUNOS_XKB_LAYOUT` and
 `BUNOS_XKB_VARIANT` override the layout. Host: `--inflight N` (frames in flight, default 2), `--no-xwayland`, `--sink`
-(benchmark with an in-process presenter), `BUNOS_WLHOST_SCALE`, `BUNOS_WLHOST_DEBUG=1`.
+(benchmark with an in-process presenter), `--dmabuf` (advertise linux-dmabuf v4 for GBM clients; off by default, see
+the WSL results), `--args-env NAME` (argv from a hex-encoded variable, used by `--wsl`), `BUNOS_WLHOST_SCALE`,
+`BUNOS_WLHOST_DEBUG=1`. After `--`, one argument is a shell line (`"weston-terminal & xterm"`) and several are an argv.
+Xwayland coexists with WSLg: our smithay fork serves the abstract X socket alone when `/tmp/.X11-unix` is read-only.
+Benchmarks and checks live in `crates/bunos-wayland-win/bench/` (`wlbench.py`, `ptyrun.py`, `cuda_check.py`,
+`cuda_vecadd.cu`).
 
 ## Verified (2026-11-03, workstation RTX 4070 + `vps`, Ubuntu 26.10, over `ssh vps`)
 
@@ -151,9 +156,58 @@ Over the WAN (`ssh vps` from the workstation: echo RTT median 61 ms, min 43 ms; 
 | nested Weston 2560x1440 full-screen damage | 1.6 | 740 ms | 12.7 ms/frame (14.7 MB raw per frame) |
 | foot, typing | 0.8 frames/s idle, one damage rectangle per keystroke | 78-97 ms | 1.3 ms |
 
-The WSLg msrdc path could not be measured. WSLg lives in the WSL utility VM, and AGENTS.md forbids starting WSL on the
-workstation, so no side-by-side number exists. A comparison needs either a run inside the `bunos` distro (`--wsl bunos`,
-same binary) or the test VM.
+### Default backend: the `bunos` WSL distro (2026-11-03)
+
+Setup: WSL 3.0.4, our 7.3.1 kernel, `/dev/dxg`, RTX 4070. Mesa is `bunos-mesa` 26.3.0-rc3 (d3d12 Gallium driver plus
+`bunos-vulkan-dzn`), installed by the Mesa agent at 08:49. bunos-wlhost was built inside the distro
+(`cargo build --release` against the checkout on `/mnt/c`) and installed as `/usr/local/bin/bunos-wlhost`. The run
+command was `bunos-wayland-win --wsl bunos --host-bin /usr/local/bin/bunos-wlhost -- <app>`. The host argv crosses
+`wsl.exe` hex-encoded in `BUNOS_WLHOST_ARGS` through `WSLENV`, because `wsl.exe --exec` re-splits arguments on spaces.
+Under bunos-wlhost, `eglinfo` reports `D3D12 (NVIDIA GeForce RTX 4070)` for GL, GLES and core profiles, and
+`vulkaninfo` reports `Microsoft Direct3D12 (NVIDIA GeForce RTX 4070)` with driver `Mesa 26.3.0-rc3-bunos.1`.
+
+Client-side numbers come from `bench/wlbench.py`. It runs the client with `WAYLAND_DEBUG=client` and reports
+`wl_surface.commit`/s, plus commit-to-`wl_callback.done` turnaround (the time until the compositor lets the client draw
+again). Ours releases the callback when the frame is shown on Windows, so turnaround is the end-to-end display round
+trip. glxgears prints its own FPS (`bench/ptyrun.py` keeps its stdout line-buffered). Presenter numbers come from
+`--stats`.
+
+| App (GPU) | Client frames/s | Turnaround median / p95 | Shown on Windows | Windows apply+present |
+| --- | --- | --- | --- | --- |
+| weston-simple-egl (GLES, d3d12) | 404 commits/s | 0.66 / 1.05 ms | 405 fps | 0.40 ms |
+| vkcube (Vulkan, Dozen) | 323 commits/s | 2.97 / 3.84 ms | 331 fps | 0.84 ms |
+| glxgears (GL via our Xwayland `:1`, `vblank_mode=0`) | 88-93 FPS | ack 1.8 ms | 88 fps | 1.25 ms |
+| foot, `ls -la /usr/lib` in a loop | 82 fps (host) | ack 2.8-10 ms | 79-91 fps | 1.7 ms |
+| nested cosmic-comp + foot (GLES on d3d12, winit backend) | 274-354 fps of compositor output | ack 1.9-3.4 ms | 309-453 fps | 1.3-3.9 ms |
+| compositor only, `--sink` (no Windows): vkcube / weston-simple-egl / glmark2-es2 | 667 / 801 / 271 fps | 0.1-0.6 ms | - | - |
+
+The WSLg (msrdc) comparison is blocked because WSLg is broken in this bundle. `/mnt/wslg/stderr.log` shows its Weston
+(`--backend=rdp-backend.so --shell=rdprail-shell.so`, WSLg 1.0.79, weston-mirror `a7e35fda`) dying with SIGSEGV
+every ~100 s since boot: 43 crashes by 08:47 and 62 by 09:20. Each restart reconnects msrdc. In the gaps, the Wayland
+socket accepts connections but never answers `wl_display.get_registry`: `wayland-info` timed out on 40 consecutive
+probes, and `weston-simple-egl` and foot never got a registry. X clients on WSLg's `:0` (glxgears with d3d12 and with
+llvmpipe) never print a frame. Each crash cycle follows rdprail-shell's app-list icon lookup for the distro's Waydroid
+entries (`find_icon_file: icon (waydroid) search retry` 1..5, then a crash about 90 s later). The three
+`/usr/share/applications/*waydroid*.desktop` files are the prime suspect. This was reported to the WSL owner and not
+changed here, since `factory/wsl/` owns the bundle. Before the crash loop, vkcube's Wayland WSI on WSLg also failed
+("Compositor did not provide the standard protocol xdg-wm-base": Weston 9 offers `xdg_wm_base` v1). To compare once
+WSLg is fixed, run the same harness against WSLg:
+`XDG_RUNTIME_DIR=/mnt/wslg/runtime-dir WAYLAND_DISPLAY=wayland-0 python3 bench/wlbench.py 14 4 weston-simple-egl`. Run
+the same app under `bunos-wayland-win --wsl bunos -- python3 bench/wlbench.py 14 4 <app>` for our side.
+
+Nested compositors in the distro:
+
+* **cosmic-comp 1.11** (Arch `cachyos-extra-v3` package) runs nested on its winit backend with hardware EGL on Mesa d3d12
+  (`PLATFORM_WAYLAND_KHR`, `hardware_accelerated: true`). Its COSMIC session (gradient background, a COSMIC-decorated
+  foot) appears in one native window. When resized it logs an `EGL_BAD_ALLOC` on surface re-creation and recovers.
+* **Hyprland 0.57** gets through protocol negotiation once bunos-wlhost offers `wl_compositor` v6 (now the default)
+  and `zwp_linux_dmabuf_v1` v4 with the render-node feedback (`--dmabuf`). The vgem node `/dev/dri/renderD128` exists
+  (kernel `CONFIG_DRM_VGEM=y`). It then stops at EGL on GBM. As user `bun`, `card0` is not readable
+  (`Permission denied`, the user is not in `video`). As root (`--i-am-really-stupid`), `kms_swrast` loads but
+  `eglInitialize` reports `DRI2: failed to create screen`, and the first `wl_surface.attach` references a dmabuf the host
+  could not import. Mesa d3d12 cannot export dmabufs and vgem has no 3D driver, so a GPU-rendered Hyprland needs the
+  dxgkrnl-to-dmabuf export path (see GPU below). `--dmabuf` stays opt-in: when it is advertised, Mesa's WSI prefers it
+  and Dozen vkcube hangs.
 
 ## GPU: what is and is not zero-copy
 
@@ -182,8 +236,20 @@ The machine has an NVIDIA GeForce RTX 4070 (12 GB, compute capability 8.9, PCIe 
 `/usr/lib/wsl/lib`: `C:\Windows\System32\lxss\lib` holds `libcuda.so.1.1`, `libcudadebugger.so.1`, `libnvcuvid.so`,
 `libnvidia-encode.so`, `libnvidia-ml.so.1`, `libnvidia-opticalflow.so`, `libnvoptix.so.1`, `libnvdxdlkernels.so`,
 `libnvwgf2umx.so` and `nvidia-smi`. WSL 3.0.4 ships `libd3d12.so`, `libd3d12core.so` and `libdxcore.so` in
-`C:\Program Files\WSL\lib` (verified). Nothing was run inside the distro, because WSL is not started on the
-workstation. Run these inside `bunos` when it is up (owner of the distro: [WSL.md](WSL.md)):
+`C:\Program Files\WSL\lib` (verified).
+
+Verified inside `bunos` on 2026-11-03:
+
+* `/usr/lib/wsl/lib/nvidia-smi`: `NVIDIA GeForce RTX 4070, 617.42, 12282 MiB, compute_cap 8.9`, with
+  `NVIDIA-SMI 615.78.05 / KMD 617.42 / CUDA UMD 13.4`.
+* `bench/cuda_check.py` (no toolkit; ctypes on `/usr/lib/wsl/lib/libcuda.so.1`, hand-written PTX JIT-compiled by the
+  driver): driver CUDA 13.4, sm_89, 46 SMs, 12.0 GiB. saxpy over 64 Mi floats runs in 2.26 ms/launch, 356 GB/s
+  effective. Pageable H2D 6.5 GB/s, D2H 9.0 GB/s. PASS.
+* `pacman -S cuda` (13.4.3, Arch `extra`; `nvcc` V13.4.92 at `/opt/cuda/bin`), then
+  `nvcc -O3 -arch=sm_89 bench/cuda_vecadd.cu`: vecadd over 64 Mi floats runs in 2.202 ms/launch, 366 GB/s (the 4070
+  peak is 504 GB/s). Pinned H2D 20.7 GB/s, D2H 17.1 GB/s. PASS.
+
+Other checks:
 
 ```
 ls /usr/lib/wsl/lib/libcuda.so.1 && /usr/lib/wsl/lib/nvidia-smi          # driver libs mounted, GPU visible
@@ -199,12 +265,17 @@ path as Mesa d3d12 above, so it remains open.
 
 ## Not done yet
 
-* No zero-copy GPU path (above). No `zwp_linux_dmabuf_v1` and no GPU renderer in bunos-wlhost, so Hyprland and other
-  GPU-only nested compositors do not start without a render node. On WSL2 with `/dev/dxg` they should, once dmabuf
-  is advertised. That run is pending.
-* `--wsl bunos` (the default backend) is implemented but never run, because WSL is not started on the workstation.
-  The host binary also has to be packaged into the distro: a PKGBUILD in `factory/desktop/pkgbuilds/`, coordinated with
-  the desktop agent.
+* No zero-copy GPU path (above). `zwp_linux_dmabuf_v1` exists (`--dmabuf`, pixman import of linear buffers), but on
+  WSL2 nothing GPU-rendered can feed it: d3d12/Dozen cannot export dmabufs and vgem has no 3D driver. So Hyprland
+  (GBM/EGL) does not start nested in the distro, while cosmic-comp does (winit/EGL over wl_shm, GPU-rendered).
+* The WSLg comparison is blocked by WSLg's Weston crash loop (above). That fix belongs to [WSL.md](WSL.md) /
+  `factory/wsl/`.
+* bunos-wlhost is not packaged yet. In the distro it is built from the checkout and installed in
+  `/usr/local/bin`. A PKGBUILD needs the crate and `vendor/smithay` from this repository as its source. That is for
+  the desktop agent's `factory/desktop/pkgbuilds/` (`bunos-wayland-win`, makedepends `cargo`, depends
+  `libxkbcommon pixman xorg-xwayland`).
+* A CUDA build of llama.cpp (`vendor/bun-llama/native/build.ts` with `-DGGML_CUDA=ON`) was not run. The toolkit and
+  the driver path are verified above.
 * hvsocket transport: works today through `--command` with `socat VSOCK-CONNECT`. A native AF_HYPERV connector in the
   presenter (as in `crates/bunos-nt-bridge`) is not written.
 * xdg popups are rendered inside their toplevel, so menus that extend past the window are clipped. X11
@@ -215,4 +286,5 @@ path as Mesa d3d12 above, so it remains open.
 * Nested cosmic-comp and GNOME are not packaged on `vps`. They need the `bunos-testing` packages from
   [DESKTOP-SESSIONS.md](DESKTOP-SESSIONS.md).
 * Frame pacing uses acks only. There is no `wp_presentation` feedback from DWM (`DwmGetCompositionTimingInfo`) yet.
-* The Windows binary is unsigned. Ship it through `factory/windows/signing/test-signing.ps1 sign` once it is packaged.
+* The Windows binary is test-signed (`factory/windows/signing/test-signing.ps1 sign`: `CN=Bun OS Test Signing`, SHA-256,
+  DigiCert RFC 3161 timestamp, `Get-AuthenticodeSignature` Valid). Packaging and an installer are still to do.
