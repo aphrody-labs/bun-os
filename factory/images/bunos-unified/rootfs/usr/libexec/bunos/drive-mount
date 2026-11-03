@@ -1,0 +1,66 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+# Optional per-user Drive mount. The user owns both the rclone config and cache.
+# A missing configuration, FUSE device, or nonempty mount directory is never
+# treated as permission to hide or replace local files.
+set -eu
+config=${XDG_CONFIG_HOME:-"$HOME/.config"}/rclone/rclone.conf
+target="$HOME/Google Drive"
+# The session manager persists HOME, not arbitrary XDG cache locations.
+cache="$HOME/.cache/bunos-drive"
+log() { printf 'bunos-drive: %s\n' "$*" >&2; }
+
+[ -f "$config" ] && [ ! -L "$config" ] || exit 0
+[ "$(stat -c %u "$config")" = "$(id -u)" ] && [ "$(stat -c %a "$config")" = 600 ] || {
+  log "rclone configuration must be owned by this user and mode 600"
+  exit 1
+}
+[ -c /dev/fuse ] && [ -r /dev/fuse ] && [ -w /dev/fuse ] || { log "FUSE unavailable"; exit 1; }
+[ ! -L "$target" ] || { log "mount directory must not be a symlink"; exit 1; }
+mkdir -p "$target" "$cache"
+# The home (and therefore the VFS cache) may outlive or be shared by sessions.
+# Keep the advisory lock across exec so a second launcher cannot use the same
+# cache while the first mount is starting or running.
+[ ! -L "$cache/.mount.lock" ] || { log "cache lock must not be a symlink"; exit 1; }
+exec 9>>"$cache/.mount.lock"
+flock -n 9 || { log "another Drive mount owns this cache"; exit 1; }
+mountpoint -q "$target" && exit 0
+[ -z "$(find "$target" -mindepth 1 -maxdepth 1 -print -quit)" ] || {
+  log "mount directory contains local files; refusing to hide them"
+  exit 1
+}
+timeout -k 5s 15s rclone --config "$config" listremotes | grep -Fxq 'gdrive:' || {
+  log "no gdrive remote in the user's rclone configuration"
+  exit 1
+}
+# Environment overrides could make rclone use a different account or root than
+# the configuration inspected below. Refuse them rather than guessing.
+if env | grep -q '^RCLONE_'; then log "rclone environment overrides are not supported"; exit 1; fi
+# Refresh through rclone first, then verify the actual account with Drive's
+# about API. Config and tokens cross only a pipe; neither is logged or passed
+# as an argument. The helper prints only a non-secret fingerprint.
+timeout -k 5s 30s rclone --config "$config" about gdrive: >/dev/null 2>&1 || { log "Drive is unavailable"; exit 1; }
+config_hash=$(sha256sum "$config" | cut -d ' ' -f1)
+identity=$(timeout -k 5s 25s bun /usr/libexec/bunos/drive-identity.ts "$config") || exit 1
+[ "$(sha256sum "$config" | cut -d ' ' -f1)" = "$config_hash" ] || { log "Drive config changed during verification"; exit 1; }
+printf '%s\n' "$identity" | grep -Eq '^[0-9a-f]{64}$' || { log "invalid Drive identity"; exit 1; }
+marker="$cache/.identity.sha256"
+[ ! -L "$marker" ] || { log "cache identity must not be a symlink"; exit 1; }
+if [ -e "$marker" ]; then
+  [ -f "$marker" ] && [ "$(stat -c %u "$marker")" = "$(id -u)" ] && [ "$(stat -c %a "$marker")" = 600 ] || {
+    log "cache identity is not private"; exit 1;
+  }
+  [ "$(cat "$marker")" = "$identity" ] || { log "Drive identity changed; existing cache preserved"; exit 1; }
+else
+  # A cache from an older version may contain queued writes for an unknown
+  # account. Never assign it automatically, even if it appears idle.
+  [ -z "$(find "$cache" -mindepth 1 -maxdepth 1 ! -name .mount.lock -print -quit)" ] || {
+    log "unidentified existing cache preserved"; exit 1;
+  }
+  umask 077
+  (set -C; printf '%s\n' "$identity" >"$marker") || { log "could not record cache identity"; exit 1; }
+fi
+# Cache lives in the persistent home volume; queued writes are not confirmed
+# remotely until rclone completes them. Never enable --allow-non-empty.
+[ "$(sha256sum "$config" | cut -d ' ' -f1)" = "$config_hash" ] || { log "Drive config changed before mount"; exit 1; }
+exec rclone --config "$config" mount gdrive: "$target" --cache-dir "$cache" --vfs-cache-mode writes

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Google Drive
+Comment=Mount the configured Google Drive for this user
+Exec=/usr/libexec/bunos/drive-mount
+OnlyShowIn=COSMIC;
+X-GNOME-Autostart-enabled=true
