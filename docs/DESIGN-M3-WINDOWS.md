@@ -36,7 +36,8 @@ the 12-core host. The DLL is linked with `/Brepro`, so it is byte-reproducible. 
 
 Current artifact: `~/build/storage/artifacts/design/386aab0d12a7`, also reachable as `design/current` and
 `icons/386aab0d12a7`. It holds 10,895 files: 148 ICO, 1,562 PNG, 9,059 SVG and 21 fonts, 163 MB in total.
-`receipt.json` sha256 is `399a364e…7d30`.
+`receipt.json` sha256 is `0d74782d…218d`. `bunos-icons.dll` is `63b06e1c…d1d2` unsigned and `34ce03f4…0de2` as signed
+and installed on the workstation.
 
 ### Layout
 
@@ -267,9 +268,20 @@ Android tech stack", combining Android and ChromeOS. It is made by Acer, ASUS, D
 Chromebook line. It went on sale on 2026-10-04 in the US, from $899, running "Googlebook OS" with up to 10 years of
 updates. The press codename "Aluminium OS" is not used by Google.
 
-Our own Android 17 desktop captures come from the official desktop emulator image,
-`system-images;android-37.1;android-desktop;x86_64`, run headless on `vps` (KVM, swiftshader). The script is
-`~/build/out/design/android-desktop.sh` and the results go in `docs/design/references/android-17-desktop/emulator/`.
+Own captures from the official Android 17 desktop emulator image were attempted on `vps`. The image is
+`system-images;android-37.1;android-desktop;x86_64`, build CLE3.260929.004, run headless with emulator 37.3.6.0, KVM
+and the `desktop_large` profile at 1920x1080. The script is `~/build/out/design/android-desktop.sh`. The image
+installs and boots, but no capture path worked:
+
+- With `swiftshader_indirect`, the guest `screencap` aborts on the gfxstream assertion
+  `!rcEnc->featureInfo()->hasReadColorBufferDma`.
+- Disabling GLDMA/GLDMA2, or using `-gpu guest`, makes system_server abort in the same assertion on its display
+  thread, so the boot never completes.
+- `-gpu swangle_indirect` does not complete the boot.
+- The host-side `emu screenrecord screenshot` writes nothing without a window.
+
+What remains open is a host-side capture through the emulator gRPC `getScreenshot` (`-grpc`), or a GPU-backed host.
+Until then, the published Android Developers images above are the Android desktop reference.
 
 ### What Android 17 desktop and Googlebook OS do
 

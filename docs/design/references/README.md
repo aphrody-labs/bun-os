@@ -40,3 +40,10 @@ API 32, 33, 34, 37.0 and 37.1, and no API 36. Each needs emulator 36.5 or newer.
 | `system-images;android-37.0;android-desktop;arm64-v8a`  | AOSP Desktop (Preview) ARM 64 v8a                        | dev     | 874 MB  | https://dl.google.com/android/repository/sys-img/android-desktop/arm64-v8a-37.0_r01.zip |
 
 All four URLs returned HTTP 200 on 2026-11-03. Nothing was downloaded.
+
+## Own emulator captures (attempted 2026-11-03)
+
+The 37.1 desktop image (build CLE3.260929.004) boots headless on `vps`, with KVM and the `desktop_large` profile at
+1920x1080. Under swiftshader, the guest `screencap` aborts on the gfxstream `hasReadColorBufferDma` assertion.
+Disabling GLDMA, or using `-gpu guest`, makes system_server crash on that same assertion. No own capture is stored yet;
+see docs/DESIGN-M3-WINDOWS.md.
