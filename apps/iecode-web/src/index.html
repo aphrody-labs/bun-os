@@ -29,7 +29,29 @@
         <h2 id="console-status-title"></h2>
         <p id="console-status-message"></p>
     </section>
-    <iframe id="wii-frame" title="Wii" hidden inert allow="autoplay; gamepad"></iframe>
+    <section id="wii-panel" aria-labelledby="wii-title" hidden inert>
+        <div id="wii-runtime-host" aria-label="Wii runtime" hidden></div>
+        <div class="wii-home">
+            <div class="wii-heading">
+                <p class="wii-eyebrow">Bun OS · Game library</p>
+                <h2 id="wii-title">Wii homebrew</h2>
+                <p>Chargez un programme DOL depuis votre bibliothèque pour le lancer dans la session Bun OS.</p>
+            </div>
+            <div class="wii-channels" aria-label="Wii tools">
+                <article class="wii-channel wii-channel-library"><span class="wii-channel-icon" aria-hidden="true">◫</span><h3>Library</h3><p>Homebrew DOL local</p></article>
+                <article class="wii-channel wii-channel-input"><span class="wii-channel-icon" aria-hidden="true">⌁</span><h3>Input</h3><p>Clavier et gamepad</p></article>
+                <article class="wii-channel wii-channel-display"><span class="wii-channel-icon" aria-hidden="true">▣</span><h3>Display</h3><p>WebGPU dans la session</p></article>
+            </div>
+            <div class="wii-launcher">
+                <label for="wii-rom">Choisir un programme homebrew (.dol)</label>
+                <input type="file" id="wii-rom" accept=".dol,application/octet-stream">
+                <label for="wii-dsp">DSP ROM (facultative)</label>
+                <input type="file" id="wii-dsp" accept=".bin,application/octet-stream">
+                <button type="button" id="wii-start" disabled>Lancer dans Bun OS</button>
+                <p id="wii-status" role="status" aria-live="polite">Le runtime Wii se charge à l’ouverture de cette section.</p>
+            </div>
+        </div>
+    </section>
     <main id="canvas-container">
         <canvas id="canvas"></canvas>
         <div id="controls">

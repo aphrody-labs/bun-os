@@ -603,6 +603,7 @@ impl<const SYSTEM: SystemId> ApplicationHandler for App<SYSTEM> {
                 .create_window(
                     Window::default_attributes()
                         .with_title("Gecko")
+                        .with_canvas(Some(document_canvas()))
                         .with_append(true),
                 )
                 .unwrap(),
@@ -741,6 +742,22 @@ impl<const SYSTEM: SystemId> ApplicationHandler for App<SYSTEM> {
             _ => {}
         }
     }
+}
+
+fn document_canvas() -> web_sys::HtmlCanvasElement {
+    use wasm_bindgen::JsCast;
+    let document = web_sys::window().unwrap().document().unwrap();
+    let host = document.get_element_by_id("wii-runtime-host").unwrap();
+    host.remove_attribute("hidden").unwrap();
+    let canvas: web_sys::HtmlCanvasElement = document
+        .create_element("canvas")
+        .unwrap()
+        .dyn_into()
+        .unwrap();
+    canvas.set_width(960);
+    canvas.set_height(540);
+    host.append_child(&canvas).unwrap();
+    canvas
 }
 
 #[wasm_bindgen]
