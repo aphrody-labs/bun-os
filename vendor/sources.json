@@ -83,12 +83,12 @@
     },
     "omarchy-pkgs": {
       "path": "omarchy-pkgs",
-      "origin": "https://github.com/omacom/omarchy-pkgs.git",
+      "origin": "https://github.com/aphrody-labs/omarchy-pkgs.git",
       "upstream": "https://github.com/omacom/omarchy-pkgs.git"
     },
     "omarchy": {
       "path": "omarchy",
-      "origin": "https://github.com/omacom/omarchy.git",
+      "origin": "https://github.com/aphrody-labs/omarchy.git",
       "upstream": "https://github.com/omacom/omarchy.git"
     },
     "steam-runtime": {
@@ -699,6 +699,126 @@
       "origin": "https://github.com/aphrody-labs/starship.git",
       "upstream": "https://github.com/starship/starship.git",
       "path": "starship"
+    },
+    "du-dust": {
+      "origin": "https://github.com/aphrody-labs/du-dust.git",
+      "upstream": "https://github.com/bootandy/dust.git",
+      "path": "du-dust"
+    },
+    "omarchy-windows": {
+      "origin": "https://github.com/aphrody-labs/try-omarchy-windows.git",
+      "upstream": "https://github.com/omacom/try-omarchy-windows.git",
+      "path": "omarchy-windows"
+    },
+    "atuin": {
+      "origin": "https://github.com/aphrody-labs/atuin.git",
+      "upstream": "https://github.com/atuinsh/atuin.git",
+      "path": "atuin"
+    },
+    "yazi": {
+      "origin": "https://github.com/aphrody-labs/yazi.git",
+      "upstream": "https://github.com/sxyazi/yazi.git",
+      "path": "yazi"
+    },
+    "bottom": {
+      "origin": "https://github.com/aphrody-labs/bottom.git",
+      "upstream": "https://github.com/ClementTsang/bottom.git",
+      "path": "bottom"
+    },
+    "zellij": {
+      "origin": "https://github.com/aphrody-labs/zellij.git",
+      "upstream": "https://github.com/zellij-org/zellij.git",
+      "path": "zellij"
+    },
+    "delta": {
+      "origin": "https://github.com/aphrody-labs/delta.git",
+      "upstream": "https://github.com/dandavison/delta.git",
+      "path": "delta"
+    },
+    "gitui": {
+      "origin": "https://github.com/aphrody-labs/gitui.git",
+      "upstream": "https://github.com/gitui-org/gitui.git",
+      "path": "gitui"
+    },
+    "just": {
+      "origin": "https://github.com/aphrody-labs/just.git",
+      "upstream": "https://github.com/casey/just.git",
+      "path": "just"
+    },
+    "mutter": {
+      "origin": "https://github.com/aphrody-labs/mutter.git",
+      "upstream": "https://github.com/GNOME/mutter.git",
+      "path": "gnome/mutter"
+    },
+    "gnome-shell": {
+      "origin": "https://github.com/aphrody-labs/gnome-shell.git",
+      "upstream": "https://github.com/GNOME/gnome-shell.git",
+      "path": "gnome/gnome-shell"
+    },
+    "hyprland/aquamarine": {
+      "origin": "https://github.com/aphrody-labs/aquamarine.git",
+      "upstream": "https://github.com/hyprwm/aquamarine.git",
+      "path": "hyprland/aquamarine"
+    },
+    "hyprland/hyprcursor": {
+      "origin": "https://github.com/aphrody-labs/hyprcursor.git",
+      "upstream": "https://github.com/hyprwm/hyprcursor.git",
+      "path": "hyprland/hyprcursor"
+    },
+    "hyprland/hyprgraphics": {
+      "origin": "https://github.com/aphrody-labs/hyprgraphics.git",
+      "upstream": "https://github.com/hyprwm/hyprgraphics.git",
+      "path": "hyprland/hyprgraphics"
+    },
+    "hyprland/hyprland": {
+      "origin": "https://github.com/aphrody-labs/Hyprland.git",
+      "upstream": "https://github.com/hyprwm/Hyprland.git",
+      "path": "hyprland/hyprland"
+    },
+    "hyprland/hyprland-guiutils": {
+      "origin": "https://github.com/aphrody-labs/hyprland-guiutils.git",
+      "upstream": "https://github.com/hyprwm/hyprland-guiutils.git",
+      "path": "hyprland/hyprland-guiutils"
+    },
+    "hyprland/hyprland-protocols": {
+      "origin": "https://github.com/aphrody-labs/hyprland-protocols.git",
+      "upstream": "https://github.com/hyprwm/hyprland-protocols.git",
+      "path": "hyprland/hyprland-protocols"
+    },
+    "hyprland/hyprland-qtutils": {
+      "origin": "https://github.com/aphrody-labs/hyprland-qtutils.git",
+      "upstream": "https://github.com/hyprwm/hyprland-qtutils.git",
+      "path": "hyprland/hyprland-qtutils"
+    },
+    "hyprland/hyprlang": {
+      "origin": "https://github.com/aphrody-labs/hyprlang.git",
+      "upstream": "https://github.com/hyprwm/hyprlang.git",
+      "path": "hyprland/hyprlang"
+    },
+    "hyprland/hyprtoolkit": {
+      "origin": "https://github.com/aphrody-labs/hyprtoolkit.git",
+      "upstream": "https://github.com/hyprwm/hyprtoolkit.git",
+      "path": "hyprland/hyprtoolkit"
+    },
+    "hyprland/hyprutils": {
+      "origin": "https://github.com/aphrody-labs/hyprutils.git",
+      "upstream": "https://github.com/hyprwm/hyprutils.git",
+      "path": "hyprland/hyprutils"
+    },
+    "hyprland/hyprwayland-scanner": {
+      "origin": "https://github.com/aphrody-labs/hyprwayland-scanner.git",
+      "upstream": "https://github.com/hyprwm/hyprwayland-scanner.git",
+      "path": "hyprland/hyprwayland-scanner"
+    },
+    "hyprland/hyprwire": {
+      "origin": "https://github.com/aphrody-labs/hyprwire.git",
+      "upstream": "https://github.com/hyprwm/hyprwire.git",
+      "path": "hyprland/hyprwire"
+    },
+    "hyprland/xdg-desktop-portal-hyprland": {
+      "origin": "https://github.com/aphrody-labs/xdg-desktop-portal-hyprland.git",
+      "upstream": "https://github.com/hyprwm/xdg-desktop-portal-hyprland.git",
+      "path": "hyprland/xdg-desktop-portal-hyprland"
     }
   },
   "references": {
@@ -832,6 +952,12 @@
       "path": "ctru-rs",
       "revision": "6b578230b3cd3cbc1eeb0dd71bbb8d7e3b12f21e",
       "origin": "https://github.com/aphrody-labs/ctru-rs.git",
+      "initialized": true
+    },
+    {
+      "path": "du-dust",
+      "revision": "079c55266917387e416e0f871c97c06da52df12d",
+      "origin": "https://github.com/aphrody-labs/du-dust.git",
       "initialized": true
     },
     {
@@ -1004,7 +1130,7 @@
     },
     {
       "path": "omarchy",
-      "revision": "84cfb93959f4fe0bbb71de71593b36647d2ba78d",
+      "revision": "ae64a4be796239a86f40de4b3cc5bd7f43866296",
       "origin": "https://github.com/aphrody-labs/omarchy.git",
       "initialized": true
     },

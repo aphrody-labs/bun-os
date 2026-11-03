@@ -875,7 +875,7 @@
 	shallow = true
 [submodule "vendor/hyprland/aquamarine"]
 	path = vendor/hyprland/aquamarine
-	url = https://github.com/hyprwm/aquamarine.git
+	url = https://github.com/aphrody-labs/aquamarine.git
 	shallow = true
 	update = none
 [submodule "vendor/wayland/cairo"]
@@ -900,22 +900,22 @@
 	update = none
 [submodule "vendor/hyprland/hyprcursor"]
 	path = vendor/hyprland/hyprcursor
-	url = https://github.com/hyprwm/hyprcursor.git
+	url = https://github.com/aphrody-labs/hyprcursor.git
 	shallow = true
 	update = none
 [submodule "vendor/hyprland/hyprgraphics"]
 	path = vendor/hyprland/hyprgraphics
-	url = https://github.com/hyprwm/hyprgraphics.git
+	url = https://github.com/aphrody-labs/hyprgraphics.git
 	shallow = true
 	update = none
 [submodule "vendor/hyprland/hyprland"]
 	path = vendor/hyprland/hyprland
-	url = https://github.com/hyprwm/Hyprland.git
+	url = https://github.com/aphrody-labs/Hyprland.git
 	shallow = true
 	update = none
 [submodule "vendor/hyprland/hyprland-guiutils"]
 	path = vendor/hyprland/hyprland-guiutils
-	url = https://github.com/hyprwm/hyprland-guiutils.git
+	url = https://github.com/aphrody-labs/hyprland-guiutils.git
 	shallow = true
 	update = none
 [submodule "vendor/hyprland/hyprland-preview-share-picker"]
@@ -925,37 +925,37 @@
 	update = none
 [submodule "vendor/hyprland/hyprland-protocols"]
 	path = vendor/hyprland/hyprland-protocols
-	url = https://github.com/hyprwm/hyprland-protocols.git
+	url = https://github.com/aphrody-labs/hyprland-protocols.git
 	shallow = true
 	update = none
 [submodule "vendor/hyprland/hyprland-qtutils"]
 	path = vendor/hyprland/hyprland-qtutils
-	url = https://github.com/hyprwm/hyprland-qtutils.git
+	url = https://github.com/aphrody-labs/hyprland-qtutils.git
 	shallow = true
 	update = none
 [submodule "vendor/hyprland/hyprlang"]
 	path = vendor/hyprland/hyprlang
-	url = https://github.com/hyprwm/hyprlang.git
+	url = https://github.com/aphrody-labs/hyprlang.git
 	shallow = true
 	update = none
 [submodule "vendor/hyprland/hyprtoolkit"]
 	path = vendor/hyprland/hyprtoolkit
-	url = https://github.com/hyprwm/hyprtoolkit.git
+	url = https://github.com/aphrody-labs/hyprtoolkit.git
 	shallow = true
 	update = none
 [submodule "vendor/hyprland/hyprutils"]
 	path = vendor/hyprland/hyprutils
-	url = https://github.com/hyprwm/hyprutils.git
+	url = https://github.com/aphrody-labs/hyprutils.git
 	shallow = true
 	update = none
 [submodule "vendor/hyprland/hyprwayland-scanner"]
 	path = vendor/hyprland/hyprwayland-scanner
-	url = https://github.com/hyprwm/hyprwayland-scanner.git
+	url = https://github.com/aphrody-labs/hyprwayland-scanner.git
 	shallow = true
 	update = none
 [submodule "vendor/hyprland/hyprwire"]
 	path = vendor/hyprland/hyprwire
-	url = https://github.com/hyprwm/hyprwire.git
+	url = https://github.com/aphrody-labs/hyprwire.git
 	shallow = true
 	update = none
 [submodule "vendor/wayland/lcms2"]
@@ -1235,7 +1235,7 @@
 	update = none
 [submodule "vendor/hyprland/xdg-desktop-portal-hyprland"]
 	path = vendor/hyprland/xdg-desktop-portal-hyprland
-	url = https://github.com/hyprwm/xdg-desktop-portal-hyprland.git
+	url = https://github.com/aphrody-labs/xdg-desktop-portal-hyprland.git
 	shallow = true
 	update = none
 [submodule "vendor/wayland/xkbcomp"]
@@ -1661,3 +1661,52 @@
 	path = vendor/tokei
 	url = https://github.com/aphrody-labs/tokei.git
 	shallow = true
+[submodule "vendor/du-dust"]
+	path = vendor/du-dust
+	url = https://github.com/aphrody-labs/du-dust.git
+	shallow = true
+[submodule "vendor/atuin"]
+	path = vendor/atuin
+	url = https://github.com/aphrody-labs/atuin.git
+	shallow = true
+	update = none
+[submodule "vendor/yazi"]
+	path = vendor/yazi
+	url = https://github.com/aphrody-labs/yazi.git
+	shallow = true
+	update = none
+[submodule "vendor/bottom"]
+	path = vendor/bottom
+	url = https://github.com/aphrody-labs/bottom.git
+	shallow = true
+	update = none
+[submodule "vendor/zellij"]
+	path = vendor/zellij
+	url = https://github.com/aphrody-labs/zellij.git
+	shallow = true
+	update = none
+[submodule "vendor/delta"]
+	path = vendor/delta
+	url = https://github.com/aphrody-labs/delta.git
+	shallow = true
+	update = none
+[submodule "vendor/gitui"]
+	path = vendor/gitui
+	url = https://github.com/aphrody-labs/gitui.git
+	shallow = true
+	update = none
+[submodule "vendor/just"]
+	path = vendor/just
+	url = https://github.com/aphrody-labs/just.git
+	shallow = true
+	update = none
+[submodule "vendor/gnome/mutter"]
+	path = vendor/gnome/mutter
+	url = https://github.com/aphrody-labs/mutter.git
+	shallow = true
+	update = none
+[submodule "vendor/gnome/gnome-shell"]
+	path = vendor/gnome/gnome-shell
+	url = https://github.com/aphrody-labs/gnome-shell.git
+	shallow = true
+	update = none

@@ -1,0 +1,190 @@
+{
+  "schema": 1,
+  "target": "x86_64-pc-windows-msvc",
+  "targetCpu": "raptorlake",
+  "targetCpuSource": "workstation CPU: 13th Gen Intel Core i7-13700F (Raptor Lake, AVX2, no AVX-512)",
+  "profile": {
+    "opt-level": "3",
+    "lto": "fat",
+    "codegen-units": "1",
+    "panic": "abort",
+    "strip": "symbols",
+    "debug": "false",
+    "incremental": "false"
+  },
+  "rustflags": ["-C", "target-feature=+crt-static"],
+  "tools": [
+    {
+      "name": "coreutils",
+      "path": "vendor/uutils/coreutils",
+      "license": "MIT",
+      "cargo": ["--features", "windows", "--bin", "coreutils"],
+      "bins": [{ "file": "coreutils", "commands": "uutils-map" }]
+    },
+    {
+      "name": "findutils",
+      "path": "vendor/uutils/findutils",
+      "license": "MIT",
+      "cargo": ["--bin", "find", "--bin", "xargs"],
+      "bins": [
+        { "file": "find", "commands": ["find"] },
+        { "file": "xargs", "commands": ["xargs"] }
+      ]
+    },
+    {
+      "name": "diffutils",
+      "path": "vendor/uutils/diffutils",
+      "license": "MIT OR Apache-2.0",
+      "cargo": ["--bin", "diffutils"],
+      "bins": [{ "file": "diffutils", "commands": ["diffutils", "diff", "cmp"] }]
+    },
+    {
+      "name": "sed",
+      "path": "vendor/uutils/sed",
+      "license": "MIT",
+      "cargo": ["--bin", "sed"],
+      "bins": [{ "file": "sed", "commands": ["sed"] }]
+    },
+    {
+      "name": "grep",
+      "path": "vendor/uutils/grep",
+      "license": "MIT",
+      "cargo": ["--bin", "grep"],
+      "bins": [{ "file": "grep", "commands": ["grep"] }]
+    },
+    {
+      "name": "procps",
+      "path": "vendor/uutils/procps",
+      "license": "MIT",
+      "optional": true,
+      "cargo": ["--bin", "procps"],
+      "bins": [{ "file": "procps", "commands": ["procps"] }]
+    },
+    {
+      "name": "brush",
+      "path": "vendor/brush",
+      "license": "MIT",
+      "panic": "unwind",
+      "cargo": ["-p", "brush-shell", "--bin", "brush"],
+      "bins": [{ "file": "brush", "commands": ["brush"] }]
+    },
+    {
+      "name": "nushell",
+      "path": "vendor/nushell",
+      "license": "MIT",
+      "panic": "unwind",
+      "cargo": ["-p", "nu", "--bin", "nu"],
+      "bins": [{ "file": "nu", "commands": ["nu"] }]
+    },
+    {
+      "name": "ripgrep",
+      "path": "vendor/ripgrep",
+      "license": "Unlicense OR MIT",
+      "cargo": ["--bin", "rg", "--features", "pcre2"],
+      "bins": [{ "file": "rg", "commands": ["rg"] }]
+    },
+    {
+      "name": "fd",
+      "path": "vendor/fd",
+      "license": "MIT OR Apache-2.0",
+      "cargo": ["--bin", "fd"],
+      "bins": [{ "file": "fd", "commands": ["fd"] }]
+    },
+    {
+      "name": "sd",
+      "path": "vendor/sd",
+      "license": "MIT",
+      "cargo": ["-p", "sd", "--bin", "sd"],
+      "bins": [{ "file": "sd", "commands": ["sd"] }]
+    },
+    {
+      "name": "bat",
+      "path": "vendor/bat",
+      "license": "MIT OR Apache-2.0",
+      "cargo": ["--bin", "bat"],
+      "bins": [{ "file": "bat", "commands": ["bat"] }]
+    },
+    {
+      "name": "eza",
+      "path": "vendor/eza",
+      "license": "EUPL-1.2",
+      "cargo": ["--bin", "eza"],
+      "bins": [{ "file": "eza", "commands": ["eza"] }]
+    },
+    {
+      "name": "dust",
+      "path": "vendor/du-dust",
+      "license": "Apache-2.0",
+      "cargo": ["--bin", "dust"],
+      "bins": [{ "file": "dust", "commands": ["dust"] }]
+    },
+    {
+      "name": "procs",
+      "path": "vendor/procs",
+      "license": "MIT",
+      "cargo": ["--bin", "procs"],
+      "bins": [{ "file": "procs", "commands": ["procs"] }]
+    },
+    {
+      "name": "hyperfine",
+      "path": "vendor/hyperfine",
+      "license": "MIT OR Apache-2.0",
+      "cargo": ["--bin", "hyperfine"],
+      "bins": [{ "file": "hyperfine", "commands": ["hyperfine"] }]
+    },
+    {
+      "name": "just",
+      "path": "vendor/bun-just/vendor/just",
+      "license": "CC0-1.0",
+      "cargo": ["--bin", "just"],
+      "bins": [{ "file": "just", "commands": ["just"] }]
+    },
+    {
+      "name": "tokei",
+      "path": "vendor/tokei",
+      "license": "MIT OR Apache-2.0",
+      "cargo": ["--bin", "tokei"],
+      "bins": [{ "file": "tokei", "commands": ["tokei"] }]
+    },
+    {
+      "name": "zoxide",
+      "path": "vendor/zoxide",
+      "license": "MIT",
+      "cargo": ["--bin", "zoxide"],
+      "bins": [{ "file": "zoxide", "commands": ["zoxide"] }]
+    },
+    {
+      "name": "xh",
+      "path": "vendor/xh",
+      "license": "MIT",
+      "cargo": ["--bin", "xh"],
+      "bins": [{ "file": "xh", "commands": ["xh", "xhs"] }]
+    },
+    {
+      "name": "ouch",
+      "path": "vendor/ouch",
+      "license": "MIT",
+      "cargo": ["--bin", "ouch"],
+      "bins": [{ "file": "ouch", "commands": ["ouch"] }]
+    },
+    {
+      "name": "starship",
+      "path": "vendor/starship",
+      "license": "ISC",
+      "panic": "unwind",
+      "cargo": ["--bin", "starship"],
+      "bins": [{ "file": "starship", "commands": ["starship"] }]
+    },
+    {
+      "name": "helix",
+      "path": "vendor/helix",
+      "license": "MPL-2.0",
+      "panic": "unwind",
+      "lto": "thin",
+      "env": { "HELIX_DISABLE_AUTO_GRAMMAR_BUILD": "1" },
+      "cargo": ["-p", "helix-term", "--bin", "hx"],
+      "bins": [{ "file": "hx", "commands": ["hx"] }],
+      "share": [{ "from": "runtime", "to": "share/helix/runtime", "exclude": ["grammars"] }]
+    }
+  ]
+}
