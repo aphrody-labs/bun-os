@@ -7,7 +7,7 @@
 driver-type = "WDM"
 
 [package]
-name = "bunos-nt-driver"
+name = "bunos"
 version = "1.4.7"
 edition = "2024"
 license = "Apache-2.0"

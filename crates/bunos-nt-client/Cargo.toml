@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: Apache-2.0
+# User-mode client of bunos.sys (crates/bunos-nt-driver): opens \\.\BunOS with windows-rs CreateFileW and speaks the
+# IOCTL contract with DeviceIoControl. Its own workspace (Windows-only, like crates/bunos-wsl): excluded from the
+# Linux root workspace gate.
+[workspace]
+
+[package]
+name = "bunos-nt-client"
+version = "1.4.7"
+edition = "2024"
+license = "Apache-2.0"
+description = "Bun OS user-mode client of the bunos.sys kernel driver (the BunOS device) on windows-rs."
+publish = false
+
+[[bin]]
+name = "bunos-nt"
+path = "src/main.rs"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62.2", default-features = false, features = [
+  "Win32_Foundation",
+  "Win32_Security",
+  "Win32_Storage_FileSystem",
+  "Win32_System_IO",
+] }

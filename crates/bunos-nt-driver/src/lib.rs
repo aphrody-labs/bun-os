@@ -3,7 +3,7 @@
 //!
 //! It creates `\Device\BunOS` and the user-visible `\\.\BunOS` link: the kernel side of the Bun OS bridge, opened by
 //! the Bun OS userland through windows-rs / bun:ffi `CreateFileW` + `DeviceIoControl`. The control codes below are
-//! the stable contract (docs/NT-DRIVER.md); every new kernel service is a new control code.
+//! the stable contract (docs/NTCORE.md, "bunos.sys"); every new kernel service is a new control code.
 #![no_std]
 
 #[cfg(not(test))]

@@ -1,0 +1,45 @@
+; SPDX-License-Identifier: Apache-2.0
+; bunos.inf: Bun OS kernel driver (\\.\BunOS). Primitive driver package (no hardware ID): installed into the
+; Driver Store with `pnputil /add-driver bunos.inf /install`, removed with `pnputil /delete-driver oemNN.inf
+; /uninstall`. `cargo wdk build` runs stampinf ($ARCH$, DriverVer), inf2cat, infverif and test-signs .sys and .cat.
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System
+ClassGuid   = {4D36E97D-E325-11CE-BFC1-08002BE10318}
+Provider    = %ProviderName%
+CatalogFile = bunos.cat
+DriverVer   =
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+bunos.sys = 1,,
+
+[DefaultInstall.NT$ARCH$]
+CopyFiles = BunOS.CopyFiles
+
+[DefaultInstall.NT$ARCH$.Services]
+AddService = BunOS,,BunOS.Service
+
+[BunOS.CopyFiles]
+bunos.sys
+
+[BunOS.Service]
+DisplayName   = %ServiceName%
+Description   = %ServiceDesc%
+ServiceType   = 1 ; SERVICE_KERNEL_DRIVER
+StartType     = 3 ; SERVICE_DEMAND_START: `sc start BunOS` loads it, nothing loads at boot
+ErrorControl  = 1 ; SERVICE_ERROR_NORMAL
+ServiceBinary = %13%\bunos.sys
+
+[Strings]
+ProviderName = "Aphrody"
+DiskName     = "Bun OS driver disk"
+ServiceName  = "Bun OS kernel bridge"
+ServiceDesc  = "Bun OS kernel driver: the \\.\BunOS device of the Bun OS userland."
