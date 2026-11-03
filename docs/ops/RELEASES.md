@@ -30,16 +30,18 @@ C userland is only what the kernel boot path still requires (glibc, systemd unti
 - **Installation media**: a dated ISO snapshot `YYYY.MM.DD` on the 1st of every month (Arch publishes its ISO
   monthly), signed, with checksums, on aphrody.com/downloads. An installed system never needs a new ISO.
 
-## Kernels (kernel.org, like Arch's `linux` and `linux-lts`)
+## Kernel (one kernel, Linux mainline)
 
-| Package              | Series                       | Repository        |
-| -------------------- | ---------------------------- | ----------------- |
-| `linux-bun`          | latest kernel.org stable     | `[bunos]`         |
-| `linux-bun-lts`      | latest kernel.org longterm   | `[bunos]`         |
-| `linux-bun-mainline` | Linus' mainline `-rc`        | `[bunos-testing]` |
-
-All three are built from kernel.org sources verified by signature, with `CONFIG_RUST=y` and `make LLVM=1`
-(Documentation/rust/quick-start.rst). Stable rules apply to our patches: upstream first, small, real fixes only.
+One kernel, `linux-bun`: Linux mainline, whichever of Linus's newest `-rc` and the newest stable release is newer
+(7.4-rc1 on 2026-11-03), rolling like the rest of the system; there is no LTS or second variant (owner decision,
+2026-11-03: Bun OS is a research project and wants the most Rust). An `-rc` comes from Linus's annotated tag, which
+must verify against his key (rc tarballs carry no `.sign`); a release comes from cdn.kernel.org with its `.sign`.
+`pkgver` is the version without the dash (`7.4rc1-1`), so pacman orders `7.4rc1 < 7.4 < 7.4.1`. Built by
+`factory/kernel/build.sh` with `LLVM=1` and `CONFIG_RUST=y`, the `aphrody-bun.config` and `android.config`
+fragments (Android 17 requirements from AOSP, checked by `check-android.ts`), into `[bunos-testing]`; it moves to
+`[bunos]` after `factory/kernel/boot-bun-init.sh` qualifies it (Bun as PID 1, binderfs). The WSL kernel uses the same
+base and Android fragment plus Microsoft's WSL2 series (`factory/wsl/kernel`). Our patches follow upstream rules:
+upstream first, small, real fixes only.
 
 ## Crates and npm packages
 
