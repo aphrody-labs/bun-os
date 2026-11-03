@@ -1,0 +1,7 @@
+{
+  "fork": "https://github.com/aphrody-labs/ui-ux-pro-max-skill",
+  "forkCommit": "17ce720ed3a4b96290251f6f2b4fa5151ced2049",
+  "upstream": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+  "upstreamCommit": "713eef51b04efc98d6fa565323b495f7c9c89fd4",
+  "path": ".claude/skills/ui-ux-pro-max"
+}

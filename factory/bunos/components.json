@@ -2310,8 +2310,8 @@
       "path": "vendor/ui-ux-pro-max-skill",
       "source": {
         "type": "submodule",
-        "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill.git",
-        "pin": "28b3b8dee8c976df4fa3e94aed4e092ad43fcb03"
+        "url": "https://github.com/aphrody-labs/ui-ux-pro-max-skill.git",
+        "pin": "17ce720ed3a4b96290251f6f2b4fa5151ced2049"
       },
       "registration": ["none"],
       "aot": true,
@@ -2320,7 +2320,7 @@
       "edges": {
         "consumers": ["skill:ui-ux-pro-max"]
       },
-      "note": "Pin = upstream HEAD of 2026-10-26T10:07:27Z."
+      "note": "Pin = aphrody-labs fork main 2026-11-03 (upstream 713eef5 merged); synced by packages/m3-design bun run sync:upstream."
     },
     {
       "id": "submodule:vendor/recalbox",
