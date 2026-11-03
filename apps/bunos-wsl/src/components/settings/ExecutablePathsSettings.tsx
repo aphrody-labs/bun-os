@@ -42,29 +42,28 @@ export function ExecutablePathsSettings() {
 
   return (
     <div className="space-y-8">
-      <section className="relative overflow-hidden bg-linear-to-br from-cyan-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-cyan-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500/10 via-transparent to-transparent" />
+      <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-900/30">
-              <TerminalIcon size="md" className="text-white" />
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+              <TerminalIcon size="md" className="text-on-primary-container" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-theme-text-primary">{t('executables.title')}</h2>
-              <p className="text-sm text-theme-text-muted">{t('executables.description')}</p>
+              <h2 className="text-lg font-medium text-on-surface">{t('executables.title')}</h2>
+              <p className="text-sm text-on-surface-variant">{t('executables.description')}</p>
             </div>
           </div>
 
           {/* Info box */}
-          <div className="mb-6 p-4 bg-theme-bg-tertiary/50 border border-theme-border-secondary/50 rounded-lg">
-            <p className="text-xs text-theme-text-muted">
+          <div className="mb-6 p-4 bg-surface-container/50 border border-outline-variant/50 rounded-lg">
+            <p className="text-xs text-on-surface-variant">
               {t('executables.infoBox')}
             </p>
           </div>
 
           {/* Core Commands */}
-          <div className="mb-6 pb-6 border-b border-theme-border-secondary/50">
-            <h3 className="text-sm font-medium text-theme-text-secondary mb-2">{t('executables.coreCommands')}</h3>
+          <div className="mb-6 pb-6 border-b border-outline-variant/50">
+            <h3 className="text-sm font-medium text-on-surface-variant mb-2">{t('executables.coreCommands')}</h3>
             <SettingInput
               className="font-mono text-sm"
               label={t('executables.wsl')}
@@ -84,8 +83,8 @@ export function ExecutablePathsSettings() {
           </div>
 
           {/* Terminal Commands */}
-          <div className="mb-6 pb-6 border-b border-theme-border-secondary/50">
-            <h3 className="text-sm font-medium text-theme-text-secondary mb-2">{t('executables.terminal')}</h3>
+          <div className="mb-6 pb-6 border-b border-outline-variant/50">
+            <h3 className="text-sm font-medium text-on-surface-variant mb-2">{t('executables.terminal')}</h3>
             <SettingInput
               className="font-mono text-sm"
               label={t('executables.windowsTerminal')}
@@ -105,8 +104,8 @@ export function ExecutablePathsSettings() {
           </div>
 
           {/* File System */}
-          <div className="mb-6 pb-6 border-b border-theme-border-secondary/50">
-            <h3 className="text-sm font-medium text-theme-text-secondary mb-2">{t('executables.fileSystem')}</h3>
+          <div className="mb-6 pb-6 border-b border-outline-variant/50">
+            <h3 className="text-sm font-medium text-on-surface-variant mb-2">{t('executables.fileSystem')}</h3>
             <SettingInput
               className="font-mono text-sm"
               label={t('executables.explorer')}
@@ -127,7 +126,7 @@ export function ExecutablePathsSettings() {
 
           {/* Installation */}
           <div className="space-y-1">
-            <h3 className="text-sm font-medium text-theme-text-secondary mb-2">{t('executables.installation')}</h3>
+            <h3 className="text-sm font-medium text-on-surface-variant mb-2">{t('executables.installation')}</h3>
             <SettingPathInput
               className="font-mono text-sm"
               label={t('executables.defaultInstallLocation')}
@@ -140,10 +139,10 @@ export function ExecutablePathsSettings() {
           </div>
 
           {/* Reset to Defaults */}
-          <div className="mt-6 pt-6 border-t border-theme-border-secondary/50 flex justify-end">
+          <div className="mt-6 pt-6 border-t border-outline-variant/50 flex justify-end">
             <button
               onClick={handleResetDefaults}
-              className="text-xs text-theme-text-muted hover:text-theme-text-secondary transition-colors"
+              className="text-xs text-on-surface-variant hover:text-on-surface transition-colors"
             >
               {t('executables.resetDefaults')}
             </button>

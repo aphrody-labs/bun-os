@@ -2,120 +2,81 @@
  * E2E Tests for Theme Settings
  *
  * Tests the theme selection functionality:
- * - Theme grid display
- * - Theme switching
- * - Custom theme option
+ * - Seed grid display
+ * - Seed switching (the engine re-derives the roles)
+ * - Light/dark mode
+ * - Custom seed option
  */
 
 import { setupHooks, actions, isElementDisplayed } from "../base";
 import { selectors } from "../utils";
 
+async function waitForPressed(selector: string, timeoutMsg: string) {
+  const element = await $(selector);
+  await browser.waitUntil(async () => (await element.getAttribute("aria-pressed")) === "true", {
+    timeout: 3000,
+    timeoutMsg,
+  });
+  return element;
+}
+
 describe("Theme Settings", () => {
   setupHooks.standard();
 
   beforeEach(async () => {
-    // Navigate to settings > appearance
     await actions.goToSettings();
 
     const appearanceTab = await $(selectors.settingsTab("appearance"));
     await appearanceTab.waitForClickable({ timeout: 5000 });
     await appearanceTab.click();
 
-    // Wait for theme grid to be displayed
-    await browser.waitUntil(
-      async () => isElementDisplayed('[data-testid="theme-obsidian"]'),
-      { timeout: 5000, timeoutMsg: "Theme grid did not appear" }
-    );
+    await browser.waitUntil(async () => isElementDisplayed('[data-testid="theme-bun-os"]'), {
+      timeout: 5000,
+      timeoutMsg: "Theme grid did not appear",
+    });
   });
 
   describe("Theme Grid", () => {
-    it("should display available themes", async () => {
-      // Check for theme buttons
-      const obsidianTheme = await $('[data-testid="theme-obsidian"]');
-      await expect(obsidianTheme).toBeDisplayed();
-
-      const cobaltTheme = await $('[data-testid="theme-cobalt"]');
-      await expect(cobaltTheme).toBeDisplayed();
-
-      const draculaTheme = await $('[data-testid="theme-dracula"]');
-      await expect(draculaTheme).toBeDisplayed();
+    it("should display the built-in seeds", async () => {
+      for (const id of ["bun-os", "obsidian", "cobalt", "high-contrast"]) {
+        await expect($(`[data-testid="theme-${id}"]`)).toBeDisplayed();
+      }
     });
 
-    it("should have Obsidian as default theme", async () => {
-      // Obsidian should be selected by default (has checkmark)
-      const obsidianTheme = await $('[data-testid="theme-obsidian"]');
-      const classes = await obsidianTheme.getAttribute("class");
-      expect(classes).toContain("border-");
+    it("should have Bun OS as default theme", async () => {
+      const bunOs = await $('[data-testid="theme-bun-os"]');
+      expect(await bunOs.getAttribute("aria-pressed")).toBe("true");
     });
 
-    it("should switch to Dracula theme", async () => {
-      const draculaTheme = await $('[data-testid="theme-dracula"]');
-      await draculaTheme.click();
-
-      // Wait for theme selection to update (selected theme has accent-primary border)
-      await browser.waitUntil(
-        async () => {
-          const classes = await draculaTheme.getAttribute("class");
-          return classes?.includes("accent-primary") ?? false;
-        },
-        { timeout: 3000, timeoutMsg: "Dracula theme selection did not update" }
+    it("should switch to Cobalt and re-derive the primary role", async () => {
+      const before = await browser.execute(() =>
+        getComputedStyle(document.documentElement).getPropertyValue("--md-sys-color-primary"),
       );
-
-      // Verify Dracula is now selected
-      const classes = await draculaTheme.getAttribute("class");
-      expect(classes).toContain("accent-primary");
-    });
-
-    it("should switch to Cobalt theme", async () => {
-      const cobaltTheme = await $('[data-testid="theme-cobalt"]');
-      await cobaltTheme.click();
-
-      // Wait for theme selection to update (selected theme has accent-primary border)
+      await (await $('[data-testid="theme-cobalt"]')).click();
+      await waitForPressed('[data-testid="theme-cobalt"]', "Cobalt theme selection did not update");
       await browser.waitUntil(
-        async () => {
-          const classes = await cobaltTheme.getAttribute("class");
-          return classes?.includes("accent-primary") ?? false;
-        },
-        { timeout: 3000, timeoutMsg: "Cobalt theme selection did not update" }
+        async () =>
+          (await browser.execute(() =>
+            getComputedStyle(document.documentElement).getPropertyValue("--md-sys-color-primary"),
+          )) !== before,
+        { timeout: 5000, timeoutMsg: "Primary role was not re-derived" },
       );
-
-      // Verify Cobalt is now selected
-      const classes = await cobaltTheme.getAttribute("class");
-      expect(classes).toContain("accent-primary");
-    });
-
-    it("should have Custom theme option", async () => {
-      const customTheme = await $('[data-testid="theme-custom"]');
-      await expect(customTheme).toBeDisplayed();
     });
 
     it("should select Custom theme when clicked", async () => {
-      const customTheme = await $('[data-testid="theme-custom"]');
-      await customTheme.click();
-
-      // Wait for theme selection to update (selected theme has accent-primary border)
-      await browser.waitUntil(
-        async () => {
-          const classes = await customTheme.getAttribute("class");
-          return classes?.includes("accent-primary") ?? false;
-        },
-        { timeout: 3000, timeoutMsg: "Custom theme selection did not update" }
-      );
-
-      // Custom theme should now be selected
-      const classes = await customTheme.getAttribute("class");
-      expect(classes).toContain("accent-primary");
+      await (await $('[data-testid="theme-custom"]')).click();
+      await waitForPressed('[data-testid="theme-custom"]', "Custom theme selection did not update");
+      await expect($('[data-testid="theme-custom-seed"]')).toBeDisplayed();
     });
   });
 
-  describe("Theme Buttons", () => {
-    it("should have clickable theme buttons", async () => {
-      // All theme buttons should be clickable
-      const nordTheme = await $('[data-testid="theme-nord"]');
-      await expect(nordTheme).toBeDisplayed();
-      
-      const monokaiTheme = await $('[data-testid="theme-monokai"]');
-      await expect(monokaiTheme).toBeDisplayed();
+  describe("Mode", () => {
+    it("should switch to the light scheme", async () => {
+      await (await $('[data-testid="theme-mode-light"]')).click();
+      await browser.waitUntil(
+        async () => (await browser.execute(() => document.documentElement.dataset.theme)) === "light",
+        { timeout: 3000, timeoutMsg: "Light scheme was not applied" },
+      );
     });
   });
 });

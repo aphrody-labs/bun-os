@@ -205,7 +205,7 @@ describe("Disk Mount Features", () => {
       const vhdClassName = await vhdTab.getAttribute("class");
 
       // VHD tab should have the active/selected styling
-      expect(vhdClassName).toContain("bg-theme-accent-primary");
+      expect(vhdClassName).toContain("bg-primary");
     });
 
     it("should show VHD file input and Browse button", async () => {
@@ -371,7 +371,7 @@ describe("Disk Mount Features", () => {
     it("should have backdrop visible when dialog is open", async () => {
       await openDiskMountDialog();
 
-      // Check that backdrop is visible (theme uses bg-theme-bg-primary/80 with backdrop-blur)
+      // Check that backdrop is visible (theme uses bg-surface/80 with backdrop-blur)
       const backdrop = await $(".backdrop-blur-xs");
       await expect(backdrop).toBeDisplayed();
     });
@@ -413,7 +413,7 @@ describe("Disk Mount Features", () => {
       const dialog = await findDialog();
 
       // Error area exists but should not have visible error initially
-      const errorDisplayed = await isElementDisplayed(".bg-red-900");
+      const errorDisplayed = await isElementDisplayed(".bg-error-container");
       expect(errorDisplayed).toBe(false);
     });
   });

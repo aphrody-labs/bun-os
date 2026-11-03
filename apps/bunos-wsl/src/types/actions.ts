@@ -20,21 +20,27 @@ export interface CustomAction {
   order: number;      // Sort order for display
 }
 
-// Available icons for custom actions
+// Icons for custom actions. `id` is what a saved action stores; `symbol` is its Material Symbols
+// Outlined glyph (rendered by the m3-fonts symbols subset through @aphrody/m3-primitives Icon).
 export const ACTION_ICONS = [
-  { id: "terminal", label: "Terminal", emoji: "💻" },
-  { id: "folder", label: "Folder", emoji: "📁" },
-  { id: "gear", label: "Settings", emoji: "⚙️" },
-  { id: "rocket", label: "Rocket", emoji: "🚀" },
-  { id: "wrench", label: "Tool", emoji: "🔧" },
-  { id: "box", label: "Package", emoji: "📦" },
-  { id: "lightning", label: "Lightning", emoji: "⚡" },
-  { id: "refresh", label: "Refresh", emoji: "🔄" },
-  { id: "database", label: "Database", emoji: "🗄️" },
-  { id: "cloud", label: "Cloud", emoji: "☁️" },
-  { id: "lock", label: "Lock", emoji: "🔒" },
-  { id: "code", label: "Code", emoji: "💾" },
+  { id: "terminal", label: "Terminal", symbol: "terminal" },
+  { id: "folder", label: "Folder", symbol: "folder" },
+  { id: "gear", label: "Settings", symbol: "settings" },
+  { id: "rocket", label: "Launch", symbol: "send" },
+  { id: "wrench", label: "Tool", symbol: "build" },
+  { id: "box", label: "Package", symbol: "inventory_2" },
+  { id: "lightning", label: "Lightning", symbol: "bolt" },
+  { id: "refresh", label: "Refresh", symbol: "refresh" },
+  { id: "database", label: "Database", symbol: "database" },
+  { id: "cloud", label: "Cloud", symbol: "cloud" },
+  { id: "lock", label: "Lock", symbol: "lock" },
+  { id: "code", label: "Code", symbol: "code" },
 ] as const;
+
+/** The Material Symbols glyph of a saved action icon id (an unknown id, e.g. from an imported file, shows "bolt"). */
+export function actionSymbol(iconId: string): string {
+  return ACTION_ICONS.find((icon) => icon.id === iconId)?.symbol ?? "bolt";
+}
 
 // Available variables for command substitution
 export const ACTION_VARIABLES = [

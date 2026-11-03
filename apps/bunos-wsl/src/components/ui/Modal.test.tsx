@@ -41,7 +41,7 @@ describe('Modal', () => {
         </Modal>
       );
       // Find and click the backdrop
-      const backdrop = document.querySelector('.bg-black\\/60, .bg-black\\/70');
+      const backdrop = document.querySelector('.bg-scrim\\/40');
       if (backdrop) {
         fireEvent.click(backdrop);
         expect(handleClose).toHaveBeenCalledTimes(1);
@@ -55,7 +55,7 @@ describe('Modal', () => {
           <div>Content</div>
         </Modal>
       );
-      const backdrop = document.querySelector('.bg-black\\/60, .bg-black\\/70');
+      const backdrop = document.querySelector('.bg-scrim\\/40');
       if (backdrop) {
         fireEvent.click(backdrop);
         expect(handleClose).not.toHaveBeenCalled();
@@ -250,7 +250,7 @@ describe('Dialog (ConfirmDialog replacement)', () => {
     );
     // Check for danger styling on confirm button
     const confirmButton = screen.getByRole('button', { name: 'Confirm' });
-    expect(confirmButton).toHaveClass('text-theme-button-danger');
+    expect(confirmButton).toHaveClass('text-error');
   });
 });
 

@@ -29,6 +29,7 @@ export interface DistroMetadata {
   importPath?: string;    // Original tar file path for imported distros
 }
 
+// design:content: installation-source badge colours (data categories, like file-type badges), not UI roles.
 /** Colors for installation source indicators (matches NewDistroDialog tabs) */
 export const INSTALL_SOURCE_COLORS: Record<InstallSource, string> = {
   store: "#10B981",     // Emerald (Quick Install)

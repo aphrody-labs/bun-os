@@ -20,8 +20,8 @@ vi.mock("../../store/distroStore", () => ({
   useDistroStore: vi.fn(),
 }));
 
-vi.mock("@tauri-apps/plugin-shell", () => ({
-  open: vi.fn(),
+vi.mock("@tauri-apps/plugin-opener", () => ({
+  openUrl: vi.fn(),
 }));
 
 const stoppedDistro: Distribution = {

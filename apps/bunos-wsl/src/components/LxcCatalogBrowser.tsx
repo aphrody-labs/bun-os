@@ -106,27 +106,27 @@ function LxcCatalogBrowserInner({ selectedDistro, onSelect, disabled }: LxcCatal
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-theme-text-muted">
-        <svg className="w-8 h-8 animate-spin mb-3 text-theme-accent-primary" viewBox="0 0 24 24">
+      <div className="flex flex-col items-center justify-center py-16 text-on-surface-variant">
+        <svg className="w-8 h-8 animate-spin mb-3 text-primary" viewBox="0 0 24 24">
           <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
           <path className="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
         </svg>
         <span className="text-sm">{t('loading')}</span>
-        <span className="text-xs text-theme-text-muted mt-1"></span>
+        <span className="text-xs text-on-surface-variant mt-1"></span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-theme-text-muted">
-        <svg className="w-12 h-12 mb-3 text-theme-status-error opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <div className="flex flex-col items-center justify-center py-16 text-on-surface-variant">
+        <svg className="w-12 h-12 mb-3 text-error opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
-        <span className="text-sm text-theme-status-error mb-2">{error}</span>
+        <span className="text-sm text-error mb-2">{error}</span>
         <button
           onClick={() => loadCatalog(true)}
-          className="text-xs text-theme-accent-primary hover:underline"
+          className="text-xs text-primary hover:underline"
         >
           {t('common:button.retry')}
         </button>
@@ -145,15 +145,15 @@ function LxcCatalogBrowserInner({ selectedDistro, onSelect, disabled }: LxcCatal
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('dialogs:diskMount.searchPlaceholder')}
             disabled={disabled}
-            className="w-full pl-10 pr-4 py-2.5 bg-theme-bg-tertiary border border-theme-border-secondary rounded-xl text-theme-text-primary placeholder-theme-text-muted focus:outline-none focus:border-theme-accent-primary text-sm disabled:opacity-50"
+            className="w-full pl-10 pr-4 py-2.5 bg-surface-container border border-outline-variant rounded-xl text-on-surface placeholder-on-surface-variant focus:outline-none focus:border-primary text-sm disabled:opacity-50"
           />
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-theme-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-theme-text-muted hover:text-theme-text-primary transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-on-surface-variant hover:text-on-surface transition-colors"
               title={t('common:button.clear')}
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,7 +165,7 @@ function LxcCatalogBrowserInner({ selectedDistro, onSelect, disabled }: LxcCatal
         <button
           onClick={() => loadCatalog(true)}
           disabled={disabled || loading}
-          className="p-2.5 bg-theme-bg-tertiary hover:bg-theme-bg-hover border border-theme-border-secondary text-theme-text-secondary rounded-xl transition-colors disabled:opacity-50"
+          className="p-2.5 bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface-variant rounded-xl transition-colors disabled:opacity-50"
           title={t('dialogs:diskMount.refreshCatalog')}
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -175,7 +175,7 @@ function LxcCatalogBrowserInner({ selectedDistro, onSelect, disabled }: LxcCatal
       </div>
 
       {filteredGroups.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 text-theme-text-muted">
+        <div className="flex flex-col items-center justify-center py-16 text-on-surface-variant">
           <LinuxLogo size={48} className="mb-3 opacity-50" />
           <span className="text-sm">{t('catalogNoMatch', { query: searchQuery })}</span>
         </div>
@@ -189,8 +189,8 @@ function LxcCatalogBrowserInner({ selectedDistro, onSelect, disabled }: LxcCatal
           disabled={disabled}
           className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
             familyFilter === null
-              ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
-              : "bg-theme-bg-tertiary text-theme-text-muted border border-theme-border-secondary hover:text-theme-text-secondary hover:border-theme-border-primary"
+              ? "bg-tertiary/20 text-tertiary border border-tertiary/30"
+              : "bg-surface-container text-on-surface-variant border border-outline-variant hover:text-on-surface hover:border-outline-variant"
           }`}
         >
           All ({filteredDistros.length})
@@ -205,8 +205,8 @@ function LxcCatalogBrowserInner({ selectedDistro, onSelect, disabled }: LxcCatal
               disabled={disabled}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
                 familyFilter === family
-                  ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
-                  : "bg-theme-bg-tertiary text-theme-text-muted border border-theme-border-secondary hover:text-theme-text-secondary hover:border-theme-border-primary"
+                  ? "bg-tertiary/20 text-tertiary border border-tertiary/30"
+                  : "bg-surface-container text-on-surface-variant border border-outline-variant hover:text-on-surface hover:border-outline-variant"
               }`}
             >
               {name} ({count})
@@ -222,32 +222,32 @@ function LxcCatalogBrowserInner({ selectedDistro, onSelect, disabled }: LxcCatal
           const Logo = getDistroLogo(group.os);
 
           return (
-            <div key={group.os} className="border border-theme-border-secondary rounded-xl overflow-hidden">
+            <div key={group.os} className="border border-outline-variant rounded-xl overflow-hidden">
               {/* Group header */}
               <button
                 onClick={() => toggleGroup(group.os)}
                 disabled={disabled}
-                className="w-full flex items-center gap-3 p-3 bg-theme-bg-tertiary/50 hover:bg-theme-bg-tertiary transition-colors text-left"
+                className="w-full flex items-center gap-3 p-3 bg-surface-container/50 hover:bg-surface-container transition-colors text-left"
               >
-                <div className="shrink-0 rounded-lg p-1 bg-theme-bg-tertiary">
+                <div className="shrink-0 rounded-lg p-1 bg-surface-container">
                   <Logo size={28} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="font-medium text-theme-text-primary">{group.displayName}</div>
-                  <div className="text-xs text-theme-text-muted">
+                  <div className="font-medium text-on-surface">{group.displayName}</div>
+                  <div className="text-xs text-on-surface-variant">
                     {t('catalogVersionCount', { count: group.releases.length })}
                   </div>
                 </div>
                 {isExpanded ? (
-                  <ChevronDownIcon size="md" className="text-theme-text-muted" />
+                  <ChevronDownIcon size="md" className="text-on-surface-variant" />
                 ) : (
-                  <ChevronRightIcon size="md" className="text-theme-text-muted" />
+                  <ChevronRightIcon size="md" className="text-on-surface-variant" />
                 )}
               </button>
 
               {/* Releases */}
               {isExpanded && (
-                <div className="border-t border-theme-border-secondary">
+                <div className="border-t border-outline-variant">
                   {group.releases.map((release) => (
                     <div key={release.version}>
                       {release.variants.map((variant) => {
@@ -259,22 +259,22 @@ function LxcCatalogBrowserInner({ selectedDistro, onSelect, disabled }: LxcCatal
                             disabled={disabled}
                             className={`w-full flex items-center gap-3 px-4 py-3 transition-colors text-left ${
                               isSelected
-                                ? "bg-purple-500/10 border-l-2 border-purple-500"
-                                : "hover:bg-theme-bg-hover border-l-2 border-transparent"
+                                ? "bg-tertiary/10 border-l-2 border-tertiary"
+                                : "hover:bg-surface-container-high border-l-2 border-transparent"
                             }`}
                           >
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2">
-                                <span className={`font-medium ${isSelected ? "text-purple-300" : "text-theme-text-primary"}`}>
+                                <span className={`font-medium ${isSelected ? "text-tertiary" : "text-on-surface"}`}>
                                   {release.releaseTitle || release.version}
                                 </span>
                                 {variant.variant !== "default" && (
-                                  <span className="text-xs px-1.5 py-0.5 bg-theme-bg-tertiary rounded text-theme-text-muted">
+                                  <span className="text-xs px-1.5 py-0.5 bg-surface-container rounded text-on-surface-variant">
                                     {variant.variant}
                                   </span>
                                 )}
                               </div>
-                              <div className="flex items-center gap-3 text-xs text-theme-text-muted mt-0.5">
+                              <div className="flex items-center gap-3 text-xs text-on-surface-variant mt-0.5">
                                 <span className="flex items-center gap-1">
                                   <DownloadIcon size="sm" className="opacity-50" />
                                   {formatLxcSize(variant.sizeBytes)}
@@ -284,8 +284,8 @@ function LxcCatalogBrowserInner({ selectedDistro, onSelect, disabled }: LxcCatal
                               </div>
                             </div>
                             {isSelected && (
-                              <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center shrink-0">
-                                <CheckIcon size="sm" className="text-white" />
+                              <div className="w-6 h-6 rounded-full bg-tertiary flex items-center justify-center shrink-0">
+                                <CheckIcon size="sm" className="text-on-tertiary" />
                               </div>
                             )}
                           </button>
@@ -302,7 +302,7 @@ function LxcCatalogBrowserInner({ selectedDistro, onSelect, disabled }: LxcCatal
 
       {/* Cache info */}
       {cacheInfo.lastUpdated && (
-        <div className="mt-4 text-xs text-theme-text-muted text-center">
+        <div className="mt-4 text-xs text-on-surface-variant text-center">
           {t('catalogCacheInfo', { date: new Date(cacheInfo.lastUpdated).toLocaleDateString(), time: new Date(cacheInfo.lastUpdated).toLocaleTimeString() })}
         </div>
       )}

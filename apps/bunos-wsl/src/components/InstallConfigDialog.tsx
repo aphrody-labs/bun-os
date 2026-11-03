@@ -185,27 +185,27 @@ export function InstallConfigDialog({
   const modeColors = {
     community: {
       accent: "purple",
-      border: "border-purple-500/50",
-      bg: "bg-purple-500/10",
-      text: "text-purple-400",
-      focus: "focus:border-purple-500/50",
-      radio: "text-purple-500 focus:ring-purple-500",
+      border: "border-tertiary/50",
+      bg: "bg-tertiary/10",
+      text: "text-tertiary",
+      focus: "focus:border-tertiary/50",
+      radio: "text-tertiary focus:ring-tertiary",
     },
     container: {
       accent: "orange",
-      border: "border-orange-500/50",
-      bg: "bg-orange-500/10",
-      text: "text-orange-400",
-      focus: "focus:border-orange-500/50",
-      radio: "text-orange-500 focus:ring-orange-500",
+      border: "border-primary/50",
+      bg: "bg-primary/10",
+      text: "text-primary",
+      focus: "focus:border-primary/50",
+      radio: "text-primary focus:ring-primary",
     },
     download: {
       accent: "blue",
-      border: "border-blue-500/50",
-      bg: "bg-blue-500/10",
-      text: "text-blue-400",
-      focus: "focus:border-blue-500/50",
-      radio: "text-blue-500 focus:ring-blue-500",
+      border: "border-secondary/50",
+      bg: "bg-secondary/10",
+      text: "text-secondary",
+      focus: "focus:border-secondary/50",
+      radio: "text-secondary focus:ring-secondary",
     },
   };
 
@@ -217,22 +217,22 @@ export function InstallConfigDialog({
     <Portal>
       <div className="fixed inset-0 z-[110] flex items-center justify-center">
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-theme-bg-primary/80 backdrop-blur-xs" onClick={handleClose} />
+        <div className="absolute inset-0 bg-scrim/40 backdrop-blur-xs" onClick={handleClose} />
 
         {/* Dialog */}
         <div
           role="dialog"
           aria-modal="true"
           data-testid="install-config-dialog"
-          className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-xl shadow-2xl shadow-black/50 max-w-md w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-md w-full mx-4 p-6"
         >
           {/* Header */}
-          <h2 className="text-xl font-semibold text-theme-text-primary mb-2">{t('installConfig.title')}</h2>
-          <p className="text-sm text-theme-text-secondary mb-1">
+          <h2 className="text-xl font-semibold text-on-surface mb-2">{t('installConfig.title')}</h2>
+          <p className="text-sm text-on-surface-variant mb-1">
             {t('installConfig.installing')} <span className={`font-medium ${colors.text}`}>{selectedItem.name}</span>
           </p>
           {selectedItem.description && (
-            <p className="text-xs text-theme-text-muted mb-4 font-mono truncate">{selectedItem.description}</p>
+            <p className="text-xs text-on-surface-variant mb-4 font-mono truncate">{selectedItem.description}</p>
           )}
 
           {/* Distribution Name */}
@@ -257,7 +257,7 @@ export function InstallConfigDialog({
           {/* Installation Location */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1">
-              <label className="text-sm font-medium text-theme-text-primary">
+              <label className="text-sm font-medium text-on-surface">
                 {t('installConfig.locationLabel')}
               </label>
               {isCustomPath && (
@@ -286,7 +286,7 @@ export function InstallConfigDialog({
 
           {/* WSL Version */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-theme-text-primary mb-2">
+            <label className="block text-sm font-medium text-on-surface mb-2">
               {t('installConfig.wslVersion')}
             </label>
             <div className="flex gap-4">
@@ -295,16 +295,16 @@ export function InstallConfigDialog({
                 checked={wslVersion === 2}
                 onChange={() => setWslVersion(2)}
                 inline
-                labelClassName="text-theme-text-secondary"
+                labelClassName="text-on-surface-variant"
                 className={colors.radio}
-                label={<>WSL 2 <span className="text-theme-text-muted">({t('installConfig.recommended')})</span></>}
+                label={<>WSL 2 <span className="text-on-surface-variant">({t('installConfig.recommended')})</span></>}
               />
               <RadioButton
                 name="installWslVersion"
                 checked={wslVersion === 1}
                 onChange={() => setWslVersion(1)}
                 inline
-                labelClassName="text-theme-text-secondary"
+                labelClassName="text-on-surface-variant"
                 className={colors.radio}
                 label="WSL 1"
               />
@@ -316,7 +316,7 @@ export function InstallConfigDialog({
             <button
               onClick={handleClose}
               data-testid="install-config-cancel-button"
-              className="px-4 py-2 text-sm font-medium text-theme-text-secondary bg-theme-bg-tertiary hover:bg-theme-bg-hover rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-on-surface-variant bg-surface-container hover:bg-surface-container-high rounded-lg transition-colors"
             >
               {t('common:button.cancel')}
             </button>
@@ -326,10 +326,10 @@ export function InstallConfigDialog({
               data-testid="install-config-confirm-button"
               className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
                 mode === "community"
-                  ? "bg-purple-600 hover:bg-purple-500 text-white"
+                  ? "bg-tertiary state-layer text-on-tertiary"
                   : mode === "container"
-                  ? "bg-orange-600 hover:bg-orange-500 text-white"
-                  : "bg-blue-600 hover:bg-blue-500 text-white"
+                  ? "bg-primary state-layer text-on-primary"
+                  : "bg-secondary state-layer text-on-secondary"
               }`}
             >
               <DownloadIcon size="sm" />

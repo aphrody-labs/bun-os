@@ -89,7 +89,7 @@ describe('EmptyState', () => {
   });
 
   it('renders icon when provided', () => {
-    render(<EmptyState title="Empty" icon={<span data-testid="icon">📦</span>} />);
+    render(<EmptyState title="Empty" icon={<svg data-testid="icon" />} />);
     expect(screen.getByTestId('icon')).toBeInTheDocument();
   });
 
@@ -136,7 +136,7 @@ describe('ProgressBar', () => {
 
   it('applies variant colors', () => {
     const { container } = render(<ProgressBar value={50} variant="success" />);
-    const bar = container.querySelector('.bg-theme-status-running');
+    const bar = container.querySelector('.bg-success');
     expect(bar).toBeInTheDocument();
   });
 });

@@ -627,7 +627,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
       <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto py-4">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-theme-bg-primary/85 backdrop-blur-sm transition-opacity"
+          className="absolute inset-0 bg-scrim/40 backdrop-blur-sm transition-opacity"
           onClick={handleClose}
         />
 
@@ -636,21 +636,14 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
           role="dialog"
           aria-modal="true"
           data-testid="new-distro-dialog"
-          className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-2xl shadow-2xl shadow-black/50 max-w-4xl w-full mx-4 max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden animate-fade-slide-in"
+          className="relative bg-surface-container-low border border-outline-variant rounded-2xl shadow-2xl shadow-shadow/50 max-w-4xl w-full mx-4 max-h-[calc(100vh-2rem)] flex flex-col overflow-hidden animate-fade-slide-in"
         >
-          {/* Top accent line */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-theme-accent-primary/50 to-transparent" />
 
-          {/* Corner accents */}
-          <div className="absolute top-0 left-0 w-8 h-px bg-gradient-to-r from-theme-accent-primary/70 to-transparent" />
-          <div className="absolute top-0 left-0 w-px h-8 bg-gradient-to-b from-theme-accent-primary/70 to-transparent" />
-          <div className="absolute top-0 right-0 w-8 h-px bg-gradient-to-l from-theme-accent-primary/70 to-transparent" />
-          <div className="absolute top-0 right-0 w-px h-8 bg-gradient-to-b from-theme-accent-primary/70 to-transparent" />
 
           {/* Header */}
           <div className="px-6 pt-6 pb-4">
             <div className="flex items-center justify-between mb-1">
-              <h2 className="text-2xl font-semibold text-theme-text-primary">{t('title')}</h2>
+              <h2 className="text-2xl font-semibold text-on-surface">{t('title')}</h2>
               <IconButton
                 icon={<CloseIcon size="md" />}
                 label={t('common:button.close')}
@@ -658,7 +651,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                 onClick={handleClose}
               />
             </div>
-            <p className="text-sm text-theme-text-muted">{t('subtitle')}</p>
+            <p className="text-sm text-on-surface-variant">{t('subtitle')}</p>
           </div>
 
           {/* Mode Selector - Card style */}
@@ -667,16 +660,16 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
               {(Object.entries(MODE_CONFIG) as [InstallMode, typeof MODE_CONFIG.quick][]).map(([key, config]) => {
                 const isActive = mode === key;
                 const colorClasses = {
-                  emerald: isActive ? "border-emerald-500/50 bg-emerald-500/10" : "border-theme-border-secondary hover:border-emerald-500/30",
-                  blue: isActive ? "border-blue-500/50 bg-blue-500/10" : "border-theme-border-secondary hover:border-blue-500/30",
-                  purple: isActive ? "border-purple-500/50 bg-purple-500/10" : "border-theme-border-secondary hover:border-purple-500/30",
-                  orange: isActive ? "border-orange-500/50 bg-orange-500/10" : "border-theme-border-secondary hover:border-orange-500/30",
+                  emerald: isActive ? "border-success/50 bg-success/10" : "border-outline-variant hover:border-success/30",
+                  blue: isActive ? "border-secondary/50 bg-secondary/10" : "border-outline-variant hover:border-secondary/30",
+                  purple: isActive ? "border-tertiary/50 bg-tertiary/10" : "border-outline-variant hover:border-tertiary/30",
+                  orange: isActive ? "border-primary/50 bg-primary/10" : "border-outline-variant hover:border-primary/30",
                 }[config.color];
                 const iconColor = {
-                  emerald: isActive ? "text-emerald-400" : "text-theme-text-muted",
-                  blue: isActive ? "text-blue-400" : "text-theme-text-muted",
-                  purple: isActive ? "text-purple-400" : "text-theme-text-muted",
-                  orange: isActive ? "text-orange-400" : "text-theme-text-muted",
+                  emerald: isActive ? "text-success" : "text-on-surface-variant",
+                  blue: isActive ? "text-secondary" : "text-on-surface-variant",
+                  purple: isActive ? "text-tertiary" : "text-on-surface-variant",
+                  orange: isActive ? "text-primary" : "text-on-surface-variant",
                 }[config.color];
 
                 // Map mode keys to data-testid values
@@ -696,12 +689,12 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                     className={`relative p-4 rounded-xl border transition-all duration-200 text-left group ${colorClasses} disabled:opacity-50`}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg bg-theme-bg-tertiary ${iconColor} transition-colors`}>
+                      <div className={`p-2 rounded-lg bg-surface-container ${iconColor} transition-colors`}>
                         <config.Icon className="w-5 h-5" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="font-medium text-theme-text-primary text-sm">{t(config.labelKey)}</div>
-                        <div className="text-xs text-theme-text-muted mt-0.5 leading-tight">{t(config.descriptionKey)}</div>
+                        <div className="font-medium text-on-surface text-sm">{t(config.labelKey)}</div>
+                        <div className="text-xs text-on-surface-variant mt-0.5 leading-tight">{t(config.descriptionKey)}</div>
                       </div>
                     </div>
                     {isActive && (
@@ -718,11 +711,11 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
           {/* Download info - for download mode, shown above name input */}
           {mode === "custom" && (
             <div className="px-6 pb-3">
-              <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-start gap-3">
-                <svg className="w-5 h-5 text-blue-400 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <div className="p-3 bg-secondary/10 border border-secondary/20 rounded-xl flex items-start gap-3">
+                <svg className="w-5 h-5 text-secondary shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
-                <p className="text-sm text-blue-300">
+                <p className="text-sm text-secondary">
                   {t('info.download')}
                 </p>
               </div>
@@ -732,11 +725,11 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
           {/* Community info - for community mode when enabled, shown above name input */}
           {mode === "community" && settings.distributionSources.lxcEnabled && (
             <div className="px-6 pb-3">
-              <div className="p-3 bg-purple-500/10 border border-purple-500/20 rounded-xl flex items-start gap-3">
-                <svg className="w-5 h-5 text-purple-400 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <div className="p-3 bg-tertiary/10 border border-tertiary/20 rounded-xl flex items-start gap-3">
+                <svg className="w-5 h-5 text-tertiary shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
-                <p className="text-sm text-purple-300">
+                <p className="text-sm text-tertiary">
                   {t('info.community', { url: settings.distributionSources.lxcBaseUrl })}
                 </p>
               </div>
@@ -746,11 +739,11 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
           {/* Container runtime info - for container mode, shown above name input */}
           {mode === "container" && (
             <div className="px-6 pb-3">
-              <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-xl flex items-start gap-3">
-                <svg className="w-5 h-5 text-orange-400 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+              <div className="p-3 bg-primary/10 border border-primary/20 rounded-xl flex items-start gap-3">
+                <svg className="w-5 h-5 text-primary shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                 </svg>
-                <div className="text-sm text-orange-300">
+                <div className="text-sm text-primary">
                   {t('info.container', {
                     runtime: (() => {
                       const runtime = settings.containerRuntime;
@@ -769,7 +762,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
           {/* Content */}
           <div ref={contentRef} className="flex-1 overflow-y-auto px-6 pb-4">
             {catalogLoadError && (
-              <div role="alert" className="mb-4 p-4 rounded-xl border border-theme-status-error text-theme-status-error text-sm">
+              <div role="alert" className="mb-4 p-4 rounded-xl border border-error text-error text-sm">
                 <p className="font-medium">{t('catalogLoadFailed')}</p>
                 <p className="mt-1 whitespace-pre-wrap">{catalogLoadError}</p>
                 <p className="mt-2">{t('catalogRetryHint')}</p>
@@ -782,7 +775,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
             {error && (
               <div
                 data-testid="install-error"
-                className="mb-4 p-4 bg-[rgba(var(--status-error-rgb),0.1)] border border-[rgba(var(--status-error-rgb),0.3)] rounded-xl text-theme-status-error text-sm flex items-start gap-3"
+                className="mb-4 p-4 bg-error/10 border border-error/30 rounded-xl text-error text-sm flex items-start gap-3"
               >
                 <svg className="w-5 h-5 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -796,25 +789,25 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
               <div
                 data-testid="install-progress"
                 data-stage={downloadProgress?.stage || (progress.toLowerCase().includes("success") ? "complete" : "working")}
-                className="mb-4 p-4 bg-theme-bg-tertiary border border-theme-border-secondary rounded-xl"
+                className="mb-4 p-4 bg-surface-container border border-outline-variant rounded-xl"
               >
                 <div className="flex items-center gap-3">
                   {isCreating ? (
                     <div className="relative w-8 h-8">
-                      <svg className="w-8 h-8 animate-spin text-theme-accent-primary" viewBox="0 0 24 24">
+                      <svg className="w-8 h-8 animate-spin text-primary" viewBox="0 0 24 24">
                         <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
                         <path className="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                       </svg>
                     </div>
                   ) : (
-                    <div className="w-8 h-8 rounded-full bg-theme-status-success/20 flex items-center justify-center">
-                      <CheckIcon size="md" className="text-theme-status-success" />
+                    <div className="w-8 h-8 rounded-full bg-success/20 flex items-center justify-center">
+                      <CheckIcon size="md" className="text-success" />
                     </div>
                   )}
                   <div className="flex-1">
-                    <p data-testid="install-progress-text" className="text-sm text-theme-text-primary font-medium">{progress}</p>
+                    <p data-testid="install-progress-text" className="text-sm text-on-surface font-medium">{progress}</p>
                     {nativeInstallStartedAt !== null && (
-                      <p data-testid="native-install-details" className="mt-1 text-xs text-theme-text-muted">
+                      <p data-testid="native-install-details" className="mt-1 text-xs text-on-surface-variant">
                         {t('progress.nativeInstallDetails', {
                           elapsed: formatElapsed(nativeInstallElapsedSeconds),
                         })}
@@ -822,11 +815,11 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                     )}
                     {downloadProgress?.stage === "downloading" && downloadProgress.percent != null && (
                       <div className="mt-2">
-                        <div className="h-1.5 bg-theme-border-secondary rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-outline-variant rounded-full overflow-hidden">
                           <div
                             data-testid="install-progress-bar"
                             data-percent={Math.round(downloadProgress.percent)}
-                            className="h-full bg-gradient-to-r from-blue-500 to-blue-400 transition-all duration-200 rounded-full"
+                            className="h-full bg-primary transition-all duration-200 rounded-full"
                             style={{ width: `${Math.min(downloadProgress.percent, 100)}%` }}
                           />
                         </div>
@@ -841,25 +834,25 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
             {mode === "quick" && (
               <div className="min-h-[320px]">
                 {/* Info hint */}
-                <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-start gap-3">
-                  <svg className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                <div className="mb-4 p-3 bg-success/10 border border-success/20 rounded-xl flex items-start gap-3">
+                  <svg className="w-5 h-5 text-success shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm text-emerald-300">
+                  <p className="text-sm text-success">
                     {t('info.quickInstall')}
                   </p>
                 </div>
 
                 {loadingDistros ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-theme-text-muted">
-                    <svg className="w-8 h-8 animate-spin mb-3 text-theme-accent-primary" viewBox="0 0 24 24">
+                  <div className="flex flex-col items-center justify-center py-16 text-on-surface-variant">
+                    <svg className="w-8 h-8 animate-spin mb-3 text-primary" viewBox="0 0 24 24">
                       <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" />
                       <path className="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
                     <span className="text-sm">{t('loading')}</span>
                   </div>
                 ) : enabledOnlineDistros.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-theme-text-muted">
+                  <div className="flex flex-col items-center justify-center py-16 text-on-surface-variant">
                     <LinuxLogo size={48} className="mb-3 opacity-50" />
                     <span className="text-sm">{t('empty')}</span>
                     {!catalogLoadError && (
@@ -879,8 +872,8 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                         onClick={() => setFamilyFilter(null)}
                         className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
                           familyFilter === null
-                            ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                            : "bg-theme-bg-tertiary text-theme-text-muted border border-theme-border-secondary hover:text-theme-text-secondary hover:border-theme-border-primary"
+                            ? "bg-success/20 text-success border border-success/30"
+                            : "bg-surface-container text-on-surface-variant border border-outline-variant hover:text-on-surface hover:border-outline-variant"
                         }`}
                       >
                         {t('filter.all')}
@@ -896,8 +889,8 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                             onClick={() => setFamilyFilter(family)}
                             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
                               familyFilter === family
-                                ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                                : "bg-theme-bg-tertiary text-theme-text-muted border border-theme-border-secondary hover:text-theme-text-secondary hover:border-theme-border-primary"
+                                ? "bg-success/20 text-success border border-success/30"
+                                : "bg-surface-container text-on-surface-variant border border-outline-variant hover:text-on-surface hover:border-outline-variant"
                             }`}
                           >
                             {name} ({count})
@@ -925,10 +918,10 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                           disabled={isCreating || exists}
                           className={`group relative p-4 text-left rounded-xl border transition-all duration-200 ${
                             isSelected
-                              ? "border-emerald-500/50 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 shadow-[0_4px_20px_rgba(16,185,129,0.15),inset_0_0_20px_rgba(16,185,129,0.05)]"
+                              ? "border-success/50 bg-success/10 shadow-md3-1"
                               : exists
-                              ? "border-theme-border-secondary bg-theme-bg-tertiary/30 opacity-60 cursor-not-allowed"
-                              : "border-[rgba(var(--accent-primary-rgb),0.1)] bg-gradient-to-br from-theme-bg-secondary to-theme-bg-tertiary hover:border-[rgba(var(--accent-primary-rgb),0.3)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.2),0_0_20px_rgba(var(--accent-primary-rgb),0.1),inset_0_0_20px_rgba(var(--accent-primary-rgb),0.02)] hover:-translate-y-0.5"
+                              ? "border-outline-variant bg-surface-container/30 opacity-60 cursor-not-allowed"
+                              : "border-primary/10 bg-surface-container-low hover:bg-surface-container hover:border-primary/30 hover:shadow-md3-2 hover:-translate-y-0.5"
                           }`}
                           style={{
                             animationDelay: `${index * 30}ms`,
@@ -936,23 +929,23 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                         >
                           <div className="flex items-center gap-4">
                             <div
-                              className={`relative shrink-0 rounded-xl p-1.5 transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg bg-theme-bg-tertiary ${
-                                isSelected ? "ring-2 ring-emerald-500/50" : ""
+                              className={`relative shrink-0 rounded-xl p-1.5 transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg bg-surface-container ${
+                                isSelected ? "ring-2 ring-success/50" : ""
                               }`}
                             >
                               <Logo size={36} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="font-semibold text-theme-text-primary truncate group-hover:text-theme-text-accent transition-colors">{distro}</div>
+                              <div className="font-semibold text-on-surface truncate group-hover:text-primary transition-colors">{distro}</div>
                               {info.description && (
-                                <div className="text-xs text-theme-text-muted mt-0.5 line-clamp-1">{info.description}</div>
+                                <div className="text-xs text-on-surface-variant mt-0.5 line-clamp-1">{info.description}</div>
                               )}
                             </div>
                             {exists ? (
-                              <span className="text-xs text-theme-text-muted bg-theme-bg-tertiary px-2 py-1 rounded-md">{t('common:label.installed')}</span>
+                              <span className="text-xs text-on-surface-variant bg-surface-container px-2 py-1 rounded-md">{t('common:label.installed')}</span>
                             ) : isSelected ? (
-                              <div className="w-6 h-6 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                                <CheckIcon size="sm" className="text-white" />
+                              <div className="w-6 h-6 rounded-full bg-success flex items-center justify-center shadow-lg">
+                                <CheckIcon size="sm" className="text-on-success" />
                               </div>
                             ) : null}
                           </div>
@@ -969,28 +962,28 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
             {mode === "custom" && (
               <div>
                 {downloadableDistros.length === 0 && !useCustomUrl ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-theme-text-muted">
+                  <div className="flex flex-col items-center justify-center py-16 text-on-surface-variant">
                     <DownloadIcon size="lg" className="mb-3 opacity-50" />
                     <span className="text-sm mb-4">{t('noDownloadable')}</span>
                     <button
                       onClick={() => setUseCustomUrl(true)}
-                      className="text-sm text-theme-accent-primary hover:underline"
+                      className="text-sm text-primary hover:underline"
                     >
                       {t('useCustomUrl')}
                     </button>
                   </div>
                 ) : downloadableDistros.length === 0 && useCustomUrl ? (
                   /* Custom URL input - shown when no distros configured but custom URL selected */
-                  <div className="p-4 rounded-xl border border-blue-500/50 bg-gradient-to-br from-blue-500/10 to-blue-600/5">
+                  <div className="p-4 rounded-xl border border-secondary/50 bg-secondary/10">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="p-2 rounded-lg bg-blue-500/20 text-blue-400">
+                      <div className="p-2 rounded-lg bg-secondary/20 text-secondary">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                         </svg>
                       </div>
                       <div>
-                        <div className="font-medium text-theme-text-primary text-sm">{t('customUrl.label')}</div>
-                        <div className="text-xs text-theme-text-muted">{t('customUrl.description')}</div>
+                        <div className="font-medium text-on-surface text-sm">{t('customUrl.label')}</div>
+                        <div className="text-xs text-on-surface-variant">{t('customUrl.description')}</div>
                       </div>
                     </div>
                     <input
@@ -999,7 +992,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                       onChange={(e) => setCustomUrl(e.target.value)}
                       placeholder={t('placeholder.url')}
                       disabled={isCreating}
-                      className="w-full px-3 py-2.5 bg-theme-bg-primary border border-theme-border-secondary rounded-lg text-theme-text-primary placeholder-theme-text-muted text-sm font-mono focus:outline-none focus:border-blue-500/50"
+                      className="w-full px-3 py-2.5 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant text-sm font-mono focus:outline-none focus:border-secondary/50"
                     />
                   </div>
                 ) : (
@@ -1010,8 +1003,8 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                         onClick={() => setFamilyFilter(null)}
                         className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
                           familyFilter === null
-                            ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                            : "bg-theme-bg-tertiary text-theme-text-muted border border-theme-border-secondary hover:text-theme-text-secondary hover:border-theme-border-primary"
+                            ? "bg-secondary/20 text-secondary border border-secondary/30"
+                            : "bg-surface-container text-on-surface-variant border border-outline-variant hover:text-on-surface hover:border-outline-variant"
                         }`}
                       >
                         {t('filter.all')}
@@ -1025,8 +1018,8 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                             onClick={() => setFamilyFilter(family)}
                             className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
                               familyFilter === family
-                                ? "bg-blue-500/20 text-blue-400 border border-blue-500/30"
-                                : "bg-theme-bg-tertiary text-theme-text-muted border border-theme-border-secondary hover:text-theme-text-secondary hover:border-theme-border-primary"
+                                ? "bg-secondary/20 text-secondary border border-secondary/30"
+                                : "bg-surface-container text-on-surface-variant border border-outline-variant hover:text-on-surface hover:border-outline-variant"
                             }`}
                           >
                             {name} ({count})
@@ -1049,32 +1042,32 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                             disabled={isCreating}
                             className={`group relative p-4 text-left rounded-xl border transition-all duration-200 ${
                               isSelected
-                                ? "border-blue-500/50 bg-gradient-to-br from-blue-500/10 to-blue-600/5 shadow-[0_4px_20px_rgba(59,130,246,0.15),inset_0_0_20px_rgba(59,130,246,0.05)]"
-                                : "border-[rgba(var(--accent-primary-rgb),0.1)] bg-gradient-to-br from-theme-bg-secondary to-theme-bg-tertiary hover:border-[rgba(var(--accent-primary-rgb),0.3)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.2),0_0_20px_rgba(var(--accent-primary-rgb),0.1),inset_0_0_20px_rgba(var(--accent-primary-rgb),0.02)] hover:-translate-y-0.5"
+                                ? "border-secondary/50 bg-secondary/10 shadow-md3-1"
+                                : "border-primary/10 bg-surface-container-low hover:bg-surface-container hover:border-primary/30 hover:shadow-md3-2 hover:-translate-y-0.5"
                             }`}
                             style={{ animationDelay: `${index * 30}ms` }}
                           >
                             <div className="flex items-start gap-4">
                               <div
-                                className={`relative shrink-0 rounded-xl p-1.5 transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg bg-theme-bg-tertiary ${
-                                  isSelected ? "ring-2 ring-blue-500/50" : ""
+                                className={`relative shrink-0 rounded-xl p-1.5 transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg bg-surface-container ${
+                                  isSelected ? "ring-2 ring-secondary/50" : ""
                                 }`}
                               >
                                 <Logo size={40} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="font-semibold text-theme-text-primary group-hover:text-theme-text-accent transition-colors">{distro.name}</div>
-                                <div className="text-xs text-theme-text-muted mt-0.5 line-clamp-2">{distro.description}</div>
+                                <div className="font-semibold text-on-surface group-hover:text-primary transition-colors">{distro.name}</div>
+                                <div className="text-xs text-on-surface-variant mt-0.5 line-clamp-2">{distro.description}</div>
                                 {distro.size && (
-                                  <div className="text-xs text-theme-text-muted mt-2 font-mono flex items-center gap-1">
+                                  <div className="text-xs text-on-surface-variant mt-2 font-mono flex items-center gap-1">
                                     <DownloadIcon size="sm" className="opacity-50" />
                                     {distro.size}
                                   </div>
                                 )}
                               </div>
                               {isSelected && (
-                                <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/30">
-                                  <CheckIcon size="sm" className="text-white" />
+                                <div className="w-6 h-6 rounded-full bg-secondary flex items-center justify-center shrink-0 shadow-lg">
+                                  <CheckIcon size="sm" className="text-on-secondary" />
                                 </div>
                               )}
                             </div>
@@ -1086,26 +1079,26 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                     {/* Custom URL input - always visible */}
                     <div className={`p-4 rounded-xl border transition-all duration-200 ${
                       useCustomUrl
-                        ? "border-blue-500/50 bg-gradient-to-br from-blue-500/10 to-blue-600/5"
-                        : "border-theme-border-secondary bg-theme-bg-tertiary/50"
+                        ? "border-secondary/50 bg-secondary/10"
+                        : "border-outline-variant bg-surface-container/50"
                     }`}>
                       <div className="flex items-center gap-3 mb-3">
                         <div className={`p-2 rounded-lg transition-colors ${
-                          useCustomUrl ? "bg-blue-500/20 text-blue-400" : "bg-theme-bg-tertiary text-theme-text-muted"
+                          useCustomUrl ? "bg-secondary/20 text-secondary" : "bg-surface-container text-on-surface-variant"
                         }`}>
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                           </svg>
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium text-theme-text-primary text-sm">{t('customUrl.label')}</div>
-                          <div className="text-xs text-theme-text-muted">{t('customUrl.description')}</div>
+                          <div className="font-medium text-on-surface text-sm">{t('customUrl.label')}</div>
+                          <div className="text-xs text-on-surface-variant">{t('customUrl.description')}</div>
                         </div>
                         {customUrl.trim() && (
                           <button
                             onClick={handleSelectCustomUrl}
                             disabled={isCreating}
-                            className="px-3 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors disabled:opacity-50"
+                            className="px-3 py-1.5 text-xs font-medium bg-secondary state-layer text-on-secondary rounded-lg transition-colors disabled:opacity-50"
                           >
                             {t('useUrl')}
                           </button>
@@ -1117,7 +1110,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                         onChange={(e) => { setCustomUrl(e.target.value); setSelectedDistro(null); }}
                         placeholder={t('placeholder.url')}
                         disabled={isCreating}
-                        className="w-full px-3 py-2.5 bg-theme-bg-primary border border-theme-border-secondary rounded-lg text-theme-text-primary placeholder-theme-text-muted text-sm font-mono focus:outline-none focus:border-blue-500/50"
+                        className="w-full px-3 py-2.5 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant text-sm font-mono focus:outline-none focus:border-secondary/50"
                       />
                     </div>
                   </div>
@@ -1129,10 +1122,10 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
             {mode === "community" && (
               <div>
                 {!settings.distributionSources.lxcEnabled ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-theme-text-muted">
+                  <div className="flex flex-col items-center justify-center py-16 text-on-surface-variant">
                     <LinuxLogo size={48} className="mb-3 opacity-50" />
                     <span className="text-sm mb-2">{t('communityDisabled')}</span>
-                    <span className="text-xs text-theme-text-muted">{t('communityDisabledHint')}</span>
+                    <span className="text-xs text-on-surface-variant">{t('communityDisabledHint')}</span>
                   </div>
                 ) : (
                   <div data-testid="lxc-content">
@@ -1150,12 +1143,12 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
             {mode === "container" && (
               <div>
                 {containerImages.length === 0 && !useCustomImage ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-theme-text-muted">
+                  <div className="flex flex-col items-center justify-center py-16 text-on-surface-variant">
                     <DockerLogo size={48} className="mb-3 opacity-50" />
                     <span className="text-sm mb-4">{t('noContainerImages')}</span>
                     <button
                       onClick={() => setUseCustomImage(true)}
-                      className="text-sm text-theme-accent-primary hover:underline"
+                      className="text-sm text-primary hover:underline"
                     >
                       {t('useCustomImage')}
                     </button>
@@ -1174,26 +1167,26 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                             disabled={isCreating}
                             className={`group relative p-4 text-left rounded-xl border transition-all duration-200 ${
                               isSelected
-                                ? "border-orange-500/50 bg-gradient-to-br from-orange-500/10 to-orange-600/5 shadow-[0_4px_20px_rgba(249,115,22,0.15),inset_0_0_20px_rgba(249,115,22,0.05)]"
-                                : "border-[rgba(var(--accent-primary-rgb),0.1)] bg-gradient-to-br from-theme-bg-secondary to-theme-bg-tertiary hover:border-[rgba(var(--accent-primary-rgb),0.3)] hover:shadow-[0_4px_20px_rgba(0,0,0,0.2),0_0_20px_rgba(var(--accent-primary-rgb),0.1),inset_0_0_20px_rgba(var(--accent-primary-rgb),0.02)] hover:-translate-y-0.5"
+                                ? "border-primary/50 bg-primary/10 shadow-md3-1"
+                                : "border-primary/10 bg-surface-container-low hover:bg-surface-container hover:border-primary/30 hover:shadow-md3-2 hover:-translate-y-0.5"
                             }`}
                             style={{ animationDelay: `${index * 30}ms` }}
                           >
                             <div className="flex items-center gap-4">
                               <div
-                                className={`relative shrink-0 rounded-xl p-1 transition-transform duration-200 group-hover:scale-110 bg-theme-bg-tertiary ${
-                                  isSelected ? "ring-2 ring-orange-500/50" : ""
+                                className={`relative shrink-0 rounded-xl p-1 transition-transform duration-200 group-hover:scale-110 bg-surface-container ${
+                                  isSelected ? "ring-2 ring-primary/50" : ""
                                 }`}
                               >
                                 <Logo size={36} />
                               </div>
                               <div className="flex-1 min-w-0">
-                                <div className="font-semibold text-theme-text-primary group-hover:text-theme-text-accent truncate transition-colors duration-200">{image.name}</div>
-                                <div className="text-xs text-theme-text-muted mt-0.5 line-clamp-1">{image.description}</div>
+                                <div className="font-semibold text-on-surface group-hover:text-primary truncate transition-colors duration-200">{image.name}</div>
+                                <div className="text-xs text-on-surface-variant mt-0.5 line-clamp-1">{image.description}</div>
                               </div>
                               {isSelected && (
-                                <div className="w-6 h-6 rounded-full bg-orange-500 flex items-center justify-center">
-                                  <CheckIcon size="sm" className="text-white" />
+                                <div className="w-6 h-6 rounded-full bg-primary flex items-center justify-center">
+                                  <CheckIcon size="sm" className="text-on-primary" />
                                 </div>
                               )}
                             </div>
@@ -1205,26 +1198,26 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                     {/* Custom image input - always visible */}
                     <div className={`p-4 rounded-xl border transition-all duration-200 ${
                       useCustomImage
-                        ? "border-orange-500/50 bg-gradient-to-br from-orange-500/10 to-orange-600/5"
-                        : "border-theme-border-secondary bg-theme-bg-tertiary/50"
+                        ? "border-primary/50 bg-primary/10"
+                        : "border-outline-variant bg-surface-container/50"
                     }`}>
                       <div className="flex items-center gap-3 mb-3">
                         <div className={`p-2 rounded-lg transition-colors ${
-                          useCustomImage ? "bg-orange-500/20 text-orange-400" : "bg-theme-bg-tertiary text-theme-text-muted"
+                          useCustomImage ? "bg-primary/20 text-primary" : "bg-surface-container text-on-surface-variant"
                         }`}>
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                           </svg>
                         </div>
                         <div className="flex-1">
-                          <div className="font-medium text-theme-text-primary text-sm">{t('customImage.label')}</div>
-                          <div className="text-xs text-theme-text-muted">{t('customImage.description')}</div>
+                          <div className="font-medium text-on-surface text-sm">{t('customImage.label')}</div>
+                          <div className="text-xs text-on-surface-variant">{t('customImage.description')}</div>
                         </div>
                         {customImage.trim() && (
                           <button
                             onClick={handleSelectCustomImage}
                             disabled={isCreating}
-                            className="px-3 py-1.5 text-xs font-medium bg-orange-600 hover:bg-orange-500 text-white rounded-lg transition-colors disabled:opacity-50"
+                            className="px-3 py-1.5 text-xs font-medium bg-primary state-layer text-on-primary rounded-lg transition-colors disabled:opacity-50"
                           >
                             {t('useImage')}
                           </button>
@@ -1236,7 +1229,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                         onChange={(e) => { setCustomImage(e.target.value); setSelectedContainer(null); }}
                         placeholder={t('placeholder.image')}
                         disabled={isCreating}
-                        className="w-full px-3 py-2.5 bg-theme-bg-primary border border-theme-border-secondary rounded-lg text-theme-text-primary placeholder-theme-text-muted text-sm font-mono focus:outline-none focus:border-orange-500/50"
+                        className="w-full px-3 py-2.5 bg-surface border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant text-sm font-mono focus:outline-none focus:border-primary/50"
                       />
                     </div>
                   </div>
@@ -1245,18 +1238,18 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
             )}
 
             {/* Trademark disclaimer */}
-            <div className="mt-6 pt-4 border-t border-theme-border-primary">
-              <p className="text-[11px] text-theme-text-muted text-center leading-relaxed whitespace-pre-line">
+            <div className="mt-6 pt-4 border-t border-outline-variant">
+              <p className="text-[11px] text-on-surface-variant text-center leading-relaxed whitespace-pre-line">
                 {t('trademarkDisclaimer')}
               </p>
             </div>
           </div>
 
           {/* Footer */}
-          <div className="px-6 py-4 border-t border-theme-border-primary bg-theme-bg-tertiary/30">
+          <div className="px-6 py-4 border-t border-outline-variant bg-surface-container/30">
             <div className="flex items-center justify-between">
               {/* Selection summary - only for quick mode */}
-              <div className="text-sm text-theme-text-muted font-mono truncate max-w-md">
+              <div className="text-sm text-on-surface-variant font-mono truncate max-w-md">
                 {mode === "quick" && selectedDistro && (
                   <span>{t('installingAs', { name: selectedDistro })}</span>
                 )}
@@ -1277,7 +1270,7 @@ export function NewDistroDialog({ isOpen, onClose }: NewDistroDialogProps) {
                   <Button
                     data-testid="new-distro-install-button"
                     variant="primary"
-                    colorScheme="emerald"
+                    colorScheme="success"
                     onClick={handleQuickInstall}
                     disabled={!canQuickInstall}
                     loading={isCreating}

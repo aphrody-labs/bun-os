@@ -23,19 +23,19 @@ describe('Button', () => {
     it('applies primary variant styles by default', () => {
       render(<Button>Primary</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-theme-button-primary');
+      expect(button).toHaveClass('bg-primary');
     });
 
     it('applies secondary variant styles', () => {
       render(<Button variant="secondary">Secondary</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('bg-theme-bg-tertiary');
+      expect(button).toHaveClass('bg-surface-container');
     });
 
     it('applies danger variant styles', () => {
       render(<Button variant="danger">Danger</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('text-theme-button-danger');
+      expect(button).toHaveClass('text-error');
     });
 
     it('applies ghost variant styles', () => {
@@ -47,7 +47,7 @@ describe('Button', () => {
     it('applies success variant styles', () => {
       render(<Button variant="success">Success</Button>);
       const button = screen.getByRole('button');
-      expect(button).toHaveClass('text-theme-status-running');
+      expect(button).toHaveClass('text-success');
     });
   });
 

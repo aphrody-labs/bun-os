@@ -39,22 +39,21 @@ export function ContainerRuntimeSettings() {
 
   return (
     <div className="space-y-8">
-      <section className="relative overflow-hidden bg-linear-to-br from-orange-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-orange-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-500/10 via-transparent to-transparent" />
+      <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-orange-500 to-red-600 flex items-center justify-center shadow-lg shadow-orange-900/30">
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
               <DockerLogo size={24} />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-theme-text-primary">{t('containerRuntime.title')}</h2>
-              <p className="text-sm text-theme-text-muted">{t('containerRuntime.description')}</p>
+              <h2 className="text-lg font-medium text-on-surface">{t('containerRuntime.title')}</h2>
+              <p className="text-sm text-on-surface-variant">{t('containerRuntime.description')}</p>
             </div>
           </div>
 
           {/* Info box */}
-          <div className="mb-6 p-4 bg-theme-bg-tertiary/50 border border-theme-border-secondary/50 rounded-lg">
-            <p className="text-xs text-theme-text-muted">
+          <div className="mb-6 p-4 bg-surface-container/50 border border-outline-variant/50 rounded-lg">
+            <p className="text-xs text-on-surface-variant">
               {t('containerRuntime.infoBox')}
             </p>
           </div>
@@ -66,8 +65,8 @@ export function ContainerRuntimeSettings() {
                 key={option.value}
                 className={`flex items-start gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
                   selectedValue === option.value
-                    ? "border-orange-500/50 bg-orange-500/10"
-                    : "border-theme-border-secondary bg-theme-bg-tertiary/30 hover:border-theme-border-primary"
+                    ? "border-primary/50 bg-primary/10"
+                    : "border-outline-variant bg-surface-container/30 hover:border-outline-variant"
                 }`}
               >
                 <input
@@ -76,11 +75,11 @@ export function ContainerRuntimeSettings() {
                   value={option.value}
                   checked={selectedValue === option.value}
                   onChange={(e) => handleRuntimeChange(e.target.value)}
-                  className="mt-1 accent-orange-500"
+                  className="mt-1 accent-primary"
                 />
                 <div className="flex-1">
-                  <div className="font-medium text-theme-text-primary">{t(option.labelKey)}</div>
-                  <div className="text-xs text-theme-text-muted mt-0.5">{t(option.descKey)}</div>
+                  <div className="font-medium text-on-surface">{t(option.labelKey)}</div>
+                  <div className="text-xs text-on-surface-variant mt-0.5">{t(option.descKey)}</div>
                 </div>
               </label>
             ))}
@@ -89,10 +88,10 @@ export function ContainerRuntimeSettings() {
           {/* Custom command input */}
           {selectedValue === "custom" && (
             <div className="mt-4 pl-7">
-              <label className="block text-sm font-medium text-theme-text-primary mb-1">
+              <label className="block text-sm font-medium text-on-surface mb-1">
                 {t('containerRuntime.customCommand')}
               </label>
-              <p className="text-xs text-theme-text-muted mb-2">
+              <p className="text-xs text-on-surface-variant mb-2">
                 {t('containerRuntime.customCommandDesc')}
               </p>
               <input
@@ -100,7 +99,7 @@ export function ContainerRuntimeSettings() {
                 value={customCommand}
                 onChange={(e) => handleCustomCommandChange(e.target.value)}
                 placeholder={t('containerRuntime.customPlaceholder')}
-                className="w-full px-3 py-2 bg-theme-bg-secondary border border-theme-border-secondary rounded-lg text-theme-text-primary placeholder:text-theme-text-muted/50 focus:outline-hidden focus:border-orange-500 font-mono text-sm"
+                className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder:text-on-surface-variant/50 focus:outline-hidden focus:border-primary font-mono text-sm"
               />
             </div>
           )}

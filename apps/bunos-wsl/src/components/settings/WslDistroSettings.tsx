@@ -6,7 +6,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { open } from "@tauri-apps/plugin-shell";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { wslService } from "../../services/wslService";
 import { useDistroStore } from "../../store/distroStore";
 import { useNotificationStore } from "../../store/notificationStore";
@@ -175,7 +175,7 @@ export function WslDistroSettings() {
 
   if (distributions.length === 0) {
     return (
-      <div className="text-center py-12 text-theme-text-muted">
+      <div className="text-center py-12 text-on-surface-variant">
         <p>{t('wslDistro.noDistros')}</p>
         <p className="text-sm">{t('wslDistro.noDistrosHint')}</p>
       </div>
@@ -184,9 +184,8 @@ export function WslDistroSettings() {
 
   return (
     <div className="space-y-6" data-testid="wsl-distro-settings">
-      <div className="relative overflow-hidden bg-linear-to-br from-amber-900/30 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-amber-700/30 rounded-xl p-4">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
-        <div className="relative text-sm text-theme-status-warning space-y-1">
+      <div className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-4">
+        <div className="relative text-sm text-warning space-y-1">
           <p>
             {t('wslDistro.noteWslConf')}
           </p>
@@ -197,15 +196,14 @@ export function WslDistroSettings() {
       </div>
 
       {/* Distribution selector */}
-      <div className="relative overflow-hidden bg-linear-to-br from-orange-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-orange-800/30 rounded-xl p-4">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-500/10 via-transparent to-transparent" />
+      <div className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-4">
         <div className="relative">
-          <label className="block text-sm font-medium text-theme-text-primary mb-2">{t('wslDistro.selectDistro')}</label>
+          <label className="block text-sm font-medium text-on-surface mb-2">{t('wslDistro.selectDistro')}</label>
           <select
             value={selectedDistro}
             onChange={(e) => setSelectedDistro(e.target.value)}
             data-testid="distro-settings-selector"
-            className="w-full px-3 py-2 bg-theme-bg-secondary/50 border border-theme-border-secondary rounded-lg text-theme-text-primary focus:outline-hidden focus:border-theme-accent-primary"
+            className="w-full px-3 py-2 bg-surface-container-low/50 border border-outline-variant rounded-lg text-on-surface focus:outline-hidden focus:border-primary"
           >
             {distributions.map((d) => (
               <option key={d.name} value={d.name}>
@@ -217,15 +215,15 @@ export function WslDistroSettings() {
       </div>
 
       {!selectedDistroInfo ? null : selectedDistroInfo.state !== "Running" ? (
-        <div className="p-6 bg-theme-bg-secondary/50 border border-theme-border-secondary rounded-xl text-center">
-          <p className="text-sm text-theme-text-secondary mb-4">
+        <div className="p-6 bg-surface-container-low/50 border border-outline-variant rounded-xl text-center">
+          <p className="text-sm text-on-surface-variant mb-4">
             {t('wslDistro.requiresRunning')}
           </p>
           <button
             onClick={handleStartAndLoad}
             disabled={!canStartSelectedDistro || actionInProgress !== null}
             data-testid="distro-start-and-load-button"
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-theme-bg-primary bg-theme-accent-primary hover:opacity-90 rounded-lg transition-opacity disabled:opacity-50"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-on-primary bg-primary hover:opacity-90 rounded-lg transition-opacity disabled:opacity-50"
           >
             {actionInProgress === `Starting ${selectedDistroInfo.name}...`
               ? t('wslDistro.starting')
@@ -234,23 +232,22 @@ export function WslDistroSettings() {
         </div>
       ) : isLoading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-8 h-8 border-2 border-theme-border-secondary border-t-theme-accent-primary rounded-full animate-spin" />
+          <div className="w-8 h-8 border-2 border-outline-variant border-t-primary rounded-full animate-spin" />
         </div>
       ) : (
         <>
-          <section className="relative overflow-hidden bg-linear-to-br from-blue-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-blue-800/30 rounded-xl p-6">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
+          <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-linear-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
-                  <FolderIcon className="text-white" size="md" />
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                  <FolderIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium text-theme-text-primary">{t('wslDistro.automount')}</h3>
-                  <p className="text-sm text-theme-text-muted">{t('wslDistro.automountDesc')}</p>
+                  <h3 className="text-lg font-medium text-on-surface">{t('wslDistro.automount')}</h3>
+                  <p className="text-sm text-on-surface-variant">{t('wslDistro.automountDesc')}</p>
                 </div>
               </div>
-              <div className="space-y-1 divide-y divide-theme-border-primary/50">
+              <div className="space-y-1 divide-y divide-outline-variant/50">
                 <Toggle
                   label={t('wslDistro.automountEnabled')}
                   description={t('wslDistro.automountEnabledDesc')}
@@ -285,19 +282,18 @@ export function WslDistroSettings() {
             </div>
           </section>
 
-          <section className="relative overflow-hidden bg-linear-to-br from-emerald-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-emerald-800/30 rounded-xl p-6">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-emerald-500/10 via-transparent to-transparent" />
+          <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-900/30">
-                  <NetworkIcon className="text-white" size="md" />
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                  <NetworkIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium text-theme-text-primary">{t('wslDistro.network')}</h3>
-                  <p className="text-sm text-theme-text-muted">{t('wslDistro.networkDesc')}</p>
+                  <h3 className="text-lg font-medium text-on-surface">{t('wslDistro.network')}</h3>
+                  <p className="text-sm text-on-surface-variant">{t('wslDistro.networkDesc')}</p>
                 </div>
               </div>
-              <div className="space-y-1 divide-y divide-theme-border-primary/50">
+              <div className="space-y-1 divide-y divide-outline-variant/50">
                 <Toggle
                   label={t('wslDistro.generateHosts')}
                   description={t('wslDistro.generateHostsDesc')}
@@ -324,19 +320,18 @@ export function WslDistroSettings() {
             </div>
           </section>
 
-          <section className="relative overflow-hidden bg-linear-to-br from-purple-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-purple-800/30 rounded-xl p-6">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
+          <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-linear-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-900/30">
-                  <TerminalIcon className="text-white" size="md" />
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                  <TerminalIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium text-theme-text-primary">{t('wslDistro.interop')}</h3>
-                  <p className="text-sm text-theme-text-muted">{t('wslDistro.interopDesc')}</p>
+                  <h3 className="text-lg font-medium text-on-surface">{t('wslDistro.interop')}</h3>
+                  <p className="text-sm text-on-surface-variant">{t('wslDistro.interopDesc')}</p>
                 </div>
               </div>
-              <div className="space-y-1 divide-y divide-theme-border-primary/50">
+              <div className="space-y-1 divide-y divide-outline-variant/50">
                 <Toggle
                   label={t('wslDistro.interopEnabled')}
                   description={t('wslDistro.interopEnabledDesc')}
@@ -355,19 +350,18 @@ export function WslDistroSettings() {
             </div>
           </section>
 
-          <section className="relative overflow-hidden bg-linear-to-br from-amber-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-amber-800/30 rounded-xl p-6">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
+          <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-linear-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-900/30">
-                  <SparklesIcon className="text-white" size="md" />
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                  <SparklesIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium text-theme-text-primary">{t('wslDistro.boot')}</h3>
-                  <p className="text-sm text-theme-text-muted">{t('wslDistro.bootDesc')}</p>
+                  <h3 className="text-lg font-medium text-on-surface">{t('wslDistro.boot')}</h3>
+                  <p className="text-sm text-on-surface-variant">{t('wslDistro.bootDesc')}</p>
                 </div>
               </div>
-              <div className="space-y-1 divide-y divide-theme-border-primary/50">
+              <div className="space-y-1 divide-y divide-outline-variant/50">
                 <Toggle
                   label={t('wslDistro.systemd')}
                   description={t('wslDistro.systemdDesc')}
@@ -387,16 +381,15 @@ export function WslDistroSettings() {
             </div>
           </section>
 
-          <section className="relative overflow-hidden bg-linear-to-br from-cyan-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-cyan-800/30 rounded-xl p-6">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500/10 via-transparent to-transparent" />
+          <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-900/30">
-                  <UserIcon className="text-white" size="md" />
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                  <UserIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium text-theme-text-primary">{t('wslDistro.user')}</h3>
-                  <p className="text-sm text-theme-text-muted">{t('wslDistro.userDesc')}</p>
+                  <h3 className="text-lg font-medium text-on-surface">{t('wslDistro.user')}</h3>
+                  <p className="text-sm text-on-surface-variant">{t('wslDistro.userDesc')}</p>
                 </div>
               </div>
               <div className="space-y-1">
@@ -412,30 +405,29 @@ export function WslDistroSettings() {
             </div>
           </section>
 
-          <section className="relative overflow-hidden bg-linear-to-br from-violet-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-violet-800/30 rounded-xl p-6">
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-violet-500/10 via-transparent to-transparent" />
+          <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
             <div className="relative">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-900/30">
-                  <GpuIcon className="text-white" size="md" />
+                <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                  <GpuIcon className="text-on-primary-container" size="md" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium text-theme-text-primary">{t('wslDistro.gpu')}</h3>
-                  <p className="text-sm text-theme-text-muted">{t('wslDistro.gpuDesc')}</p>
+                  <h3 className="text-lg font-medium text-on-surface">{t('wslDistro.gpu')}</h3>
+                  <p className="text-sm text-on-surface-variant">{t('wslDistro.gpuDesc')}</p>
                 </div>
               </div>
 
               {gpuStatus ? (
                 <div className="space-y-3" data-testid="distro-gpu-status">
-                  <div className="flex items-center justify-between py-2 border-b border-theme-border-primary/50">
-                    <span className="text-sm text-theme-text-primary">{t('wslDistro.gpuDirectX')}</span>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${gpuStatus.directxAvailable ? 'bg-green-900/40 text-green-400' : 'bg-theme-bg-tertiary text-theme-text-muted'}`}>
+                  <div className="flex items-center justify-between py-2 border-b border-outline-variant/50">
+                    <span className="text-sm text-on-surface">{t('wslDistro.gpuDirectX')}</span>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${gpuStatus.directxAvailable ? 'bg-success-container text-success' : 'bg-surface-container text-on-surface-variant'}`}>
                       {gpuStatus.directxAvailable ? t('wslDistro.gpuAvailableLabel') : t('wslDistro.gpuNotAvailableLabel')}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between py-2 border-b border-theme-border-primary/50">
-                    <span className="text-sm text-theme-text-primary">{t('wslDistro.gpuNvidia')}</span>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${gpuStatus.nvidiaAvailable ? 'bg-green-900/40 text-green-400' : 'bg-theme-bg-tertiary text-theme-text-muted'}`}>
+                  <div className="flex items-center justify-between py-2 border-b border-outline-variant/50">
+                    <span className="text-sm text-on-surface">{t('wslDistro.gpuNvidia')}</span>
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${gpuStatus.nvidiaAvailable ? 'bg-success-container text-success' : 'bg-surface-container text-on-surface-variant'}`}>
                       {gpuStatus.nvidiaAvailable ? t('wslDistro.gpuAvailableLabel') : t('wslDistro.gpuNotAvailableLabel')}
                     </span>
                   </div>
@@ -444,18 +436,18 @@ export function WslDistroSettings() {
                   {gpuStatus.nvidiaAvailable && (
                     <div className="space-y-3 pt-1">
                       {toolkitChecking ? (
-                        <p className="text-xs text-theme-text-muted">{t('wslDistro.toolkitChecking')}</p>
+                        <p className="text-xs text-on-surface-variant">{t('wslDistro.toolkitChecking')}</p>
                       ) : toolkitStatus ? (
                         <>
-                          <div className="flex items-center justify-between py-2 border-b border-theme-border-primary/50">
-                            <span className="text-sm text-theme-text-primary">{t('wslDistro.toolkitInstalled')}</span>
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${toolkitStatus.toolkitInstalled ? 'bg-green-900/40 text-green-400' : 'bg-amber-900/40 text-amber-400'}`}>
+                          <div className="flex items-center justify-between py-2 border-b border-outline-variant/50">
+                            <span className="text-sm text-on-surface">{t('wslDistro.toolkitInstalled')}</span>
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${toolkitStatus.toolkitInstalled ? 'bg-success-container text-success' : 'bg-warning-container text-warning'}`}>
                               {toolkitStatus.toolkitInstalled ? t('wslDistro.gpuAvailableLabel') : t('wslDistro.gpuNotAvailableLabel')}
                             </span>
                           </div>
                           <div className="flex items-center justify-between py-2">
-                            <span className="text-sm text-theme-text-primary">{t('wslDistro.cdiSpecs')}</span>
-                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${toolkitStatus.cdiSpecsExist ? 'bg-green-900/40 text-green-400' : 'bg-amber-900/40 text-amber-400'}`}>
+                            <span className="text-sm text-on-surface">{t('wslDistro.cdiSpecs')}</span>
+                            <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${toolkitStatus.cdiSpecsExist ? 'bg-success-container text-success' : 'bg-warning-container text-warning'}`}>
                               {toolkitStatus.cdiSpecsExist
                                 ? (toolkitStatus.cdiDevices.length > 0 ? `${t('wslDistro.gpuAvailableLabel')} (${toolkitStatus.cdiDevices.length})` : t('wslDistro.gpuAvailableLabel'))
                                 : t('wslDistro.gpuNotAvailableLabel')}
@@ -464,15 +456,15 @@ export function WslDistroSettings() {
 
                           {(!toolkitStatus.toolkitInstalled || !toolkitStatus.cdiSpecsExist) && (
                             <button
-                              onClick={() => open("https://github.com/aphrody-labs/bun-os/blob/main/docs/TROUBLESHOOTING.md#gpu-containers")}
-                              className="text-xs text-theme-accent-primary hover:text-theme-accent-secondary transition-colors"
+                              onClick={() => openUrl("https://github.com/aphrody-labs/bun-os/blob/main/docs/TROUBLESHOOTING.md#gpu-containers")}
+                              className="text-xs text-primary hover:text-primary transition-colors"
                             >
                               {t('wslDistro.toolkitTroubleshootingLink')}
                             </button>
                           )}
                         </>
                       ) : toolkitError ? (
-                        <p className="text-xs text-theme-status-warning">{toolkitError}</p>
+                        <p className="text-xs text-warning">{toolkitError}</p>
                       ) : null}
                     </div>
                   )}
@@ -480,7 +472,7 @@ export function WslDistroSettings() {
                   <button
                     onClick={checkGpuStatus}
                     disabled={gpuChecking}
-                    className="mt-2 text-xs text-theme-text-muted hover:text-theme-text-secondary transition-colors"
+                    className="mt-2 text-xs text-on-surface-variant hover:text-on-surface transition-colors"
                   >
                     {t('wslDistro.gpuRecheck')}
                   </button>
@@ -488,14 +480,14 @@ export function WslDistroSettings() {
               ) : (
                 <div className="space-y-3">
                   {gpuError && (
-                    <p className="text-sm text-theme-status-warning">{gpuError}</p>
+                    <p className="text-sm text-warning">{gpuError}</p>
                   )}
-                  <p className="text-xs text-theme-text-muted">{t('wslDistro.gpuNote')}</p>
+                  <p className="text-xs text-on-surface-variant">{t('wslDistro.gpuNote')}</p>
                   <button
                     onClick={checkGpuStatus}
                     disabled={gpuChecking}
                     data-testid="distro-gpu-check-btn"
-                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-theme-text-primary bg-theme-bg-tertiary hover:bg-theme-bg-hover border border-theme-border-secondary rounded-lg transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-on-surface bg-surface-container hover:bg-surface-container-high border border-outline-variant rounded-lg transition-colors disabled:opacity-50"
                   >
                     {gpuChecking ? t('wslDistro.gpuChecking') : t('wslDistro.gpuCheck')}
                   </button>
@@ -505,8 +497,8 @@ export function WslDistroSettings() {
           </section>
 
           {error && (
-            <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-xl" data-testid="distro-config-error">
-              <p className="text-sm text-red-400">
+            <div className="p-4 bg-error-container border border-outline-variant rounded-xl" data-testid="distro-config-error">
+              <p className="text-sm text-error">
                 <span className="font-medium">{t('wslDistro.errorLabel')}</span> {error}
               </p>
             </div>
@@ -517,7 +509,7 @@ export function WslDistroSettings() {
               {error && (
                 <button
                   onClick={() => setError(null)}
-                  className="px-4 py-3 bg-theme-bg-tertiary hover:bg-theme-bg-hover text-theme-text-secondary font-medium rounded-lg transition-colors"
+                  className="px-4 py-3 bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-medium rounded-lg transition-colors"
                 >
                   {t('common:button.dismiss')}
                 </button>
@@ -526,7 +518,7 @@ export function WslDistroSettings() {
                 onClick={handleSave}
                 disabled={isSaving}
                 data-testid="distro-save-button"
-                className="px-6 py-3 bg-theme-accent-primary hover:opacity-90 text-theme-bg-primary font-medium rounded-lg shadow-lg shadow-black/30 transition-colors disabled:opacity-50"
+                className="px-6 py-3 bg-primary hover:opacity-90 text-on-primary font-medium rounded-lg shadow-lg shadow-shadow/30 transition-colors disabled:opacity-50"
               >
                 {isSaving ? t('wslDistro.saving') : error ? t('wslDistro.retrySave') : t('wslDistro.saveChanges')}
               </button>

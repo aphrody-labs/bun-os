@@ -1,0 +1,54 @@
+{
+  "name": "@aphrody/bunos-wsl",
+  "version": "1.4.7",
+  "private": true,
+  "description": "Bun OS WSL: the WSL distribution manager (derived from octasoft-ltd/wsl-ui, see docs/wsl/PROVENANCE.md), themed by the Bun OS Material 3 design system.",
+  "license": "GPL-3.0-only",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "bun check --no-script -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "check": "bun check --no-script -p tsconfig.json",
+    "test": "vitest run",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@aphrody/identity": "workspace:*",
+    "@aphrody/m3-fonts": "workspace:*",
+    "@aphrody/m3-primitives": "workspace:*",
+    "@aphrody/m3-theme": "workspace:*",
+    "@aphrody/m3-tokens": "workspace:*",
+    "@aptabase/web": "^0.5.0",
+    "@tauri-apps/api": "catalog:",
+    "@tauri-apps/plugin-dialog": "catalog:",
+    "@tauri-apps/plugin-fs": "catalog:",
+    "@tauri-apps/plugin-log": "catalog:",
+    "@tauri-apps/plugin-opener": "catalog:",
+    "@tauri-apps/plugin-shell": "catalog:",
+    "i18next": "^26.4.3",
+    "i18next-browser-languagedetector": "^8.2.1",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "react-i18next": "^17.0.16",
+    "zustand": "catalog:"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "catalog:",
+    "@tauri-apps/cli": "catalog:",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "jsdom": "catalog:",
+    "postcss": "catalog:",
+    "tailwindcss": "catalog:",
+    "vite": "^8.3.4",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
+}

@@ -13,7 +13,6 @@ const defaultProps = {
   title: "IDE Integration",
   description: "Choose your preferred code editor",
   icon: <span data-testid="icon">Icon</span>,
-  iconGradient: "from-violet-500 to-purple-600",
   presets: TEST_PRESETS,
   currentValue: "code",
   onValueChange: vi.fn(),
@@ -63,7 +62,7 @@ describe('SettingSection', () => {
     it('shows the current preset as selected', () => {
       render(<SettingSection {...defaultProps} currentValue="code" />);
       const vsCodeButton = screen.getByText("VS Code").closest('button');
-      expect(vsCodeButton).toHaveClass('border-theme-accent-primary');
+      expect(vsCodeButton).toHaveClass('border-primary');
     });
 
     it('calls onValueChange when clicking a different preset', () => {
@@ -282,7 +281,7 @@ describe('SettingSection', () => {
 
       // Should show custom as selected since the value doesn't match any preset
       const customButton = screen.getByText("Custom").closest('button');
-      expect(customButton).toHaveClass('border-theme-accent-primary');
+      expect(customButton).toHaveClass('border-primary');
 
       // Custom input should be visible with the current value
       const input = screen.getByPlaceholderText("Enter custom command");
@@ -293,7 +292,7 @@ describe('SettingSection', () => {
       render(<SettingSection {...defaultProps} currentValue="cursor" />);
 
       const cursorButton = screen.getByText("Cursor").closest('button');
-      expect(cursorButton).toHaveClass('border-theme-accent-primary');
+      expect(cursorButton).toHaveClass('border-primary');
 
       // Custom input should not be visible
       expect(screen.queryByPlaceholderText("Enter custom command")).not.toBeInTheDocument();

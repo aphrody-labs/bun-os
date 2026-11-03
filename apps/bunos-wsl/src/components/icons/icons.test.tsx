@@ -83,9 +83,9 @@ describe('Icon Components', () => {
 
   describe('className prop', () => {
     it('merges custom className with size classes', () => {
-      const { container } = render(<SettingsIcon className="text-red-500" />);
+      const { container } = render(<SettingsIcon className="text-error" />);
       const svg = container.querySelector('svg');
-      expect(svg).toHaveClass('text-red-500');
+      expect(svg).toHaveClass('text-error');
       expect(svg).toHaveClass('w-5', 'h-5'); // default size
     });
   });

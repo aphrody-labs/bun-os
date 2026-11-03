@@ -2,7 +2,6 @@
  * Reusable Button Components
  *
  * Consistent, accessible button components with variants and sizes.
- * Mission Control aesthetic with cyber styling.
  */
 
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
@@ -11,7 +10,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'success' | 'accent' | 'link';
 type ButtonSize = 'sm' | 'md' | 'lg';
-type ColorScheme = 'blue' | 'orange' | 'emerald' | 'red' | 'amber';
+type ColorScheme = 'primary' | 'secondary' | 'tertiary' | 'success' | 'error';
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
@@ -36,31 +35,31 @@ export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement>
 // ==================== Style Mappings ====================
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: 'bg-theme-button-primary hover:bg-theme-button-primary-hover text-theme-bg-primary border-transparent shadow-lg shadow-[rgba(var(--accent-primary-rgb),0.2)] hover:shadow-[rgba(var(--accent-primary-rgb),0.3)]',
-  secondary: 'bg-theme-bg-tertiary hover:bg-theme-bg-hover text-theme-text-secondary hover:text-theme-text-primary border-theme-border-secondary',
-  danger: 'bg-[rgba(var(--status-error-rgb),0.1)] hover:bg-[rgba(var(--status-error-rgb),0.2)] text-theme-button-danger border-[rgba(var(--status-error-rgb),0.3)] hover:border-[rgba(var(--status-error-rgb),0.5)]',
-  ghost: 'bg-transparent hover:bg-theme-bg-tertiary text-theme-text-muted hover:text-theme-text-secondary border-transparent hover:border-theme-border-secondary',
-  success: 'bg-[rgba(var(--status-running-rgb),0.1)] hover:bg-[rgba(var(--status-running-rgb),0.2)] text-theme-status-running border-[rgba(var(--status-running-rgb),0.3)] hover:border-[rgba(var(--status-running-rgb),0.5)]',
-  accent: 'bg-[rgba(var(--accent-primary-rgb),0.1)] hover:bg-[rgba(var(--accent-primary-rgb),0.2)] text-theme-accent-primary border-[rgba(var(--accent-primary-rgb),0.3)] hover:border-[rgba(var(--accent-primary-rgb),0.5)]',
-  link: 'bg-transparent hover:bg-transparent text-theme-accent-primary brightness-100 hover:brightness-125 underline underline-offset-2 border-transparent',
+  primary: 'bg-primary state-layer text-on-primary border-transparent shadow-md3-1',
+  secondary: 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant hover:text-on-surface border-outline-variant',
+  danger: 'bg-error/10 hover:bg-error/20 text-error border-error/30 hover:border-error/50',
+  ghost: 'bg-transparent hover:bg-surface-container text-on-surface-variant hover:text-on-surface border-transparent hover:border-outline-variant',
+  success: 'bg-success/10 hover:bg-success/20 text-success border-success/30 hover:border-success/50',
+  accent: 'bg-primary/10 hover:bg-primary/20 text-primary border-primary/30 hover:border-primary/50',
+  link: 'bg-transparent hover:bg-transparent text-primary brightness-100 hover:brightness-125 underline underline-offset-2 border-transparent',
 };
 
-/** Solid color schemes that override primary variant */
+/** Filled role colour schemes that override the primary variant */
 const COLOR_SCHEME_CLASSES: Record<ColorScheme, string> = {
-  blue: 'bg-blue-600 hover:bg-blue-500 text-white border-transparent shadow-lg shadow-blue-600/20 hover:shadow-blue-600/30',
-  orange: 'bg-orange-600 hover:bg-orange-500 text-white border-transparent shadow-lg shadow-orange-600/20 hover:shadow-orange-600/30',
-  emerald: 'bg-emerald-600 hover:bg-emerald-500 text-white border-transparent shadow-lg shadow-emerald-600/20 hover:shadow-emerald-600/30',
-  red: 'bg-red-600 hover:bg-red-500 text-white border-transparent shadow-lg shadow-red-600/20 hover:shadow-red-600/30',
-  amber: 'bg-amber-600 hover:bg-amber-500 text-white border-transparent shadow-lg shadow-amber-600/20 hover:shadow-amber-600/30',
+  primary: 'bg-primary state-layer text-on-primary border-transparent shadow-md3-1',
+  secondary: 'bg-secondary state-layer text-on-secondary border-transparent shadow-md3-1',
+  tertiary: 'bg-tertiary state-layer text-on-tertiary border-transparent shadow-md3-1',
+  success: 'bg-success state-layer text-on-success border-transparent shadow-md3-1',
+  error: 'bg-error state-layer text-on-error border-transparent shadow-md3-1',
 };
 
-/** Ghost color schemes for icon buttons with colored hover */
+/** Ghost colour schemes for icon buttons with a role-tinted hover */
 const GHOST_COLOR_SCHEME_CLASSES: Record<ColorScheme, string> = {
-  blue: 'bg-transparent hover:bg-blue-500/10 text-theme-text-muted hover:text-blue-400 border-transparent',
-  orange: 'bg-transparent hover:bg-orange-500/10 text-theme-text-muted hover:text-orange-400 border-transparent',
-  emerald: 'bg-transparent hover:bg-emerald-500/10 text-theme-text-muted hover:text-emerald-400 border-transparent',
-  red: 'bg-transparent hover:bg-red-500/10 text-theme-text-muted hover:text-red-400 border-transparent',
-  amber: 'bg-transparent hover:bg-amber-500/10 text-theme-text-muted hover:text-amber-400 border-transparent hover:border-amber-500/30',
+  primary: 'bg-transparent hover:bg-primary/10 text-on-surface-variant hover:text-primary border-transparent',
+  secondary: 'bg-transparent hover:bg-secondary/10 text-on-surface-variant hover:text-secondary border-transparent',
+  tertiary: 'bg-transparent hover:bg-tertiary/10 text-on-surface-variant hover:text-tertiary border-transparent',
+  success: 'bg-transparent hover:bg-success/10 text-on-surface-variant hover:text-success border-transparent',
+  error: 'bg-transparent hover:bg-error/10 text-on-surface-variant hover:text-error border-transparent',
 };
 
 function getVariantClasses(variant: ButtonVariant, colorScheme?: ColorScheme): string {
@@ -71,8 +70,8 @@ function getVariantClasses(variant: ButtonVariant, colorScheme?: ColorScheme): s
     if (variant === 'ghost') {
       return GHOST_COLOR_SCHEME_CLASSES[colorScheme];
     }
-    if (variant === 'danger' && colorScheme === 'red') {
-      return COLOR_SCHEME_CLASSES.red;
+    if (variant === 'danger' && colorScheme === 'error') {
+      return COLOR_SCHEME_CLASSES.error;
     }
   }
   return VARIANT_CLASSES[variant];

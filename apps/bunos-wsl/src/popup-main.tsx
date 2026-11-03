@@ -4,6 +4,8 @@ import { PopupHost } from "./components/PopupHost";
 import { QuickActionsPopup, type QuickActionsPopupData } from "./components/QuickActionsPopup";
 import { ThemeProvider } from "./themes";
 import "./i18n";
+import "@aphrody/m3-fonts/fonts.css";
+import "@aphrody/m3-fonts/fonts-symbols.css";
 import "./index.css";
 
 const popupContentRegistry = {

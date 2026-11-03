@@ -95,19 +95,19 @@ export function SetDefaultUserDialog({ isOpen, distro, onClose }: SetDefaultUser
 
       <ModalBody>
         {error && (
-          <div className="mb-4 p-3 bg-[rgba(var(--status-error-rgb),0.2)] border border-[rgba(var(--status-error-rgb),0.4)] rounded-lg text-theme-status-error text-sm">
+          <div className="mb-4 p-3 bg-error/20 border border-error/40 rounded-lg text-error text-sm">
             {error}
           </div>
         )}
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-theme-text-secondary mb-1">
+            <label className="block text-sm font-medium text-on-surface-variant mb-1">
               {t('setUser.usernameLabel')}
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <UserIcon size="sm" className="text-theme-text-muted" />
+                <UserIcon size="sm" className="text-on-surface-variant" />
               </div>
               <input
                 type="text"
@@ -116,25 +116,25 @@ export function SetDefaultUserDialog({ isOpen, distro, onClose }: SetDefaultUser
                 placeholder={t('setUser.usernamePlaceholder')}
                 disabled={isSaving}
                 maxLength={32}
-                className="w-full pl-10 pr-3 py-2 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg text-theme-text-primary placeholder-theme-text-muted focus:outline-hidden focus:border-theme-accent-primary disabled:opacity-50"
+                className="w-full pl-10 pr-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary disabled:opacity-50"
               />
             </div>
-            <p className="text-xs text-theme-text-muted mt-1">
+            <p className="text-xs text-on-surface-variant mt-1">
               {t('setUser.usernameHint')}
             </p>
           </div>
 
-          <div className="p-3 bg-[rgba(var(--accent-primary-rgb),0.15)] border border-[rgba(var(--accent-primary-rgb),0.3)] rounded-lg flex items-start gap-3">
-            <InfoIcon size="sm" className="text-theme-accent-primary mt-0.5 shrink-0" />
-            <div className="text-theme-accent-primary/80 text-sm">
+          <div className="p-3 bg-primary/15 border border-primary/30 rounded-lg flex items-start gap-3">
+            <InfoIcon size="sm" className="text-primary mt-0.5 shrink-0" />
+            <div className="text-primary/80 text-sm">
               {t('setUser.infoNote')}
             </div>
           </div>
         </div>
 
         {isSaving && (
-          <div className="mt-4 p-3 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg">
-            <div className="flex items-center gap-3 text-theme-text-secondary text-sm">
+          <div className="mt-4 p-3 bg-surface-container border border-outline-variant rounded-lg">
+            <div className="flex items-center gap-3 text-on-surface-variant text-sm">
               <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"

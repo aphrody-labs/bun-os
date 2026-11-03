@@ -2,14 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { PreflightBanner } from "./PreflightBanner";
 import { usePreflightStore } from "../store/preflightStore";
-import { open } from "@tauri-apps/plugin-shell";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 // Mock the store
 vi.mock("../store/preflightStore");
 
-// Mock the shell plugin
-vi.mock("@tauri-apps/plugin-shell", () => ({
-  open: vi.fn(),
+// Mock the opener plugin
+vi.mock("@tauri-apps/plugin-opener", () => ({
+  openUrl: vi.fn(),
 }));
 
 describe("PreflightBanner", () => {
@@ -175,7 +175,7 @@ describe("PreflightBanner", () => {
 
     fireEvent.click(screen.getByText("Learn More"));
 
-    expect(open).toHaveBeenCalledWith(helpUrl);
+    expect(openUrl).toHaveBeenCalledWith(helpUrl);
   });
 
   it("does not show Learn More button when helpUrl is null", () => {

@@ -18,6 +18,7 @@
   "workspaces": [
     "apps/aphrody-model-view",
     "apps/artcraft-web-app",
+    "apps/bunos-wsl",
     "apps/desktop",
     "apps/iecode-web",
     "apps/lu",

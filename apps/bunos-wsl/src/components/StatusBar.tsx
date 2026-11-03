@@ -27,17 +27,17 @@ const formatBytes = (bytes: number): string => {
 
 // Health status color mapping
 const healthColors = {
-  stopped: "bg-theme-status-stopped",
-  healthy: "bg-theme-status-running",
-  warning: "bg-theme-status-warning",
-  unhealthy: "bg-theme-status-error",
+  stopped: "bg-outline",
+  healthy: "bg-success",
+  warning: "bg-warning",
+  unhealthy: "bg-error",
 };
 
 const healthGlowColors = {
   stopped: "",
-  healthy: "shadow-[0_0_8px_rgba(var(--status-running-rgb),1)]",
-  warning: "shadow-[0_0_8px_rgba(var(--status-warning-rgb),1)]",
-  unhealthy: "shadow-[0_0_8px_rgba(var(--status-error-rgb),1)]",
+  healthy: "",
+  warning: "",
+  unhealthy: "",
 };
 
 // Minimum time to display status message (ms) - ensures users see feedback
@@ -148,9 +148,7 @@ export function StatusBar() {
   })() : null;
 
   return (
-    <footer data-testid="status-bar" className="relative px-6 py-2 border-t border-theme-border-primary bg-gradient-to-r from-theme-bg-primary via-theme-bg-secondary to-theme-bg-primary">
-      {/* Top accent line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-theme-accent-primary/20 to-transparent" />
+    <footer data-testid="status-bar" className="relative px-6 py-2 border-t border-outline-variant bg-surface-container">
 
       <div className="flex items-center justify-between gap-4">
         {/* Left: System telemetry */}
@@ -169,12 +167,12 @@ export function StatusBar() {
           >
             <div className={`w-2.5 h-2.5 rounded-full ${
               isBackedOff
-                ? "bg-theme-status-warning animate-pulse shadow-[0_0_8px_rgba(var(--status-warning-rgb),1)]"
+                ? "bg-warning animate-pulse"
                 : !wslReady && preflightStatus
                   ? `${healthColors.unhealthy} ${healthGlowColors.unhealthy}`
                   : health
                     ? `${healthColors[health.status]} ${healthGlowColors[health.status]}`
-                    : "bg-theme-status-stopped"
+                    : "bg-outline"
             }`} />
           </div>
 
@@ -182,7 +180,7 @@ export function StatusBar() {
           <div className="flex items-center gap-2">
             <span className="data-label">{t('wsl')}</span>
             <span
-              className="data-value text-xs text-theme-accent-primary cursor-help"
+              className="data-value text-xs text-primary cursor-help"
               title={versionTooltip}
             >
               v{versionInfo?.wslVersion || "..."}
@@ -191,7 +189,7 @@ export function StatusBar() {
               onClick={handleUpdate}
               disabled={isUpdating}
               data-testid="wsl-update-button"
-              className="p-1 rounded hover:bg-theme-bg-tertiary transition-colors disabled:opacity-50 disabled:cursor-not-allowed group min-w-[44px] flex justify-center"
+              className="p-1 rounded hover:bg-surface-container transition-colors disabled:opacity-50 disabled:cursor-not-allowed group min-w-[44px] flex justify-center"
               title={
                 isUpdating
                   ? t('updateWsl.updating')
@@ -202,11 +200,11 @@ export function StatusBar() {
             >
               {isUpdating ? (
                 <div className="flex items-center gap-1" data-testid="wsl-update-spinner">
-                  <div className="w-3 h-3 border border-theme-status-warning border-t-transparent rounded-full animate-spin" />
-                  <span className="text-[9px] text-theme-status-warning font-medium animate-pulse">{t('updateWsl.uac')}</span>
+                  <div className="w-3 h-3 border border-warning border-t-transparent rounded-full animate-spin" />
+                  <span className="text-[9px] text-warning font-medium animate-pulse">{t('updateWsl.uac')}</span>
                 </div>
               ) : (
-                <svg className="w-3 h-3 text-theme-text-muted group-hover:text-theme-accent-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg className="w-3 h-3 text-on-surface-variant group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M21 12a9 9 0 0 0-9-9M3 12a9 9 0 0 0 9 9m0-18v6m0 12v-6" strokeLinecap="round" strokeLinejoin="round" />
                   <path d="M12 3l3 3-3 3M12 21l-3-3 3-3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
@@ -220,16 +218,16 @@ export function StatusBar() {
               ref={diskButtonRef}
               onClick={() => setShowMountPanel(!showMountPanel)}
               data-testid="disk-mounts-button"
-              className="flex items-center gap-2 px-2 py-1 rounded hover:bg-theme-bg-tertiary transition-colors group"
+              className="flex items-center gap-2 px-2 py-1 rounded hover:bg-surface-container transition-colors group"
               title={diskCount > 0 ? t('diskMounts.count', { count: diskCount }) : t('diskMounts.empty')}
             >
-              <svg className="w-3.5 h-3.5 text-theme-text-muted group-hover:text-theme-accent-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="w-3.5 h-3.5 text-on-surface-variant group-hover:text-primary transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="10" />
                 <circle cx="12" cy="12" r="3" />
               </svg>
-              <span className="data-label group-hover:text-theme-text-secondary">{t('disk')}</span>
+              <span className="data-label group-hover:text-on-surface">{t('disk')}</span>
               {diskCount > 0 && (
-                <span className="data-value text-[10px] text-theme-accent-primary">
+                <span className="data-value text-[10px] text-primary">
                   {diskCount}
                 </span>
               )}
@@ -243,24 +241,24 @@ export function StatusBar() {
           </div>
 
           {/* Divider */}
-          <div className="w-px h-4 bg-theme-border-secondary" />
+          <div className="w-px h-4 bg-outline-variant" />
 
           {/* Distribution stats */}
           <div className="flex items-center gap-4">
             {mockMode && (
-              <span className="px-2 py-0.5 bg-[rgba(var(--status-warning-rgb),0.1)] text-theme-status-warning rounded text-[10px] font-mono font-semibold border border-[rgba(var(--status-warning-rgb),0.3)] uppercase tracking-wider">
+              <span className="px-2 py-0.5 bg-warning/10 text-warning rounded text-[10px] font-mono font-semibold border border-warning/30 uppercase tracking-wider">
                 {t('dev')}
               </span>
             )}
 
             <div className="flex items-center gap-2">
               <span className="data-label">{t('instances')}</span>
-              <span className="data-value text-xs text-theme-text-secondary">{distributions.length}</span>
+              <span className="data-value text-xs text-on-surface-variant">{distributions.length}</span>
             </div>
 
             <div className="flex items-center gap-2">
               <span className="data-label">{t('active')}</span>
-              <span className={`data-value text-xs ${runningCount > 0 ? 'text-theme-status-running' : 'text-theme-text-muted'}`}>
+              <span className={`data-value text-xs ${runningCount > 0 ? 'text-success' : 'text-on-surface-variant'}`}>
                 {runningCount}
               </span>
             </div>
@@ -268,7 +266,7 @@ export function StatusBar() {
             {memoryStats && memoryStats.totalMemory > 0 && (
               <div className="flex items-center gap-2 whitespace-nowrap">
                 <span className="data-label">{t('mem')}</span>
-                <span className="data-value text-xs text-theme-text-secondary">
+                <span className="data-value text-xs text-on-surface-variant">
                   {formatBytes(memoryStats.totalMemory)}
                 </span>
               </div>
@@ -277,7 +275,7 @@ export function StatusBar() {
             {defaultDistro && (
               <div className="hidden lg:flex items-center gap-2">
                 <span className="data-label">{t('primary')}</span>
-                <span className="data-value text-xs text-theme-accent-primary">{defaultDistro.name}</span>
+                <span className="data-value text-xs text-primary">{defaultDistro.name}</span>
               </div>
             )}
           </div>
@@ -288,13 +286,13 @@ export function StatusBar() {
           role="status"
           aria-live="polite"
           aria-atomic="true"
-          className="relative z-10 flex items-center gap-3 shrink-0 justify-end bg-theme-bg-primary pl-3 w-60"
+          className="relative z-10 flex items-center gap-3 shrink-0 justify-end bg-surface pl-3 w-60"
         >
           {displayedStatus ? (
             <div className="flex items-center gap-2 min-w-0">
-              <div className="w-3 h-3 shrink-0 border-2 border-theme-accent-primary border-t-transparent rounded-full animate-spin" />
+              <div className="w-3 h-3 shrink-0 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               <span
-                className="data-value text-xs text-theme-accent-primary truncate"
+                className="data-value text-xs text-primary truncate"
                 title={displayedStatus}
               >
                 {displayedStatus}
@@ -302,13 +300,13 @@ export function StatusBar() {
             </div>
           ) : runningCount > 0 ? (
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 shrink-0 rounded-full bg-theme-status-running shadow-[0_0_8px_rgba(var(--status-running-rgb),1)] animate-pulse" />
-              <span className="data-value text-xs text-theme-status-running">{t('common:status.operational')}</span>
+              <div className="w-2 h-2 shrink-0 rounded-full bg-success animate-pulse" />
+              <span className="data-value text-xs text-success">{t('common:status.operational')}</span>
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <div className="w-2 h-2 shrink-0 rounded-full bg-theme-status-stopped" />
-              <span className="data-value text-xs text-theme-text-muted">{t('common:status.standby')}</span>
+              <div className="w-2 h-2 shrink-0 rounded-full bg-outline" />
+              <span className="data-value text-xs text-on-surface-variant">{t('common:status.standby')}</span>
             </div>
           )}
         </div>

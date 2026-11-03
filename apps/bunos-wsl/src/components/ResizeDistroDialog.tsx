@@ -145,37 +145,37 @@ export function ResizeDistroDialog({ isOpen, distro, onClose }: ResizeDistroDial
 
       <ModalBody>
         {error && (
-          <div className="mb-4 p-3 bg-[rgba(var(--status-error-rgb),0.2)] border border-[rgba(var(--status-error-rgb),0.4)] rounded-lg text-theme-status-error text-sm">
+          <div className="mb-4 p-3 bg-error/20 border border-error/40 rounded-lg text-error text-sm">
             {error}
           </div>
         )}
 
         <div className="space-y-4">
-          <div className="p-3 bg-theme-bg-tertiary/50 border border-theme-border-secondary rounded-lg space-y-3">
+          <div className="p-3 bg-surface-container/50 border border-outline-variant rounded-lg space-y-3">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-theme-text-muted text-xs uppercase tracking-wider">{t('resize.virtualSize')}</span>
-                <p className="text-theme-text-primary font-medium">
+                <span className="text-on-surface-variant text-xs uppercase tracking-wider">{t('resize.virtualSize')}</span>
+                <p className="text-on-surface font-medium">
                   {vhdSize !== null ? formatSize(vhdSize.virtualSize) : t('common:label.loading')}
                 </p>
               </div>
               <div>
-                <span className="text-theme-text-muted text-xs uppercase tracking-wider">{t('resize.fileSize')}</span>
-                <p className="text-theme-text-secondary font-medium">
+                <span className="text-on-surface-variant text-xs uppercase tracking-wider">{t('resize.fileSize')}</span>
+                <p className="text-on-surface-variant font-medium">
                   {vhdSize !== null ? formatSize(vhdSize.fileSize) : t('common:label.loading')}
                 </p>
               </div>
             </div>
-            <div className="pt-2 border-t border-theme-border-secondary/50">
-              <span className="text-theme-text-muted text-xs uppercase tracking-wider">{t('resize.newVirtualSize')}</span>
-              <p className="text-theme-accent-primary font-medium">
+            <div className="pt-2 border-t border-outline-variant/50">
+              <span className="text-on-surface-variant text-xs uppercase tracking-wider">{t('resize.newVirtualSize')}</span>
+              <p className="text-primary font-medium">
                 {isValidSize ? formatSize(sizeBytes) : t('resize.invalid')}
               </p>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-theme-text-secondary mb-1">
+            <label className="block text-sm font-medium text-on-surface-variant mb-1">
               {t('resize.newSize')}
             </label>
             <div className="flex gap-2">
@@ -189,13 +189,13 @@ export function ResizeDistroDialog({ isOpen, distro, onClose }: ResizeDistroDial
                 min="1"
                 step="1"
                 disabled={isResizing}
-                className="flex-1 px-3 py-2 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg text-theme-text-primary placeholder-theme-text-muted focus:outline-hidden focus:border-theme-accent-primary disabled:opacity-50"
+                className="flex-1 px-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary disabled:opacity-50"
               />
               <select
                 value={sizeUnit}
                 onChange={(e) => setSizeUnit(e.target.value as SizeUnit)}
                 disabled={isResizing}
-                className="px-3 py-2 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg text-theme-text-primary focus:outline-hidden focus:border-theme-accent-primary disabled:opacity-50"
+                className="px-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface focus:outline-hidden focus:border-primary disabled:opacity-50"
               >
                 <option value="GB">GB</option>
                 <option value="TB">TB</option>
@@ -203,17 +203,17 @@ export function ResizeDistroDialog({ isOpen, distro, onClose }: ResizeDistroDial
             </div>
           </div>
 
-          <div className="p-3 bg-[rgba(var(--status-warning-rgb),0.15)] border border-[rgba(var(--status-warning-rgb),0.3)] rounded-lg flex items-start gap-3">
-            <WarningIcon size="sm" className="text-theme-status-warning mt-0.5 shrink-0" />
-            <div className="text-theme-status-warning/80 text-sm">
-              <strong className="text-theme-status-warning">{t('resize.note')}</strong> {t('resize.noteDescription')}
+          <div className="p-3 bg-warning/15 border border-warning/30 rounded-lg flex items-start gap-3">
+            <WarningIcon size="sm" className="text-warning mt-0.5 shrink-0" />
+            <div className="text-warning/80 text-sm">
+              <strong className="text-warning">{t('resize.note')}</strong> {t('resize.noteDescription')}
             </div>
           </div>
         </div>
 
         {isResizing && (
-          <div className="mt-4 p-3 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg">
-            <div className="flex items-center gap-3 text-theme-text-secondary text-sm">
+          <div className="mt-4 p-3 bg-surface-container border border-outline-variant rounded-lg">
+            <div className="flex items-center gap-3 text-on-surface-variant text-sm">
               <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"

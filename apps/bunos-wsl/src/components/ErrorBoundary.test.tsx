@@ -188,7 +188,7 @@ describe('ErrorBoundary', () => {
       );
 
       const button = screen.getByText('Try Again');
-      expect(button).toHaveClass('bg-theme-button-primary');
+      expect(button).toHaveClass('bg-primary');
     });
   });
 

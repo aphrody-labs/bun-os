@@ -152,33 +152,33 @@ export function CompactDistroDialog({ isOpen, distro, onClose }: CompactDistroDi
 
       <ModalBody>
         {error && (
-          <div data-testid="compact-error" className="mb-4 p-3 bg-[rgba(var(--status-error-rgb),0.2)] border border-[rgba(var(--status-error-rgb),0.4)] rounded-lg text-theme-status-error text-sm">
+          <div data-testid="compact-error" className="mb-4 p-3 bg-error/20 border border-error/40 rounded-lg text-error text-sm">
             {error}
           </div>
         )}
 
         <div className="space-y-4">
-          <div className="p-3 bg-theme-bg-tertiary/50 border border-theme-border-secondary rounded-lg">
+          <div className="p-3 bg-surface-container/50 border border-outline-variant rounded-lg">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <span className="text-theme-text-muted text-xs uppercase tracking-wider">{t('compact.virtualSize')}</span>
-                <p data-testid="compact-virtual-size" className="text-theme-text-primary font-medium">
+                <span className="text-on-surface-variant text-xs uppercase tracking-wider">{t('compact.virtualSize')}</span>
+                <p data-testid="compact-virtual-size" className="text-on-surface font-medium">
                   {vhdSize !== null ? formatSize(vhdSize.virtualSize) : t('common:label.loading')}
                 </p>
               </div>
               <div>
-                <span className="text-theme-text-muted text-xs uppercase tracking-wider">{t('compact.fileSize')}</span>
-                <p data-testid="compact-file-size" className="text-theme-text-secondary font-medium">
+                <span className="text-on-surface-variant text-xs uppercase tracking-wider">{t('compact.fileSize')}</span>
+                <p data-testid="compact-file-size" className="text-on-surface-variant font-medium">
                   {vhdSize !== null ? formatSize(vhdSize.fileSize) : t('common:label.loading')}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="p-3 bg-[rgba(var(--status-warning-rgb),0.15)] border border-[rgba(var(--status-warning-rgb),0.3)] rounded-lg flex items-start gap-3">
-            <WarningIcon size="sm" className="text-theme-status-warning mt-0.5 shrink-0" />
-            <div className="text-theme-status-warning/80 text-sm">
-              <strong className="text-theme-status-warning">{t('compact.important')}</strong>
+          <div className="p-3 bg-warning/15 border border-warning/30 rounded-lg flex items-start gap-3">
+            <WarningIcon size="sm" className="text-warning mt-0.5 shrink-0" />
+            <div className="text-warning/80 text-sm">
+              <strong className="text-warning">{t('compact.important')}</strong>
               <ul className="mt-1 ml-4 list-disc space-y-1">
                 <li>{t('compact.warningUac')}</li>
                 <li>{t('compact.warningShutdown')}</li>
@@ -189,9 +189,9 @@ export function CompactDistroDialog({ isOpen, distro, onClose }: CompactDistroDi
         </div>
 
         {isCompacting && (
-          <div data-testid="compact-progress" className="mt-4 p-4 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg">
-            <div className="flex items-center gap-3 text-theme-text-primary">
-              <svg className="w-5 h-5 animate-spin text-theme-accent-primary" fill="none" viewBox="0 0 24 24">
+          <div data-testid="compact-progress" className="mt-4 p-4 bg-surface-container border border-outline-variant rounded-lg">
+            <div className="flex items-center gap-3 text-on-surface">
+              <svg className="w-5 h-5 animate-spin text-primary" fill="none" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"
                   cx="12"
@@ -208,12 +208,12 @@ export function CompactDistroDialog({ isOpen, distro, onClose }: CompactDistroDi
               </svg>
               <div className="flex-1">
                 <span className="font-medium">{t('compact.optimizing')}</span>
-                <span data-testid="compact-elapsed-time" className="text-theme-text-muted ml-2">
+                <span data-testid="compact-elapsed-time" className="text-on-surface-variant ml-2">
                   {t('compact.elapsed', { time: formatElapsedTime(elapsedSeconds) })}
                 </span>
               </div>
             </div>
-            <div className="mt-3 text-theme-text-muted text-sm space-y-1">
+            <div className="mt-3 text-on-surface-variant text-sm space-y-1">
               <p>{t('compact.progressSteps')}</p>
               <p>{t('compact.progressWait')}</p>
             </div>

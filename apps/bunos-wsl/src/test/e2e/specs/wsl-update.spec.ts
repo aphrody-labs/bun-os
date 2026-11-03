@@ -31,7 +31,7 @@ async function switchToTab(tabId: string): Promise<void> {
   await browser.waitUntil(
     async () => {
       const classes = (await tab.getAttribute("class")) ?? "";
-      return classes.includes("accent-primary") || classes.includes("border-r-2");
+      return classes.includes("primary") || classes.includes("border-r-2");
     },
     { timeout: 3000, timeoutMsg: "Tab did not become active" }
   );
@@ -359,11 +359,11 @@ describe("WSL Update", () => {
       const toggle = await $('[data-testid="wsl-prerelease-updates-toggle"]');
       await toggle.waitForClickable({ timeout: 5000 });
 
-      if (!((await toggle.getAttribute("class")) ?? "").includes("bg-theme-accent-primary")) {
+      if (!((await toggle.getAttribute("class")) ?? "").includes("bg-primary")) {
         await toggle.click();
       }
       await browser.waitUntil(
-        async () => ((await toggle.getAttribute("class")) ?? "").includes("bg-theme-accent-primary"),
+        async () => ((await toggle.getAttribute("class")) ?? "").includes("bg-primary"),
         { timeout: 5000, timeoutMsg: "Pre-release setting did not become enabled" }
       );
       // This app setting saves immediately; the WSL config Save button is unrelated.

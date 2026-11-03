@@ -7,6 +7,7 @@
 import type { InputHTMLAttributes, TextareaHTMLAttributes, SelectHTMLAttributes, ReactNode } from 'react';
 import { useId } from 'react';
 import { ErrorCircleIcon, FolderIcon } from '../icons';
+import { Icon } from "@aphrody/m3-primitives";
 
 // ==================== Types ====================
 
@@ -51,18 +52,18 @@ const SIZE_CLASSES: Record<InputSize, string> = {
 };
 
 const BASE_INPUT_CLASSES = [
-  'w-full bg-theme-bg-tertiary text-theme-text-primary',
-  'placeholder-theme-text-muted',
+  'w-full bg-surface-container text-on-surface',
+  'placeholder-on-surface-variant',
   'focus:outline-hidden',
   'disabled:opacity-50 disabled:cursor-not-allowed',
   'transition-colors',
 ].join(' ');
 
-const LABEL_CLASSES = 'block text-sm font-medium text-theme-text-secondary mb-1';
+const LABEL_CLASSES = 'block text-sm font-medium text-on-surface-variant mb-1';
 
-const HELPER_CLASSES = 'mt-1 text-xs text-theme-text-muted';
+const HELPER_CLASSES = 'mt-1 text-xs text-on-surface-variant';
 
-const ERROR_CLASSES = 'mt-1 text-xs text-theme-status-error';
+const ERROR_CLASSES = 'mt-1 text-xs text-error';
 
 // ==================== Helper Components ====================
 
@@ -81,7 +82,7 @@ function HelperText({ children, id }: { children: ReactNode; id?: string }) {
 function ErrorText({ children, showIcon, testId, id }: { children: ReactNode; showIcon?: boolean; testId?: string; id?: string }) {
   if (showIcon) {
     return (
-      <p id={id} data-testid={testId} role="alert" className="mt-2 text-xs text-theme-status-error flex items-center gap-1.5">
+      <p id={id} data-testid={testId} role="alert" className="mt-2 text-xs text-error flex items-center gap-1.5">
         <ErrorCircleIcon size="sm" className="flex-shrink-0" />
         {children}
       </p>
@@ -120,10 +121,10 @@ export function Input({
     SIZE_CLASSES[size],
     'border rounded-lg',
     error
-      ? 'border-theme-status-error focus:border-theme-status-error'
+      ? 'border-error focus:border-error'
       : customFocus
-        ? 'border-theme-border-secondary'
-        : 'border-theme-border-secondary focus:border-theme-accent-primary',
+        ? 'border-outline-variant'
+        : 'border-outline-variant focus:border-primary',
     leftAddon ? 'rounded-l-none' : '',
     rightAddon ? 'rounded-r-none' : '',
     className,
@@ -144,13 +145,13 @@ export function Input({
       {hasAddons ? (
         <div className="flex">
           {leftAddon && (
-            <span className="inline-flex items-center px-3 text-sm text-theme-text-secondary bg-theme-bg-hover border border-r-0 border-theme-border-secondary rounded-l-lg">
+            <span className="inline-flex items-center px-3 text-sm text-on-surface-variant bg-surface-container-high border border-r-0 border-outline-variant rounded-l-lg">
               {leftAddon}
             </span>
           )}
           <input {...inputProps} />
           {rightAddon && (
-            <span className="inline-flex items-center px-3 text-sm text-theme-text-secondary bg-theme-bg-hover border border-l-0 border-theme-border-secondary rounded-r-lg">
+            <span className="inline-flex items-center px-3 text-sm text-on-surface-variant bg-surface-container-high border border-l-0 border-outline-variant rounded-r-lg">
               {rightAddon}
             </span>
           )}
@@ -190,7 +191,7 @@ export function TextArea({
     BASE_INPUT_CLASSES,
     SIZE_CLASSES[size],
     'border rounded-lg resize-none',
-    error ? 'border-theme-status-error focus:border-theme-status-error' : 'border-theme-border-secondary focus:border-theme-accent-primary',
+    error ? 'border-error focus:border-error' : 'border-outline-variant focus:border-primary',
     className,
   ].filter(Boolean).join(' ');
 
@@ -234,20 +235,20 @@ export function Checkbox({
         id={checkboxId}
         className={[
           'mt-0.5 w-4 h-4 rounded',
-          'border-theme-border-secondary bg-theme-bg-tertiary',
-          'text-theme-accent-primary',
-          'focus:ring-theme-accent-primary focus:ring-offset-0',
+          'border-outline-variant bg-surface-container',
+          'text-primary',
+          'focus:ring-primary focus:ring-offset-0',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           className,
         ].filter(Boolean).join(' ')}
         {...props}
       />
       <div>
-        <span className="text-sm text-theme-text-primary group-hover:text-theme-text-primary">
+        <span className="text-sm text-on-surface group-hover:text-on-surface">
           {label}
         </span>
         {description && (
-          <p className="text-xs text-theme-text-muted">
+          <p className="text-xs text-on-surface-variant">
             {description}
           </p>
         )}
@@ -293,20 +294,20 @@ export function RadioButton({
         id={radioId}
         className={[
           inline ? 'w-4 h-4' : 'mt-0.5 w-4 h-4',
-          'bg-theme-bg-tertiary border-theme-border-secondary',
-          'text-theme-accent-primary',
-          'focus:ring-theme-accent-primary focus:ring-offset-0',
+          'bg-surface-container border-outline-variant',
+          'text-primary',
+          'focus:ring-primary focus:ring-offset-0',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           className,
         ].filter(Boolean).join(' ')}
         {...props}
       />
       <div>
-        <span className={`text-sm ${labelClassName || 'text-theme-text-primary group-hover:text-theme-text-primary'}`}>
+        <span className={`text-sm ${labelClassName || 'text-on-surface group-hover:text-on-surface'}`}>
           {label}
         </span>
         {description && (
-          <p className="text-xs text-theme-text-muted">
+          <p className="text-xs text-on-surface-variant">
             {description}
           </p>
         )}
@@ -356,7 +357,7 @@ export function PathInput({
       {label && (
         <label htmlFor={inputId} className={LABEL_CLASSES}>
           {label}
-          {labelSuffix && <span className="text-theme-text-muted font-normal"> {labelSuffix}</span>}
+          {labelSuffix && <span className="text-on-surface-variant font-normal"> {labelSuffix}</span>}
         </label>
       )}
       <div className="flex gap-2">
@@ -372,8 +373,8 @@ export function PathInput({
             SIZE_CLASSES.md,
             'border rounded-lg',
             error
-              ? 'border-theme-status-error focus:border-theme-status-error'
-              : 'border-theme-border-secondary focus:border-theme-accent-primary',
+              ? 'border-error focus:border-error'
+              : 'border-outline-variant focus:border-primary',
             className,
           ].filter(Boolean).join(' ')}
           {...props}
@@ -383,7 +384,7 @@ export function PathInput({
           onClick={onBrowse}
           disabled={disabled || browseDisabled}
           aria-label="Browse for file"
-          className="px-3 py-2 bg-theme-bg-tertiary hover:bg-theme-bg-hover border border-theme-border-secondary text-theme-text-secondary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-3 py-2 bg-surface-container hover:bg-surface-container-high border border-outline-variant text-on-surface-variant rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           title="Browse"
           data-testid="browse-button"
         >
@@ -424,19 +425,15 @@ export function Select({
     SIZE_CLASSES[size],
     'border rounded-lg',
     'appearance-none cursor-pointer',
-    // Add custom dropdown arrow
-    'bg-[url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20fill%3D%22none%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20stroke%3D%22%2378716c%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%20stroke-width%3D%221.5%22%20d%3D%22m6%208%204%204%204-4%22%2F%3E%3C%2Fsvg%3E")]',
-    'bg-size-[1.5rem_1.5rem]',
-    'bg-position-[right_0.5rem_center]',
-    'bg-no-repeat',
     'pr-10',
-    error ? 'border-theme-status-error focus:border-theme-status-error' : 'border-theme-border-secondary focus:border-theme-accent-primary',
+    error ? 'border-error focus:border-error' : 'border-outline-variant focus:border-primary',
     className,
   ].filter(Boolean).join(' ');
 
   return (
     <div>
       {label && <Label htmlFor={selectId}>{label}</Label>}
+      <div className="relative">
       <select
         id={selectId}
         className={selectClasses}
@@ -455,6 +452,12 @@ export function Select({
           </option>
         ))}
       </select>
+      <Icon
+        name="keyboard_arrow_down"
+        size={20}
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
+      />
+      </div>
       {error ? <ErrorText id={errorId}>{error}</ErrorText> : helperText && <HelperText id={helperId}>{helperText}</HelperText>}
     </div>
   );

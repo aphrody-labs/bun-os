@@ -145,7 +145,7 @@ describe('CompactDistroDialog', () => {
         await vi.advanceTimersByTimeAsync(100);
       });
 
-      const backdrop = document.querySelector('.backdrop-blur-sm');
+      const backdrop = document.querySelector('.bg-scrim\\/40');
       fireEvent.click(backdrop!);
       expect(mockOnClose).toHaveBeenCalledTimes(1);
     });
@@ -288,7 +288,7 @@ describe('CompactDistroDialog', () => {
         await vi.advanceTimersByTimeAsync(100);
       });
 
-      const backdrop = document.querySelector('.backdrop-blur-sm');
+      const backdrop = document.querySelector('.bg-scrim\\/40');
       fireEvent.click(backdrop!);
       expect(mockOnClose).not.toHaveBeenCalled();
     });

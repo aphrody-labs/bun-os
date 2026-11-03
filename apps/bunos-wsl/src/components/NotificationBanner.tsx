@@ -5,32 +5,28 @@ import type { NotificationType } from "../store/notificationStore";
 
 const styles = {
   success: {
-    container: "bg-[rgba(var(--status-running-rgb),0.05)] border-[rgba(var(--status-running-rgb),0.3)] shadow-[rgba(var(--status-running-rgb),0.05)]",
-    accent: "via-[rgba(var(--status-running-rgb),0.5)]",
-    icon: "bg-[rgba(var(--status-running-rgb),0.1)] border-[rgba(var(--status-running-rgb),0.3)]",
-    text: "text-theme-status-running",
-    button: "hover:text-theme-status-running hover:bg-[rgba(var(--status-running-rgb),0.1)] hover:border-[rgba(var(--status-running-rgb),0.3)]",
+    container: "bg-success/5 border-success/30",
+    icon: "bg-success/10 border-success/30",
+    text: "text-success",
+    button: "hover:text-success hover:bg-success/10 hover:border-success/30",
   },
   info: {
-    container: "bg-[rgba(var(--accent-primary-rgb),0.05)] border-[rgba(var(--accent-primary-rgb),0.3)] shadow-[rgba(var(--accent-primary-rgb),0.05)]",
-    accent: "via-[rgba(var(--accent-primary-rgb),0.5)]",
-    icon: "bg-[rgba(var(--accent-primary-rgb),0.1)] border-[rgba(var(--accent-primary-rgb),0.3)]",
-    text: "text-theme-accent-primary",
-    button: "hover:text-theme-accent-primary hover:bg-[rgba(var(--accent-primary-rgb),0.1)] hover:border-[rgba(var(--accent-primary-rgb),0.3)]",
+    container: "bg-primary/5 border-primary/30",
+    icon: "bg-primary/10 border-primary/30",
+    text: "text-primary",
+    button: "hover:text-primary hover:bg-primary/10 hover:border-primary/30",
   },
   warning: {
-    container: "bg-[rgba(var(--status-warning-rgb),0.05)] border-[rgba(var(--status-warning-rgb),0.3)] shadow-[rgba(var(--status-warning-rgb),0.05)]",
-    accent: "via-[rgba(var(--status-warning-rgb),0.5)]",
-    icon: "bg-[rgba(var(--status-warning-rgb),0.1)] border-[rgba(var(--status-warning-rgb),0.3)]",
-    text: "text-theme-status-warning",
-    button: "hover:text-theme-status-warning hover:bg-[rgba(var(--status-warning-rgb),0.1)] hover:border-[rgba(var(--status-warning-rgb),0.3)]",
+    container: "bg-warning/5 border-warning/30",
+    icon: "bg-warning/10 border-warning/30",
+    text: "text-warning",
+    button: "hover:text-warning hover:bg-warning/10 hover:border-warning/30",
   },
   error: {
-    container: "bg-[rgba(var(--status-error-rgb),0.05)] border-[rgba(var(--status-error-rgb),0.3)] shadow-[rgba(var(--status-error-rgb),0.05)]",
-    accent: "via-[rgba(var(--status-error-rgb),0.5)]",
-    icon: "bg-[rgba(var(--status-error-rgb),0.1)] border-[rgba(var(--status-error-rgb),0.3)]",
-    text: "text-theme-status-error",
-    button: "hover:text-theme-status-error hover:bg-[rgba(var(--status-error-rgb),0.1)] hover:border-[rgba(var(--status-error-rgb),0.3)]",
+    container: "bg-error/5 border-error/30",
+    icon: "bg-error/10 border-error/30",
+    text: "text-error",
+    button: "hover:text-error hover:bg-error/10 hover:border-error/30",
   },
 };
 
@@ -137,8 +133,6 @@ export function NotificationBanner({
             isExpanded ? "opacity-100" : "opacity-0"
           } ${style.container}`}
         >
-        {/* Top accent line */}
-        <div className={`absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent ${style.accent} to-transparent`} />
 
         <div className="flex items-start gap-4">
         <div className={`w-10 h-10 rounded-lg border flex items-center justify-center flex-shrink-0 ${style.icon}`}>
@@ -148,7 +142,7 @@ export function NotificationBanner({
           <p data-testid={`${testIdPrefix}-title`} className={`font-semibold text-sm uppercase tracking-wider font-mono ${style.text}`}>
             {title}
           </p>
-          <p data-testid={messageTestId} className="text-sm mt-2 text-theme-text-secondary break-words whitespace-pre-wrap leading-relaxed">
+          <p data-testid={messageTestId} className="text-sm mt-2 text-on-surface-variant break-words whitespace-pre-wrap leading-relaxed">
             {message}
           </p>
           {children && <div className="mt-4">{children}</div>}
@@ -158,7 +152,7 @@ export function NotificationBanner({
             onClick={handleDismiss}
             data-testid={dismissTestId}
             aria-label={t('button.dismiss')}
-            className={`p-2 text-theme-text-muted rounded-lg border border-transparent transition-all flex-shrink-0 ${style.button}`}
+            className={`p-2 text-on-surface-variant rounded-lg border border-transparent transition-all flex-shrink-0 ${style.button}`}
             title={t('button.dismiss')}
           >
             <CloseIcon size="sm" />

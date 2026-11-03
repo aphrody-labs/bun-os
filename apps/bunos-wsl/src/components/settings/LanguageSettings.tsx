@@ -39,16 +39,15 @@ export function LanguageSettings() {
 
   return (
     <div className="space-y-6">
-      <section className="relative overflow-hidden bg-linear-to-br from-blue-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-blue-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent" />
+      <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
-              <GlobeIcon size="md" className="text-white" />
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+              <GlobeIcon size="md" className="text-on-primary-container" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-theme-text-primary">{t("language.title")}</h2>
-              <p className="text-sm text-theme-text-secondary">{t("language.description")}</p>
+              <h2 className="text-lg font-medium text-on-surface">{t("language.title")}</h2>
+              <p className="text-sm text-on-surface-variant">{t("language.description")}</p>
             </div>
           </div>
 
@@ -57,8 +56,8 @@ export function LanguageSettings() {
             <label
               className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                 currentLocale === "auto"
-                  ? "border-theme-accent-primary bg-theme-accent-primary/10"
-                  : "border-theme-border-primary hover:border-theme-border-secondary"
+                  ? "border-primary bg-primary/10"
+                  : "border-outline-variant hover:border-outline-variant"
               }`}
             >
               <input
@@ -67,13 +66,13 @@ export function LanguageSettings() {
                 value="auto"
                 checked={currentLocale === "auto"}
                 onChange={() => handleLanguageChange("auto")}
-                className="accent-theme-accent-primary"
+                className="accent-primary"
               />
               <div>
-                <span className="text-sm font-medium text-theme-text-primary">
+                <span className="text-sm font-medium text-on-surface">
                   {t("language.auto")}
                 </span>
-                <p className="text-xs text-theme-text-muted">
+                <p className="text-xs text-on-surface-variant">
                   {t("language.autoDesc")}
                 </p>
               </div>
@@ -85,8 +84,8 @@ export function LanguageSettings() {
                 key={lang.code}
                 className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
                   currentLocale === lang.code
-                    ? "border-theme-accent-primary bg-theme-accent-primary/10"
-                    : "border-theme-border-primary hover:border-theme-border-secondary"
+                    ? "border-primary bg-primary/10"
+                    : "border-outline-variant hover:border-outline-variant"
                 }`}
               >
                 <input
@@ -95,14 +94,14 @@ export function LanguageSettings() {
                   value={lang.code}
                   checked={currentLocale === lang.code}
                   onChange={() => handleLanguageChange(lang.code)}
-                  className="accent-theme-accent-primary"
+                  className="accent-primary"
                 />
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-theme-text-primary">
+                  <span className="text-sm font-medium text-on-surface">
                     {lang.nativeName}
                   </span>
                   {lang.code !== "en" && (
-                    <span className="text-xs text-theme-text-muted">
+                    <span className="text-xs text-on-surface-variant">
                       ({lang.name})
                     </span>
                   )}
@@ -111,12 +110,12 @@ export function LanguageSettings() {
             ))}
           </div>
 
-          <div className="mt-4 pt-3 border-t border-theme-border-primary/50">
+          <div className="mt-4 pt-3 border-t border-outline-variant/50">
             <a
               href="https://github.com/aphrody-labs/bun-os/issues/new?template=language-request.yml"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-theme-text-muted hover:text-theme-accent-primary transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm text-on-surface-variant hover:text-primary transition-colors"
             >
               <span>{t("language.requestLanguage")}</span>
               <span className="underline">{t("language.requestLanguageLink")}</span>

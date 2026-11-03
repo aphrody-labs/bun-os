@@ -80,29 +80,28 @@ export function TimeoutSettings() {
   return (
     <div className="space-y-8">
       {/* Timeout Section Header */}
-      <section className="relative overflow-hidden bg-linear-to-br from-orange-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-orange-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-orange-500/10 via-transparent to-transparent" />
+      <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-900/30">
-              <ClockIcon size="md" className="text-white" />
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+              <ClockIcon size="md" className="text-on-primary-container" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-theme-text-primary">{t('timeouts.title')}</h2>
-              <p className="text-sm text-theme-text-muted">{t('timeouts.description')}</p>
+              <h2 className="text-lg font-medium text-on-surface">{t('timeouts.title')}</h2>
+              <p className="text-sm text-on-surface-variant">{t('timeouts.description')}</p>
             </div>
           </div>
 
           {/* Info box */}
-          <div className="mb-6 p-4 bg-theme-bg-tertiary/50 border border-theme-border-secondary/50 rounded-lg">
-            <p className="text-xs text-theme-text-muted">
+          <div className="mb-6 p-4 bg-surface-container/50 border border-outline-variant/50 rounded-lg">
+            <p className="text-xs text-on-surface-variant">
               {t('timeouts.infoBox')}
             </p>
           </div>
 
           {/* Quick Operations */}
-          <div className="mb-6 pb-6 border-b border-theme-border-secondary/50">
-            <h3 className="text-sm font-medium text-theme-text-secondary mb-2">{t('timeouts.quick')}</h3>
+          <div className="mb-6 pb-6 border-b border-outline-variant/50">
+            <h3 className="text-sm font-medium text-on-surface-variant mb-2">{t('timeouts.quick')}</h3>
             <SettingSelect
               label={t('timeouts.quickLabel')}
               description={t('timeouts.quickDesc')}
@@ -113,8 +112,8 @@ export function TimeoutSettings() {
           </div>
 
           {/* Standard Operations */}
-          <div className="mb-6 pb-6 border-b border-theme-border-secondary/50">
-            <h3 className="text-sm font-medium text-theme-text-secondary mb-2">{t('timeouts.default')}</h3>
+          <div className="mb-6 pb-6 border-b border-outline-variant/50">
+            <h3 className="text-sm font-medium text-on-surface-variant mb-2">{t('timeouts.default')}</h3>
             <SettingSelect
               label={t('timeouts.defaultLabel')}
               description={t('timeouts.defaultDesc')}
@@ -125,8 +124,8 @@ export function TimeoutSettings() {
           </div>
 
           {/* Long Operations */}
-          <div className="mb-6 pb-6 border-b border-theme-border-secondary/50">
-            <h3 className="text-sm font-medium text-theme-text-secondary mb-2">{t('timeouts.long')}</h3>
+          <div className="mb-6 pb-6 border-b border-outline-variant/50">
+            <h3 className="text-sm font-medium text-on-surface-variant mb-2">{t('timeouts.long')}</h3>
             <SettingSelect
               label={t('timeouts.longLabel')}
               description={t('timeouts.longDesc')}
@@ -138,7 +137,7 @@ export function TimeoutSettings() {
 
           {/* Shell Commands */}
           <div className="space-y-1">
-            <h3 className="text-sm font-medium text-theme-text-secondary mb-2">{t('timeouts.customActions')}</h3>
+            <h3 className="text-sm font-medium text-on-surface-variant mb-2">{t('timeouts.customActions')}</h3>
             <SettingSelect
               label={t('timeouts.shell')}
               description={t('timeouts.shellDesc')}
@@ -157,10 +156,10 @@ export function TimeoutSettings() {
           </div>
 
           {/* Reset to Defaults */}
-          <div className="mt-6 pt-6 border-t border-theme-border-secondary/50 flex justify-end">
+          <div className="mt-6 pt-6 border-t border-outline-variant/50 flex justify-end">
             <button
               onClick={handleResetDefaults}
-              className="text-xs text-theme-text-muted hover:text-theme-text-secondary transition-colors"
+              className="text-xs text-on-surface-variant hover:text-on-surface transition-colors"
             >
               {t('timeouts.resetDefaults')}
             </button>

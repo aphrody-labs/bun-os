@@ -71,7 +71,7 @@ export function CloseActionDialog({
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-theme-bg-primary/80 backdrop-blur-xs"
+          className="absolute inset-0 bg-scrim/40 backdrop-blur-xs"
           onClick={onCancel}
         />
 
@@ -80,37 +80,37 @@ export function CloseActionDialog({
           role="dialog"
           aria-modal="true"
           data-testid="close-action-dialog"
-          className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-xl shadow-2xl shadow-black/50 max-w-md w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-md w-full mx-4 p-6"
         >
           <div className="flex items-start gap-4 mb-4">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[rgba(var(--accent-primary-rgb),0.2)] text-theme-accent-primary">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/20 text-primary">
               <CloseIcon size="md" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-theme-text-primary">
+              <h3 className="text-lg font-semibold text-on-surface">
                 {t('closeAction.title')}
               </h3>
-              <p className="text-sm text-theme-text-secondary mt-1">
+              <p className="text-sm text-on-surface-variant mt-1">
                 {t('closeAction.description')}
               </p>
             </div>
           </div>
 
           {/* Remember choice checkbox - above buttons */}
-          <div className="mb-4 p-3 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg">
+          <div className="mb-4 p-3 bg-surface-container border border-outline-variant rounded-lg">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
                 checked={rememberChoice}
                 onChange={(e) => setRememberChoice(e.target.checked)}
-                className="w-4 h-4 rounded border-theme-border-secondary bg-theme-bg-tertiary text-theme-accent-primary focus:ring-theme-accent-primary focus:ring-offset-0"
+                className="w-4 h-4 rounded border-outline-variant bg-surface-container text-primary focus:ring-primary focus:ring-offset-0"
               />
-              <span className="text-sm text-theme-text-secondary">
+              <span className="text-sm text-on-surface-variant">
                 {t('closeAction.rememberChoice')}
               </span>
             </label>
             {rememberChoice && (
-              <p className="text-xs text-theme-text-muted mt-2 ml-7">
+              <p className="text-xs text-on-surface-variant mt-2 ml-7">
                 {t('closeAction.changeInSettings')}
               </p>
             )}
@@ -120,7 +120,7 @@ export function CloseActionDialog({
             <button
               onClick={handleMinimize}
               data-testid="close-dialog-minimize-button"
-              className="px-4 py-2 text-sm font-medium text-theme-text-secondary bg-theme-bg-tertiary hover:bg-theme-bg-hover rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-on-surface-variant bg-surface-container hover:bg-surface-container-high rounded-lg transition-colors flex items-center gap-2"
             >
               <MinimizeIcon size="sm" />
               {t('closeAction.minimizeToTray')}
@@ -128,7 +128,7 @@ export function CloseActionDialog({
             <button
               onClick={handleQuit}
               data-testid="close-dialog-quit-button"
-              className="px-4 py-2 text-sm font-medium text-white bg-theme-status-error hover:opacity-90 rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 text-sm font-medium text-on-error bg-error hover:opacity-90 rounded-lg transition-colors flex items-center gap-2"
             >
               <CloseIcon size="sm" />
               {t('closeAction.quit')}

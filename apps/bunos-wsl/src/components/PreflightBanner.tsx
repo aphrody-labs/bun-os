@@ -1,4 +1,4 @@
-import { open } from "@tauri-apps/plugin-shell";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { useTranslation } from "react-i18next";
 import { usePreflightStore } from "../store/preflightStore";
 import { NotificationBanner } from "./NotificationBanner";
@@ -41,7 +41,7 @@ export function PreflightBanner() {
 
   const handleHelpClick = () => {
     if (helpUrl) {
-      open(helpUrl);
+      openUrl(helpUrl);
     }
   };
 

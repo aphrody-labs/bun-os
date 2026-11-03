@@ -25,19 +25,19 @@ export function Toggle({
   return (
     <div className="flex items-center justify-between py-3" data-testid={testId ? `${testId}-container` : undefined}>
       <div>
-        <p className="text-sm font-medium text-theme-text-primary" data-testid={testId ? `${testId}-label` : undefined}>{label}</p>
-        {description && <p className="text-xs text-theme-text-muted">{description}</p>}
+        <p className="text-sm font-medium text-on-surface" data-testid={testId ? `${testId}-label` : undefined}>{label}</p>
+        {description && <p className="text-xs text-on-surface-variant">{description}</p>}
       </div>
       <button
         onClick={() => onChange(!checked)}
         disabled={disabled}
         data-testid={testId ? `${testId}-toggle` : undefined}
         className={`relative w-11 h-6 rounded-full transition-colors ${
-          checked ? "bg-theme-accent-primary" : "bg-theme-border-secondary"
+          checked ? "bg-primary" : "bg-outline-variant"
         } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
       >
         <div
-          className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
+          className={`absolute top-1 w-4 h-4 rounded-full bg-surface-container-lowest transition-transform ${
             checked ? "translate-x-6" : "translate-x-1"
           }`}
         />
@@ -66,8 +66,8 @@ export function SettingSelect({
 }) {
   return (
     <div className="py-3" data-testid={testId ? `${testId}-container` : undefined}>
-      <label className="block text-sm font-medium text-theme-text-primary mb-1">{label}</label>
-      {description && <p className="text-xs text-theme-text-muted mb-2">{description}</p>}
+      <label className="block text-sm font-medium text-on-surface mb-1">{label}</label>
+      {description && <p className="text-xs text-on-surface-variant mb-2">{description}</p>}
       <select
         value={value}
         onChange={(e) => {
@@ -77,7 +77,7 @@ export function SettingSelect({
         }}
         disabled={disabled}
         data-testid={testId}
-        className="w-full px-3 py-2 bg-theme-bg-secondary border border-theme-border-secondary rounded-lg text-theme-text-primary focus:outline-hidden focus:border-theme-accent-primary disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface focus:outline-hidden focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -115,8 +115,8 @@ export function SettingInput({
 }) {
   return (
     <div className="py-3" data-testid={testId ? `${testId}-container` : undefined}>
-      <label className="block text-sm font-medium text-theme-text-primary mb-1" data-testid={testId ? `${testId}-label` : undefined}>{label}</label>
-      {description && <p className="text-xs text-theme-text-muted mb-2">{description}</p>}
+      <label className="block text-sm font-medium text-on-surface mb-1" data-testid={testId ? `${testId}-label` : undefined}>{label}</label>
+      {description && <p className="text-xs text-on-surface-variant mb-2">{description}</p>}
       <input
         type={type}
         value={value}
@@ -125,7 +125,7 @@ export function SettingInput({
         min={min}
         step={step}
         data-testid={testId ? `${testId}-input` : undefined}
-        className={`w-full px-3 py-2 bg-theme-bg-secondary border border-theme-border-secondary rounded-lg text-theme-text-primary placeholder-theme-text-muted focus:outline-hidden focus:border-theme-accent-primary ${className}`}
+        className={`w-full px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary ${className}`}
       />
     </div>
   );
@@ -183,8 +183,8 @@ export function SettingPathInput({
 
   return (
     <div className="py-3" data-testid={testId ? `${testId}-container` : undefined}>
-      <label className="block text-sm font-medium text-theme-text-primary mb-1" data-testid={testId ? `${testId}-label` : undefined}>{label}</label>
-      {description && <p className="text-xs text-theme-text-muted mb-2">{description}</p>}
+      <label className="block text-sm font-medium text-on-surface mb-1" data-testid={testId ? `${testId}-label` : undefined}>{label}</label>
+      {description && <p className="text-xs text-on-surface-variant mb-2">{description}</p>}
       <div className="flex gap-2">
         <input
           type="text"
@@ -192,13 +192,13 @@ export function SettingPathInput({
           onChange={(e) => handleChange(e.target.value)}
           placeholder={placeholder}
           data-testid={testId ? `${testId}-input` : undefined}
-          className={`flex-1 px-3 py-2 bg-theme-bg-secondary border border-theme-border-secondary rounded-lg text-theme-text-primary placeholder-theme-text-muted focus:outline-hidden focus:border-theme-accent-primary ${className}`}
+          className={`flex-1 px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary ${className}`}
         />
         <button
           type="button"
           onClick={onBrowse}
           data-testid={testId ? `${testId}-browse` : undefined}
-          className="px-3 py-2 bg-theme-bg-tertiary hover:bg-theme-bg-hover border border-theme-border-secondary rounded-lg text-theme-text-secondary transition-colors"
+          className="px-3 py-2 bg-surface-container hover:bg-surface-container-high border border-outline-variant rounded-lg text-on-surface-variant transition-colors"
           title="Browse for folder"
         >
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>

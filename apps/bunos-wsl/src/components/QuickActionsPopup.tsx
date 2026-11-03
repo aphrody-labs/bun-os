@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { Distribution } from "../types/distribution";
 import type { CustomAction } from "../types/actions";
-import { ACTION_ICONS } from "../types/actions";
+import { actionSymbol } from "../types/actions";
+import { Icon } from "@aphrody/m3-primitives";
 import {
   FolderIcon,
   CodeIcon,
@@ -62,10 +63,6 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
     menuItems[nextIndex].focus();
   };
 
-  const getActionIcon = (iconId: string) => {
-    return ACTION_ICONS.find((actionIcon) => actionIcon.id === iconId)?.emoji || "⚡";
-  };
-
   // Built-in actions
   const builtInActions = [
     { id: "info", label: t("quickActions.info"), icon: <InfoIcon size="sm" /> },
@@ -91,9 +88,7 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
       onKeyDown={handleMenuKeyDown}
       role="menu"
     >
-      <div className="bg-theme-bg-secondary rounded-xl shadow-xl shadow-black/70 py-1 h-full overflow-y-auto">
-      {/* Top accent line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-theme-accent-primary/30 to-transparent" />
+      <div className="bg-surface-container-low rounded-xl shadow-xl shadow-shadow/70 py-1 h-full overflow-y-auto">
 
       {/* Built-in actions */}
       {builtInActions.map((action) => (
@@ -105,19 +100,19 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
           role="menuitem"
           className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left transition-all ${
             action.disabled
-              ? "text-theme-status-stopped cursor-not-allowed"
+              ? "text-outline cursor-not-allowed"
               : action.highlight
-              ? "text-[#f97316] hover:bg-[#f97316]/10"
-              : "text-theme-text-secondary hover:bg-theme-bg-tertiary hover:text-theme-text-primary"
+              ? "text-primary hover:bg-primary/8"
+              : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
           }`}
         >
-          <span className={action.highlight ? "text-[#f97316]" : "text-theme-text-muted"}>
+          <span className={action.highlight ? "text-primary" : "text-on-surface-variant"}>
             {action.icon}
           </span>
           {action.label}
           {action.requiresStopped && distro.state === "Running" && (
             <span
-              className="ml-auto text-theme-status-warning"
+              className="ml-auto text-warning"
               data-testid="requires-stop-indicator"
               title={t("customActions.requiresStop")}
             >
@@ -128,7 +123,7 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
       ))}
 
       {/* Manage Submenu */}
-      <div className="border-t border-theme-border-primary my-1" role="separator" />
+      <div className="border-t border-outline-variant my-1" role="separator" />
       <div className="relative">
         <button
           aria-expanded={showManageSubmenu}
@@ -136,17 +131,17 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
           onClick={() => setShowManageSubmenu((isVisible) => !isVisible)}
           data-testid="quick-action-manage"
           role="menuitem"
-          className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-left text-theme-text-secondary hover:bg-theme-bg-tertiary hover:text-theme-text-primary transition-all"
+          className="w-full flex items-center justify-between px-4 py-2.5 text-sm text-left text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
         >
           <span className="flex items-center gap-3">
-            <span className="text-theme-text-muted">
+            <span className="text-on-surface-variant">
               <SettingsIcon size="sm" />
             </span>
             {t("manage.title")}
           </span>
           <ChevronRightIcon
             size="sm"
-            className={`text-theme-text-muted transition-transform ${
+            className={`text-on-surface-variant transition-transform ${
               showManageSubmenu ? "rotate-90" : ""
             }`}
           />
@@ -155,7 +150,7 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
         {showManageSubmenu && (
           <div
             aria-label={t("manage.title")}
-            className="bg-theme-bg-primary/50 border-y border-theme-border-primary"
+            className="bg-surface/50 border-y border-outline-variant"
             role="menu"
           >
             {distro.version === 2 && (
@@ -163,12 +158,12 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
                 onClick={() => onAction("manage:move")}
                 data-testid="manage-action-move"
                 role="menuitem"
-                className="w-full flex items-center gap-3 px-6 py-2 text-sm text-left text-theme-text-secondary hover:bg-theme-bg-tertiary hover:text-theme-text-primary transition-all"
+                className="w-full flex items-center gap-3 px-6 py-2 text-sm text-left text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
               >
-                <span className="text-theme-text-muted"><FolderIcon size="sm" /></span>
+                <span className="text-on-surface-variant"><FolderIcon size="sm" /></span>
                 {t("manage.move")}
                 {distro.state === "Running" && (
-                  <span className="ml-auto text-theme-status-error" data-testid="requires-shutdown-indicator" title={t("customActions.requiresShutdown")}>
+                  <span className="ml-auto text-error" data-testid="requires-shutdown-indicator" title={t("customActions.requiresShutdown")}>
                     <PowerIcon size="sm" />
                   </span>
                 )}
@@ -179,12 +174,12 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
                 onClick={() => onAction("manage:resize")}
                 data-testid="manage-action-resize"
                 role="menuitem"
-                className="w-full flex items-center gap-3 px-6 py-2 text-sm text-left text-theme-text-secondary hover:bg-theme-bg-tertiary hover:text-theme-text-primary transition-all"
+                className="w-full flex items-center gap-3 px-6 py-2 text-sm text-left text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
               >
-                <span className="text-theme-text-muted"><ServerIcon size="sm" /></span>
+                <span className="text-on-surface-variant"><ServerIcon size="sm" /></span>
                 {t("manage.resize")}
                 {distro.state === "Running" && (
-                  <span className="ml-auto text-theme-status-error" data-testid="requires-shutdown-indicator" title={t("customActions.requiresShutdown")}>
+                  <span className="ml-auto text-error" data-testid="requires-shutdown-indicator" title={t("customActions.requiresShutdown")}>
                     <PowerIcon size="sm" />
                   </span>
                 )}
@@ -195,9 +190,9 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
                 onClick={() => onAction("manage:compact")}
                 data-testid="manage-action-compact"
                 role="menuitem"
-                className="w-full flex items-center gap-3 px-6 py-2 text-sm text-left text-theme-text-secondary hover:bg-theme-bg-tertiary hover:text-theme-text-primary transition-all"
+                className="w-full flex items-center gap-3 px-6 py-2 text-sm text-left text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
               >
-                <span className="text-theme-text-muted"><CompressIcon size="sm" /></span>
+                <span className="text-on-surface-variant"><CompressIcon size="sm" /></span>
                 {t("manage.compact")}
               </button>
             )}
@@ -205,9 +200,9 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
               onClick={() => onAction("manage:user")}
               data-testid="manage-action-user"
               role="menuitem"
-              className="w-full flex items-center gap-3 px-6 py-2 text-sm text-left text-theme-text-secondary hover:bg-theme-bg-tertiary hover:text-theme-text-primary transition-all"
+              className="w-full flex items-center gap-3 px-6 py-2 text-sm text-left text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
             >
-              <span className="text-theme-text-muted"><UserIcon size="sm" /></span>
+              <span className="text-on-surface-variant"><UserIcon size="sm" /></span>
               {t("manage.user")}
             </button>
             <button
@@ -217,18 +212,18 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
               role="menuitem"
               className={`w-full flex items-center gap-3 px-6 py-2 text-sm text-left transition-all ${
                 !distro.id
-                  ? "text-theme-status-stopped cursor-not-allowed"
-                  : "text-theme-text-secondary hover:bg-theme-bg-tertiary hover:text-theme-text-primary"
+                  ? "text-outline cursor-not-allowed"
+                  : "text-on-surface-variant hover:bg-surface-container hover:text-on-surface"
               }`}
             >
-              <span className="text-theme-text-muted">
+              <span className="text-on-surface-variant">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
               </span>
               {t("manage.rename")}
               {distro.state === "Running" && (
-                <span className="ml-auto text-theme-status-warning" data-testid="requires-stop-indicator" title={t("customActions.requiresStop")}>
+                <span className="ml-auto text-warning" data-testid="requires-stop-indicator" title={t("customActions.requiresStop")}>
                   <PauseIcon size="sm" />
                 </span>
               )}
@@ -239,14 +234,14 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
                 onClick={() => onAction(enabled ? "manage:sparse-enable" : "manage:sparse-disable")}
                 data-testid={enabled ? "manage-action-sparse" : "manage-action-sparse-disable"}
                 role="menuitem"
-                className="w-full flex items-center justify-between px-6 py-2 text-sm text-left text-theme-text-secondary hover:bg-theme-bg-tertiary hover:text-theme-text-primary transition-all"
+                className="w-full flex items-center justify-between px-6 py-2 text-sm text-left text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
               >
                 <span className="flex items-center gap-3">
-                  <span className="text-theme-text-muted"><SparklesIcon size="sm" /></span>
+                  <span className="text-on-surface-variant"><SparklesIcon size="sm" /></span>
                   {t(enabled ? "manage.sparseEnable" : "manage.sparseDisable")}
                 </span>
                 {distro.state === "Running" && (
-                  <span className="text-theme-status-error" data-testid="requires-shutdown-indicator" title={t("customActions.requiresShutdown")}>
+                  <span className="text-error" data-testid="requires-shutdown-indicator" title={t("customActions.requiresShutdown")}>
                     <PowerIcon size="sm" />
                   </span>
                 )}
@@ -256,10 +251,10 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
               onClick={() => onAction("manage:setVersion")}
               data-testid="manage-action-set-version"
               role="menuitem"
-              className="w-full flex items-center justify-between px-6 py-2 text-sm text-left text-theme-text-secondary hover:bg-theme-bg-tertiary hover:text-theme-text-primary transition-all"
+              className="w-full flex items-center justify-between px-6 py-2 text-sm text-left text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
             >
               <span className="flex items-center gap-3">
-                <span className="text-theme-text-muted">
+                <span className="text-on-surface-variant">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                   </svg>
@@ -267,11 +262,11 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
                 {t("manage.version")}
               </span>
               <span className="ml-auto flex items-center gap-2">
-                <span className="text-xs px-2 py-0.5 rounded bg-theme-bg-tertiary text-theme-text-muted border border-theme-border-secondary">
+                <span className="text-xs px-2 py-0.5 rounded bg-surface-container text-on-surface-variant border border-outline-variant">
                   v{distro.version}
                 </span>
                 {distro.state === "Running" && (
-                  <span className="text-theme-status-warning" data-testid="requires-stop-indicator" title={t("customActions.requiresStop")}>
+                  <span className="text-warning" data-testid="requires-stop-indicator" title={t("customActions.requiresStop")}>
                     <PauseIcon size="sm" />
                   </span>
                 )}
@@ -284,8 +279,8 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
       {/* Custom Actions */}
       {actions.length > 0 && (
         <>
-          <div className="border-t border-theme-border-primary my-1" role="separator" />
-          <div className="px-4 py-1.5 text-xs text-theme-text-muted uppercase tracking-wider font-mono">
+          <div className="border-t border-outline-variant my-1" role="separator" />
+          <div className="px-4 py-1.5 text-xs text-on-surface-variant uppercase tracking-wider font-mono">
             {t("customActions.title")}
           </div>
           {actions.map((action) => (
@@ -294,20 +289,18 @@ export function QuickActionsPopup({ distro, actions, onAction }: QuickActionsPop
               onClick={() => onAction(`custom:${action.id}`)}
               data-testid={`quick-action-custom-${action.id}`}
               role="menuitem"
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left text-theme-text-secondary hover:bg-theme-bg-tertiary hover:text-theme-text-primary transition-all"
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-left text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-all"
             >
-              <span className="text-base">{getActionIcon(action.icon)}</span>
+              <Icon name={actionSymbol(action.icon)} size={20} />
               {action.name}
               <div className="ml-auto flex items-center gap-1.5">
                 {action.requiresStopped && distro.state === "Running" && (
-                  <span className="text-theme-status-warning" data-testid="requires-stop-indicator" title={t("customActions.requiresStop")}>
+                  <span className="text-warning" data-testid="requires-stop-indicator" title={t("customActions.requiresStop")}>
                     <PauseIcon size="sm" />
                   </span>
                 )}
                 {action.requiresSudo && (
-                  <span className="text-xs text-theme-text-muted opacity-60" title={t("requiresSudo")}>
-                    🔒
-                  </span>
+                  <Icon name="lock" size={16} className="text-on-surface-variant" label={t("requiresSudo")} />
                 )}
               </div>
             </button>

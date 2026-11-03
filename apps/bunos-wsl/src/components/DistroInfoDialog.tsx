@@ -18,7 +18,7 @@ import {
   CPUIcon,
   SettingsIcon,
 } from "./icons";
-import { open } from "@tauri-apps/plugin-shell";
+import { openUrl } from "@tauri-apps/plugin-opener";
 import { wslService } from "../services/wslService";
 
 interface DistroInfoDialogProps {
@@ -96,10 +96,10 @@ interface InfoRowProps {
 
 function InfoRow({ label, value, testId }: InfoRowProps) {
   return (
-    <div className="flex justify-between items-start py-2 border-b border-theme-border-secondary/50 last:border-b-0">
-      <span className="text-theme-text-secondary text-sm">{label}</span>
+    <div className="flex justify-between items-start py-2 border-b border-outline-variant/50 last:border-b-0">
+      <span className="text-on-surface-variant text-sm">{label}</span>
       <span
-        className="text-theme-text-primary text-sm text-right max-w-[60%] break-all"
+        className="text-on-surface text-sm text-right max-w-[60%] break-all"
         data-testid={testId}
       >
         {value}
@@ -130,12 +130,12 @@ function CopyButton({ text, label }: CopyButtonProps) {
   return (
     <button
       onClick={handleCopy}
-      className="ml-2 p-1.5 text-theme-text-tertiary hover:text-theme-accent-primary hover:bg-theme-accent-primary/10 transition-all rounded-md border border-transparent hover:border-theme-accent-primary/30"
+      className="ml-2 p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary/10 transition-all rounded-md border border-transparent hover:border-primary/30"
       title={copied ? t('common:label.copied') : t('distroInfo.copyToClipboard', { field: label || "" })}
       data-testid="copy-button"
     >
       {copied ? (
-        <CheckIcon size="sm" className="text-theme-status-success" />
+        <CheckIcon size="sm" className="text-success" />
       ) : (
         <CopyIcon size="sm" />
       )}
@@ -208,7 +208,7 @@ export function DistroInfoDialog({
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-theme-bg-primary/80 backdrop-blur-xs"
+          className="absolute inset-0 bg-scrim/40 backdrop-blur-xs"
           onClick={onClose}
         />
 
@@ -217,7 +217,7 @@ export function DistroInfoDialog({
           role="dialog"
           aria-modal="true"
           data-testid="distro-info-dialog"
-          className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-xl shadow-2xl shadow-black/50 max-w-2xl w-full mx-4 p-6 max-h-[85vh] overflow-y-auto"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-2xl w-full mx-4 p-6 max-h-[85vh] overflow-y-auto"
         >
           {/* Header */}
           <div className="flex items-center gap-3 mb-6">
@@ -228,10 +228,10 @@ export function DistroInfoDialog({
               <InfoIcon size="lg" style={{ color: sourceColor }} />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-theme-text-primary">
+              <h2 className="text-xl font-semibold text-on-surface">
                 {distro.name}
               </h2>
-              <p className="text-sm text-theme-text-secondary">
+              <p className="text-sm text-on-surface-variant">
                 {t('distroInfo.subtitle')}
               </p>
             </div>
@@ -239,23 +239,23 @@ export function DistroInfoDialog({
 
           {/* Identity Section */}
           <div className="mb-5">
-            <h3 className="text-sm font-medium text-theme-text-tertiary uppercase tracking-wider mb-2">
+            <h3 className="text-sm font-medium text-on-surface-variant uppercase tracking-wider mb-2">
               {t('distroInfo.identity')}
             </h3>
-            <div className="bg-theme-bg-tertiary/50 rounded-lg px-4 py-1">
+            <div className="bg-surface-container/50 rounded-lg px-4 py-1">
               <InfoRow label={t('distroInfo.name')} value={distro.name} testId="info-name" />
               <InfoRow
                 label={t('distroInfo.distributionId')}
                 value={
                   distro.id ? (
                     <span className="flex items-center">
-                      <code className="text-xs font-mono bg-theme-bg-primary/50 px-1.5 py-0.5 rounded">
+                      <code className="text-xs font-mono bg-surface/50 px-1.5 py-0.5 rounded">
                         {distro.id}
                       </code>
                       <CopyButton text={distro.id} label="ID" />
                     </span>
                   ) : (
-                    <span className="text-theme-text-tertiary">—</span>
+                    <span className="text-on-surface-variant">—</span>
                   )
                 }
                 testId="info-id"
@@ -269,7 +269,7 @@ export function DistroInfoDialog({
                 label={t('distroInfo.default')}
                 value={
                   distro.isDefault ? (
-                    <span className="text-theme-status-success">{t('common:label.yes')}</span>
+                    <span className="text-success">{t('common:label.yes')}</span>
                   ) : (
                     t('common:label.no')
                   )
@@ -281,10 +281,10 @@ export function DistroInfoDialog({
 
           {/* Location Section */}
           <div className="mb-5">
-            <h3 className="text-sm font-medium text-theme-text-tertiary uppercase tracking-wider mb-2">
+            <h3 className="text-sm font-medium text-on-surface-variant uppercase tracking-wider mb-2">
               {t('distroInfo.storage')}
             </h3>
-            <div className="bg-theme-bg-tertiary/50 rounded-lg px-4 py-1">
+            <div className="bg-surface-container/50 rounded-lg px-4 py-1">
               <InfoRow
                 label={t('distroInfo.installLocation')}
                 value={
@@ -292,7 +292,7 @@ export function DistroInfoDialog({
                     <span className="flex items-center gap-1">
                       <button
                         onClick={() => wslService.openFolder(stripExtendedPathPrefix(distro.location!))}
-                        className="truncate max-w-[320px] font-mono text-xs text-theme-accent-primary hover:underline cursor-pointer text-left"
+                        className="truncate max-w-[320px] font-mono text-xs text-primary hover:underline cursor-pointer text-left"
                         title={stripExtendedPathPrefix(distro.location)}
                       >
                         {stripExtendedPathPrefix(distro.location)}
@@ -300,7 +300,7 @@ export function DistroInfoDialog({
                       <CopyButton text={stripExtendedPathPrefix(distro.location)} label="path" />
                     </span>
                   ) : (
-                    <span className="text-theme-text-tertiary">—</span>
+                    <span className="text-on-surface-variant">—</span>
                   )
                 }
                 testId="info-location"
@@ -311,7 +311,7 @@ export function DistroInfoDialog({
                   distro.diskSize ? (
                     formatBytes(distro.diskSize)
                   ) : (
-                    <span className="text-theme-text-tertiary">—</span>
+                    <span className="text-on-surface-variant">—</span>
                   )
                 }
                 testId="info-disk-size"
@@ -321,10 +321,10 @@ export function DistroInfoDialog({
 
           {/* Source Section */}
           <div className="mb-5">
-            <h3 className="text-sm font-medium text-theme-text-tertiary uppercase tracking-wider mb-2">
+            <h3 className="text-sm font-medium text-on-surface-variant uppercase tracking-wider mb-2">
               {t('distroInfo.source')}
             </h3>
-            <div className="bg-theme-bg-tertiary/50 rounded-lg px-4 py-1">
+            <div className="bg-surface-container/50 rounded-lg px-4 py-1">
               <InfoRow
                 label={t('distroInfo.installSource')}
                 value={
@@ -346,8 +346,8 @@ export function DistroInfoDialog({
                         // Download URLs are clickable
                         <>
                           <button
-                            onClick={() => open(sourceReference)}
-                            className="truncate max-w-[320px] font-mono text-xs text-theme-accent-primary hover:underline cursor-pointer text-left"
+                            onClick={() => openUrl(sourceReference)}
+                            className="truncate max-w-[320px] font-mono text-xs text-primary hover:underline cursor-pointer text-left"
                             title={sourceReference}
                           >
                             {sourceReference}
@@ -376,11 +376,11 @@ export function DistroInfoDialog({
                 value={
                   metadata?.installedAt ? (
                     <span className="flex items-center gap-1">
-                      <ClockIcon size="sm" className="text-theme-text-tertiary" />
+                      <ClockIcon size="sm" className="text-on-surface-variant" />
                       {formatDate(metadata.installedAt)}
                     </span>
                   ) : (
-                    <span className="text-theme-text-tertiary">—</span>
+                    <span className="text-on-surface-variant">—</span>
                   )
                 }
                 testId="info-installed-at"
@@ -391,20 +391,20 @@ export function DistroInfoDialog({
           {/* Runtime Section (only shown when running) */}
           {isRunning && (
             <div className="mb-5">
-              <h3 className="text-sm font-medium text-theme-text-tertiary uppercase tracking-wider mb-2">
+              <h3 className="text-sm font-medium text-on-surface-variant uppercase tracking-wider mb-2">
                 {t('distroInfo.runtime')}
               </h3>
-              <div className="bg-theme-bg-tertiary/50 rounded-lg px-4 py-1">
+              <div className="bg-surface-container/50 rounded-lg px-4 py-1">
                 <InfoRow
                   label={t('distroInfo.operatingSystem')}
                   value={
                     distro.osInfo ? (
                       <span className="flex items-center gap-1">
-                        <ServerIcon size="sm" className="text-theme-text-tertiary" />
+                        <ServerIcon size="sm" className="text-on-surface-variant" />
                         {distro.osInfo}
                       </span>
                     ) : (
-                      <span className="text-theme-text-tertiary">—</span>
+                      <span className="text-on-surface-variant">—</span>
                     )
                   }
                   testId="info-os"
@@ -421,7 +421,7 @@ export function DistroInfoDialog({
                         label={t('distroInfo.cpuUsage')}
                         value={
                           <span className="flex items-center gap-1">
-                            <CPUIcon size="sm" className="text-theme-text-tertiary" />
+                            <CPUIcon size="sm" className="text-on-surface-variant" />
                             {resources.cpuPercent.toFixed(1)}%
                           </span>
                         }
@@ -438,24 +438,24 @@ export function DistroInfoDialog({
           {isRunning && (
             <div className="mb-5">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-medium text-theme-text-tertiary uppercase tracking-wider flex items-center gap-2">
-                  <SettingsIcon size="sm" className="text-theme-text-tertiary" />
+                <h3 className="text-sm font-medium text-on-surface-variant uppercase tracking-wider flex items-center gap-2">
+                  <SettingsIcon size="sm" className="text-on-surface-variant" />
                   {t('distroInfo.configuration')}
                 </h3>
-                <span className="text-xs text-theme-text-tertiary font-mono">/etc/wsl.conf</span>
+                <span className="text-xs text-on-surface-variant font-mono">/etc/wsl.conf</span>
               </div>
-              <div className="bg-theme-bg-tertiary/50 rounded-lg p-4">
+              <div className="bg-surface-container/50 rounded-lg p-4">
                 {wslConfLoading ? (
-                  <div className="text-theme-text-tertiary text-sm flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-theme-text-tertiary/30 border-t-theme-text-tertiary rounded-full animate-spin" />
+                  <div className="text-on-surface-variant text-sm flex items-center gap-2">
+                    <div className="w-4 h-4 border-2 border-on-surface-variant/30 border-t-on-surface-variant rounded-full animate-spin" />
                     {t('distroInfo.loadingConfig')}
                   </div>
                 ) : wslConfError ? (
-                  <div className="text-theme-status-error text-sm">{wslConfError}</div>
+                  <div className="text-error text-sm">{wslConfError}</div>
                 ) : wslConfRaw ? (
                   <div className="relative group">
                     <pre
-                      className="text-xs font-mono text-theme-text-primary overflow-x-auto whitespace-pre"
+                      className="text-xs font-mono text-on-surface overflow-x-auto whitespace-pre"
                       data-testid="wsl-conf-content"
                     >
                       {wslConfRaw}
@@ -465,7 +465,7 @@ export function DistroInfoDialog({
                     </div>
                   </div>
                 ) : (
-                  <div className="text-theme-text-tertiary text-sm italic">
+                  <div className="text-on-surface-variant text-sm italic">
                     {t('distroInfo.noConfig')}
                   </div>
                 )}
@@ -478,7 +478,7 @@ export function DistroInfoDialog({
             <button
               onClick={onClose}
               data-testid="info-close-button"
-              className="px-4 py-2 text-sm font-medium text-theme-text-secondary bg-theme-bg-tertiary hover:bg-theme-bg-hover rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-on-surface-variant bg-surface-container hover:bg-surface-container-high rounded-lg transition-colors"
             >
               {t('common:button.close')}
             </button>

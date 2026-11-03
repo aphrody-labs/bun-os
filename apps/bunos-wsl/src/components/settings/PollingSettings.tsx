@@ -52,32 +52,31 @@ export function PollingSettings() {
   return (
     <div className="space-y-8">
       {/* Polling Section Header */}
-      <section className="relative overflow-hidden bg-linear-to-br from-blue-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-blue-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
+      <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
-              <RefreshIcon size="md" className="text-white" />
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+              <RefreshIcon size="md" className="text-on-primary-container" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-theme-text-primary">{t('polling.title')}</h2>
-              <p className="text-sm text-theme-text-muted">{t('polling.description')}</p>
+              <h2 className="text-lg font-medium text-on-surface">{t('polling.title')}</h2>
+              <p className="text-sm text-on-surface-variant">{t('polling.description')}</p>
             </div>
           </div>
 
           {/* Backoff Warning */}
           {isBackedOff && (
-            <div className="mb-6 p-4 bg-[rgba(var(--status-warning-rgb),0.15)] border border-[rgba(var(--status-warning-rgb),0.3)] rounded-lg">
+            <div className="mb-6 p-4 bg-warning/15 border border-warning/30 rounded-lg">
               <div className="flex items-start gap-3">
-                <WarningIcon size="md" className="text-theme-status-warning mt-0.5 flex-shrink-0" />
+                <WarningIcon size="md" className="text-warning mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-theme-status-warning">{t('polling.backoffWarning')}</p>
-                  <p className="text-xs text-theme-status-warning/80 mt-1">
+                  <p className="text-sm font-medium text-warning">{t('polling.backoffWarning')}</p>
+                  <p className="text-xs text-warning/80 mt-1">
                     {t('polling.backoffDesc')}
                   </p>
                   <button
                     onClick={resetAllBackoff}
-                    className="mt-2 text-xs text-theme-status-warning hover:text-theme-status-warning/90 underline"
+                    className="mt-2 text-xs text-warning hover:text-warning/90 underline"
                   >
                     {t('polling.resetBackoff')}
                   </button>
@@ -87,7 +86,7 @@ export function PollingSettings() {
           )}
 
           {/* Enable/Disable Toggle */}
-          <div className="mb-6 pb-6 border-b border-theme-border-secondary/50">
+          <div className="mb-6 pb-6 border-b border-outline-variant/50">
             <Toggle
               label={t('polling.enabled')}
               description={t('polling.enabledDesc')}
@@ -130,14 +129,14 @@ export function PollingSettings() {
           </div>
 
           {/* Current Status */}
-          <div className="mt-6 pt-6 border-t border-theme-border-secondary/50">
-            <p className="text-xs text-theme-text-muted mb-3">{t('polling.currentStatus')}</p>
+          <div className="mt-6 pt-6 border-t border-outline-variant/50">
+            <p className="text-xs text-on-surface-variant mb-3">{t('polling.currentStatus')}</p>
             <div className="grid grid-cols-3 gap-3 text-xs">
-              <div className="p-2 bg-theme-bg-tertiary/50 rounded-md">
-                <div className="text-theme-text-secondary">{t('polling.distros')}</div>
-                <div className="text-theme-text-primary font-mono">
+              <div className="p-2 bg-surface-container/50 rounded-md">
+                <div className="text-on-surface-variant">{t('polling.distros')}</div>
+                <div className="text-on-surface font-mono">
                   {polls.distros.consecutiveTimeouts > 0 ? (
-                    <span className="text-theme-status-warning">
+                    <span className="text-warning">
                       {t('polling.backedOff', { interval: Math.round(polls.distros.currentInterval / 1000) })}
                     </span>
                   ) : (
@@ -145,11 +144,11 @@ export function PollingSettings() {
                   )}
                 </div>
               </div>
-              <div className="p-2 bg-theme-bg-tertiary/50 rounded-md">
-                <div className="text-theme-text-secondary">{t('polling.resources')}</div>
-                <div className="text-theme-text-primary font-mono">
+              <div className="p-2 bg-surface-container/50 rounded-md">
+                <div className="text-on-surface-variant">{t('polling.resources')}</div>
+                <div className="text-on-surface font-mono">
                   {polls.resources.consecutiveTimeouts > 0 ? (
-                    <span className="text-theme-status-warning">
+                    <span className="text-warning">
                       {t('polling.backedOff', { interval: Math.round(polls.resources.currentInterval / 1000) })}
                     </span>
                   ) : (
@@ -157,11 +156,11 @@ export function PollingSettings() {
                   )}
                 </div>
               </div>
-              <div className="p-2 bg-theme-bg-tertiary/50 rounded-md">
-                <div className="text-theme-text-secondary">{t('polling.health')}</div>
-                <div className="text-theme-text-primary font-mono">
+              <div className="p-2 bg-surface-container/50 rounded-md">
+                <div className="text-on-surface-variant">{t('polling.health')}</div>
+                <div className="text-on-surface font-mono">
                   {polls.health.consecutiveTimeouts > 0 ? (
-                    <span className="text-theme-status-warning">
+                    <span className="text-warning">
                       {t('polling.backedOff', { interval: Math.round(polls.health.currentInterval / 1000) })}
                     </span>
                   ) : (
@@ -176,13 +175,13 @@ export function PollingSettings() {
           <div className="mt-4 flex justify-end">
             <button
               onClick={handleResetDefaults}
-              className="text-xs text-theme-text-muted hover:text-theme-text-secondary transition-colors"
+              className="text-xs text-on-surface-variant hover:text-on-surface transition-colors"
             >
               {t('polling.resetDefaults')}
             </button>
           </div>
 
-          <p className="mt-4 text-xs text-theme-text-muted">
+          <p className="mt-4 text-xs text-on-surface-variant">
             {t('polling.tip')}
           </p>
         </div>

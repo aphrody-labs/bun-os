@@ -88,7 +88,7 @@ export function StopAndActionDialog({
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-theme-bg-primary/80 backdrop-blur-xs"
+          className="absolute inset-0 bg-scrim/40 backdrop-blur-xs"
           onClick={handleCancel}
         />
 
@@ -97,31 +97,31 @@ export function StopAndActionDialog({
           role="dialog"
           aria-modal="true"
           data-testid="stop-and-action-dialog"
-          className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-xl shadow-2xl shadow-black/50 max-w-md w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-md w-full mx-4 p-6"
         >
           <div className="flex items-start gap-4 mb-4">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
               requiresShutdown
-                ? "bg-[rgba(var(--status-error-rgb),0.2)] text-theme-status-error"
-                : "bg-[rgba(var(--status-warning-rgb),0.2)] text-theme-status-warning"
+                ? "bg-error/20 text-error"
+                : "bg-warning/20 text-warning"
             }`}>
               {requiresShutdown ? <PowerIcon size="md" /> : <PauseIcon size="md" />}
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-theme-text-primary">
+              <h3 className="text-lg font-semibold text-on-surface">
                 {requiresShutdown ? t('stopAction.titleShutdown') : t('stopAction.titleStop')}
               </h3>
-              <p className="text-sm text-theme-text-secondary mt-1">
-                <span className="font-medium text-theme-text-primary">{actionName}</span>{" "}
+              <p className="text-sm text-on-surface-variant mt-1">
+                <span className="font-medium text-on-surface">{actionName}</span>{" "}
                 {t('stopAction.requires')}{" "}
                 {requiresShutdown ? (
                   <>
-                    <span className="font-medium text-theme-status-error">{t('stopAction.allDistros')}</span>{" "}
+                    <span className="font-medium text-error">{t('stopAction.allDistros')}</span>{" "}
                     {t('stopAction.shutdownReason')}
                   </>
                 ) : (
                   <>
-                    <span className="font-medium text-theme-status-warning">{distroName}</span>{" "}
+                    <span className="font-medium text-warning">{distroName}</span>{" "}
                     {t('stopAction.stopReason')}
                   </>
                 )}
@@ -130,18 +130,18 @@ export function StopAndActionDialog({
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-[rgba(var(--status-error-rgb),0.2)] border border-[rgba(var(--status-error-rgb),0.4)] rounded-lg flex items-start gap-2">
-              <WarningIcon size="sm" className="text-theme-status-error mt-0.5 shrink-0" />
-              <span className="text-theme-status-error text-sm">{error}</span>
+            <div className="mb-4 p-3 bg-error/20 border border-error/40 rounded-lg flex items-start gap-2">
+              <WarningIcon size="sm" className="text-error mt-0.5 shrink-0" />
+              <span className="text-error text-sm">{error}</span>
             </div>
           )}
 
           {isStopping && (
             <div
               data-testid="stop-dialog-loading"
-              className="mb-4 p-3 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg"
+              className="mb-4 p-3 bg-surface-container border border-outline-variant rounded-lg"
             >
-              <div className="flex items-center gap-3 text-theme-text-secondary text-sm">
+              <div className="flex items-center gap-3 text-on-surface-variant text-sm">
                 <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle
                     className="opacity-25"
@@ -167,7 +167,7 @@ export function StopAndActionDialog({
               onClick={handleCancel}
               disabled={isStopping}
               data-testid="stop-dialog-cancel-button"
-              className="px-4 py-2 text-sm font-medium text-theme-text-secondary bg-theme-bg-tertiary hover:bg-theme-bg-hover rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 text-sm font-medium text-on-surface-variant bg-surface-container hover:bg-surface-container-high rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {t('common:button.cancel')}
             </button>
@@ -175,8 +175,8 @@ export function StopAndActionDialog({
               onClick={handleStopAndContinue}
               disabled={isStopping}
               data-testid="stop-and-continue-button"
-              className={`px-4 py-2 text-sm font-medium hover:opacity-90 text-theme-bg-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
-                requiresShutdown ? "bg-theme-status-error" : "bg-theme-status-warning"
+              className={`px-4 py-2 text-sm font-medium hover:opacity-90 text-surface rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
+                requiresShutdown ? "bg-error" : "bg-warning"
               }`}
             >
               {isStopping ? (

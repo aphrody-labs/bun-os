@@ -1,264 +1,195 @@
 /**
  * Theme Settings Component
  *
- * Allows users to select from built-in themes or customize their own.
+ * Light/dark mode, a built-in seed or a custom seed with its scheme variant and contrast level.
+ * Every colour shown in the UI is derived from the chosen seed by the Material 3 engine.
  */
 
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useTheme } from "../../themes";
-import type { ThemeColors, ThemeId } from "../../themes";
-import { PaletteIcon, CheckIcon, ResetIcon, ChevronDownIcon, ChevronUpIcon } from "../icons";
+import { CONTRAST_LEVELS, CUSTOM_VARIANTS, useTheme } from "../../themes";
+import type { ThemeId, ThemeMode } from "../../themes";
+import { PaletteIcon, CheckIcon, ResetIcon } from "../icons";
 
-// Color groups for the custom theme editor
-const COLOR_GROUP_KEYS = [
-  {
-    nameKey: "theme.colors.background",
-    colors: [
-      { key: "bgPrimary" as const, labelKey: "theme.colors.primary" },
-      { key: "bgSecondary" as const, labelKey: "theme.colors.secondary" },
-      { key: "bgTertiary" as const, labelKey: "theme.colors.tertiary" },
-      { key: "bgHover" as const, labelKey: "theme.colors.hover" },
-      { key: "bgSelected" as const, labelKey: "theme.colors.selected" },
-    ],
-  },
-  {
-    nameKey: "theme.colors.text",
-    colors: [
-      { key: "textPrimary" as const, labelKey: "theme.colors.primary" },
-      { key: "textSecondary" as const, labelKey: "theme.colors.secondary" },
-      { key: "textMuted" as const, labelKey: "theme.colors.muted" },
-      { key: "textAccent" as const, labelKey: "theme.colors.accent" },
-    ],
-  },
-  {
-    nameKey: "theme.colors.border",
-    colors: [
-      { key: "borderPrimary" as const, labelKey: "theme.colors.primary" },
-      { key: "borderSecondary" as const, labelKey: "theme.colors.secondary" },
-      { key: "borderAccent" as const, labelKey: "theme.colors.accent" },
-    ],
-  },
-  {
-    nameKey: "theme.colors.accent",
-    colors: [
-      { key: "accentPrimary" as const, labelKey: "theme.colors.primary" },
-      { key: "accentSecondary" as const, labelKey: "theme.colors.secondary" },
-    ],
-  },
-  {
-    nameKey: "theme.colors.status",
-    colors: [
-      { key: "statusRunning" as const, labelKey: "theme.colors.running" },
-      { key: "statusStopped" as const, labelKey: "theme.colors.stopped" },
-      { key: "statusWarning" as const, labelKey: "theme.colors.warning" },
-      { key: "statusError" as const, labelKey: "theme.colors.error" },
-      { key: "statusSuccess" as const, labelKey: "theme.colors.success" },
-    ],
-  },
-  {
-    nameKey: "theme.colors.buttons",
-    colors: [
-      { key: "buttonPrimary" as const, labelKey: "theme.colors.primary" },
-      { key: "buttonPrimaryHover" as const, labelKey: "theme.colors.primaryHover" },
-      { key: "buttonSecondary" as const, labelKey: "theme.colors.secondary" },
-      { key: "buttonSecondaryHover" as const, labelKey: "theme.colors.secondaryHover" },
-      { key: "buttonDanger" as const, labelKey: "theme.colors.danger" },
-      { key: "buttonDangerHover" as const, labelKey: "theme.colors.dangerHover" },
-    ],
-  },
-  {
-    nameKey: "theme.colors.scrollbar",
-    colors: [
-      { key: "scrollbarTrack" as const, labelKey: "theme.colors.track" },
-      { key: "scrollbarThumb" as const, labelKey: "theme.colors.thumb" },
-      { key: "scrollbarThumbHover" as const, labelKey: "theme.colors.thumbHover" },
-    ],
-  },
-];
+const MODES: readonly ThemeMode[] = ["system", "light", "dark"];
 
-interface ColorPickerProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}
-
-function ColorPicker({ label, value, onChange }: ColorPickerProps) {
-  return (
-    <div className="flex items-center gap-3">
-      <label className="flex-1 text-sm text-(--text-secondary)">{label}</label>
-      <div className="flex items-center gap-2">
-        <input
-          type="color"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-8 h-8 rounded-sm cursor-pointer border border-(--border-secondary) bg-transparent"
-        />
-        <input
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-20 px-2 py-1 text-xs font-mono bg-(--bg-tertiary) border border-(--border-secondary) rounded-sm text-(--text-primary)"
-        />
-      </div>
-    </div>
-  );
-}
-
-interface ColorGroupProps {
-  name: string;
-  colors: { key: keyof ThemeColors; label: string }[];
-  values: ThemeColors;
-  onChange: (key: keyof ThemeColors, value: string) => void;
-}
-
-function ColorGroup({ name, colors, values, onChange }: ColorGroupProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  return (
-    <div className="border border-(--border-primary) rounded-lg overflow-hidden">
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full flex items-center justify-between px-4 py-3 bg-(--bg-tertiary) hover:bg-(--bg-hover) transition-colors"
-      >
-        <span className="text-sm font-medium text-(--text-primary)">{name}</span>
-        {isExpanded ? (
-          <ChevronUpIcon size="sm" className="text-(--text-muted)" />
-        ) : (
-          <ChevronDownIcon size="sm" className="text-(--text-muted)" />
-        )}
-      </button>
-      {isExpanded && (
-        <div className="p-4 space-y-3 bg-(--bg-secondary)">
-          {colors.map(({ key, label }) => (
-            <ColorPicker
-              key={key}
-              label={label}
-              value={values[key]}
-              onChange={(value) => onChange(key, value)}
-            />
-          ))}
-        </div>
-      )}
-    </div>
-  );
+function optionClass(selected: boolean): string {
+  return `px-3 py-2 text-sm rounded-lg border transition-colors ${
+    selected
+      ? "border-primary bg-secondary-container text-on-secondary-container"
+      : "border-outline-variant text-on-surface-variant hover:bg-on-surface/8"
+  }`;
 }
 
 export function ThemeSettings() {
   const { t } = useTranslation("settings");
-  const { themeId, setTheme, availableThemes, customColors, updateCustomColors, resetCustomColors } =
+  const { themeId, setTheme, mode, setMode, availableThemes, customSeed, updateCustomSeed, resetCustomSeed, schemeError } =
     useTheme();
-
-  const handleThemeSelect = (id: ThemeId) => {
-    setTheme(id);
-  };
-
-  const handleColorChange = (key: keyof ThemeColors, value: string) => {
-    updateCustomColors({ [key]: value });
-  };
 
   return (
     <div className="space-y-8">
-      {/* Theme Section Header */}
-      <section className="relative overflow-hidden bg-linear-to-br from-purple-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-purple-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
-        <div className="relative">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-900/30">
-              <PaletteIcon size="md" className="text-white" />
-            </div>
-            <div>
-              <h2 className="text-lg font-medium text-(--text-primary)">{t('theme.title')}</h2>
-              <p className="text-sm text-(--text-muted)">{t('theme.description')}</p>
-            </div>
+      <section className="bg-surface-container-low border border-outline-variant rounded-xl p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+            <PaletteIcon size="md" className="text-on-primary-container" />
           </div>
-
-          {/* Theme Grid */}
-          <div className="grid grid-cols-2 gap-3">
-            {availableThemes.map((theme) => {
-              const isSelected = themeId === theme.id;
-              const colors = theme.colors;
-
-              return (
-                <button
-                  key={theme.id}
-                  onClick={() => handleThemeSelect(theme.id as ThemeId)}
-                  data-testid={`theme-${theme.id}`}
-                  className={`relative p-4 rounded-lg border-2 transition-all text-left ${
-                    isSelected
-                      ? "border-(--accent-primary) bg-(--accent-glow)"
-                      : "border-(--border-primary) hover:border-(--border-secondary) bg-(--bg-tertiary)"
-                  }`}
-                >
-                  {isSelected && (
-                    <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-(--accent-primary) flex items-center justify-center">
-                      <CheckIcon size="sm" className="text-white w-3 h-3" />
-                    </div>
-                  )}
-
-                  {/* Theme Preview */}
-                  <div className="mb-3 h-12 rounded-md overflow-hidden flex">
-                    <div className="flex-1" style={{ backgroundColor: colors.bgPrimary }} />
-                    <div className="flex-1" style={{ backgroundColor: colors.bgSecondary }} />
-                    <div className="flex-1" style={{ backgroundColor: colors.accentPrimary }} />
-                    <div className="flex-1" style={{ backgroundColor: colors.accentSecondary }} />
-                  </div>
-
-                  <div className="font-medium text-(--text-primary) text-sm">{theme.name}</div>
-                  <div className="text-xs text-(--text-muted) mt-0.5">{t(`theme.builtIn.${theme.id}`, theme.description)}</div>
-                </button>
-              );
-            })}
+          <div>
+            <h2 className="text-lg font-medium text-on-surface">{t("theme.title")}</h2>
+            <p className="text-sm text-on-surface-variant">{t("theme.description")}</p>
           </div>
         </div>
+
+        {/* Light / dark */}
+        <div className="mb-6" role="radiogroup" aria-label={t("theme.mode.title")}>
+          <div className="text-sm font-medium text-on-surface mb-2">{t("theme.mode.title")}</div>
+          <div className="flex gap-2">
+            {MODES.map((option) => (
+              <button
+                key={option}
+                type="button"
+                role="radio"
+                aria-checked={mode === option}
+                data-testid={`theme-mode-${option}`}
+                onClick={() => setMode(option)}
+                className={optionClass(mode === option)}
+              >
+                {t(`theme.mode.${option}`)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Seeds */}
+        <div className="grid grid-cols-2 gap-3">
+          {availableThemes.map((theme) => {
+            const isSelected = themeId === theme.id;
+            return (
+              <button
+                key={theme.id}
+                type="button"
+                onClick={() => setTheme(theme.id as ThemeId)}
+                data-testid={`theme-${theme.id}`}
+                aria-pressed={isSelected}
+                className={`relative p-4 rounded-lg border-2 transition-colors text-left ${
+                  isSelected
+                    ? "border-primary bg-secondary-container"
+                    : "border-outline-variant hover:border-outline bg-surface-container"
+                }`}
+              >
+                {isSelected && (
+                  <div className="absolute top-2 right-2 w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                    <CheckIcon size="sm" className="text-on-primary w-3 h-3" />
+                  </div>
+                )}
+
+                <div className="flex items-center gap-3">
+                  {/* The seed itself: a colour swatch (content), not a UI role. */}
+                  <span
+                    className="w-8 h-8 rounded-full border border-outline-variant shrink-0"
+                    style={{ backgroundColor: theme.seed }}
+                    aria-hidden="true"
+                  />
+                  <div>
+                    <div
+                      className={`font-medium text-sm ${isSelected ? "text-on-secondary-container" : "text-on-surface"}`}
+                    >
+                      {theme.id === "custom" ? t("theme.customTheme") : theme.name}
+                    </div>
+                    <div
+                      className={`text-xs mt-0.5 ${isSelected ? "text-on-secondary-container" : "text-on-surface-variant"}`}
+                    >
+                      {t(`theme.builtIn.${theme.id}`, theme.description)}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {schemeError && (
+          <p role="alert" className="mt-4 text-sm text-error">
+            {t("theme.schemeError", { error: schemeError })}
+          </p>
+        )}
       </section>
 
-      {/* Custom Theme Editor */}
+      {/* Custom seed */}
       {themeId === "custom" && (
-        <section className="relative overflow-hidden bg-linear-to-br from-cyan-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-cyan-800/30 rounded-xl p-6">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-cyan-500/10 via-transparent to-transparent" />
-          <div className="relative">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-900/30">
-                  <PaletteIcon size="md" className="text-white" />
-                </div>
-                <div>
-                  <h2 className="text-lg font-medium text-(--text-primary)">{t('theme.customColors')}</h2>
-                  <p className="text-sm text-(--text-muted)">{t('theme.customColorsDesc')}</p>
-                </div>
+        <section className="bg-surface-container-low border border-outline-variant rounded-xl p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-tertiary-container flex items-center justify-center">
+                <PaletteIcon size="md" className="text-on-tertiary-container" />
               </div>
-              <button
-                onClick={resetCustomColors}
-                className="flex items-center gap-2 px-3 py-2 text-sm text-(--text-muted) hover:text-(--text-primary) bg-(--bg-tertiary) hover:bg-(--bg-hover) border border-(--border-secondary) rounded-lg transition-colors"
-              >
-                <ResetIcon size="sm" />
-                {t('theme.resetToDefault')}
-              </button>
+              <div>
+                <h2 className="text-lg font-medium text-on-surface">{t("theme.customTheme")}</h2>
+                <p className="text-sm text-on-surface-variant">{t("theme.customSeedDesc")}</p>
+              </div>
             </div>
+            <button
+              type="button"
+              onClick={resetCustomSeed}
+              className="flex items-center gap-2 px-3 py-2 text-sm text-on-surface-variant hover:text-on-surface bg-surface-container hover:bg-surface-container-high border border-outline-variant rounded-lg transition-colors"
+            >
+              <ResetIcon size="sm" />
+              {t("theme.resetToDefault")}
+            </button>
+          </div>
 
-            <div className="space-y-3">
-              {COLOR_GROUP_KEYS.map((group) => (
-                <ColorGroup
-                  key={group.nameKey}
-                  name={t(group.nameKey)}
-                  colors={group.colors.map((c) => ({ key: c.key, label: t(c.labelKey) }))}
-                  values={customColors}
-                  onChange={handleColorChange}
-                />
+          <div className="flex items-center gap-3">
+            <label htmlFor="theme-custom-seed" className="flex-1 text-sm text-on-surface">
+              {t("theme.seed")}
+            </label>
+            <input
+              id="theme-custom-seed"
+              type="color"
+              value={customSeed.seed}
+              onChange={(event) => updateCustomSeed({ seed: event.target.value })}
+              data-testid="theme-custom-seed"
+              className="w-10 h-10 rounded-sm cursor-pointer border border-outline-variant bg-transparent"
+            />
+            <span className="w-20 text-xs font-mono text-on-surface-variant">{customSeed.seed}</span>
+          </div>
+
+          <div role="radiogroup" aria-label={t("theme.variant")}>
+            <div className="text-sm text-on-surface mb-2">{t("theme.variant")}</div>
+            <div className="flex flex-wrap gap-2">
+              {CUSTOM_VARIANTS.map((variant) => (
+                <button
+                  key={variant}
+                  type="button"
+                  role="radio"
+                  aria-checked={customSeed.variant === variant}
+                  onClick={() => updateCustomSeed({ variant })}
+                  className={optionClass(customSeed.variant === variant)}
+                >
+                  {t(`theme.variants.${variant}`)}
+                </button>
               ))}
             </div>
-
-            <p className="mt-4 text-xs text-(--text-muted)">
-              {t('theme.tip')}
-            </p>
           </div>
+
+          <div role="radiogroup" aria-label={t("theme.contrast")}>
+            <div className="text-sm text-on-surface mb-2">{t("theme.contrast")}</div>
+            <div className="flex gap-2">
+              {CONTRAST_LEVELS.map(({ id, level }) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="radio"
+                  aria-checked={customSeed.contrastLevel === level}
+                  onClick={() => updateCustomSeed({ contrastLevel: level })}
+                  className={optionClass(customSeed.contrastLevel === level)}
+                >
+                  {t(`theme.contrastLevels.${id}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <p className="text-xs text-on-surface-variant">{t("theme.tip")}</p>
         </section>
       )}
     </div>
   );
 }
-
-
-
-

@@ -57,11 +57,11 @@ class ErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBoundaryStat
 
       // Default fallback UI
       return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-stone-950">
-          <div className="max-w-md w-full bg-stone-900 border border-stone-800 rounded-lg p-8 text-center">
+        <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-surface">
+          <div className="max-w-md w-full bg-surface-container-low border border-outline-variant rounded-lg p-8 text-center">
             <div className="mb-6">
               <svg
-                className="w-16 h-16 mx-auto text-red-500"
+                className="w-16 h-16 mx-auto text-error"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -76,17 +76,17 @@ class ErrorBoundaryClass extends Component<ErrorBoundaryProps, ErrorBoundaryStat
               </svg>
             </div>
 
-            <h1 className="text-2xl font-bold text-white mb-2">
+            <h1 className="text-2xl font-bold text-on-surface mb-2">
               {this.props.t('boundary.title')}
             </h1>
 
             {error?.message && (
-              <p className="text-stone-400 mb-6 text-sm">
+              <p className="text-on-surface-variant mb-6 text-sm">
                 {error.message}
               </p>
             )}
 
-            <p className="text-stone-400 mb-6">
+            <p className="text-on-surface-variant mb-6">
               {this.props.t('boundary.message')}
             </p>
 

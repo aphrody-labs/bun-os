@@ -40,7 +40,7 @@ export function NoRdpDetectedDialog({
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-theme-bg-primary/80 backdrop-blur-xs"
+          className="absolute inset-0 bg-scrim/40 backdrop-blur-xs"
           onClick={handleClose}
         />
 
@@ -48,17 +48,17 @@ export function NoRdpDetectedDialog({
         <div
           role="dialog"
           data-testid="no-rdp-detected-dialog"
-          className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-xl shadow-2xl shadow-black/50 max-w-md w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-md w-full mx-4 p-6"
         >
           <div className="flex items-start gap-4 mb-4">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-[rgba(var(--accent-primary-rgb),0.2)] text-theme-accent-primary">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-primary/20 text-primary">
               <MonitorIcon size="md" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-theme-text-primary">
+              <h3 className="text-lg font-semibold text-on-surface">
                 {t('noRdp.title')}
               </h3>
-              <p className="text-sm text-theme-text-secondary mt-2">
+              <p className="text-sm text-on-surface-variant mt-2">
                 {t('noRdp.description')}
                 <br /><br />
                 {t('noRdp.instructions')}
@@ -71,7 +71,7 @@ export function NoRdpDetectedDialog({
               href={BLOG_SERIES_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-theme-accent-primary hover:underline"
+              className="flex items-center gap-2 text-sm text-primary hover:underline"
             >
               {t('noRdp.learnMore')}
               <ExternalLinkIcon size="sm" />
@@ -79,7 +79,7 @@ export function NoRdpDetectedDialog({
             <button
               onClick={handleClose}
               data-testid="dialog-close-button"
-              className="px-4 py-2 text-sm font-medium text-theme-text-secondary bg-theme-bg-tertiary hover:bg-theme-bg-hover rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-on-surface-variant bg-surface-container hover:bg-surface-container-high rounded-lg transition-colors"
             >
               {t('common:button.close')}
             </button>

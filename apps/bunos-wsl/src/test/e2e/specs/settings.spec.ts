@@ -24,8 +24,8 @@ describe("Settings Page", () => {
     await browser.waitUntil(
       async () => {
         const classes = (await tab.getAttribute("class")) ?? "";
-        // Active tab has accent-primary color classes
-        return classes.includes("accent-primary") || classes.includes("border-r-2");
+        // Active tab carries primary role classes
+        return classes.includes("primary") || classes.includes("border-r-2");
       },
       { timeout: 5000, timeoutMsg: `Settings tab ${tabId} did not become active` }
     );
@@ -95,9 +95,9 @@ describe("Settings Page", () => {
       const themeHeader = await $("h2*=Color Theme");
       await expect(themeHeader).toBeDisplayed();
 
-      // Verify at least one theme option exists (first built-in theme is mission-control)
-      const missionControlTheme = await $('[data-testid="theme-mission-control"]');
-      await expect(missionControlTheme).toBeDisplayed();
+      // Verify at least one theme option exists (first built-in theme is bun-os)
+      const bunOsTheme = await $('[data-testid="theme-bun-os"]');
+      await expect(bunOsTheme).toBeDisplayed();
     });
 
     it("should switch to Polling tab and show polling options", async () => {
@@ -136,22 +136,22 @@ describe("Settings Page", () => {
       await actions.goToSettings();
       await switchToTab("appearance");
 
-      // Select Dracula theme
-      const draculaTheme = await $('[data-testid="theme-dracula"]');
-      await draculaTheme.click();
+      // Select Slate Dusk theme
+      const slateDuskTheme = await $('[data-testid="theme-slate-dusk"]');
+      await slateDuskTheme.click();
 
       // Wait for theme to be applied
       await browser.waitUntil(
         async () => {
-          const cls = (await draculaTheme.getAttribute("class")) ?? "";
-          return cls.includes("border-(--accent-primary)");
+          const cls = (await slateDuskTheme.getAttribute("class")) ?? "";
+          return cls.includes("border-primary");
         },
-        { timeout: 5000, timeoutMsg: "Dracula theme was not selected" }
+        { timeout: 5000, timeoutMsg: "Slate Dusk theme was not selected" }
       );
 
       // Verify it's selected
-      const draculaClass = (await draculaTheme.getAttribute("class")) ?? "";
-      expect(draculaClass).toContain("border-(--accent-primary)");
+      const slateDuskClass = (await slateDuskTheme.getAttribute("class")) ?? "";
+      expect(slateDuskClass).toContain("border-primary");
 
       // Refresh the page
       await safeRefresh();
@@ -161,10 +161,10 @@ describe("Settings Page", () => {
       await actions.goToSettings();
       await switchToTab("appearance");
 
-      // Verify Dracula is still selected
-      const draculaThemeAfter = await $('[data-testid="theme-dracula"]');
-      const draculaClassAfter = (await draculaThemeAfter.getAttribute("class")) ?? "";
-      expect(draculaClassAfter).toContain("border-(--accent-primary)");
+      // Verify Slate Dusk is still selected
+      const slateDuskThemeAfter = await $('[data-testid="theme-slate-dusk"]');
+      const slateDuskClassAfter = (await slateDuskThemeAfter.getAttribute("class")) ?? "";
+      expect(slateDuskClassAfter).toContain("border-primary");
     });
 
     it("should persist Cobalt theme after refresh", async () => {
@@ -179,7 +179,7 @@ describe("Settings Page", () => {
       await browser.waitUntil(
         async () => {
           const cls = (await cobaltTheme.getAttribute("class")) ?? "";
-          return cls.includes("border-(--accent-primary)");
+          return cls.includes("border-primary");
         },
         { timeout: 5000, timeoutMsg: "Cobalt theme was not selected" }
       );
@@ -194,7 +194,7 @@ describe("Settings Page", () => {
 
       const cobaltThemeAfter = await $('[data-testid="theme-cobalt"]');
       const cobaltClassAfter = (await cobaltThemeAfter.getAttribute("class")) ?? "";
-      expect(cobaltClassAfter).toContain("border-(--accent-primary)");
+      expect(cobaltClassAfter).toContain("border-primary");
     });
 
     it("should persist Custom theme selection after refresh", async () => {
@@ -205,21 +205,21 @@ describe("Settings Page", () => {
       const customTheme = await $('[data-testid="theme-custom"]');
       await customTheme.click();
 
-      // Wait for Custom Colors section to appear
+      // Wait for Custom Theme section to appear
       await browser.waitUntil(
         async () => {
-          const section = await $("h2*=Custom Colors");
+          const section = await $("h2*=Custom Theme");
           try {
             return await section.isDisplayed();
           } catch {
             return false;
           }
         },
-        { timeout: 5000, timeoutMsg: "Custom Colors section did not appear" }
+        { timeout: 5000, timeoutMsg: "Custom Theme section did not appear" }
       );
 
-      // Verify Custom Colors section appears
-      const customColorsSection = await $("h2*=Custom Colors");
+      // Verify Custom Theme section appears
+      const customColorsSection = await $("h2*=Custom Theme");
       await expect(customColorsSection).toBeDisplayed();
 
       // Refresh
@@ -232,10 +232,10 @@ describe("Settings Page", () => {
 
       const customThemeAfter = await $('[data-testid="theme-custom"]');
       const customClassAfter = (await customThemeAfter.getAttribute("class")) ?? "";
-      expect(customClassAfter).toContain("border-(--accent-primary)");
+      expect(customClassAfter).toContain("border-primary");
 
-      // Custom Colors section should still be visible
-      const customColorsSectionAfter = await $("h2*=Custom Colors");
+      // Custom Theme section should still be visible
+      const customColorsSectionAfter = await $("h2*=Custom Theme");
       await expect(customColorsSectionAfter).toBeDisplayed();
     });
   });
@@ -253,9 +253,9 @@ describe("Settings Page", () => {
       const toggleContainer = await labelContainer.parentElement();
       const toggleButton = await toggleContainer.$("button.rounded-full");
 
-      // Get initial state by checking the button's class (bg-theme-accent-primary means checked)
+      // Get initial state by checking the button's class (bg-primary means checked)
       const initialClass = (await toggleButton.getAttribute("class")) ?? "";
-      const initialChecked = initialClass.includes("bg-theme-accent-primary");
+      const initialChecked = initialClass.includes("bg-primary");
 
       // Toggle it
       await toggleButton.click();
@@ -264,7 +264,7 @@ describe("Settings Page", () => {
       await browser.waitUntil(
         async () => {
           const cls = (await toggleButton.getAttribute("class")) ?? "";
-          const isChecked = cls.includes("bg-theme-accent-primary");
+          const isChecked = cls.includes("bg-primary");
           return isChecked !== initialChecked;
         },
         { timeout: 5000, timeoutMsg: "Toggle did not change state" }
@@ -272,7 +272,7 @@ describe("Settings Page", () => {
 
       // Verify it changed
       const afterToggleClass = (await toggleButton.getAttribute("class")) ?? "";
-      const afterToggleChecked = afterToggleClass.includes("bg-theme-accent-primary");
+      const afterToggleChecked = afterToggleClass.includes("bg-primary");
       expect(afterToggleChecked).toBe(!initialChecked);
 
       // Refresh
@@ -289,7 +289,7 @@ describe("Settings Page", () => {
       const toggleContainerAfter = await labelContainerAfter.parentElement();
       const toggleButtonAfter = await toggleContainerAfter.$("button.rounded-full");
       const persistedClass = (await toggleButtonAfter.getAttribute("class")) ?? "";
-      const persistedChecked = persistedClass.includes("bg-theme-accent-primary");
+      const persistedChecked = persistedClass.includes("bg-primary");
       expect(persistedChecked).toBe(!initialChecked);
 
       // Toggle it back to original state for cleanup
@@ -691,23 +691,23 @@ describe("Settings Page", () => {
       await actions.goToSettings();
       await switchToTab("appearance");
 
-      const nordTheme = await $('[data-testid="theme-nord"]');
-      let isNordDisplayed = false;
+      const oceanFogTheme = await $('[data-testid="theme-ocean-fog"]');
+      let isOceanFogDisplayed = false;
       try {
-        isNordDisplayed = await nordTheme.isDisplayed();
+        isOceanFogDisplayed = await oceanFogTheme.isDisplayed();
       } catch {
-        isNordDisplayed = false;
+        isOceanFogDisplayed = false;
       }
 
-      if (isNordDisplayed) {
-        await nordTheme.click();
+      if (isOceanFogDisplayed) {
+        await oceanFogTheme.click();
         // Wait for theme to be applied
         await browser.waitUntil(
           async () => {
-            const cls = (await nordTheme.getAttribute("class")) ?? "";
-            return cls.includes("border-(--accent-primary)");
+            const cls = (await oceanFogTheme.getAttribute("class")) ?? "";
+            return cls.includes("border-primary");
           },
-          { timeout: 5000, timeoutMsg: "Nord theme was not selected" }
+          { timeout: 5000, timeoutMsg: "OceanFog theme was not selected" }
         );
       }
 
@@ -719,17 +719,17 @@ describe("Settings Page", () => {
       await switchToTab("appearance");
 
       // Verify theme persisted
-      const nordThemeAfter = await $('[data-testid="theme-nord"]');
-      let isNordAfterDisplayed = false;
+      const oceanFogThemeAfter = await $('[data-testid="theme-ocean-fog"]');
+      let isOceanFogAfterDisplayed = false;
       try {
-        isNordAfterDisplayed = await nordThemeAfter.isDisplayed();
+        isOceanFogAfterDisplayed = await oceanFogThemeAfter.isDisplayed();
       } catch {
-        isNordAfterDisplayed = false;
+        isOceanFogAfterDisplayed = false;
       }
 
-      if (isNordAfterDisplayed) {
-        const nordClass = (await nordThemeAfter.getAttribute("class")) ?? "";
-        expect(nordClass).toContain("border-(--accent-primary)");
+      if (isOceanFogAfterDisplayed) {
+        const oceanFogClass = (await oceanFogThemeAfter.getAttribute("class")) ?? "";
+        expect(oceanFogClass).toContain("border-primary");
       }
 
       // Change polling
@@ -762,17 +762,17 @@ describe("Settings Page", () => {
       await actions.goToSettings();
       await switchToTab("appearance");
 
-      const nordThemeFinal = await $('[data-testid="theme-nord"]');
-      let isNordFinalDisplayed = false;
+      const oceanFogThemeFinal = await $('[data-testid="theme-ocean-fog"]');
+      let isOceanFogFinalDisplayed = false;
       try {
-        isNordFinalDisplayed = await nordThemeFinal.isDisplayed();
+        isOceanFogFinalDisplayed = await oceanFogThemeFinal.isDisplayed();
       } catch {
-        isNordFinalDisplayed = false;
+        isOceanFogFinalDisplayed = false;
       }
 
-      if (isNordFinalDisplayed) {
-        const nordClassFinal = (await nordThemeFinal.getAttribute("class")) ?? "";
-        expect(nordClassFinal).toContain("border-(--accent-primary)");
+      if (isOceanFogFinalDisplayed) {
+        const oceanFogClassFinal = (await oceanFogThemeFinal.getAttribute("class")) ?? "";
+        expect(oceanFogClassFinal).toContain("border-primary");
       }
 
       await switchToTab("polling");
@@ -787,25 +787,25 @@ describe("Settings Page", () => {
       await actions.goToSettings();
       await switchToTab("appearance");
 
-      // Select a dark theme (Dracula)
-      const draculaTheme = await $('[data-testid="theme-dracula"]');
-      let isDraculaDisplayed = false;
+      // Select a dark theme (Slate Dusk)
+      const slateDuskTheme = await $('[data-testid="theme-slate-dusk"]');
+      let isSlate DuskDisplayed = false;
       try {
-        isDraculaDisplayed = await draculaTheme.isDisplayed();
+        isSlate DuskDisplayed = await slateDuskTheme.isDisplayed();
       } catch {
-        isDraculaDisplayed = false;
+        isSlate DuskDisplayed = false;
       }
 
-      if (isDraculaDisplayed) {
-        await draculaTheme.click();
+      if (isSlate DuskDisplayed) {
+        await slateDuskTheme.click();
 
         // Wait for theme to be applied
         await browser.waitUntil(
           async () => {
-            const cls = (await draculaTheme.getAttribute("class")) ?? "";
-            return cls.includes("border-(--accent-primary)");
+            const cls = (await slateDuskTheme.getAttribute("class")) ?? "";
+            return cls.includes("border-primary");
           },
-          { timeout: 5000, timeoutMsg: "Dracula theme was not selected" }
+          { timeout: 5000, timeoutMsg: "Slate Dusk theme was not selected" }
         );
 
         // Go back to main page
@@ -813,7 +813,7 @@ describe("Settings Page", () => {
 
         // Verify the page has theme applied (check for CSS variables)
         const bgColor = await browser.execute(() => {
-          return getComputedStyle(document.documentElement).getPropertyValue("--bg-primary");
+          return getComputedStyle(document.documentElement).getPropertyValue("--md-sys-color-surface");
         });
         // Theme should be applied - CSS variable should have a value
         expect(bgColor).toBeTruthy();
@@ -832,7 +832,7 @@ describe("Settings Page", () => {
 
       // Get initial state
       const initialClass = (await toggleButton.getAttribute("class")) ?? "";
-      const isEnabled = initialClass.includes("bg-theme-accent-primary");
+      const isEnabled = initialClass.includes("bg-primary");
 
       if (isEnabled) {
         // Disable polling
@@ -842,7 +842,7 @@ describe("Settings Page", () => {
         await browser.waitUntil(
           async () => {
             const cls = (await toggleButton.getAttribute("class")) ?? "";
-            return !cls.includes("bg-theme-accent-primary");
+            return !cls.includes("bg-primary");
           },
           { timeout: 5000, timeoutMsg: "Toggle did not change state" }
         );

@@ -94,7 +94,7 @@ function DistroCardComponent({ distro, index = 0 }: DistroCardProps) {
           <div className="flex items-center gap-2">
             {distro.isDefault && (
               <span
-                className="text-[10px] px-2 py-1 bg-[rgba(var(--accent-primary-rgb),0.1)] text-theme-accent-primary rounded border border-[rgba(var(--accent-primary-rgb),0.3)] font-mono font-semibold uppercase tracking-wider"
+                className="text-[10px] px-2 py-1 bg-primary/10 text-primary rounded border border-primary/30 font-mono font-semibold uppercase tracking-wider"
                 data-testid="primary-badge"
               >
                 {t('common:status.primary')}
@@ -103,7 +103,7 @@ function DistroCardComponent({ distro, index = 0 }: DistroCardProps) {
             {isCompacting ? (
               <span
                 data-testid="compacting-badge"
-                className="text-[10px] font-mono font-semibold px-3 py-1 rounded uppercase tracking-wider bg-[rgba(var(--accent-primary-rgb),0.15)] text-theme-accent-primary border border-[rgba(var(--accent-primary-rgb),0.4)] flex items-center gap-1.5"
+                className="text-[10px] font-mono font-semibold px-3 py-1 rounded uppercase tracking-wider bg-primary/15 text-primary border border-primary/40 flex items-center gap-1.5"
               >
                 <svg className="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -116,8 +116,8 @@ function DistroCardComponent({ distro, index = 0 }: DistroCardProps) {
                 data-testid="state-badge"
                 className={`text-[10px] font-mono font-semibold px-3 py-1 rounded uppercase tracking-wider ${
                   isRunning
-                    ? "bg-[rgba(var(--status-running-rgb),0.1)] text-theme-status-running border border-[rgba(var(--status-running-rgb),0.3)]"
-                    : "bg-theme-bg-tertiary text-theme-text-muted border border-theme-border-secondary"
+                    ? "bg-success/10 text-success border border-success/30"
+                    : "bg-surface-container text-on-surface-variant border border-outline-variant"
                 }`}
               >
                 {isRunning ? t('common:status.online') : t('common:status.offline')}
@@ -133,18 +133,18 @@ function DistroCardComponent({ distro, index = 0 }: DistroCardProps) {
             <div
               className={`w-3 h-3 rounded-full transition-all ${
                 isRunning
-                  ? "bg-theme-status-running shadow-lg shadow-[rgba(var(--status-running-rgb),0.5)]"
-                  : "bg-theme-status-stopped"
+                  ? "bg-success shadow-lg"
+                  : "bg-outline"
               }`}
             />
           </div>
           <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-theme-text-primary text-lg break-words">
+            <h3 className="font-semibold text-on-surface text-lg break-words">
               {distro.name}
             </h3>
-            <p className="text-xs font-mono text-theme-text-muted mt-0.5">
+            <p className="text-xs font-mono text-on-surface-variant mt-0.5">
               {distro.osInfo ? (
-                <span className="text-theme-text-secondary">{distro.osInfo}</span>
+                <span className="text-on-surface-variant">{distro.osInfo}</span>
               ) : (
                 <span>WSL {distro.version}</span>
               )}
@@ -153,19 +153,19 @@ function DistroCardComponent({ distro, index = 0 }: DistroCardProps) {
         </div>
 
         {/* Telemetry section */}
-        <div className="grid grid-cols-3 gap-4 mb-4 p-2.5 bg-theme-bg-primary/50 rounded-lg border border-theme-border-primary">
+        <div className="grid grid-cols-3 gap-4 mb-4 p-2.5 bg-surface/50 rounded-lg border border-outline-variant">
           {/* Disk */}
           <div className="text-center">
             <span className="data-label block mb-1">{t('common:label.disk')}</span>
-            <span className="data-value text-sm text-theme-text-secondary">
+            <span className="data-value text-sm text-on-surface-variant">
               {distro.diskSize && distro.diskSize > 0 ? formatBytes(distro.diskSize) : '—'}
             </span>
           </div>
 
           {/* Memory */}
-          <div className="text-center border-x border-theme-border-primary">
+          <div className="text-center border-x border-outline-variant">
             <span className="data-label block mb-1">{t('common:label.memory')}</span>
-            <span data-testid="memory-usage" className="data-value text-sm text-theme-accent-primary">
+            <span data-testid="memory-usage" className="data-value text-sm text-primary">
               {resources ? formatBytes(resources.memoryUsedBytes) : '—'}
             </span>
           </div>
@@ -173,7 +173,7 @@ function DistroCardComponent({ distro, index = 0 }: DistroCardProps) {
           {/* CPU */}
           <div className="text-center">
             <span className="data-label block mb-1">{t('common:label.cpu')}</span>
-            <span data-testid="cpu-usage" className="data-value text-sm text-theme-status-warning">
+            <span data-testid="cpu-usage" className="data-value text-sm text-warning">
               {resources?.cpuPercent != null ? `${resources.cpuPercent.toFixed(1)}%` : '—'}
             </span>
           </div>
@@ -187,8 +187,8 @@ function DistroCardComponent({ distro, index = 0 }: DistroCardProps) {
             data-testid={isRunning ? "stop-button" : "start-button"}
             className={`btn-cyber flex-1 px-4 py-2.5 text-sm font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
               isRunning
-                ? "bg-[rgba(var(--status-warning-rgb),0.1)] text-theme-status-warning border border-[rgba(var(--status-warning-rgb),0.3)] hover:bg-[rgba(var(--status-warning-rgb),0.2)] hover:shadow-lg hover:shadow-[rgba(var(--status-warning-rgb),0.1)]"
-                : "bg-[rgba(var(--status-running-rgb),0.1)] text-theme-status-running border border-[rgba(var(--status-running-rgb),0.3)] hover:bg-[rgba(var(--status-running-rgb),0.2)] hover:shadow-lg hover:shadow-[rgba(var(--status-running-rgb),0.1)]"
+                ? "bg-warning/10 text-warning border border-warning/30 hover:bg-warning/20 hover:shadow-lg"
+                : "bg-success/10 text-success border border-success/30 hover:bg-success/20 hover:shadow-lg"
             }`}
           >
             {isRunning ? (
@@ -205,10 +205,10 @@ function DistroCardComponent({ distro, index = 0 }: DistroCardProps) {
           </button>
 
           <IconButton
-            icon={<TerminalWindowIcon size="sm" className="text-amber-500" />}
+            icon={<TerminalWindowIcon size="sm" className="text-warning" />}
             label={t('card.openTerminal')}
             variant="secondary"
-            colorScheme="amber"
+            colorScheme="tertiary"
             className="btn-cyber"
             onClick={() => openTerminal(distro.name, distro.id)}
             disabled={isDisabled}
@@ -216,10 +216,10 @@ function DistroCardComponent({ distro, index = 0 }: DistroCardProps) {
           />
 
           <IconButton
-            icon={<MonitorIcon size="sm" className="text-blue-500" />}
+            icon={<MonitorIcon size="sm" className="text-secondary" />}
             label={t('card.openRdp')}
             variant="secondary"
-            colorScheme="blue"
+            colorScheme="secondary"
             className="btn-cyber"
             onClick={handleOpenRemoteDesktop}
             disabled={isDisabled}

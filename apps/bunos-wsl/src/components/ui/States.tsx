@@ -61,9 +61,9 @@ const SPINNER_SIZE_CLASSES: Record<SpinnerSize, string> = {
 };
 
 const ERROR_VARIANT_CLASSES: Record<ErrorVariant, { bg: string; border: string; text: string }> = {
-  error: { bg: 'bg-[rgba(var(--status-error-rgb),0.2)]', border: 'border-[rgba(var(--status-error-rgb),0.4)]', text: 'text-theme-status-error' },
-  warning: { bg: 'bg-[rgba(var(--status-warning-rgb),0.2)]', border: 'border-[rgba(var(--status-warning-rgb),0.4)]', text: 'text-theme-status-warning' },
-  info: { bg: 'bg-[rgba(var(--accent-primary-rgb),0.2)]', border: 'border-[rgba(var(--accent-primary-rgb),0.4)]', text: 'text-theme-accent-primary' },
+  error: { bg: 'bg-error/20', border: 'border-error/40', text: 'text-error' },
+  warning: { bg: 'bg-warning/20', border: 'border-warning/40', text: 'text-warning' },
+  info: { bg: 'bg-primary/20', border: 'border-primary/40', text: 'text-primary' },
 };
 
 const PROGRESS_SIZE_CLASSES: Record<ProgressSize, string> = {
@@ -73,10 +73,10 @@ const PROGRESS_SIZE_CLASSES: Record<ProgressSize, string> = {
 };
 
 const PROGRESS_VARIANT_CLASSES: Record<ProgressVariant, string> = {
-  default: 'bg-theme-accent-primary',
-  success: 'bg-theme-status-running',
-  warning: 'bg-theme-status-warning',
-  danger: 'bg-theme-status-error',
+  default: 'bg-primary',
+  success: 'bg-success',
+  warning: 'bg-warning',
+  danger: 'bg-error',
 };
 
 // ==================== Components ====================
@@ -103,7 +103,7 @@ export function LoadingSpinner({ size = 'md', label, className = '' }: LoadingSp
           d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
         />
       </svg>
-      {label && <span className="text-theme-text-secondary text-sm">{label}</span>}
+      {label && <span className="text-on-surface-variant text-sm">{label}</span>}
     </div>
   );
 }
@@ -111,13 +111,13 @@ export function LoadingSpinner({ size = 'md', label, className = '' }: LoadingSp
 export function LoadingOverlay({ message = 'Loading...', inline = false }: LoadingOverlayProps) {
   const containerClasses = inline
     ? 'flex items-center justify-center py-8'
-    : 'absolute inset-0 flex items-center justify-center bg-theme-bg-primary/80 backdrop-blur-xs';
+    : 'absolute inset-0 flex items-center justify-center bg-surface/80 backdrop-blur-xs';
 
   return (
     <div className={containerClasses}>
       <div className="flex flex-col items-center gap-3">
         <LoadingSpinner size="lg" />
-        <span className="text-theme-text-secondary text-sm">{message}</span>
+        <span className="text-on-surface-variant text-sm">{message}</span>
       </div>
     </div>
   );
@@ -170,13 +170,13 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
       {icon && (
-        <div className="text-4xl mb-4 text-theme-text-muted">
+        <div className="text-4xl mb-4 text-on-surface-variant">
           {icon}
         </div>
       )}
-      <h3 className="text-lg font-medium text-theme-text-primary">{title}</h3>
+      <h3 className="text-lg font-medium text-on-surface">{title}</h3>
       {description && (
-        <p className="text-sm text-theme-text-muted mt-1 max-w-md">{description}</p>
+        <p className="text-sm text-on-surface-variant mt-1 max-w-md">{description}</p>
       )}
       {action && (
         <div className="mt-4">
@@ -199,14 +199,14 @@ export function ProgressBar({
 
   return (
     <div className={`w-full ${className}`}>
-      <div className={`bg-theme-border-secondary rounded-full overflow-hidden ${PROGRESS_SIZE_CLASSES[size]}`}>
+      <div className={`bg-outline-variant rounded-full overflow-hidden ${PROGRESS_SIZE_CLASSES[size]}`}>
         <div
           className={`${PROGRESS_VARIANT_CLASSES[variant]} ${PROGRESS_SIZE_CLASSES[size]} rounded-full transition-all duration-300`}
           style={{ width: `${clampedValue}%` }}
         />
       </div>
       {showLabel && (
-        <span className="text-xs text-theme-text-secondary mt-1 block text-right">{clampedValue}%</span>
+        <span className="text-xs text-on-surface-variant mt-1 block text-right">{clampedValue}%</span>
       )}
     </div>
   );

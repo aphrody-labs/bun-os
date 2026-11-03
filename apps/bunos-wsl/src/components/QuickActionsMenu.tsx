@@ -470,13 +470,11 @@ export function QuickActionsMenu({ distro, disabled }: QuickActionsMenuProps) {
       {/* Output Dialog */}
       {showOutputDialog && (
         <Portal>
-          <div className="fixed inset-0 bg-theme-bg-primary/90 backdrop-blur-sm flex items-center justify-center z-[100] p-4" role="dialog" aria-modal="true">
-            <div className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-xl shadow-2xl shadow-black/70 max-w-2xl w-full max-h-[80vh] overflow-hidden animate-fade-slide-in">
-              {/* Top accent line */}
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-theme-accent-primary/50 to-transparent" />
+          <div className="fixed inset-0 bg-scrim/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4" role="dialog" aria-modal="true">
+            <div className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/70 max-w-2xl w-full max-h-[80vh] overflow-hidden animate-fade-slide-in">
 
-              <div className="flex items-center justify-between px-5 py-4 border-b border-theme-border-primary">
-                <h3 className="font-semibold text-theme-text-primary">{showOutputDialog.title} {t('outputDialog.titleSuffix')}</h3>
+              <div className="flex items-center justify-between px-5 py-4 border-b border-outline-variant">
+                <h3 className="font-semibold text-on-surface">{showOutputDialog.title} {t('outputDialog.titleSuffix')}</h3>
                 <IconButton
                   icon={<CloseIcon size="md" />}
                   label={t('common:button.close')}
@@ -486,13 +484,13 @@ export function QuickActionsMenu({ distro, disabled }: QuickActionsMenuProps) {
               </div>
               <div className="p-5 overflow-auto max-h-96">
                 {showOutputDialog.output && (
-                  <pre className="text-sm text-theme-text-secondary font-mono whitespace-pre-wrap">{showOutputDialog.output}</pre>
+                  <pre className="text-sm text-on-surface-variant font-mono whitespace-pre-wrap">{showOutputDialog.output}</pre>
                 )}
                 {showOutputDialog.error && (
-                  <pre className="mt-2 text-sm text-theme-status-error font-mono whitespace-pre-wrap">{showOutputDialog.error}</pre>
+                  <pre className="mt-2 text-sm text-error font-mono whitespace-pre-wrap">{showOutputDialog.error}</pre>
                 )}
                 {!showOutputDialog.output && !showOutputDialog.error && (
-                  <p className="text-theme-text-muted text-sm font-mono">{t('outputDialog.noOutput')}</p>
+                  <p className="text-on-surface-variant text-sm font-mono">{t('outputDialog.noOutput')}</p>
                 )}
               </div>
             </div>

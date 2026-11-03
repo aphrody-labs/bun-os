@@ -107,16 +107,16 @@ export function ImportDialog({ isOpen, onClose }: ImportDialogProps) {
     <Portal>
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-theme-bg-primary/80 backdrop-blur-xs" onClick={handleClose} />
+        <div className="absolute inset-0 bg-scrim/40 backdrop-blur-xs" onClick={handleClose} />
 
         {/* Dialog */}
-        <div role="dialog" aria-modal="true" className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-xl shadow-2xl shadow-black/50 max-w-lg w-full mx-4 p-6">
-        <h2 className="text-xl font-semibold text-theme-text-primary mb-4">{t('import.title')}</h2>
+        <div role="dialog" aria-modal="true" className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-lg w-full mx-4 p-6">
+        <h2 className="text-xl font-semibold text-on-surface mb-4">{t('import.title')}</h2>
 
         {/* Error message - always reserve space to prevent layout shift */}
         <div className="mb-4 min-h-11">
           {error && (
-            <div className="p-3 bg-[rgba(var(--status-error-rgb),0.2)] border border-[rgba(var(--status-error-rgb),0.4)] rounded-lg text-theme-status-error text-sm">
+            <div className="p-3 bg-error/20 border border-error/40 rounded-lg text-error text-sm">
               {error}
             </div>
           )}
@@ -164,14 +164,14 @@ export function ImportDialog({ isOpen, onClose }: ImportDialogProps) {
           <button
             onClick={handleClose}
             disabled={isImporting}
-            className="px-4 py-2 text-sm font-medium text-theme-text-secondary bg-theme-bg-tertiary hover:bg-theme-bg-hover rounded-lg transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-on-surface-variant bg-surface-container hover:bg-surface-container-high rounded-lg transition-colors disabled:opacity-50"
           >
             {t('common:button.cancel')}
           </button>
           <button
             onClick={handleImport}
             disabled={isImporting || !name.trim() || nameExists || !tarPath || !installLocation}
-            className="px-4 py-2 text-sm font-medium bg-theme-accent-primary hover:opacity-90 text-theme-bg-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 text-sm font-medium bg-primary hover:opacity-90 text-on-primary rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isImporting ? (
               t('import.importing')

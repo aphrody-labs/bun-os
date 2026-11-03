@@ -114,8 +114,8 @@ export function Modal({
   };
 
   const modalClasses = [
-    'relative bg-theme-bg-secondary border border-theme-border-secondary',
-    'rounded-xl shadow-2xl shadow-black/70',
+    'relative bg-surface-container-low border border-outline-variant',
+    'rounded-xl shadow-2xl shadow-shadow/70',
     SIZE_CLASSES[size],
     'w-full mx-4',
     'animate-fade-slide-in',
@@ -125,27 +125,14 @@ export function Modal({
   return (
     <Portal>
       <div className="fixed inset-0 z-[100] flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby={labelledBy}>
-        {/* Backdrop with grid pattern */}
+        {/* Scrim */}
         <div
-          className="absolute inset-0 bg-theme-bg-primary/90 backdrop-blur-sm"
+          className="absolute inset-0 bg-scrim/40"
           onClick={handleBackdropClick}
         />
 
         {/* Modal */}
         <div ref={modalRef} tabIndex={-1} className={modalClasses}>
-          {/* Top accent line */}
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-theme-accent-primary/50 to-transparent" />
-
-          {/* Corner accents */}
-          <div className="absolute top-0 left-0 w-4 h-px bg-gradient-to-r from-theme-accent-primary/70 to-transparent" />
-          <div className="absolute top-0 left-0 w-px h-4 bg-gradient-to-b from-theme-accent-primary/70 to-transparent" />
-          <div className="absolute top-0 right-0 w-4 h-px bg-gradient-to-l from-theme-accent-primary/70 to-transparent" />
-          <div className="absolute top-0 right-0 w-px h-4 bg-gradient-to-b from-theme-accent-primary/70 to-transparent" />
-          <div className="absolute bottom-0 left-0 w-4 h-px bg-gradient-to-r from-theme-accent-primary/30 to-transparent" />
-          <div className="absolute bottom-0 left-0 w-px h-4 bg-gradient-to-t from-theme-accent-primary/30 to-transparent" />
-          <div className="absolute bottom-0 right-0 w-4 h-px bg-gradient-to-l from-theme-accent-primary/30 to-transparent" />
-          <div className="absolute bottom-0 right-0 w-px h-4 bg-gradient-to-t from-theme-accent-primary/30 to-transparent" />
-
           {children}
         </div>
       </div>
@@ -161,15 +148,15 @@ export function ModalHeader({
   titleId,
 }: ModalHeaderProps) {
   return (
-    <div className="flex items-start justify-between p-6 border-b border-theme-border-primary">
+    <div className="flex items-start justify-between p-6 border-b border-outline-variant">
       <div>
-        <h2 id={titleId} className="text-xl font-semibold text-theme-text-primary">{title}</h2>
-        {subtitle && <p className="text-sm text-theme-text-muted mt-1 font-mono">{subtitle}</p>}
+        <h2 id={titleId} className="text-xl font-semibold text-on-surface">{title}</h2>
+        {subtitle && <p className="text-sm text-on-surface-variant mt-1 font-mono">{subtitle}</p>}
       </div>
       {showCloseButton && (
         <button
           onClick={onClose}
-          className="p-1.5 text-theme-text-muted hover:text-theme-accent-primary transition-colors rounded-lg hover:bg-theme-bg-tertiary border border-transparent hover:border-theme-border-secondary"
+          className="p-1.5 text-on-surface-variant hover:text-primary transition-colors rounded-lg hover:bg-surface-container border border-transparent hover:border-outline-variant"
           aria-label="Close dialog"
         >
           <CloseIcon size="md" />
@@ -189,7 +176,7 @@ export function ModalBody({ children, className = '' }: ModalBodyProps) {
 
 export function ModalFooter({ children, className = '' }: ModalFooterProps) {
   return (
-    <div className={`flex items-center justify-end gap-3 p-6 border-t border-theme-border-primary ${className}`}>
+    <div className={`flex items-center justify-end gap-3 p-6 border-t border-outline-variant ${className}`}>
       {children}
     </div>
   );
@@ -246,29 +233,27 @@ export function Dialog({
       <div className="fixed inset-0 z-[100] flex items-center justify-center" role="alertdialog" aria-modal="true" aria-labelledby={titleId}>
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-theme-bg-primary/90 backdrop-blur-sm"
+          className="absolute inset-0 bg-scrim/40 backdrop-blur-sm"
           onClick={onCancel}
         />
 
         {/* Dialog */}
-        <div ref={dialogRef} tabIndex={-1} className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-xl shadow-2xl shadow-black/70 max-w-md w-full mx-4 p-6 animate-fade-slide-in">
-          {/* Top accent line */}
-          <div className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent ${isDanger ? 'via-theme-status-error/50' : 'via-theme-accent-primary/50'} to-transparent`} />
+        <div ref={dialogRef} tabIndex={-1} className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/70 max-w-md w-full mx-4 p-6 animate-fade-slide-in">
 
           <div className="flex items-start gap-4 mb-6">
             <div
               className={`w-11 h-11 rounded-lg flex items-center justify-center shrink-0 ${
                 isDanger
-                  ? 'bg-[rgba(var(--status-error-rgb),0.1)] text-theme-status-error border border-[rgba(var(--status-error-rgb),0.3)]'
-                  : 'bg-[rgba(var(--status-warning-rgb),0.1)] text-theme-status-warning border border-[rgba(var(--status-warning-rgb),0.3)]'
+                  ? 'bg-error/10 text-error border border-error/30'
+                  : 'bg-warning/10 text-warning border border-warning/30'
               }`}
               aria-hidden="true"
             >
               <WarningIcon size="md" />
             </div>
             <div>
-              <h3 id={titleId} className="text-lg font-semibold text-theme-text-primary">{title}</h3>
-              <p className="text-sm text-theme-text-secondary mt-1.5 leading-relaxed">{message}</p>
+              <h3 id={titleId} className="text-lg font-semibold text-on-surface">{title}</h3>
+              <p className="text-sm text-on-surface-variant mt-1.5 leading-relaxed">{message}</p>
             </div>
           </div>
 

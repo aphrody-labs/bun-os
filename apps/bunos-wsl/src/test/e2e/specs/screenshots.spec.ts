@@ -441,48 +441,37 @@ describe("Screenshot Capture", () => {
   });
 
   describe("Theme Variations", () => {
-    it("captures main view with Dracula theme", async () => {
+    it("captures main view with Slate Dusk theme", async () => {
       await actions.goToSettings();
       await switchToTab("appearance");
 
-      const draculaTheme = await $(selectors.themeButton("dracula"));
-      await draculaTheme.click();
-      // Wait for theme to be applied
+      const slateDuskTheme = await $(selectors.themeButton("slate-dusk"));
+      await slateDuskTheme.click();
       await browser.waitUntil(
-        async () => {
-          const html = await $("html");
-          const className = await html.getAttribute("class");
-          return className?.includes("dracula") ?? false;
-        },
-        { timeout: 5000, timeoutMsg: "Dracula theme was not applied" }
-      );
+          async () => (await $(selectors.themeButton("slate-dusk")).getAttribute("aria-pressed")) === "true",
+          { timeout: 5000, timeoutMsg: "Slate Dusk theme was not applied" }
+        );
 
       await actions.goBackFromSettings();
       await waitForResourceStats();
-      await saveScreenshot("theme-dracula");
+      await saveScreenshot("theme-slate-dusk");
     });
 
-    it("captures main view with Nord theme", async () => {
+    it("captures main view with Ocean Fog theme", async () => {
       await actions.goToSettings();
       await switchToTab("appearance");
 
-      const nordSelector = selectors.themeButton("nord");
-      if (await isElementDisplayed(nordSelector)) {
-        const nordTheme = await $(nordSelector);
-        await nordTheme.click();
-        // Wait for theme to be applied
+      const oceanFogSelector = selectors.themeButton("ocean-fog");
+      if (await isElementDisplayed(oceanFogSelector)) {
+        await (await $(oceanFogSelector)).click();
         await browser.waitUntil(
-          async () => {
-            const html = await $("html");
-            const className = await html.getAttribute("class");
-            return className?.includes("nord") ?? false;
-          },
-          { timeout: 5000, timeoutMsg: "Nord theme was not applied" }
+          async () => (await $(selectors.themeButton("ocean-fog")).getAttribute("aria-pressed")) === "true",
+          { timeout: 5000, timeoutMsg: "Ocean Fog theme was not applied" }
         );
 
         await actions.goBackFromSettings();
         await waitForResourceStats();
-        await saveScreenshot("theme-nord");
+        await saveScreenshot("theme-ocean-fog");
       }
     });
 
@@ -496,11 +485,7 @@ describe("Screenshot Capture", () => {
         await cobaltTheme.click();
         // Wait for theme to be applied
         await browser.waitUntil(
-          async () => {
-            const html = await $("html");
-            const className = await html.getAttribute("class");
-            return className?.includes("cobalt") ?? false;
-          },
+          async () => (await $(selectors.themeButton("cobalt")).getAttribute("aria-pressed")) === "true",
           { timeout: 5000, timeoutMsg: "Cobalt theme was not applied" }
         );
 
@@ -514,18 +499,12 @@ describe("Screenshot Capture", () => {
       await actions.goToSettings();
       await switchToTab("appearance");
 
-      const lightSelector = selectors.themeButton("light");
+      const lightSelector = '[data-testid="theme-mode-light"]';
       if (await isElementDisplayed(lightSelector)) {
-        const lightTheme = await $(lightSelector);
-        await lightTheme.click();
-        // Wait for theme to be applied
+        await (await $(lightSelector)).click();
         await browser.waitUntil(
-          async () => {
-            const html = await $("html");
-            const className = await html.getAttribute("class");
-            return className?.includes("light") ?? false;
-          },
-          { timeout: 5000, timeoutMsg: "Light theme was not applied" }
+          async () => (await browser.execute(() => document.documentElement.dataset.theme)) === "light",
+          { timeout: 5000, timeoutMsg: "Light scheme was not applied" }
         );
 
         await actions.goBackFromSettings();
@@ -544,16 +523,11 @@ describe("Screenshot Capture", () => {
         await actions.goToSettings();
         await switchToTab("appearance");
 
-        const defaultTheme = await $(selectors.themeButton("mission-control"));
-        await defaultTheme.click();
-        // Wait for theme to be applied
+        await (await $('[data-testid="theme-mode-system"]')).click();
+        await (await $(selectors.themeButton("bun-os"))).click();
         await browser.waitUntil(
-          async () => {
-            const html = await $("html");
-            const className = await html.getAttribute("class");
-            return className?.includes("mission-control") ?? false;
-          },
-          { timeout: 5000 }
+          async () => (await $(selectors.themeButton("bun-os")).getAttribute("aria-pressed")) === "true",
+          { timeout: 5000, timeoutMsg: "Bun OS theme was not applied" }
         );
       } catch {
         // Ignore errors in cleanup - theme reset is optional

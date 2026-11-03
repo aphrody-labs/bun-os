@@ -1,135 +1,137 @@
 /**
  * Theme Provider Component
  *
- * Manages theme state and applies CSS variables to the document root.
+ * Resolves the selected seed, the light/dark mode and the contrast preference, asks the scheme
+ * worker for the engine's roles and writes them as `--md-sys-color-*` / `--md-ext-color-*` on the
+ * document root, over the baseline roles of @aphrody/m3-theme/tokens.css.
  */
 
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
-import type { Theme, ThemeColors, ThemeId } from "./types";
-import { THEME_STORAGE_KEY, CUSTOM_THEME_STORAGE_KEY } from "./types";
-import { BUILT_IN_THEMES, getThemeById, getDefaultTheme, defaultCustomColors } from "./themes";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import type { SchemeReply, SchemeRequest } from "./scheme.worker";
+import { BUILT_IN_THEMES, CUSTOM_VARIANTS, DEFAULT_CUSTOM_SEED, getDefaultTheme, getThemeById } from "./themes";
+import {
+  CUSTOM_THEME_STORAGE_KEY,
+  SCHEME_CACHE_STORAGE_KEY,
+  THEME_MODE_STORAGE_KEY,
+  THEME_STORAGE_KEY,
+  type SchemeProperties,
+  type SchemeSeed,
+  type Theme,
+  type ThemeId,
+  type ThemeMode,
+} from "./types";
 
 interface ThemeContextValue {
   currentTheme: Theme;
   themeId: ThemeId;
-  customColors: ThemeColors;
+  mode: ThemeMode;
+  customSeed: SchemeSeed;
   setTheme: (id: ThemeId) => void;
-  updateCustomColors: (colors: Partial<ThemeColors>) => void;
-  resetCustomColors: () => void;
+  setMode: (mode: ThemeMode) => void;
+  updateCustomSeed: (seed: Partial<SchemeSeed>) => void;
+  resetCustomSeed: () => void;
   availableThemes: Theme[];
+  /** Set when the engine rejected the last request; the previous scheme stays applied. */
+  schemeError: string | null;
+}
+
+interface DerivedSchemes {
+  key: string;
+  light: SchemeProperties;
+  dark: SchemeProperties;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-/**
- * Convert hex color to RGB values string for use in rgba()
- * @param hex - Hex color string (e.g., "#00f0ff" or "00f0ff")
- * @returns RGB values as comma-separated string (e.g., "0, 240, 255")
- */
-function hexToRgb(hex: string): string {
-  const cleanHex = hex.replace("#", "");
-  const result = /^([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(cleanHex);
-  if (!result) return "0, 0, 0";
-  return `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`;
+function readStorage(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
 }
 
-function applyThemeToDocument(colors: ThemeColors): void {
-  const root = document.documentElement;
-
-  // Background colors
-  root.style.setProperty("--bg-primary", colors.bgPrimary);
-  root.style.setProperty("--bg-secondary", colors.bgSecondary);
-  root.style.setProperty("--bg-tertiary", colors.bgTertiary);
-  root.style.setProperty("--bg-hover", colors.bgHover);
-  root.style.setProperty("--bg-selected", colors.bgSelected);
-
-  // Text colors
-  root.style.setProperty("--text-primary", colors.textPrimary);
-  root.style.setProperty("--text-secondary", colors.textSecondary);
-  root.style.setProperty("--text-muted", colors.textMuted);
-  root.style.setProperty("--text-accent", colors.textAccent);
-
-  // Border colors
-  root.style.setProperty("--border-primary", colors.borderPrimary);
-  root.style.setProperty("--border-secondary", colors.borderSecondary);
-  root.style.setProperty("--border-accent", colors.borderAccent);
-
-  // Accent colors
-  root.style.setProperty("--accent-primary", colors.accentPrimary);
-  root.style.setProperty("--accent-secondary", colors.accentSecondary);
-  root.style.setProperty("--accent-glow", colors.accentGlow);
-
-  // Status colors
-  root.style.setProperty("--status-running", colors.statusRunning);
-  root.style.setProperty("--status-stopped", colors.statusStopped);
-  root.style.setProperty("--status-warning", colors.statusWarning);
-  root.style.setProperty("--status-error", colors.statusError);
-  root.style.setProperty("--status-success", colors.statusSuccess);
-
-  // Button colors
-  root.style.setProperty("--button-primary", colors.buttonPrimary);
-  root.style.setProperty("--button-primary-hover", colors.buttonPrimaryHover);
-  root.style.setProperty("--button-secondary", colors.buttonSecondary);
-  root.style.setProperty("--button-secondary-hover", colors.buttonSecondaryHover);
-  root.style.setProperty("--button-danger", colors.buttonDanger);
-  root.style.setProperty("--button-danger-hover", colors.buttonDangerHover);
-
-  // Scrollbar colors
-  root.style.setProperty("--scrollbar-track", colors.scrollbarTrack);
-  root.style.setProperty("--scrollbar-thumb", colors.scrollbarThumb);
-  root.style.setProperty("--scrollbar-thumb-hover", colors.scrollbarThumbHover);
-
-  // RGB variants for use in rgba() shadows and glows
-  root.style.setProperty("--accent-primary-rgb", hexToRgb(colors.accentPrimary));
-  root.style.setProperty("--accent-secondary-rgb", hexToRgb(colors.accentSecondary));
-  root.style.setProperty("--status-running-rgb", hexToRgb(colors.statusRunning));
-  root.style.setProperty("--status-stopped-rgb", hexToRgb(colors.statusStopped));
-  root.style.setProperty("--status-warning-rgb", hexToRgb(colors.statusWarning));
-  root.style.setProperty("--status-error-rgb", hexToRgb(colors.statusError));
-  root.style.setProperty("--status-success-rgb", hexToRgb(colors.statusSuccess));
-  root.style.setProperty("--text-primary-rgb", hexToRgb(colors.textPrimary));
-  root.style.setProperty("--text-secondary-rgb", hexToRgb(colors.textSecondary));
-  root.style.setProperty("--text-muted-rgb", hexToRgb(colors.textMuted));
+function writeStorage(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // Storage can be unavailable (private mode, quota); the choice then lasts for the session.
+  }
 }
 
 function loadThemeId(): ThemeId {
-  try {
-    const stored = localStorage.getItem(THEME_STORAGE_KEY);
-    if (stored && (BUILT_IN_THEMES.some((t) => t.id === stored) || stored === "custom")) {
-      return stored as ThemeId;
+  const stored = readStorage(THEME_STORAGE_KEY);
+  if (stored === "custom" || (stored && getThemeById(stored))) return stored as ThemeId;
+  return getDefaultTheme().id;
+}
+
+function loadMode(): ThemeMode {
+  const stored = readStorage(THEME_MODE_STORAGE_KEY);
+  return stored === "light" || stored === "dark" ? stored : "system";
+}
+
+function isSchemeSeed(value: unknown): value is SchemeSeed {
+  if (!value || typeof value !== "object") return false;
+  const { seed, variant, contrastLevel } = value as Record<string, unknown>;
+  return (
+    typeof seed === "string" &&
+    /^#[\da-f]{6}$/i.test(seed) &&
+    CUSTOM_VARIANTS.includes(variant as SchemeSeed["variant"]) &&
+    typeof contrastLevel === "number" &&
+    contrastLevel >= 0 &&
+    contrastLevel <= 1
+  );
+}
+
+function loadCustomSeed(): SchemeSeed {
+  const stored = readStorage(CUSTOM_THEME_STORAGE_KEY);
+  if (stored) {
+    try {
+      const parsed: unknown = JSON.parse(stored);
+      if (isSchemeSeed(parsed)) return parsed;
+    } catch {
+      // A value written by an older version: start from the default seed.
     }
-  } catch {
-    // Ignore localStorage errors
   }
-  return "obsidian";
+  return { ...DEFAULT_CUSTOM_SEED };
 }
 
-function loadCustomColors(): ThemeColors {
-  try {
-    const stored = localStorage.getItem(CUSTOM_THEME_STORAGE_KEY);
-    if (stored) {
-      return { ...defaultCustomColors, ...JSON.parse(stored) };
-    }
-  } catch {
-    // Ignore parse errors
-  }
-  return { ...defaultCustomColors };
+function schemeKey({ seed, variant, contrastLevel }: SchemeSeed): string {
+  return `${seed.toLowerCase()}|${variant}|${contrastLevel}`;
 }
 
-function saveThemeId(id: ThemeId): void {
+/** Last engine output, so the next start paints the chosen scheme before the worker answers. */
+function loadCachedSchemes(): DerivedSchemes | null {
+  const stored = readStorage(SCHEME_CACHE_STORAGE_KEY);
+  if (!stored) return null;
   try {
-    localStorage.setItem(THEME_STORAGE_KEY, id);
+    const parsed = JSON.parse(stored) as DerivedSchemes;
+    return typeof parsed.key === "string" && parsed.light && parsed.dark ? parsed : null;
   } catch {
-    // Ignore localStorage errors
+    return null;
   }
 }
 
-function saveCustomColors(colors: ThemeColors): void {
-  try {
-    localStorage.setItem(CUSTOM_THEME_STORAGE_KEY, JSON.stringify(colors));
-  } catch {
-    // Ignore localStorage errors
-  }
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
+  useEffect(() => {
+    const list = window.matchMedia(query);
+    const onChange = () => setMatches(list.matches);
+    onChange();
+    list.addEventListener("change", onChange);
+    return () => list.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
 }
 
 interface ThemeProviderProps {
@@ -138,65 +140,116 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const [themeId, setThemeId] = useState<ThemeId>(loadThemeId);
-  const [customColors, setCustomColors] = useState<ThemeColors>(loadCustomColors);
+  const [mode, setModeState] = useState<ThemeMode>(loadMode);
+  const [customSeed, setCustomSeed] = useState<SchemeSeed>(loadCustomSeed);
+  const [schemes, setSchemes] = useState<DerivedSchemes | null>(loadCachedSchemes);
+  const [schemeError, setSchemeError] = useState<string | null>(null);
+  const prefersDark = useMediaQuery("(prefers-color-scheme: dark)");
+  const prefersMoreContrast = useMediaQuery("(prefers-contrast: more)");
 
-  // Derive current theme
-  const currentTheme: Theme =
-    themeId === "custom"
-      ? {
-          id: "custom",
-          name: "Custom",
-          description: "Your personalized color scheme",
-          colors: customColors,
-          isBuiltIn: false,
-        }
-      : getThemeById(themeId) || getDefaultTheme();
+  const customTheme: Theme = useMemo(
+    () => ({ id: "custom", name: "Custom", description: "Your personalized color scheme", ...customSeed }),
+    [customSeed],
+  );
+  const currentTheme: Theme = themeId === "custom" ? customTheme : (getThemeById(themeId) ?? getDefaultTheme());
 
-  // Apply theme on mount and when it changes
+  // The OS "increase contrast" setting raises the level to high; it never lowers a chosen level.
+  const request: SchemeSeed = {
+    seed: currentTheme.seed,
+    variant: currentTheme.variant,
+    contrastLevel: prefersMoreContrast ? Math.max(currentTheme.contrastLevel, 1) : currentTheme.contrastLevel,
+  };
+  const key = schemeKey(request);
+  const dark = mode === "dark" || (mode === "system" && prefersDark);
+
+  const workerRef = useRef<Worker | null>(null);
+  const requestIdRef = useRef(0);
+
+  useEffect(
+    () => () => {
+      workerRef.current?.terminate();
+      workerRef.current = null;
+    },
+    [],
+  );
+
   useEffect(() => {
-    applyThemeToDocument(currentTheme.colors);
-  }, [currentTheme.colors]);
+    if (schemes?.key === key) return;
+    if (!workerRef.current) {
+      workerRef.current = new Worker(new URL("./scheme.worker.ts", import.meta.url), { type: "module" });
+    }
+    const worker = workerRef.current;
+    const id = ++requestIdRef.current;
+    const onMessage = (event: MessageEvent<SchemeReply>) => {
+      const reply = event.data;
+      if (reply.id !== id) return;
+      worker.removeEventListener("message", onMessage);
+      if (!reply.ok) {
+        setSchemeError(reply.error);
+        return;
+      }
+      const derived = { key, light: reply.light, dark: reply.dark };
+      setSchemeError(null);
+      setSchemes(derived);
+      writeStorage(SCHEME_CACHE_STORAGE_KEY, JSON.stringify(derived));
+    };
+    worker.addEventListener("message", onMessage);
+    const message: SchemeRequest = { id, ...request };
+    worker.postMessage(message);
+    return () => worker.removeEventListener("message", onMessage);
+    // `request` is fully described by `key`.
+  }, [key, schemes?.key]);
+
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    root.style.colorScheme = dark ? "dark" : "light";
+    root.dataset.theme = dark ? "dark" : "light";
+    if (!schemes) return;
+    for (const [name, value] of Object.entries(dark ? schemes.dark : schemes.light)) {
+      root.style.setProperty(name, value);
+    }
+  }, [schemes, dark]);
 
   const setTheme = useCallback((id: ThemeId) => {
     setThemeId(id);
-    saveThemeId(id);
+    writeStorage(THEME_STORAGE_KEY, id);
   }, []);
 
-  const updateCustomColors = useCallback((colors: Partial<ThemeColors>) => {
-    setCustomColors((prev) => {
-      const updated = { ...prev, ...colors };
-      saveCustomColors(updated);
+  const setMode = useCallback((next: ThemeMode) => {
+    setModeState(next);
+    writeStorage(THEME_MODE_STORAGE_KEY, next);
+  }, []);
+
+  const updateCustomSeed = useCallback((patch: Partial<SchemeSeed>) => {
+    setCustomSeed((previous) => {
+      const updated = { ...previous, ...patch };
+      if (!isSchemeSeed(updated)) return previous;
+      writeStorage(CUSTOM_THEME_STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });
   }, []);
 
-  const resetCustomColors = useCallback(() => {
-    const reset = { ...defaultCustomColors };
-    setCustomColors(reset);
-    saveCustomColors(reset);
+  const resetCustomSeed = useCallback(() => {
+    const reset = { ...DEFAULT_CUSTOM_SEED };
+    setCustomSeed(reset);
+    writeStorage(CUSTOM_THEME_STORAGE_KEY, JSON.stringify(reset));
   }, []);
 
-  const availableThemes: Theme[] = [
-    ...BUILT_IN_THEMES,
-    {
-      id: "custom",
-      name: "Custom",
-      description: "Your personalized color scheme",
-      colors: customColors,
-      isBuiltIn: false,
-    },
-  ];
+  const availableThemes: Theme[] = useMemo(() => [...BUILT_IN_THEMES, customTheme], [customTheme]);
 
   return (
     <ThemeContext.Provider
       value={{
         currentTheme,
         themeId,
-        customColors,
+        mode,
+        customSeed,
         setTheme,
-        updateCustomColors,
-        resetCustomColors,
+        setMode,
+        updateCustomSeed,
+        resetCustomSeed,
         availableThemes,
+        schemeError,
       }}
     >
       {children}
@@ -211,7 +264,3 @@ export function useTheme(): ThemeContextValue {
   }
   return context;
 }
-
-
-
-

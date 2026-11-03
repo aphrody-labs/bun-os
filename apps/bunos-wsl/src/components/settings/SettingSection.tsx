@@ -12,7 +12,6 @@ interface SettingSectionProps {
   title: string;
   description: string;
   icon: React.ReactNode;
-  iconGradient: string;
   presets: PresetOption[];
   currentValue: string;
   onValueChange: (value: string) => void;
@@ -31,7 +30,6 @@ export function SettingSection({
   title,
   description,
   icon,
-  iconGradient,
   presets,
   currentValue,
   onValueChange,
@@ -103,43 +101,22 @@ export function SettingSection({
     }
   };
 
-  // Extract gradient color from iconGradient for section styling
-  function resolveGradientColor(): "violet" | "emerald" | "amber" {
-    if (iconGradient.includes("violet") || iconGradient.includes("purple")) return "violet";
-    if (iconGradient.includes("emerald") || iconGradient.includes("teal")) return "emerald";
-    return "amber";
-  }
-  const gradientColor = resolveGradientColor();
-
-  const sectionStyles = {
-    violet: "from-violet-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border-violet-800/30",
-    emerald: "from-emerald-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border-emerald-800/30",
-    amber: "from-amber-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border-amber-800/30",
-  };
-
-  const glowStyles = {
-    violet: "from-violet-500/10",
-    emerald: "from-emerald-500/10",
-    amber: "from-amber-500/10",
-  };
-
   return (
-    <section className={`relative overflow-hidden bg-linear-to-br ${sectionStyles[gradientColor]} border rounded-xl p-6`}>
-      <div className={`absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] ${glowStyles[gradientColor]} via-transparent to-transparent`} />
-      <div className="relative">
+    <section className="bg-surface-container-low border border-outline-variant rounded-xl p-6">
+      <div>
         <div className="flex items-center gap-3 mb-6">
-          <div className={`w-10 h-10 rounded-lg bg-linear-to-br ${iconGradient} flex items-center justify-center shadow-lg`}>
+          <div className="w-10 h-10 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center">
             {icon}
           </div>
           <div>
-            <h2 className="text-lg font-medium text-theme-text-primary">{title}</h2>
-            <p className="text-sm text-theme-text-muted">{description}</p>
+            <h2 className="text-lg font-medium text-on-surface">{title}</h2>
+            <p className="text-sm text-on-surface-variant">{description}</p>
           </div>
         </div>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-8">
-            <div className="w-6 h-6 border-2 border-theme-border-secondary border-t-theme-accent-primary rounded-full animate-spin" />
+            <div className="w-6 h-6 border-2 border-outline-variant border-t-primary rounded-full animate-spin" />
           </div>
         ) : (
           <div className="space-y-4">
@@ -153,26 +130,26 @@ export function SettingSection({
                     disabled={isDisabled}
                     className={`flex items-center gap-3 p-4 rounded-lg border transition-all text-left ${
                       isDisabled
-                        ? "border-theme-border-secondary bg-theme-bg-tertiary/30 text-theme-text-muted opacity-50 cursor-not-allowed"
+                        ? "border-outline-variant bg-surface-container/30 text-on-surface-variant opacity-50 cursor-not-allowed"
                         : selectedPreset === preset.value
-                        ? "border-theme-accent-primary bg-theme-accent-primary/10 text-theme-text-primary"
-                        : "border-theme-border-secondary bg-theme-bg-tertiary/50 text-theme-text-muted hover:border-theme-border-primary hover:text-theme-text-secondary"
+                        ? "border-primary bg-primary/10 text-on-surface"
+                        : "border-outline-variant bg-surface-container/50 text-on-surface-variant hover:border-outline-variant hover:text-on-surface"
                     }`}
                   >
                     <div
                       className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                         isDisabled
-                          ? "border-theme-border-primary opacity-50"
+                          ? "border-outline-variant opacity-50"
                           : selectedPreset === preset.value
-                          ? "border-theme-accent-primary bg-theme-accent-primary"
-                          : "border-theme-border-primary"
+                          ? "border-primary bg-primary"
+                          : "border-outline-variant"
                       }`}
                     >
-                      {selectedPreset === preset.value && !isDisabled && <div className="w-1.5 h-1.5 rounded-full bg-white" />}
+                      {selectedPreset === preset.value && !isDisabled && <div className="w-1.5 h-1.5 rounded-full bg-on-primary" />}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className={`font-medium truncate ${isDisabled ? "line-through" : ""}`}>{preset.label}</p>
-                      <p className={`text-xs truncate ${isDisabled ? "text-theme-text-muted/70" : "text-theme-text-muted"}`}>{preset.description}</p>
+                      <p className={`text-xs truncate ${isDisabled ? "text-on-surface-variant/70" : "text-on-surface-variant"}`}>{preset.description}</p>
                     </div>
                   </button>
                 );
@@ -180,8 +157,8 @@ export function SettingSection({
             </div>
 
             {selectedPreset === "custom" && (
-              <div className="mt-4 p-4 bg-theme-bg-secondary/50 rounded-lg border border-theme-border-secondary/50" data-testid={testId ? `${testId}-custom-section` : undefined}>
-                <label className="block text-sm font-medium text-theme-text-secondary mb-2">{t('settingSection.customCommand')}</label>
+              <div className="mt-4 p-4 bg-surface-container-low/50 rounded-lg border border-outline-variant/50" data-testid={testId ? `${testId}-custom-section` : undefined}>
+                <label className="block text-sm font-medium text-on-surface-variant mb-2">{t('settingSection.customCommand')}</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -189,25 +166,25 @@ export function SettingSection({
                     onChange={(e) => setCustomCommandInput(e.target.value)}
                     placeholder={customPlaceholder}
                     data-testid={testId ? `${testId}-custom-input` : undefined}
-                    className="flex-1 px-4 py-2 bg-theme-bg-secondary border border-theme-border-secondary rounded-lg text-theme-text-primary placeholder-theme-text-muted focus:outline-hidden focus:border-theme-accent-primary"
+                    className="flex-1 px-4 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface placeholder-on-surface-variant focus:outline-hidden focus:border-primary"
                   />
                   <button
                     onClick={handleCustomCommandSave}
                     disabled={!customCommandInput.trim() || customCommandInput.trim() === savedCustomValue}
                     data-testid={testId ? `${testId}-custom-save` : undefined}
-                    className="px-4 py-2 bg-theme-accent-primary hover:opacity-90 text-theme-bg-primary font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-primary hover:opacity-90 text-on-primary font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {t('common:button.save')}
                   </button>
                 </div>
-                <div className="mt-3 text-xs text-theme-text-muted">{customHelpText}</div>
+                <div className="mt-3 text-xs text-on-surface-variant">{customHelpText}</div>
               </div>
             )}
 
-            <div className="mt-4 p-3 bg-theme-bg-secondary/30 rounded-lg border border-theme-border-primary/50">
+            <div className="mt-4 p-3 bg-surface-container-low/30 rounded-lg border border-outline-variant/50">
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-theme-text-muted">{t('settingSection.currentSetting')}</span>
-                <code className="px-2 py-0.5 bg-theme-bg-secondary rounded-sm text-theme-accent-primary font-mono">{currentValue}</code>
+                <span className="text-on-surface-variant">{t('settingSection.currentSetting')}</span>
+                <code className="px-2 py-0.5 bg-surface-container-low rounded-sm text-primary font-mono">{currentValue}</code>
               </div>
             </div>
           </div>

@@ -7,6 +7,7 @@ import { NewDistroDialog } from "./NewDistroDialog";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { PlusIcon, DownloadIcon, RefreshIcon, ShutdownIcon, SettingsIcon, TerminalWindowIcon, HelpIcon } from "./icons";
 import { HelpDialog } from "./HelpDialog";
+import { AppMark } from "./AppMark";
 import { Button, IconButton } from "./ui/Button";
 import { wslService, SystemDistroInfo } from "../services/wslService";
 
@@ -65,45 +66,31 @@ export function Header({ onOpenSettings }: HeaderProps) {
 
   return (
     <>
-      <header className="relative flex items-center justify-between px-6 py-3 border-b border-theme-border-primary bg-gradient-to-r from-theme-bg-primary via-theme-bg-secondary to-theme-bg-primary">
+      <header className="relative flex items-center justify-between px-6 py-3 border-b border-outline-variant bg-surface-container">
         {/* Ambient glow effect */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-32 bg-[#f97316]/5 blur-3xl rounded-full" />
-          <div className="absolute top-0 right-1/4 w-64 h-24 bg-[#f59e0b]/5 blur-3xl rounded-full" />
+          <div className="absolute top-0 left-1/4 w-96 h-32 bg-primary/5 blur-3xl rounded-full" />
+          <div className="absolute top-0 right-1/4 w-64 h-24 bg-tertiary/5 blur-3xl rounded-full" />
         </div>
 
         {/* Left: Logo, title, and system info */}
         <div className="relative flex items-center gap-6">
           {/* Logo and title */}
           <div className="flex items-center gap-4">
-            {/* Cyber-styled logo */}
-            <div className="relative group">
-              <div className="absolute inset-0 bg-[#f97316]/20 blur-xl rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <svg width="33" height="33" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" className="relative drop-shadow-lg">
-                <defs>
-                  <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#f59e0b"/>
-                    <stop offset="100%" stopColor="#d97706"/>
-                  </linearGradient>
-                </defs>
-                <rect x="0" y="0" width="512" height="512" rx="76" fill="url(#logoGrad)"/>
-                <path d="M128 179 L256 256 L128 333" stroke="#1a1a1a" strokeWidth="32" strokeLinecap="round" strokeLinejoin="round"/>
-                <rect x="288" y="307" width="140" height="26" rx="13" fill="#1a1a1a"/>
-              </svg>
-            </div>
+            <AppMark size={33} />
 
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-semibold tracking-tight text-theme-text-primary">
-                  WSL<span className="font-bold text-[#f59e0b]">UI</span>
+                <h1 className="text-2xl font-semibold tracking-tight text-on-surface">
+                  Bun OS <span className="font-bold text-primary">WSL</span>
                 </h1>
                 {appVersion && (
-                  <span className="px-1.5 py-0.5 text-[10px] font-medium bg-amber-500/20 text-amber-400 rounded-full border border-amber-500/30">
+                  <span className="px-1.5 py-0.5 text-[10px] font-medium bg-secondary-container text-on-secondary-container rounded-full border border-outline-variant">
                     v{appVersion}
                   </span>
                 )}
               </div>
-              <p className="text-xs font-mono text-theme-text-muted tracking-wider uppercase whitespace-nowrap">
+              <p className="text-xs font-mono text-on-surface-variant tracking-wider uppercase whitespace-nowrap">
                 {t('subtitle')}
               </p>
             </div>
@@ -113,21 +100,21 @@ export function Header({ onOpenSettings }: HeaderProps) {
           {systemInfo && (
             <div className="hidden lg:flex items-center gap-4">
               {/* Divider */}
-              <div className="w-px h-8 bg-gradient-to-b from-transparent via-theme-border-secondary to-transparent" />
+              <div className="w-px h-8 bg-outline-variant" />
 
               <div
-                className="px-2.5 py-1 bg-theme-bg-tertiary/50 border border-theme-border-secondary rounded-md cursor-help"
+                className="px-2.5 py-1 bg-surface-container/50 border border-outline-variant rounded-md cursor-help"
                 title={`WSL2 System Distribution\n${systemInfo.name}\nVersion: ${systemInfo.version}`}
               >
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] uppercase tracking-wider text-theme-text-muted font-mono">SYS</span>
-                  <span className="text-[10px] text-theme-accent-primary font-mono font-medium">
+                  <span className="text-[9px] uppercase tracking-wider text-on-surface-variant font-mono">SYS</span>
+                  <span className="text-[10px] text-primary font-mono font-medium">
                     {systemInfo.name}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[9px] uppercase tracking-wider text-theme-text-muted font-mono">VER</span>
-                  <span className="text-[10px] text-theme-text-secondary font-mono">
+                  <span className="text-[9px] uppercase tracking-wider text-on-surface-variant font-mono">VER</span>
+                  <span className="text-[10px] text-on-surface-variant font-mono">
                     {systemInfo.version}
                   </span>
                 </div>
@@ -190,14 +177,14 @@ export function Header({ onOpenSettings }: HeaderProps) {
           </Button>
 
           {/* Divider */}
-          <div className="w-px h-8 bg-gradient-to-b from-transparent via-theme-border-secondary to-transparent mx-1" />
+          <div className="w-px h-8 bg-outline-variant mx-1" />
 
           {/* System Terminal */}
           <IconButton
             icon={<TerminalWindowIcon size="md" />}
             label={t('button.systemTerminal')}
             variant="ghost"
-            colorScheme="amber"
+            colorScheme="tertiary"
             onClick={() => openSystemTerminal()}
             disabled={isLoading || !!actionInProgress}
             data-testid="system-terminal-button"
@@ -221,9 +208,6 @@ export function Header({ onOpenSettings }: HeaderProps) {
             data-testid="settings-button"
           />
         </div>
-
-        {/* Bottom accent line */}
-        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#f97316]/30 to-transparent" />
       </header>
 
       <ImportDialog isOpen={showImportDialog} onClose={() => setShowImportDialog(false)} />

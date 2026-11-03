@@ -66,7 +66,7 @@ export function WslGlobalSettings() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="w-8 h-8 border-2 border-theme-border-secondary border-t-theme-accent-primary rounded-full animate-spin" />
+        <div className="w-8 h-8 border-2 border-outline-variant border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -82,45 +82,43 @@ export function WslGlobalSettings() {
   return (
     <div className="space-y-6" data-testid="wsl-global-settings">
       {/* Link to Windows WSL Settings app */}
-      <div className="flex items-center justify-between p-4 bg-theme-bg-secondary/50 border border-theme-border-secondary rounded-xl">
+      <div className="flex items-center justify-between p-4 bg-surface-container-low/50 border border-outline-variant rounded-xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-linear-to-br from-slate-600 to-slate-700 flex items-center justify-center">
-            <SettingsIcon className="text-white" size="md" />
+          <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+            <SettingsIcon className="text-on-primary-container" size="md" />
           </div>
           <div>
-            <h3 className="text-sm font-medium text-theme-text-primary">{t('wslGlobal.windowsSettings')}</h3>
-            <p className="text-xs text-theme-text-muted">{t('wslGlobal.windowsSettingsDesc')}</p>
+            <h3 className="text-sm font-medium text-on-surface">{t('wslGlobal.windowsSettings')}</h3>
+            <p className="text-xs text-on-surface-variant">{t('wslGlobal.windowsSettingsDesc')}</p>
           </div>
         </div>
         <button
           onClick={openWindowsWslSettings}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-theme-text-primary bg-theme-bg-tertiary hover:bg-theme-bg-hover border border-theme-border-secondary rounded-lg transition-colors"
+          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-on-surface bg-surface-container hover:bg-surface-container-high border border-outline-variant rounded-lg transition-colors"
         >
           <ExternalLinkIcon size="sm" />
           <span>{t('wslGlobal.open')}</span>
         </button>
       </div>
 
-      <div className="relative overflow-hidden bg-linear-to-br from-amber-900/30 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-amber-700/30 rounded-xl p-4">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
-        <p className="relative text-sm text-theme-status-warning">
+      <div className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-4">
+        <p className="relative text-sm text-warning">
           {t('wslGlobal.restartNote')}
         </p>
       </div>
 
-      <section className="relative overflow-hidden bg-linear-to-br from-blue-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-blue-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent" />
+      <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
-              <CPUIcon className="text-white" size="md" />
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+              <CPUIcon className="text-on-primary-container" size="md" />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-theme-text-primary">{t('wslGlobal.resources')}</h3>
-              <p className="text-sm text-theme-text-muted">{t('wslGlobal.resourcesDesc')}</p>
+              <h3 className="text-lg font-medium text-on-surface">{t('wslGlobal.resources')}</h3>
+              <p className="text-sm text-on-surface-variant">{t('wslGlobal.resourcesDesc')}</p>
             </div>
           </div>
-          <div className="space-y-1 divide-y divide-theme-border-primary/50">
+          <div className="space-y-1 divide-y divide-outline-variant/50">
             <SettingInput
               label={t('wslGlobal.memory')}
               description={t('wslGlobal.memoryDesc')}
@@ -161,19 +159,18 @@ export function WslGlobalSettings() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-linear-to-br from-emerald-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-emerald-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-emerald-500/10 via-transparent to-transparent" />
+      <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-900/30">
-              <SettingsIcon className="text-white" size="md" />
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+              <SettingsIcon className="text-on-primary-container" size="md" />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-theme-text-primary">{t('wslGlobal.features')}</h3>
-              <p className="text-sm text-theme-text-muted">{t('wslGlobal.featuresDesc')}</p>
+              <h3 className="text-lg font-medium text-on-surface">{t('wslGlobal.features')}</h3>
+              <p className="text-sm text-on-surface-variant">{t('wslGlobal.featuresDesc')}</p>
             </div>
           </div>
-          <div className="space-y-1 divide-y divide-theme-border-primary/50">
+          <div className="space-y-1 divide-y divide-outline-variant/50">
             <Toggle
               label={t('wslGlobal.guiApplications')}
               description={t('wslGlobal.guiApplicationsDesc')}
@@ -199,48 +196,46 @@ export function WslGlobalSettings() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-linear-to-br from-violet-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-violet-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-violet-500/10 via-transparent to-transparent" />
+      <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-violet-500 to-purple-600 flex items-center justify-center shadow-lg shadow-violet-900/30">
-              <GpuIcon className="text-white" size="md" />
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+              <GpuIcon className="text-on-primary-container" size="md" />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-theme-text-primary">{t('wslGlobal.gpu')}</h3>
-              <p className="text-sm text-theme-text-muted">{t('wslGlobal.gpuDesc')}</p>
+              <h3 className="text-lg font-medium text-on-surface">{t('wslGlobal.gpu')}</h3>
+              <p className="text-sm text-on-surface-variant">{t('wslGlobal.gpuDesc')}</p>
             </div>
           </div>
-          <p className="text-sm text-theme-text-secondary leading-relaxed">
+          <p className="text-sm text-on-surface-variant leading-relaxed">
             {t('wslGlobal.gpuNote')}
           </p>
-          <p className="mt-2 text-xs text-theme-text-muted">
+          <p className="mt-2 text-xs text-on-surface-variant">
             {t('wslGlobal.gpuGuiNote')}
           </p>
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-linear-to-br from-purple-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-purple-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-500/10 via-transparent to-transparent" />
+      <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-900/30">
-              <NetworkIcon className="text-white" size="md" />
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+              <NetworkIcon className="text-on-primary-container" size="md" />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-theme-text-primary">{t('wslGlobal.networking')}</h3>
-              <p className="text-sm text-theme-text-muted">{t('wslGlobal.networkingDesc')}</p>
+              <h3 className="text-lg font-medium text-on-surface">{t('wslGlobal.networking')}</h3>
+              <p className="text-sm text-on-surface-variant">{t('wslGlobal.networkingDesc')}</p>
             </div>
           </div>
-          <div className="space-y-1 divide-y divide-theme-border-primary/50">
+          <div className="space-y-1 divide-y divide-outline-variant/50">
             <div className="py-3">
-              <label className="block text-sm font-medium text-theme-text-primary mb-1">{t('wslGlobal.networkingMode')}</label>
-              <p className="text-xs text-theme-text-muted mb-2">{t('wslGlobal.networkingModeDesc')}</p>
+              <label className="block text-sm font-medium text-on-surface mb-1">{t('wslGlobal.networkingMode')}</label>
+              <p className="text-xs text-on-surface-variant mb-2">{t('wslGlobal.networkingModeDesc')}</p>
               <select
                 value={config.networkingMode || "NAT"}
                 onChange={(e) => updateConfig("networkingMode", e.target.value)}
                 data-testid="wsl-networking-mode-select"
-                className="w-full px-3 py-2 bg-theme-bg-secondary/50 border border-theme-border-secondary rounded-lg text-theme-text-primary focus:outline-hidden focus:border-purple-500"
+                className="w-full px-3 py-2 bg-surface-container-low/50 border border-outline-variant rounded-lg text-on-surface focus:outline-hidden focus:border-tertiary"
               >
                 <option value="NAT">{t('wslGlobal.natDefault')}</option>
                 <option value="mirrored">{t('wslGlobal.mirrored')}</option>
@@ -249,7 +244,7 @@ export function WslGlobalSettings() {
                 <option value="bridged">{t('wslGlobal.bridgedDeprecated')}</option>
               </select>
               {config.networkingMode === "bridged" && (
-                <p className="text-xs text-amber-400 mt-2" data-testid="wsl-networking-mode-bridged-warning">
+                <p className="text-xs text-warning mt-2" data-testid="wsl-networking-mode-bridged-warning">
                   {t('wslGlobal.bridgedDeprecatedWarning')}
                 </p>
               )}
@@ -268,24 +263,23 @@ export function WslGlobalSettings() {
               onChange={(v) => updateConfig("firewall", v)}
               testId="wsl-firewall"
             />
-            <p className="pt-3 text-xs text-theme-text-muted italic">{t('wslGlobal.networkingRequiresWin11')}</p>
+            <p className="pt-3 text-xs text-on-surface-variant italic">{t('wslGlobal.networkingRequiresWin11')}</p>
           </div>
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-linear-to-br from-cyan-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-cyan-800/30 rounded-xl p-6">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-cyan-500/10 via-transparent to-transparent" />
+      <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
         <div className="relative">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-900/30">
-              <DownloadIcon className="text-white" size="md" />
+            <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+              <DownloadIcon className="text-on-primary-container" size="md" />
             </div>
             <div>
-              <h3 className="text-lg font-medium text-theme-text-primary">{t('wslGlobal.updates')}</h3>
-              <p className="text-sm text-theme-text-muted">{t('wslGlobal.updatesDesc')}</p>
+              <h3 className="text-lg font-medium text-on-surface">{t('wslGlobal.updates')}</h3>
+              <p className="text-sm text-on-surface-variant">{t('wslGlobal.updatesDesc')}</p>
             </div>
           </div>
-          <div className="space-y-1 divide-y divide-theme-border-primary/50">
+          <div className="space-y-1 divide-y divide-outline-variant/50">
             <Toggle
               label={t('wslGlobal.preReleaseUpdates')}
               description={t('wslGlobal.preReleaseUpdatesDesc')}
@@ -298,8 +292,8 @@ export function WslGlobalSettings() {
       </section>
 
       {error && (
-        <div className="p-4 bg-red-900/30 border border-red-700/50 rounded-xl" data-testid="wsl-config-error">
-          <p className="text-sm text-red-400">
+        <div className="p-4 bg-error-container border border-outline-variant rounded-xl" data-testid="wsl-config-error">
+          <p className="text-sm text-error">
             <span className="font-medium">{t('wslGlobal.errorLabel')}</span> {error}
           </p>
         </div>
@@ -310,7 +304,7 @@ export function WslGlobalSettings() {
           {error && (
             <button
               onClick={() => setError(null)}
-              className="px-4 py-3 bg-theme-bg-tertiary hover:bg-theme-bg-hover text-theme-text-secondary font-medium rounded-lg transition-colors"
+              className="px-4 py-3 bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-medium rounded-lg transition-colors"
             >
               {t('common:button.dismiss')}
             </button>
@@ -319,7 +313,7 @@ export function WslGlobalSettings() {
             onClick={handleSave}
             disabled={isSaving}
             data-testid="wsl-save-button"
-            className="px-6 py-3 bg-theme-accent-primary hover:opacity-90 text-theme-bg-primary font-medium rounded-lg shadow-lg shadow-black/30 transition-colors disabled:opacity-50"
+            className="px-6 py-3 bg-primary hover:opacity-90 text-on-primary font-medium rounded-lg shadow-lg shadow-shadow/30 transition-colors disabled:opacity-50"
           >
             {isSaving ? t('wslGlobal.saving') : error ? t('wslGlobal.retrySave') : t('wslGlobal.saveChanges')}
           </button>

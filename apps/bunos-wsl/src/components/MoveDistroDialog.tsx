@@ -120,22 +120,22 @@ export function MoveDistroDialog({ isOpen, distro, onClose }: MoveDistroDialogPr
 
       <ModalBody>
         {error && (
-          <div className="mb-4 p-3 bg-[rgba(var(--status-error-rgb),0.2)] border border-[rgba(var(--status-error-rgb),0.4)] rounded-lg text-theme-status-error text-sm">
+          <div className="mb-4 p-3 bg-error/20 border border-error/40 rounded-lg text-error text-sm">
             {error}
           </div>
         )}
 
         <div className="space-y-4">
-          <div className="p-3 bg-theme-bg-tertiary/50 border border-theme-border-secondary rounded-lg space-y-2">
+          <div className="p-3 bg-surface-container/50 border border-outline-variant rounded-lg space-y-2">
             <div>
-              <span className="text-theme-text-muted text-xs uppercase tracking-wider">{t('move.currentLocation')}</span>
-              <p className="text-theme-text-primary text-sm font-mono break-all mt-0.5">
+              <span className="text-on-surface-variant text-xs uppercase tracking-wider">{t('move.currentLocation')}</span>
+              <p className="text-on-surface text-sm font-mono break-all mt-0.5">
                 {currentLocation ? formatPath(currentLocation) : t('common:label.loading')}
               </p>
             </div>
-            <div className="pt-2 border-t border-theme-border-secondary/50">
-              <span className="text-theme-text-muted text-xs uppercase tracking-wider">{t('move.currentSize')}</span>
-              <p className="text-theme-text-primary text-sm mt-0.5">
+            <div className="pt-2 border-t border-outline-variant/50">
+              <span className="text-on-surface-variant text-xs uppercase tracking-wider">{t('move.currentSize')}</span>
+              <p className="text-on-surface text-sm mt-0.5">
                 {diskSize !== null ? formatSize(diskSize) : t('common:label.loading')}
               </p>
             </div>
@@ -158,8 +158,8 @@ export function MoveDistroDialog({ isOpen, distro, onClose }: MoveDistroDialogPr
         </div>
 
         {isMoving && (
-          <div className="mt-4 p-3 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg">
-            <div className="flex items-center gap-3 text-theme-text-secondary text-sm">
+          <div className="mt-4 p-3 bg-surface-container border border-outline-variant rounded-lg">
+            <div className="flex items-center gap-3 text-on-surface-variant text-sm">
               <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle
                   className="opacity-25"

@@ -162,28 +162,27 @@ export function WslDistroSourcesSettings() {
   };
 
   return (
-    <section className="relative overflow-hidden bg-linear-to-br from-emerald-900/20 via-theme-bg-secondary/50 to-theme-bg-secondary/50 border border-emerald-800/30 rounded-xl p-6">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-emerald-500/10 via-transparent to-transparent" />
+    <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
       <div className="relative">
         <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-900/30">
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+            <svg className="w-5 h-5 text-on-primary-container" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
             </svg>
           </div>
           <div>
-            <h2 className="text-lg font-medium text-theme-text-primary">
+            <h2 className="text-lg font-medium text-on-surface">
               {t("distroSources.title")}
             </h2>
-            <p className="text-sm text-theme-text-muted">
+            <p className="text-sm text-on-surface-variant">
               {t("distroSources.description")}
             </p>
           </div>
         </div>
 
         {/* Warning banner */}
-        <div className="mb-6 p-4 bg-amber-900/20 border border-amber-700/50 rounded-lg">
-          <p className="text-xs text-amber-200">
+        <div className="mb-6 p-4 bg-warning-container border border-outline-variant rounded-lg">
+          <p className="text-xs text-warning">
             <strong>{t("distroSources.warningTitle")}:</strong>{" "}
             {t("distroSources.warningBody")}
           </p>
@@ -194,8 +193,8 @@ export function WslDistroSourcesSettings() {
           <div
             className={`mb-4 p-3 rounded-lg text-sm ${
               banner.kind === "success"
-                ? "bg-emerald-900/20 border border-emerald-700/50 text-emerald-200"
-                : "bg-red-900/20 border border-red-700/50 text-red-200"
+                ? "bg-success-container border border-outline-variant text-success"
+                : "bg-error-container border border-outline-variant text-error"
             }`}
           >
             {banner.message}
@@ -203,35 +202,35 @@ export function WslDistroSourcesSettings() {
         )}
 
         {/* Current state */}
-        <div className="mb-6 pb-6 border-b border-theme-border-secondary/50">
-          <p className="text-xs text-theme-text-muted mb-2">
+        <div className="mb-6 pb-6 border-b border-outline-variant/50">
+          <p className="text-xs text-on-surface-variant mb-2">
             {t("distroSources.currentLabel")}
           </p>
-          <div className="p-3 bg-theme-bg-tertiary/50 rounded-md text-sm">
+          <div className="p-3 bg-surface-container/50 rounded-md text-sm">
             {isLoading ? (
-              <span className="text-theme-text-muted">
+              <span className="text-on-surface-variant">
                 {t("distroSources.loading")}
               </span>
             ) : loadError ? (
-              <span className="text-red-300">{loadError}</span>
+              <span className="text-error">{loadError}</span>
             ) : currentSource ? (
               <div className="space-y-1">
                 <div className="flex justify-between gap-2">
-                  <span className="text-theme-text-secondary">
+                  <span className="text-on-surface-variant">
                     {t("distroSources.modeLabel")}
                   </span>
-                  <span className="font-mono text-theme-text-primary">
+                  <span className="font-mono text-on-surface">
                     {currentSource.mode === "append"
                       ? t("distroSources.modeAppend")
                       : t("distroSources.modeReplace")}
                   </span>
                 </div>
-                <div className="text-xs text-theme-text-muted break-all font-mono">
+                <div className="text-xs text-on-surface-variant break-all font-mono">
                   {currentSource.url}
                 </div>
               </div>
             ) : (
-              <span className="text-theme-text-muted">
+              <span className="text-on-surface-variant">
                 {t("distroSources.noCurrent")}
               </span>
             )}
@@ -240,7 +239,7 @@ export function WslDistroSourcesSettings() {
 
         {/* Mode selector */}
         <div className="mb-4">
-          <p className="block text-sm font-medium text-theme-text-primary mb-2">
+          <p className="block text-sm font-medium text-on-surface mb-2">
             {t("distroSources.modeLabel")}
           </p>
           <div className="space-y-2">
@@ -254,10 +253,10 @@ export function WslDistroSourcesSettings() {
                 className="mt-1"
               />
               <div>
-                <div className="text-sm text-theme-text-primary">
+                <div className="text-sm text-on-surface">
                   {t("distroSources.modeAppend")}
                 </div>
-                <div className="text-xs text-theme-text-muted">
+                <div className="text-xs text-on-surface-variant">
                   {t("distroSources.modeAppendDesc")}
                 </div>
               </div>
@@ -272,10 +271,10 @@ export function WslDistroSourcesSettings() {
                 className="mt-1"
               />
               <div>
-                <div className="text-sm text-theme-text-primary">
+                <div className="text-sm text-on-surface">
                   {t("distroSources.modeReplace")}
                 </div>
-                <div className="text-xs text-amber-300">
+                <div className="text-xs text-warning">
                   {t("distroSources.modeReplaceWarning")}
                 </div>
               </div>
@@ -287,11 +286,11 @@ export function WslDistroSourcesSettings() {
         <div className="mb-4">
           <label
             htmlFor="distro-source-url"
-            className="block text-sm font-medium text-theme-text-primary mb-1"
+            className="block text-sm font-medium text-on-surface mb-1"
           >
             {t("distroSources.urlLabel")}
           </label>
-          <p className="text-xs text-theme-text-muted mb-2">
+          <p className="text-xs text-on-surface-variant mb-2">
             {t("distroSources.urlDesc")}
           </p>
           <div className="flex gap-2">
@@ -307,12 +306,12 @@ export function WslDistroSourcesSettings() {
                 setIsPreviewing(false);
               }}
               placeholder="https://example.com/distributions.json"
-              className="flex-1 px-3 py-2 bg-theme-bg-secondary border border-theme-border-secondary rounded-lg text-theme-text-primary text-sm font-mono focus:outline-none focus:border-emerald-500"
+              className="flex-1 px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg text-on-surface text-sm font-mono focus:outline-none focus:border-success"
             />
             <button
               onClick={() => handlePreview()}
               disabled={isPreviewing || !urlInput.trim()}
-              className="px-3 py-2 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg text-theme-text-secondary hover:text-theme-text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="px-3 py-2 bg-surface-container border border-outline-variant rounded-lg text-on-surface-variant hover:text-on-surface transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               {isPreviewing
                 ? t("distroSources.previewing")
@@ -323,14 +322,14 @@ export function WslDistroSourcesSettings() {
 
         {/* Preview */}
         {(preview || previewError) && (
-          <div className="mb-6 p-3 bg-theme-bg-tertiary/50 rounded-md">
-            <p className="text-xs text-theme-text-muted mb-2">
+          <div className="mb-6 p-3 bg-surface-container/50 rounded-md">
+            <p className="text-xs text-on-surface-variant mb-2">
               {t("distroSources.previewLabel")}
             </p>
             {previewError ? (
-              <p className="text-sm text-red-300">{previewError}</p>
+              <p className="text-sm text-error">{previewError}</p>
             ) : preview && preview.entries.length === 0 ? (
-              <p className="text-sm text-theme-text-muted">
+              <p className="text-sm text-on-surface-variant">
                 {t("distroSources.previewEmpty")}
               </p>
             ) : preview ? (
@@ -340,13 +339,13 @@ export function WslDistroSourcesSettings() {
                     key={`${e.flavor}-${e.name}`}
                     className="flex flex-wrap items-baseline gap-2"
                   >
-                    <span className="font-mono text-theme-text-primary">
+                    <span className="font-mono text-on-surface">
                       {e.name}
                     </span>
-                    <span className="text-xs text-theme-text-muted">
+                    <span className="text-xs text-on-surface-variant">
                       {e.friendlyName}
                     </span>
-                    <span className="text-xs text-theme-text-muted">
+                    <span className="text-xs text-on-surface-variant">
                       ({[e.hasAmd64 && "x64", e.hasArm64 && "arm64"]
                         .filter(Boolean)
                         .join(", ") || "no arch"}
@@ -364,7 +363,7 @@ export function WslDistroSourcesSettings() {
           <button
             onClick={handleApply}
             disabled={isMutating || !urlInput.trim()}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-success state-layer text-on-success rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isApplying
               ? t("distroSources.applying")
@@ -373,7 +372,7 @@ export function WslDistroSourcesSettings() {
           <button
             onClick={handleClear}
             disabled={isMutating || (!currentSource && !urlInput.trim())}
-            className="px-4 py-2 bg-theme-bg-tertiary hover:bg-theme-bg-secondary border border-theme-border-secondary rounded-lg text-theme-text-secondary text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-surface-container hover:bg-surface-container-low border border-outline-variant rounded-lg text-on-surface-variant text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isClearing
               ? t("distroSources.clearing")
@@ -382,33 +381,33 @@ export function WslDistroSourcesSettings() {
         </div>
 
         {/* Suggested sources */}
-        <div className="pt-6 border-t border-theme-border-secondary/50">
-          <p className="text-sm font-medium text-theme-text-primary mb-1">
+        <div className="pt-6 border-t border-outline-variant/50">
+          <p className="text-sm font-medium text-on-surface mb-1">
             {t("distroSources.suggestedTitle")}
           </p>
-          <p className="text-xs text-theme-text-muted mb-3">
+          <p className="text-xs text-on-surface-variant mb-3">
             {t("distroSources.suggestedDesc")}
           </p>
           <ul className="space-y-2">
             {SUGGESTED_SOURCES.map((s) => (
               <li
                 key={s.id}
-                className="flex items-start gap-3 p-3 bg-theme-bg-tertiary/30 border border-theme-border-secondary/40 rounded-lg"
+                className="flex items-start gap-3 p-3 bg-surface-container/30 border border-outline-variant/40 rounded-lg"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-theme-text-primary">
+                  <div className="text-sm text-on-surface">
                     {s.label}
                   </div>
-                  <div className="text-xs text-theme-text-muted">
+                  <div className="text-xs text-on-surface-variant">
                     {s.description}
                   </div>
-                  <div className="text-xs text-theme-text-muted font-mono break-all mt-1">
+                  <div className="text-xs text-on-surface-variant font-mono break-all mt-1">
                     {s.url}
                   </div>
                 </div>
                 <button
                   onClick={() => handleAddSuggested(s)}
-                  className="shrink-0 px-3 py-1.5 text-xs text-emerald-300 hover:text-emerald-200 border border-emerald-700/50 hover:border-emerald-500 rounded-md transition-colors"
+                  className="shrink-0 px-3 py-1.5 text-xs text-success hover:text-success border border-outline-variant hover:border-success rounded-md transition-colors"
                 >
                   {t("distroSources.suggestedAdd")}
                 </button>

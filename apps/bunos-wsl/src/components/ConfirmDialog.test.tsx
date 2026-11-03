@@ -82,26 +82,26 @@ describe('ConfirmDialog', () => {
     it('applies danger styling when danger prop is true', () => {
       render(<ConfirmDialog {...defaultProps} danger />);
       const confirmButton = screen.getByText('Confirm');
-      expect(confirmButton).toHaveClass('bg-theme-status-error');
+      expect(confirmButton).toHaveClass('bg-error');
     });
 
     it('applies orange styling when danger is false', () => {
       render(<ConfirmDialog {...defaultProps} danger={false} />);
       const confirmButton = screen.getByText('Confirm');
-      expect(confirmButton).toHaveClass('bg-theme-status-warning');
+      expect(confirmButton).toHaveClass('bg-warning');
     });
 
     it('applies danger icon styling when danger is true', () => {
       render(<ConfirmDialog {...defaultProps} danger />);
       // Icon container uses theme CSS variable classes
-      const iconContainer = document.querySelector('.text-theme-status-error');
+      const iconContainer = document.querySelector('.text-error');
       expect(iconContainer).toBeInTheDocument();
     });
 
     it('applies orange icon styling when danger is false', () => {
       render(<ConfirmDialog {...defaultProps} danger={false} />);
       // Icon container uses theme CSS variable classes
-      const iconContainer = document.querySelector('.text-theme-status-warning');
+      const iconContainer = document.querySelector('.text-warning');
       expect(iconContainer).toBeInTheDocument();
     });
   });

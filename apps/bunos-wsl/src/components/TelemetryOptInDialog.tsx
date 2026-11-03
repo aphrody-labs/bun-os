@@ -28,55 +28,55 @@ export function TelemetryOptInDialog({
     <Portal>
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
-        <div className="absolute inset-0 bg-theme-bg-primary/80 backdrop-blur-xs" />
+        <div className="absolute inset-0 bg-scrim/40 backdrop-blur-xs" />
 
         {/* Dialog */}
         <div
           role="dialog"
           aria-modal="true"
           data-testid="telemetry-opt-in-dialog"
-          className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-xl shadow-2xl shadow-black/50 max-w-lg w-full mx-4 p-6"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-lg w-full mx-4 p-6"
         >
           <div className="flex items-start gap-4 mb-5">
-            <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-[rgba(var(--accent-primary-rgb),0.2)] text-theme-accent-primary">
+            <div className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 bg-primary/20 text-primary">
               <ChartBarIcon size="lg" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-theme-text-primary">
+              <h3 className="text-lg font-semibold text-on-surface">
                 {t('telemetry.title')}
               </h3>
-              <p className="text-sm text-theme-text-secondary mt-1">
+              <p className="text-sm text-on-surface-variant mt-1">
                 {t('telemetry.subtitle')}
               </p>
             </div>
           </div>
 
           {/* What we collect */}
-          <div className="mb-5 p-4 bg-theme-bg-tertiary border border-theme-border-secondary rounded-lg">
+          <div className="mb-5 p-4 bg-surface-container border border-outline-variant rounded-lg">
             <div className="flex items-center gap-2 mb-3">
-              <ShieldCheckIcon size="sm" className="text-theme-status-success" />
-              <span className="text-sm font-medium text-theme-text-primary">
+              <ShieldCheckIcon size="sm" className="text-success" />
+              <span className="text-sm font-medium text-on-surface">
                 {t('telemetry.privacyTitle')}
               </span>
             </div>
-            <ul className="text-sm text-theme-text-secondary space-y-1.5 ml-6">
+            <ul className="text-sm text-on-surface-variant space-y-1.5 ml-6">
               <li className="flex items-start gap-2">
-                <span className="text-theme-accent-primary mt-0.5">•</span>
+                <span className="text-primary mt-0.5">•</span>
                 <span>{t('telemetry.dataPoint1')}</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-theme-accent-primary mt-0.5">•</span>
+                <span className="text-primary mt-0.5">•</span>
                 <span>{t('telemetry.dataPoint2')}</span>
               </li>
             </ul>
-            <div className="mt-3 pt-3 border-t border-theme-border-primary">
-              <p className="text-xs text-theme-text-muted">
+            <div className="mt-3 pt-3 border-t border-outline-variant">
+              <p className="text-xs text-on-surface-variant">
                 {t('telemetry.privacyNote')}{" "}
                 <a
                   href="https://aptabase.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-theme-accent-primary hover:underline"
+                  className="text-primary hover:underline"
                 >
                   Aptabase
                 </a>
@@ -90,20 +90,20 @@ export function TelemetryOptInDialog({
             <button
               onClick={onDecline}
               data-testid="telemetry-decline-button"
-              className="px-4 py-2 text-sm font-medium text-theme-text-secondary bg-theme-bg-tertiary hover:bg-theme-bg-hover rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-on-surface-variant bg-surface-container hover:bg-surface-container-high rounded-lg transition-colors"
             >
               {t('telemetry.decline')}
             </button>
             <button
               onClick={onAccept}
               data-testid="telemetry-accept-button"
-              className="px-4 py-2 text-sm font-medium text-theme-bg-primary bg-theme-accent-primary hover:opacity-90 rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-on-primary bg-primary hover:opacity-90 rounded-lg transition-colors"
             >
               {t('telemetry.accept')}
             </button>
           </div>
 
-          <p className="text-xs text-theme-text-muted text-center mt-4">
+          <p className="text-xs text-on-surface-variant text-center mt-4">
             {t('telemetry.changeAnytime')}
           </p>
         </div>

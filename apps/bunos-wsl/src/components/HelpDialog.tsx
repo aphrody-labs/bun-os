@@ -21,7 +21,7 @@ import {
   PaletteIcon,
 } from "./icons";
 import { getVersion } from "@tauri-apps/api/app";
-import { open } from "@tauri-apps/plugin-shell";
+import { openUrl } from "@tauri-apps/plugin-opener";
 
 interface HelpDialogProps {
   onClose: () => void;
@@ -38,23 +38,23 @@ function HelpSection({ title, icon, children, defaultOpen = false }: HelpSection
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border border-theme-border-secondary/50 rounded-lg overflow-hidden">
+    <div className="border border-outline-variant/50 rounded-lg overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-theme-bg-tertiary/30 hover:bg-theme-bg-tertiary/50 transition-colors text-left"
+        className="w-full flex items-center justify-between p-4 bg-surface-container/30 hover:bg-surface-container/50 transition-colors text-left"
       >
         <div className="flex items-center gap-3">
-          <span className="text-theme-accent-primary">{icon}</span>
-          <span className="font-medium text-theme-text-primary">{title}</span>
+          <span className="text-primary">{icon}</span>
+          <span className="font-medium text-on-surface">{title}</span>
         </div>
         {isOpen ? (
-          <ChevronUpIcon size="sm" className="text-theme-text-tertiary" />
+          <ChevronUpIcon size="sm" className="text-on-surface-variant" />
         ) : (
-          <ChevronDownIcon size="sm" className="text-theme-text-tertiary" />
+          <ChevronDownIcon size="sm" className="text-on-surface-variant" />
         )}
       </button>
       {isOpen && (
-        <div className="p-4 bg-theme-bg-secondary/50 text-sm text-theme-text-secondary leading-relaxed">
+        <div className="p-4 bg-surface-container-low/50 text-sm text-on-surface-variant leading-relaxed">
           {children}
         </div>
       )}
@@ -65,15 +65,15 @@ function HelpSection({ title, icon, children, defaultOpen = false }: HelpSection
 function HelpItem({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mb-3 last:mb-0">
-      <h4 className="font-medium text-theme-text-primary mb-1">{title}</h4>
-      <p className="text-theme-text-secondary">{children}</p>
+      <h4 className="font-medium text-on-surface mb-1">{title}</h4>
+      <p className="text-on-surface-variant">{children}</p>
     </div>
   );
 }
 
 function FeatureList({ items }: { items: string[] }) {
   return (
-    <ul className="list-disc list-inside space-y-1 text-theme-text-secondary">
+    <ul className="list-disc list-inside space-y-1 text-on-surface-variant">
       {items.map((item, i) => (
         <li key={i}>{item}</li>
       ))}
@@ -106,7 +106,7 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
       <div className="fixed inset-0 z-[100] flex items-center justify-center">
         {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-theme-bg-primary/80 backdrop-blur-xs"
+          className="absolute inset-0 bg-scrim/40 backdrop-blur-xs"
           onClick={onClose}
         />
 
@@ -116,18 +116,18 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
           aria-modal="true"
           aria-labelledby="help-dialog-title"
           data-testid="help-dialog"
-          className="relative bg-theme-bg-secondary border border-theme-border-secondary rounded-xl shadow-2xl shadow-black/50 max-w-3xl w-full mx-4 max-h-[85vh] overflow-hidden flex flex-col"
+          className="relative bg-surface-container-low border border-outline-variant rounded-xl shadow-2xl shadow-shadow/50 max-w-3xl w-full mx-4 max-h-[85vh] overflow-hidden flex flex-col"
         >
           {/* Header */}
-          <div className="flex items-center gap-3 p-6 border-b border-theme-border-secondary bg-gradient-to-r from-cyan-900/20 via-theme-bg-secondary to-theme-bg-secondary">
-            <div className="p-2 rounded-lg bg-cyan-500/20">
-              <HelpIcon size="lg" className="text-cyan-400" />
+          <div className="flex items-center gap-3 p-6 border-b border-outline-variant bg-surface-container-low">
+            <div className="p-2 rounded-lg bg-secondary/20">
+              <HelpIcon size="lg" className="text-secondary" />
             </div>
             <div>
-              <h2 id="help-dialog-title" className="text-xl font-semibold text-theme-text-primary">
+              <h2 id="help-dialog-title" className="text-xl font-semibold text-on-surface">
                 {t('title')}
               </h2>
-              <p className="text-sm text-theme-text-secondary">
+              <p className="text-sm text-on-surface-variant">
                 {t('subtitle')}
               </p>
             </div>
@@ -159,10 +159,10 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
             >
               <HelpItem title={t('distroManagement.startingStoppingTitle')}>
                 <span className="flex items-center gap-2 mb-1">
-                  <PlayIcon size="sm" className="text-theme-status-success" /> {t('distroManagement.start')}
+                  <PlayIcon size="sm" className="text-success" /> {t('distroManagement.start')}
                 </span>
                 <span className="flex items-center gap-2">
-                  <StopIcon size="sm" className="text-theme-status-error" /> {t('distroManagement.stop')}
+                  <StopIcon size="sm" className="text-error" /> {t('distroManagement.stop')}
                 </span>
               </HelpItem>
               <HelpItem title={t('distroManagement.setAsDefault')}>
@@ -205,30 +205,30 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
             >
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <StoreIcon size="md" className="text-amber-400 mt-0.5 shrink-0" />
+                  <StoreIcon size="md" className="text-warning mt-0.5 shrink-0" />
                   <div>
-                    <h4 className="font-medium text-theme-text-primary">{t('creatingDistros.quickInstall')}</h4>
+                    <h4 className="font-medium text-on-surface">{t('creatingDistros.quickInstall')}</h4>
                     <p>{t('creatingDistros.quickInstallText')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <ContainerIcon size="md" className="text-blue-400 mt-0.5 shrink-0" />
+                  <ContainerIcon size="md" className="text-secondary mt-0.5 shrink-0" />
                   <div>
-                    <h4 className="font-medium text-theme-text-primary">{t('creatingDistros.containerImages')}</h4>
+                    <h4 className="font-medium text-on-surface">{t('creatingDistros.containerImages')}</h4>
                     <p>{t('creatingDistros.containerImagesText')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <DownloadIcon size="md" className="text-green-400 mt-0.5 shrink-0" />
+                  <DownloadIcon size="md" className="text-success mt-0.5 shrink-0" />
                   <div>
-                    <h4 className="font-medium text-theme-text-primary">{t('creatingDistros.directDownload')}</h4>
+                    <h4 className="font-medium text-on-surface">{t('creatingDistros.directDownload')}</h4>
                     <p>{t('creatingDistros.directDownloadText')}</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <LxcIcon size="md" className="text-purple-400 mt-0.5 shrink-0" />
+                  <LxcIcon size="md" className="text-tertiary mt-0.5 shrink-0" />
                   <div>
-                    <h4 className="font-medium text-theme-text-primary">{t('creatingDistros.communityCatalog')}</h4>
+                    <h4 className="font-medium text-on-surface">{t('creatingDistros.communityCatalog')}</h4>
                     <p>{t('creatingDistros.communityCatalogText')}</p>
                   </div>
                 </div>
@@ -262,11 +262,11 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
               <HelpItem title={t('customActions.variables')}>
                 {t('customActions.variablesText')}
               </HelpItem>
-              <ul className="list-none space-y-1 font-mono text-xs bg-theme-bg-tertiary/50 p-3 rounded-lg mt-2">
-                <li><code className="text-cyan-400">{"${DISTRO_NAME}"}</code> - {t('customActions.varDistroName')}</li>
-                <li><code className="text-cyan-400">{"${HOME}"}</code> - {t('customActions.varHome')}</li>
-                <li><code className="text-cyan-400">{"${USER}"}</code> - {t('customActions.varUser')}</li>
-                <li><code className="text-cyan-400">{"${WINDOWS_HOME}"}</code> - {t('customActions.varWindowsHome')}</li>
+              <ul className="list-none space-y-1 font-mono text-xs bg-surface-container/50 p-3 rounded-lg mt-2">
+                <li><code className="text-secondary">{"${DISTRO_NAME}"}</code> - {t('customActions.varDistroName')}</li>
+                <li><code className="text-secondary">{"${HOME}"}</code> - {t('customActions.varHome')}</li>
+                <li><code className="text-secondary">{"${USER}"}</code> - {t('customActions.varUser')}</li>
+                <li><code className="text-secondary">{"${WINDOWS_HOME}"}</code> - {t('customActions.varWindowsHome')}</li>
               </ul>
               <HelpItem title={t('customActions.targeting')}>
                 {t('customActions.targetingText')}
@@ -296,15 +296,15 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
             >
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div><kbd className="px-2 py-0.5 bg-theme-bg-tertiary rounded text-xs">{t('keyboardShortcuts.tab')}</kbd></div>
+                  <div><kbd className="px-2 py-0.5 bg-surface-container rounded text-xs">{t('keyboardShortcuts.tab')}</kbd></div>
                   <div>{t('keyboardShortcuts.tabAction')}</div>
-                  <div><kbd className="px-2 py-0.5 bg-theme-bg-tertiary rounded text-xs">{t('keyboardShortcuts.shiftTab')}</kbd></div>
+                  <div><kbd className="px-2 py-0.5 bg-surface-container rounded text-xs">{t('keyboardShortcuts.shiftTab')}</kbd></div>
                   <div>{t('keyboardShortcuts.shiftTabAction')}</div>
-                  <div><kbd className="px-2 py-0.5 bg-theme-bg-tertiary rounded text-xs">{t('keyboardShortcuts.enter')}</kbd></div>
+                  <div><kbd className="px-2 py-0.5 bg-surface-container rounded text-xs">{t('keyboardShortcuts.enter')}</kbd></div>
                   <div>{t('keyboardShortcuts.enterAction')}</div>
-                  <div><kbd className="px-2 py-0.5 bg-theme-bg-tertiary rounded text-xs">{t('keyboardShortcuts.escape')}</kbd></div>
+                  <div><kbd className="px-2 py-0.5 bg-surface-container rounded text-xs">{t('keyboardShortcuts.escape')}</kbd></div>
                   <div>{t('keyboardShortcuts.escapeAction')}</div>
-                  <div><kbd className="px-2 py-0.5 bg-theme-bg-tertiary rounded text-xs">{t('keyboardShortcuts.space')}</kbd></div>
+                  <div><kbd className="px-2 py-0.5 bg-surface-container rounded text-xs">{t('keyboardShortcuts.space')}</kbd></div>
                   <div>{t('keyboardShortcuts.spaceAction')}</div>
                 </div>
               </div>
@@ -362,10 +362,10 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
               <HelpItem title={t('troubleshooting.distroWontStart')}>
                 {t('troubleshooting.distroWontStartText')}
               </HelpItem>
-              <div className="mt-3 pt-3 border-t border-theme-border-secondary/30">
+              <div className="mt-3 pt-3 border-t border-outline-variant/30">
                 <button
-                  onClick={() => open("https://github.com/aphrody-labs/bun-os/tree/os/docs/wsl")}
-                  className="flex items-center gap-2 text-theme-accent-primary hover:underline"
+                  onClick={() => openUrl("https://github.com/aphrody-labs/bun-os/tree/os/docs/wsl")}
+                  className="flex items-center gap-2 text-primary hover:underline"
                 >
                   <ExternalLinkIcon size="sm" />
                   {t('troubleshooting.fullGuide')}
@@ -380,36 +380,36 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
             >
               <div className="space-y-3">
                 <button
-                  onClick={() => open("https://github.com/aphrody-labs/bun-os/tree/os/docs/wsl")}
-                  className="flex items-center gap-2 text-theme-accent-primary hover:underline"
+                  onClick={() => openUrl("https://github.com/aphrody-labs/bun-os/tree/os/docs/wsl")}
+                  className="flex items-center gap-2 text-primary hover:underline"
                 >
                   <ExternalLinkIcon size="sm" />
                   {t('resources.wslUiWebsite')}
                 </button>
                 <button
-                  onClick={() => open("https://github.com/aphrody-labs/bun-os")}
-                  className="flex items-center gap-2 text-theme-accent-primary hover:underline"
+                  onClick={() => openUrl("https://github.com/aphrody-labs/bun-os")}
+                  className="flex items-center gap-2 text-primary hover:underline"
                 >
                   <ExternalLinkIcon size="sm" />
                   {t('resources.githubRepo')}
                 </button>
                 <button
-                  onClick={() => open("https://github.com/aphrody-labs/bun-os/issues")}
-                  className="flex items-center gap-2 text-theme-accent-primary hover:underline"
+                  onClick={() => openUrl("https://github.com/aphrody-labs/bun-os/issues")}
+                  className="flex items-center gap-2 text-primary hover:underline"
                 >
                   <ExternalLinkIcon size="sm" />
                   {t('resources.reportIssue')}
                 </button>
                 <button
-                  onClick={() => open("https://www.octasoft.co.uk")}
-                  className="flex items-center gap-2 text-theme-accent-primary hover:underline"
+                  onClick={() => openUrl("https://www.octasoft.co.uk")}
+                  className="flex items-center gap-2 text-primary hover:underline"
                 >
                   <ExternalLinkIcon size="sm" />
                   {t('resources.octasoftWebsite')}
                 </button>
                 <button
-                  onClick={() => open("https://docs.microsoft.com/en-us/windows/wsl/")}
-                  className="flex items-center gap-2 text-theme-accent-primary hover:underline"
+                  onClick={() => openUrl("https://docs.microsoft.com/en-us/windows/wsl/")}
+                  className="flex items-center gap-2 text-primary hover:underline"
                 >
                   <ExternalLinkIcon size="sm" />
                   {t('resources.microsoftDocs')}
@@ -419,14 +419,14 @@ export function HelpDialog({ onClose }: HelpDialogProps) {
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between p-4 border-t border-theme-border-secondary bg-theme-bg-tertiary/30">
-            <span className="text-xs text-theme-text-tertiary">
+          <div className="flex items-center justify-between p-4 border-t border-outline-variant bg-surface-container/30">
+            <span className="text-xs text-on-surface-variant">
               Bun OS WSL {appVersion && `v${appVersion}`}
             </span>
             <button
               onClick={onClose}
               data-testid="help-close-button"
-              className="px-4 py-2 text-sm font-medium text-theme-text-secondary bg-theme-bg-tertiary hover:bg-theme-bg-hover rounded-lg transition-colors"
+              className="px-4 py-2 text-sm font-medium text-on-surface-variant bg-surface-container hover:bg-surface-container-high rounded-lg transition-colors"
             >
               {t('common:button.close')}
             </button>

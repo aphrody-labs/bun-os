@@ -48,7 +48,7 @@ describe('Input', () => {
     it('applies error styles when error is present', () => {
       render(<Input label="Email" error="Invalid" />);
       const input = screen.getByLabelText('Email');
-      expect(input).toHaveClass('border-theme-status-error');
+      expect(input).toHaveClass('border-error');
     });
   });
 
@@ -102,7 +102,7 @@ describe('TextArea', () => {
   it('applies error styles', () => {
     render(<TextArea label="Description" error="Required" />);
     const textarea = screen.getByLabelText('Description');
-    expect(textarea).toHaveClass('border-theme-status-error');
+    expect(textarea).toHaveClass('border-error');
   });
 });
 

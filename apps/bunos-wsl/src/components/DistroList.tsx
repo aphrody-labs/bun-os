@@ -40,14 +40,14 @@ export function DistroList() {
         <div className="text-center">
           {/* Cyber loading spinner */}
           <div className="relative w-16 h-16 mx-auto mb-6">
-            <div className="absolute inset-0 border-2 border-[rgba(var(--accent-primary-rgb),0.3)] rounded-full" />
-            <div className="absolute inset-0 border-2 border-transparent border-t-theme-accent-primary rounded-full animate-spin" />
-            <div className="absolute inset-2 border-2 border-transparent border-b-[rgba(var(--accent-primary-rgb),0.5)] rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
+            <div className="absolute inset-0 border-2 border-primary/30 rounded-full" />
+            <div className="absolute inset-0 border-2 border-transparent border-t-primary rounded-full animate-spin" />
+            <div className="absolute inset-2 border-2 border-transparent border-b-primary/50 rounded-full animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-2 h-2 bg-theme-accent-primary rounded-full animate-pulse shadow-[0_0_10px_rgba(var(--accent-primary-rgb),1)]" />
+              <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
             </div>
           </div>
-          <p className="text-theme-text-muted font-mono text-sm uppercase tracking-wider">{t('loading')}</p>
+          <p className="text-on-surface-variant font-mono text-sm uppercase tracking-wider">{t('loading')}</p>
         </div>
       </div>
     );
@@ -59,9 +59,9 @@ export function DistroList() {
         <div className="text-center animate-fade-slide-in">
           {/* Empty state icon */}
           <div className="relative w-20 h-20 mx-auto mb-6">
-            <div className="absolute inset-0 bg-theme-bg-tertiary rounded-xl border border-theme-border-secondary flex items-center justify-center">
+            <div className="absolute inset-0 bg-surface-container rounded-xl border border-outline-variant flex items-center justify-center">
               <svg
-                className="w-10 h-10 text-theme-status-stopped"
+                className="w-10 h-10 text-outline"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -74,20 +74,15 @@ export function DistroList() {
                 />
               </svg>
             </div>
-            {/* Corner accents */}
-            <div className="absolute top-0 left-0 w-3 h-px bg-gradient-to-r from-theme-accent-primary/50 to-transparent" />
-            <div className="absolute top-0 left-0 w-px h-3 bg-gradient-to-b from-theme-accent-primary/50 to-transparent" />
-            <div className="absolute bottom-0 right-0 w-3 h-px bg-gradient-to-l from-theme-accent-primary/50 to-transparent" />
-            <div className="absolute bottom-0 right-0 w-px h-3 bg-gradient-to-t from-theme-accent-primary/50 to-transparent" />
           </div>
 
-          <h3 className="text-lg font-semibold text-theme-text-secondary mb-2">{t('emptyState.title')}</h3>
-          <p className="text-theme-text-muted text-sm font-mono">
+          <h3 className="text-lg font-semibold text-on-surface-variant mb-2">{t('emptyState.title')}</h3>
+          <p className="text-on-surface-variant text-sm font-mono">
             {t('emptyState.description')}
           </p>
 
           {/* Decorative line */}
-          <div className="w-32 h-px mx-auto mt-6 bg-gradient-to-r from-transparent via-theme-border-secondary to-transparent" />
+          <div className="w-32 h-px mx-auto mt-6 bg-outline-variant" />
         </div>
       </div>
     );
@@ -148,34 +143,34 @@ export function DistroList() {
   return (
     <div>
       {/* Filter Bar - Two rows on mobile, one row on desktop */}
-      <div className="sticky top-0 z-20 -mx-6 px-6 py-3 mb-1 bg-theme-bg-primary/95 backdrop-blur-sm border-b border-theme-border-primary/50">
+      <div className="sticky top-0 z-20 -mx-6 px-6 py-3 mb-1 bg-surface/95 backdrop-blur-sm border-b border-outline-variant/50">
         <div className="relative">
         {/* IP Address - Always top right */}
         {wslIp && (
           <button
             onClick={copyIpToClipboard}
             data-testid="wsl-ip-display"
-            className="absolute right-0 top-0 flex items-center gap-2 px-3 py-2 bg-theme-bg-secondary border border-theme-border-primary rounded-lg whitespace-nowrap hover:bg-theme-bg-hover transition-colors group z-10"
+            className="absolute right-0 top-0 flex items-center gap-2 px-3 py-2 bg-surface-container-low border border-outline-variant rounded-lg whitespace-nowrap hover:bg-surface-container-high transition-colors group z-10"
             title={t('card.ipTooltip')}
           >
-            <span className="text-xs font-mono text-theme-text-muted">{t('common:label.ip')}</span>
-            <span className="text-sm font-mono text-theme-accent-primary" data-testid="wsl-ip-value">{wslIp}</span>
-            <CopyIcon size="sm" className={`text-theme-text-muted group-hover:text-theme-accent-primary transition-colors ${ipCopied ? 'text-theme-status-running' : ''}`} />
-            {ipCopied && <span className="text-[10px] text-theme-status-running" data-testid="ip-copied-indicator">{t('common:label.copied')}</span>}
+            <span className="text-xs font-mono text-on-surface-variant">{t('common:label.ip')}</span>
+            <span className="text-sm font-mono text-primary" data-testid="wsl-ip-value">{wslIp}</span>
+            <CopyIcon size="sm" className={`text-on-surface-variant group-hover:text-primary transition-colors ${ipCopied ? 'text-success' : ''}`} />
+            {ipCopied && <span className="text-[10px] text-success" data-testid="ip-copied-indicator">{t('common:label.copied')}</span>}
           </button>
         )}
 
         {/* Filters */}
         <div className={`flex items-center gap-2 flex-wrap ${wslIp ? 'pr-44 lg:pr-48' : ''}`}>
           {/* Status Filters */}
-          <div className="flex items-center gap-1 p-1 bg-theme-bg-tertiary/50 rounded-lg border border-theme-border-primary" data-testid="status-filter-group">
+          <div className="flex items-center gap-1 p-1 bg-surface-container/50 rounded-lg border border-outline-variant" data-testid="status-filter-group">
             <button
               onClick={() => setStatusFilter("all")}
               data-testid="status-filter-all"
               className={`px-2 sm:px-3 py-1.5 text-xs font-medium rounded-md transition-all border ${
                 statusFilter === "all"
-                  ? "bg-theme-accent-primary/20 text-theme-accent-primary border-theme-accent-primary/30"
-                  : "border-transparent text-theme-text-muted hover:text-theme-text-secondary hover:bg-theme-bg-hover"
+                  ? "bg-primary/20 text-primary border-primary/30"
+                  : "border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
               }`}
             >
               {t('filter.all')}
@@ -185,12 +180,12 @@ export function DistroList() {
               data-testid="status-filter-online"
               className={`px-2 py-1.5 text-xs font-medium rounded-md transition-all border flex items-center gap-1.5 ${
                 statusFilter === "online"
-                  ? "bg-theme-status-running/20 text-theme-status-running border-theme-status-running/30"
-                  : "border-transparent text-theme-text-muted hover:text-theme-text-secondary hover:bg-theme-bg-hover"
+                  ? "bg-success/20 text-success border-success/30"
+                  : "border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
               }`}
               title={t('filter.onlineTooltip', { count: onlineCount })}
             >
-              <span className="w-2 h-2 rounded-full bg-theme-status-running" />
+              <span className="w-2 h-2 rounded-full bg-success" />
               <span className="text-[10px]" data-testid="online-count">{onlineCount}</span>
             </button>
             <button
@@ -198,28 +193,28 @@ export function DistroList() {
               data-testid="status-filter-offline"
               className={`px-2 py-1.5 text-xs font-medium rounded-md transition-all border flex items-center gap-1.5 ${
                 statusFilter === "offline"
-                  ? "bg-theme-text-muted/20 text-theme-text-secondary border-theme-text-muted/30"
-                  : "border-transparent text-theme-text-muted hover:text-theme-text-secondary hover:bg-theme-bg-hover"
+                  ? "bg-on-surface-variant/20 text-on-surface-variant border-on-surface-variant/30"
+                  : "border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
               }`}
               title={t('filter.offlineTooltip', { count: offlineCount })}
             >
-              <span className="w-2 h-2 rounded-full bg-theme-status-stopped" />
+              <span className="w-2 h-2 rounded-full bg-outline" />
               <span className="text-[10px]" data-testid="offline-count">{offlineCount}</span>
             </button>
           </div>
 
           {/* Divider - hidden on very small screens */}
-          <div className="hidden sm:block w-px h-6 bg-theme-border-secondary" />
+          <div className="hidden sm:block w-px h-6 bg-outline-variant" />
 
           {/* Source Filters */}
-          <div className="flex items-center gap-1 p-1 bg-theme-bg-tertiary/50 rounded-lg border border-theme-border-primary" data-testid="source-filter-group">
+          <div className="flex items-center gap-1 p-1 bg-surface-container/50 rounded-lg border border-outline-variant" data-testid="source-filter-group">
             <button
               onClick={() => setSourceFilter("all")}
               data-testid="source-filter-all"
               className={`px-2 sm:px-3 py-1.5 text-xs font-medium rounded-md transition-all border ${
                 sourceFilter === "all"
-                  ? "bg-theme-accent-primary/20 text-theme-accent-primary border-theme-accent-primary/30"
-                  : "border-transparent text-theme-text-muted hover:text-theme-text-secondary hover:bg-theme-bg-hover"
+                  ? "bg-primary/20 text-primary border-primary/30"
+                  : "border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
               }`}
               title={t('filter.allSources')}
             >
@@ -237,7 +232,7 @@ export function DistroList() {
                   onClick={() => setSourceFilter(source)}
                   data-testid={`source-filter-${source}`}
                   className={`p-1.5 text-xs font-medium rounded-md transition-all border ${
-                    isSelected ? "" : "border-transparent text-theme-text-muted hover:text-theme-text-secondary hover:bg-theme-bg-hover"
+                    isSelected ? "" : "border-transparent text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
                   }`}
                   style={isSelected ? {
                     backgroundColor: `${color}20`,
@@ -253,18 +248,18 @@ export function DistroList() {
           </div>
 
           {/* Divider - hidden on very small screens */}
-          <div className="hidden sm:block w-px h-6 bg-theme-border-secondary" />
+          <div className="hidden sm:block w-px h-6 bg-outline-variant" />
 
           {/* WSL Version Toggle Buttons */}
-          <div className="flex items-center gap-1 p-1 bg-theme-bg-tertiary/50 rounded-lg border border-theme-border-primary" data-testid="version-filter-group">
+          <div className="flex items-center gap-1 p-1 bg-surface-container/50 rounded-lg border border-outline-variant" data-testid="version-filter-group">
             {hasWsl1 && (
               <button
                 onClick={() => setWsl1Enabled(!wsl1Enabled)}
                 data-testid="version-filter-wsl1"
                 className={`px-2 py-1.5 text-xs font-medium rounded-md transition-all border flex items-center gap-1 ${
                   wsl1Enabled
-                    ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                    : "border-transparent text-theme-text-muted/50 hover:text-theme-text-muted hover:bg-theme-bg-hover line-through"
+                    ? "bg-secondary/20 text-secondary border-secondary/30"
+                    : "border-transparent text-on-surface-variant/50 hover:text-on-surface hover:bg-surface-container-high line-through"
                 }`}
                 title={wsl1Enabled ? t('filter.hideWsl1', { count: wsl1Count }) : t('filter.showWsl1', { count: wsl1Count })}
               >
@@ -278,8 +273,8 @@ export function DistroList() {
                 data-testid="version-filter-wsl2"
                 className={`px-2 py-1.5 text-xs font-medium rounded-md transition-all border flex items-center gap-1 ${
                   wsl2Enabled
-                    ? "bg-blue-500/20 text-blue-400 border-blue-500/30"
-                    : "border-transparent text-theme-text-muted/50 hover:text-theme-text-muted hover:bg-theme-bg-hover line-through"
+                    ? "bg-secondary/20 text-secondary border-secondary/30"
+                    : "border-transparent text-on-surface-variant/50 hover:text-on-surface hover:bg-surface-container-high line-through"
                 }`}
                 title={wsl2Enabled ? t('filter.hideWsl2', { count: wsl2Count }) : t('filter.showWsl2', { count: wsl2Count })}
               >
@@ -296,7 +291,7 @@ export function DistroList() {
       {sortedDistributions.length === 0 ? (
         <div className="flex items-center justify-center h-40" data-testid="empty-filter-state">
           <div className="text-center">
-            <p className="text-theme-text-muted text-sm" data-testid="empty-filter-message">
+            <p className="text-on-surface-variant text-sm" data-testid="empty-filter-message">
               {distributions.length === 0
                 ? t('emptyFilter.noDistros')
                 : t('emptyFilter.noMatch')}
@@ -305,7 +300,7 @@ export function DistroList() {
               <button
                 onClick={clearFilters}
                 data-testid="clear-filters-button"
-                className="mt-2 text-xs text-theme-accent-primary hover:underline"
+                className="mt-2 text-xs text-primary hover:underline"
               >
                 {t('emptyFilter.clearFilters')}
               </button>

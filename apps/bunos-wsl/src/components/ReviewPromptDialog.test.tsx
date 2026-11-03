@@ -54,9 +54,9 @@ describe('ReviewPromptDialog', () => {
 
     it('displays the app logo', () => {
       render(<ReviewPromptDialog {...defaultProps} />);
-      const svg = document.querySelector('svg');
-      expect(svg).toBeInTheDocument();
-      expect(svg).toHaveAttribute('viewBox', '0 0 512 512');
+      const mark = document.querySelector('[data-m3-component="Icon"]');
+      expect(mark).toBeInTheDocument();
+      expect(mark).toHaveTextContent('terminal');
     });
   });
 
@@ -149,7 +149,7 @@ describe('ReviewPromptDialog', () => {
     it('Leave a Review button has primary styling', () => {
       render(<ReviewPromptDialog {...defaultProps} />);
       const button = screen.getByTestId('review-leave-review-button');
-      expect(button).toHaveClass('bg-theme-accent-primary');
+      expect(button).toHaveClass('bg-primary');
     });
   });
 });

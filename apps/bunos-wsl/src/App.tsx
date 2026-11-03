@@ -238,29 +238,29 @@ function App() {
         {/* Startup action output dialog */}
         {startupActionOutput && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/50" onClick={clearStartupActionOutput} />
-            <div className="relative bg-theme-bg-secondary border border-theme-border rounded-lg p-4 max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
+            <div className="absolute inset-0 bg-scrim/50" onClick={clearStartupActionOutput} />
+            <div className="relative bg-surface-container-low border border-outline-variant rounded-lg p-4 max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-theme-text-primary">{startupActionOutput.actionName} {t('common:output')}</h3>
+                <h3 className="font-semibold text-on-surface">{startupActionOutput.actionName} {t('common:output')}</h3>
                 <button
                   onClick={clearStartupActionOutput}
-                  className="text-theme-text-muted hover:text-theme-text-primary"
+                  className="text-on-surface-variant hover:text-on-surface"
                 >
                   &times;
                 </button>
               </div>
-              <div className="font-mono text-xs bg-theme-bg-primary p-3 rounded">
+              <div className="font-mono text-xs bg-surface p-3 rounded">
                 {startupActionOutput.output && (
-                  <pre className="text-sm text-theme-text-secondary font-mono whitespace-pre-wrap">{startupActionOutput.output}</pre>
+                  <pre className="text-sm text-on-surface-variant font-mono whitespace-pre-wrap">{startupActionOutput.output}</pre>
                 )}
                 {startupActionOutput.error && (
-                  <pre className="mt-2 text-sm text-theme-status-error font-mono whitespace-pre-wrap">{startupActionOutput.error}</pre>
+                  <pre className="mt-2 text-sm text-error font-mono whitespace-pre-wrap">{startupActionOutput.error}</pre>
                 )}
                 {!startupActionOutput.output && !startupActionOutput.error && (
-                  <p className="text-theme-text-muted italic">{t('common:noOutput')}</p>
+                  <p className="text-on-surface-variant italic">{t('common:noOutput')}</p>
                 )}
               </div>
-              <p className="mt-2 text-xs text-theme-text-muted">
+              <p className="mt-2 text-xs text-on-surface-variant">
                 {t('common:ranOn', { distro: startupActionOutput.distro })}
               </p>
             </div>
@@ -289,7 +289,7 @@ function App() {
             >
               {isTimeoutError && (
                 <div className="space-y-3">
-                  <p className="text-xs text-theme-text-muted">
+                  <p className="text-xs text-on-surface-variant">
                     {t('system.timeoutTip')}
                   </p>
                   <Button
@@ -361,29 +361,29 @@ function App() {
         {/* Startup action output dialog */}
         {startupActionOutput && (
           <div className="fixed inset-0 z-50 flex items-center justify-center">
-            <div className="absolute inset-0 bg-black/50" onClick={clearStartupActionOutput} />
-            <div className="relative bg-theme-bg-secondary border border-theme-border rounded-lg p-4 max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
+            <div className="absolute inset-0 bg-scrim/50" onClick={clearStartupActionOutput} />
+            <div className="relative bg-surface-container-low border border-outline-variant rounded-lg p-4 max-w-lg w-full mx-4 max-h-[80vh] overflow-auto">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-theme-text-primary">{startupActionOutput.actionName} {t('common:output')}</h3>
+                <h3 className="font-semibold text-on-surface">{startupActionOutput.actionName} {t('common:output')}</h3>
                 <button
                   onClick={clearStartupActionOutput}
-                  className="text-theme-text-muted hover:text-theme-text-primary"
+                  className="text-on-surface-variant hover:text-on-surface"
                 >
                   &times;
                 </button>
               </div>
-              <div className="font-mono text-xs bg-theme-bg-primary p-3 rounded">
+              <div className="font-mono text-xs bg-surface p-3 rounded">
                 {startupActionOutput.output && (
-                  <pre className="text-sm text-theme-text-secondary font-mono whitespace-pre-wrap">{startupActionOutput.output}</pre>
+                  <pre className="text-sm text-on-surface-variant font-mono whitespace-pre-wrap">{startupActionOutput.output}</pre>
                 )}
                 {startupActionOutput.error && (
-                  <pre className="mt-2 text-sm text-theme-status-error font-mono whitespace-pre-wrap">{startupActionOutput.error}</pre>
+                  <pre className="mt-2 text-sm text-error font-mono whitespace-pre-wrap">{startupActionOutput.error}</pre>
                 )}
                 {!startupActionOutput.output && !startupActionOutput.error && (
-                  <p className="text-theme-text-muted italic">{t('common:noOutput')}</p>
+                  <p className="text-on-surface-variant italic">{t('common:noOutput')}</p>
                 )}
               </div>
-              <p className="mt-2 text-xs text-theme-text-muted">
+              <p className="mt-2 text-xs text-on-surface-variant">
                 {t('common:ranOn', { distro: startupActionOutput.distro })}
               </p>
             </div>

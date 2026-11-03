@@ -11,6 +11,7 @@ import { useSettingsStore } from "../store/settingsStore";
 import { wslService, type WslVersionInfo } from "../services/wslService";
 import { CustomActionsSettings } from "./CustomActionsSettings";
 import { DistroSourcesSettings } from "./DistroSourcesSettings";
+import { AppMark } from "./AppMark";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -130,22 +131,22 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
     <div className="flex h-full">
       {/* Sidebar */}
       <div
-        className={`flex flex-col border-r border-(--border-primary) bg-(--bg-secondary)/50 transition-all duration-200 ${
+        className={`flex flex-col border-r border-outline-variant bg-surface-container-low/50 transition-all duration-200 ${
           sidebarExpanded ? "w-56" : "w-16"
         }`}
       >
         {/* Sidebar Header */}
-        <div className="flex items-center gap-3 px-4 py-4 border-b border-(--border-primary)">
+        <div className="flex items-center gap-3 px-4 py-4 border-b border-outline-variant">
           <button
             onClick={onBack}
             data-testid="back-button"
-            className="p-2 text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-hover) rounded-lg transition-colors"
+            className="p-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-colors"
             title={t('common:button.back')}
           >
             <ChevronLeftIcon size="md" />
           </button>
           {sidebarExpanded && (
-            <h1 className="text-lg font-semibold text-(--text-primary)">{t('title')}</h1>
+            <h1 className="text-lg font-semibold text-on-surface">{t('title')}</h1>
           )}
         </div>
 
@@ -163,13 +164,13 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 title={!sidebarExpanded ? t(`tabs.${tabTranslationKey(tab.id)}`) : undefined}
                 className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
                   isActive
-                    ? "bg-(--accent-primary)/10 text-(--accent-primary) border-r-2 border-(--accent-primary)"
-                    : "text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-hover)"
+                    ? "bg-primary/10 text-primary border-r-2 border-primary"
+                    : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high"
                 } ${sidebarExpanded ? "" : "justify-center"}`}
               >
                 <IconComponent
                   size="md"
-                  className={isActive ? "text-(--accent-primary)" : "text-(--text-muted)"}
+                  className={isActive ? "text-primary" : "text-on-surface-variant"}
                 />
                 {sidebarExpanded && (
                   <span className="font-medium">{t(`tabs.${tabTranslationKey(tab.id)}`)}</span>
@@ -180,10 +181,10 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
         </nav>
 
         {/* Collapse Toggle */}
-        <div className="border-t border-(--border-primary) p-2">
+        <div className="border-t border-outline-variant p-2">
           <button
             onClick={() => setSidebarExpanded(!sidebarExpanded)}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-(--text-muted) hover:text-(--text-primary) hover:bg-(--bg-hover) rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high rounded-lg transition-colors"
             title={sidebarExpanded ? t('sidebarCollapse') : t('sidebarExpand')}
           >
             {sidebarExpanded ? (
@@ -207,8 +208,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 <SettingSection
                   title={t('ide.title')}
                   description={t('ide.description')}
-                  icon={<CodeIcon size="md" className="text-white" />}
-                  iconGradient="from-violet-500 to-purple-600"
+                  icon={<CodeIcon size="md" />}
                   presets={IDE_PRESETS}
                   currentValue={settings.ideCommand}
                   onValueChange={(value) => updateSetting("ideCommand", value)}
@@ -225,13 +225,13 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                       <div>
                         <strong>{t('ide.placeholders')}</strong>
                         <ul className="list-disc list-inside ml-2 mt-1">
-                          <li><code className="text-theme-accent-primary">$WSL_PATH</code> — {t('ide.wslPathDesc')}</li>
-                          <li><code className="text-theme-accent-primary">$DISTRO_NAME</code> — {t('ide.distroNameDesc')}</li>
+                          <li><code className="text-primary">$WSL_PATH</code> — {t('ide.wslPathDesc')}</li>
+                          <li><code className="text-primary">$DISTRO_NAME</code> — {t('ide.distroNameDesc')}</li>
                         </ul>
                       </div>
                       <div>
                         <strong>{t('ide.example')}</strong>
-                        <code className="block mt-1 p-2 bg-theme-bg-tertiary rounded text-theme-text-secondary break-all">
+                        <code className="block mt-1 p-2 bg-surface-container rounded text-on-surface-variant break-all">
                           "C:\Program Files\JetBrains\IntelliJ IDEA\bin\idea64.exe" $WSL_PATH\$DISTRO_NAME\home
                         </code>
                       </div>
@@ -244,8 +244,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 <SettingSection
                   title={t('terminal.title')}
                   description={t('terminal.description')}
-                  icon={<TerminalIcon size="md" className="text-white" />}
-                  iconGradient="from-emerald-500 to-teal-600"
+                  icon={<TerminalIcon size="md" />}
                   presets={terminalPresets}
                   currentValue={settings.terminalCommand}
                   onValueChange={(value) => updateSetting("terminalCommand", value)}
@@ -262,16 +261,16 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                       <div>
                         <strong>{t('terminal.placeholders')}</strong>
                         <ul className="list-disc list-inside ml-2 mt-1">
-                          <li><code className="text-theme-accent-primary">$WSL</code> — {t('terminal.wslDesc')}</li>
-                          <li><code className="text-theme-accent-primary">$DISTRO_ARGS</code> — {t('terminal.distroArgsDesc')}</li>
+                          <li><code className="text-primary">$WSL</code> — {t('terminal.wslDesc')}</li>
+                          <li><code className="text-primary">$DISTRO_ARGS</code> — {t('terminal.distroArgsDesc')}</li>
                         </ul>
                       </div>
                       <div>
                         <strong>{t('terminal.examples')}</strong>
                         <ul className="list-disc list-inside ml-2 mt-1">
-                          <li>{t('terminal.exampleAlacrittyLabel')}: <code className="text-theme-text-secondary">{t('terminal.exampleAlacrittyCmd')}</code></li>
-                          <li>{t('terminal.exampleKittyLabel')}: <code className="text-theme-text-secondary">{t('terminal.exampleKittyCmd')}</code></li>
-                          <li>{t('terminal.exampleWeztermLabel')}: <code className="text-theme-text-secondary">{t('terminal.exampleWeztermCmd')}</code></li>
+                          <li>{t('terminal.exampleAlacrittyLabel')}: <code className="text-on-surface-variant">{t('terminal.exampleAlacrittyCmd')}</code></li>
+                          <li>{t('terminal.exampleKittyLabel')}: <code className="text-on-surface-variant">{t('terminal.exampleKittyCmd')}</code></li>
+                          <li>{t('terminal.exampleWeztermLabel')}: <code className="text-on-surface-variant">{t('terminal.exampleWeztermCmd')}</code></li>
                         </ul>
                       </div>
                     </div>
@@ -281,66 +280,65 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 />
 
                 {/* Window Behavior Section */}
-                <div className="relative overflow-hidden bg-linear-to-br from-blue-900/20 via-stone-900/50 to-stone-900/50 border border-blue-800/30 rounded-xl p-6">
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-blue-500/5 via-transparent to-transparent" />
+                <div className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-900/30">
-                        <WindowIcon size="md" className="text-white" />
+                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                        <WindowIcon size="md" className="text-on-primary-container" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-medium text-stone-100">{t('window.title')}</h2>
-                        <p className="text-sm text-stone-500">{t('window.description')}</p>
+                        <h2 className="text-lg font-medium text-on-surface">{t('window.title')}</h2>
+                        <p className="text-sm text-on-surface-variant">{t('window.description')}</p>
                       </div>
                     </div>
 
                     <div className="space-y-3">
-                      <label className="flex items-center gap-3 p-4 bg-stone-800/50 rounded-lg border border-stone-700/50 cursor-pointer hover:bg-stone-800/70 transition-colors">
+                      <label className="flex items-center gap-3 p-4 bg-surface-container/50 rounded-lg border border-outline-variant/50 cursor-pointer hover:bg-surface-container/70 transition-colors">
                         <input
                           type="radio"
                           name="closeAction"
                           value="ask"
                           checked={settings.closeAction === "ask"}
                           onChange={() => updateSetting("closeAction", "ask")}
-                          className="w-4 h-4 text-blue-500 bg-stone-700 border-stone-600 focus:ring-blue-500 focus:ring-offset-0"
+                          className="w-4 h-4 text-secondary bg-surface-container-high border-outline focus:ring-secondary focus:ring-offset-0"
                         />
                         <div>
-                          <p className="text-sm font-medium text-stone-200">{t('window.ask')}</p>
-                          <p className="text-xs text-stone-500 mt-0.5">
+                          <p className="text-sm font-medium text-on-surface">{t('window.ask')}</p>
+                          <p className="text-xs text-on-surface-variant mt-0.5">
                             {t('window.askDesc')}
                           </p>
                         </div>
                       </label>
 
-                      <label className="flex items-center gap-3 p-4 bg-stone-800/50 rounded-lg border border-stone-700/50 cursor-pointer hover:bg-stone-800/70 transition-colors">
+                      <label className="flex items-center gap-3 p-4 bg-surface-container/50 rounded-lg border border-outline-variant/50 cursor-pointer hover:bg-surface-container/70 transition-colors">
                         <input
                           type="radio"
                           name="closeAction"
                           value="minimize"
                           checked={settings.closeAction === "minimize"}
                           onChange={() => updateSetting("closeAction", "minimize")}
-                          className="w-4 h-4 text-blue-500 bg-stone-700 border-stone-600 focus:ring-blue-500 focus:ring-offset-0"
+                          className="w-4 h-4 text-secondary bg-surface-container-high border-outline focus:ring-secondary focus:ring-offset-0"
                         />
                         <div>
-                          <p className="text-sm font-medium text-stone-200">{t('window.minimize')}</p>
-                          <p className="text-xs text-stone-500 mt-0.5">
+                          <p className="text-sm font-medium text-on-surface">{t('window.minimize')}</p>
+                          <p className="text-xs text-on-surface-variant mt-0.5">
                             {t('window.minimizeDesc')}
                           </p>
                         </div>
                       </label>
 
-                      <label className="flex items-center gap-3 p-4 bg-stone-800/50 rounded-lg border border-stone-700/50 cursor-pointer hover:bg-stone-800/70 transition-colors">
+                      <label className="flex items-center gap-3 p-4 bg-surface-container/50 rounded-lg border border-outline-variant/50 cursor-pointer hover:bg-surface-container/70 transition-colors">
                         <input
                           type="radio"
                           name="closeAction"
                           value="quit"
                           checked={settings.closeAction === "quit"}
                           onChange={() => updateSetting("closeAction", "quit")}
-                          className="w-4 h-4 text-blue-500 bg-stone-700 border-stone-600 focus:ring-blue-500 focus:ring-offset-0"
+                          className="w-4 h-4 text-secondary bg-surface-container-high border-outline focus:ring-secondary focus:ring-offset-0"
                         />
                         <div>
-                          <p className="text-sm font-medium text-stone-200">{t('window.quit')}</p>
-                          <p className="text-xs text-stone-500 mt-0.5">
+                          <p className="text-sm font-medium text-on-surface">{t('window.quit')}</p>
+                          <p className="text-xs text-on-surface-variant mt-0.5">
                             {t('window.quitDesc')}
                           </p>
                         </div>
@@ -353,24 +351,23 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 <LanguageSettings />
 
                 {/* Debug Logging Section */}
-                <div className="relative overflow-hidden bg-linear-to-br from-orange-900/20 via-stone-900/50 to-stone-900/50 border border-orange-800/30 rounded-xl p-6">
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-orange-500/5 via-transparent to-transparent" />
+                <div className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-linear-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-900/30">
-                        <InfoIcon size="md" className="text-white" />
+                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                        <InfoIcon size="md" className="text-on-primary-container" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-medium text-stone-100">{t('troubleshooting.title')}</h2>
-                        <p className="text-sm text-stone-500">{t('troubleshooting.description')}</p>
+                        <h2 className="text-lg font-medium text-on-surface">{t('troubleshooting.title')}</h2>
+                        <p className="text-sm text-on-surface-variant">{t('troubleshooting.description')}</p>
                       </div>
                     </div>
 
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between p-4 bg-stone-800/50 rounded-lg border border-stone-700/50">
+                      <div className="flex items-center justify-between p-4 bg-surface-container/50 rounded-lg border border-outline-variant/50">
                         <div>
-                          <p className="text-sm font-medium text-stone-200">{t('troubleshooting.debugLogging')}</p>
-                          <p className="text-xs text-stone-500 mt-0.5">
+                          <p className="text-sm font-medium text-on-surface">{t('troubleshooting.debugLogging')}</p>
+                          <p className="text-xs text-on-surface-variant mt-0.5">
                             {t('troubleshooting.debugLoggingDesc')}
                           </p>
                         </div>
@@ -385,7 +382,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                             }}
                             className="sr-only peer"
                           />
-                          <div className="w-11 h-6 bg-stone-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500" />
+                          <div className="w-11 h-6 bg-surface-container-high peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-outline-variant after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-surface-container-lowest after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary" />
                         </label>
                       </div>
 
@@ -395,7 +392,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                             const logPath = await wslService.getLogPath();
                             wslService.openFolder(logPath);
                           }}
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-stone-300 bg-stone-800/50 hover:bg-stone-700/50 border border-stone-700 rounded-lg transition-colors"
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-on-surface-variant bg-surface-container/50 hover:bg-surface-container-high/50 border border-outline-variant rounded-lg transition-colors"
                         >
                           <FolderIcon size="sm" />
                           <span>{t('troubleshooting.openLogFolder')}</span>
@@ -404,7 +401,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                           href="https://github.com/aphrody-labs/bun-os/tree/os/docs/wsl"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-stone-300 bg-stone-800/50 hover:bg-stone-700/50 border border-stone-700 rounded-lg transition-colors"
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-on-surface-variant bg-surface-container/50 hover:bg-surface-container-high/50 border border-outline-variant rounded-lg transition-colors"
                         >
                           <ExternalLinkIcon size="sm" />
                           <span>{t('troubleshooting.troubleshootingGuide')}</span>
@@ -445,42 +442,31 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
             {activeTab === "about" && (
               <div className="space-y-6">
                 {/* App Hero */}
-                <section className="relative overflow-hidden bg-linear-to-br from-amber-900/30 via-stone-900/50 to-stone-900/50 border border-amber-800/30 rounded-xl p-8">
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent" />
+                <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-8">
                   <div className="relative flex items-center gap-5">
-                    <svg width="64" height="64" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-lg flex-shrink-0">
-                      <defs>
-                        <linearGradient id="aboutLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor="#f59e0b"/>
-                          <stop offset="100%" stopColor="#d97706"/>
-                        </linearGradient>
-                      </defs>
-                      <rect x="15" y="15" width="90" height="90" rx="18" fill="url(#aboutLogoGrad)"/>
-                      <path d="M35 45 L55 60 L35 75" stroke="#1a1a1a" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
-                      <rect x="62" y="70" width="26" height="5" rx="2.5" fill="#1a1a1a"/>
-                    </svg>
+                    <AppMark size={64} className="flex-shrink-0" />
                     <div className="flex-1">
                       <div className="flex items-center gap-3">
-                        <h2 className="text-2xl font-semibold text-stone-100">
-                          WSL<span className="font-bold text-amber-500">UI</span>
+                        <h2 className="text-2xl font-semibold text-on-surface">
+                          Bun OS <span className="font-bold text-primary">WSL</span>
                         </h2>
                         {appVersion && (
-                          <span className="px-2 py-0.5 text-xs font-medium bg-amber-500/20 text-amber-400 rounded-full border border-amber-500/30">
+                          <span className="px-2 py-0.5 text-xs font-medium bg-secondary-container text-on-secondary-container rounded-full border border-outline-variant">
                             v{appVersion}
                           </span>
                         )}
                       </div>
-                      <p className="text-stone-400 mt-1">{t('about.description')}</p>
-                      <p className="text-stone-600 text-sm mt-1">{t('about.builtWith')}</p>
+                      <p className="text-on-surface-variant mt-1">{t('about.description')}</p>
+                      <p className="text-outline text-sm mt-1">{t('about.builtWith')}</p>
                     </div>
                   </div>
-                  <div className="relative mt-6 pt-4 border-t border-stone-700/50 flex items-center justify-between">
+                  <div className="relative mt-6 pt-4 border-t border-outline-variant/50 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <a
                         href="https://github.com/aphrody-labs/bun-os/tree/os/docs/wsl"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-stone-300 bg-stone-800/50 hover:bg-stone-700/50 border border-stone-700 rounded-lg transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-on-surface-variant bg-surface-container/50 hover:bg-surface-container-high/50 border border-outline-variant rounded-lg transition-colors"
                       >
                         <ExternalLinkIcon size="sm" />
                         <span>{t('about.website')}</span>
@@ -489,7 +475,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                         href="https://github.com/aphrody-labs/bun-os"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-stone-300 bg-stone-800/50 hover:bg-stone-700/50 border border-stone-700 rounded-lg transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-on-surface-variant bg-surface-container/50 hover:bg-surface-container-high/50 border border-outline-variant rounded-lg transition-colors"
                       >
                         <ExternalLinkIcon size="sm" />
                         <span>{t('about.github')}</span>
@@ -499,9 +485,9 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                       href="http://www.octasoft.co.uk"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-stone-400 hover:text-stone-200 transition-colors"
+                      className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors"
                     >
-                      <span className="text-stone-500 text-sm">{t('about.developedBy')}</span>
+                      <span className="text-on-surface-variant text-sm">{t('about.developedBy')}</span>
                       <img
                         src="/octasoft-logo.png"
                         alt="Aphrody Labs"
@@ -513,24 +499,23 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 </section>
 
                 {/* License Info */}
-                <section className="relative overflow-hidden bg-linear-to-br from-emerald-900/20 via-stone-900/50 to-stone-900/50 border border-emerald-800/30 rounded-xl p-6">
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-emerald-500/5 via-transparent to-transparent" />
+                <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-linear-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-900/30">
-                        <InfoIcon size="md" className="text-white" />
+                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                        <InfoIcon size="md" className="text-on-primary-container" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-medium text-stone-100">{t('about.license.title')}</h2>
-                        <p className="text-sm text-stone-500">{t('about.license.type')}</p>
+                        <h2 className="text-lg font-medium text-on-surface">{t('about.license.title')}</h2>
+                        <p className="text-sm text-on-surface-variant">{t('about.license.type')}</p>
                       </div>
                     </div>
                     <div className="space-y-3">
-                      <div className="bg-stone-900/30 rounded-lg p-4 border border-stone-800/50">
-                        <p className="text-sm text-stone-300">
+                      <div className="bg-surface-container-low/30 rounded-lg p-4 border border-outline-variant/50">
+                        <p className="text-sm text-on-surface-variant">
                           {t('about.license.freeText')}
                         </p>
-                        <p className="text-xs text-stone-500 mt-2">
+                        <p className="text-xs text-on-surface-variant mt-2">
                           {t('about.license.conversion')}
                         </p>
                       </div>
@@ -539,7 +524,7 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                           href="https://github.com/aphrody-labs/bun-os/blob/main/LICENSE"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-emerald-400 hover:text-emerald-300 bg-emerald-900/20 hover:bg-emerald-900/30 border border-emerald-800/50 rounded-lg transition-colors"
+                          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-success hover:text-success bg-success-container hover:bg-success-container border border-outline-variant rounded-lg transition-colors"
                         >
                           <ExternalLinkIcon size="sm" />
                           <span>{t('about.license.view')}</span>
@@ -550,42 +535,41 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                 </section>
 
                 {/* WSL Version Info */}
-                <section className="relative overflow-hidden bg-linear-to-br from-cyan-900/20 via-stone-900/50 to-stone-900/50 border border-cyan-800/30 rounded-xl p-6">
-                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-cyan-500/5 via-transparent to-transparent" />
+                <section className="relative overflow-hidden bg-surface-container-low border border-outline-variant rounded-xl p-6">
                   <div className="relative">
                     <div className="flex items-center gap-3 mb-5">
-                      <div className="w-10 h-10 rounded-lg bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-900/30">
-                        <TerminalIcon size="md" className="text-white" />
+                      <div className="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center shadow-lg">
+                        <TerminalIcon size="md" className="text-on-primary-container" />
                       </div>
                       <div>
-                        <h2 className="text-lg font-medium text-stone-100">{t('about.wslInfo.title')}</h2>
-                        <p className="text-sm text-stone-500">{t('about.wslInfo.description')}</p>
+                        <h2 className="text-lg font-medium text-on-surface">{t('about.wslInfo.title')}</h2>
+                        <p className="text-sm text-on-surface-variant">{t('about.wslInfo.description')}</p>
                       </div>
                     </div>
                     {wslVersion ? (
                       <div className="text-sm space-y-2">
-                        <div className="grid grid-cols-2 gap-x-6 gap-y-3 bg-stone-900/30 rounded-lg p-4 border border-stone-800/50">
-                          <span className="text-stone-500">{t('about.wslInfo.wslVersion')}</span>
-                          <span className="text-cyan-300 font-mono">{wslVersion.wslVersion}</span>
-                          <span className="text-stone-500">{t('about.wslInfo.kernelVersion')}</span>
-                          <span className="text-stone-200 font-mono">{wslVersion.kernelVersion}</span>
-                          <span className="text-stone-500">{t('about.wslInfo.wslgVersion')}</span>
-                          <span className="text-stone-200 font-mono">{wslVersion.wslgVersion}</span>
-                          <span className="text-stone-500">{t('about.wslInfo.msrdcVersion')}</span>
-                          <span className="text-stone-200 font-mono">{wslVersion.msrdcVersion}</span>
-                          <span className="text-stone-500">{t('about.wslInfo.direct3dVersion')}</span>
-                          <span className="text-stone-300 font-mono text-xs">{wslVersion.direct3dVersion}</span>
-                          <span className="text-stone-500">{t('about.wslInfo.dxcoreVersion')}</span>
-                          <span className="text-stone-300 font-mono text-xs">{wslVersion.dxcoreVersion}</span>
-                          <span className="text-stone-500">{t('about.wslInfo.windowsVersion')}</span>
-                          <span className="text-stone-200 font-mono">{wslVersion.windowsVersion}</span>
+                        <div className="grid grid-cols-2 gap-x-6 gap-y-3 bg-surface-container-low/30 rounded-lg p-4 border border-outline-variant/50">
+                          <span className="text-on-surface-variant">{t('about.wslInfo.wslVersion')}</span>
+                          <span className="text-secondary font-mono">{wslVersion.wslVersion}</span>
+                          <span className="text-on-surface-variant">{t('about.wslInfo.kernelVersion')}</span>
+                          <span className="text-on-surface font-mono">{wslVersion.kernelVersion}</span>
+                          <span className="text-on-surface-variant">{t('about.wslInfo.wslgVersion')}</span>
+                          <span className="text-on-surface font-mono">{wslVersion.wslgVersion}</span>
+                          <span className="text-on-surface-variant">{t('about.wslInfo.msrdcVersion')}</span>
+                          <span className="text-on-surface font-mono">{wslVersion.msrdcVersion}</span>
+                          <span className="text-on-surface-variant">{t('about.wslInfo.direct3dVersion')}</span>
+                          <span className="text-on-surface-variant font-mono text-xs">{wslVersion.direct3dVersion}</span>
+                          <span className="text-on-surface-variant">{t('about.wslInfo.dxcoreVersion')}</span>
+                          <span className="text-on-surface-variant font-mono text-xs">{wslVersion.dxcoreVersion}</span>
+                          <span className="text-on-surface-variant">{t('about.wslInfo.windowsVersion')}</span>
+                          <span className="text-on-surface font-mono">{wslVersion.windowsVersion}</span>
                         </div>
                         <div className="pt-3 mt-1">
                           <a
                             href="https://github.com/microsoft/WSL"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-cyan-400 hover:text-cyan-300 bg-cyan-900/20 hover:bg-cyan-900/30 border border-cyan-800/50 rounded-lg transition-colors"
+                            className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-secondary hover:text-secondary bg-secondary-container hover:bg-secondary-container border border-outline-variant rounded-lg transition-colors"
                           >
                             <ExternalLinkIcon size="sm" />
                             <span>{t('about.wslInfo.wslGithub')}</span>
@@ -593,8 +577,8 @@ export function SettingsPage({ onBack }: SettingsPageProps) {
                         </div>
                       </div>
                     ) : (
-                      <div className="flex items-center gap-2 text-stone-500 p-4">
-                        <div className="w-4 h-4 border-2 border-cyan-600 border-t-cyan-400 rounded-full animate-spin" />
+                      <div className="flex items-center gap-2 text-on-surface-variant p-4">
+                        <div className="w-4 h-4 border-2 border-secondary border-t-secondary rounded-full animate-spin" />
                         <span>{t('about.wslInfo.loading')}</span>
                       </div>
                     )}
