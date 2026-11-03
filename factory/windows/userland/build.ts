@@ -85,8 +85,9 @@ async function waitForMemory(tool: string) {
 const git = async (dir: string, ...a: string[]) => (await $`git -C ${dir} ${a}`.quiet().nothrow().text()).trim();
 const cargoField = (dir: string, field: string) => {
   const toml = existsSync(join(dir, "Cargo.toml")) ? readFileSync(join(dir, "Cargo.toml"), "utf8") : "";
-  const pkg = toml.split(/^\[package\]/m)[1]?.split(/^\[/m)[0] ?? "";
-  return new RegExp(`^${field}\\s*=\\s*"([^"]+)"`, "m").exec(pkg)?.[1];
+  const section = (header: RegExp) => toml.split(header)[1]?.split(/^\[/m)[0] ?? "";
+  const re = new RegExp(`^${field}\\s*=\\s*"([^"]+)"`, "m");
+  return re.exec(section(/^\[package\]/m))?.[1] ?? re.exec(section(/^\[workspace\.package\]/m))?.[1];
 };
 
 // clang-cl shim: cargo-xwin owns CC/CFLAGS, so C dependencies get the CPU tuning through a PATH wrapper that prepends
@@ -103,7 +104,11 @@ const rustc = (await $`rustc -V`.text()).trim();
 const xwin = (await $`cargo xwin --version`.quiet().nothrow().text()).trim();
 const repoRev = await git(root, "rev-parse", "HEAD");
 const stamp = new Date().toISOString().replace(/[-:]/g, "").replace(/\..*/, "Z");
-const outDir = join(outRoot, `userland-${stamp}-${repoRev.slice(0, 10)}`);
+// --into <dir>: rebuild some tools into an existing output (their entries are replaced, the others kept).
+const into = option("--into");
+const outDir = into ? resolve(outRoot, into) : join(outRoot, `userland-${stamp}-${repoRev.slice(0, 10)}`);
+const previous = into && existsSync(join(outDir, "manifest.json")) ? JSON.parse(readFileSync(join(outDir, "manifest.json"), "utf8")) : undefined;
+const rebuilt = (name: string) => config.tools.some((t) => t.name === name && (!only || only.includes(t.name)));
 const binDir = join(outDir, "bin");
 mkdirSync(binDir, { recursive: true });
 
@@ -125,8 +130,10 @@ const sources = JSON.parse(readFileSync(join(root, "vendor/sources.json"), "utf8
   string,
   { origin: string; upstream?: string; path: string }
 >;
-const entries: Entry[] = [];
-const failures: { name: string; optional: boolean; log: string }[] = [];
+const entries: Entry[] = (previous?.tools ?? []).filter((e: Entry) => !rebuilt(e.name));
+const failures: { name: string; optional: boolean; log: string }[] = (previous?.failures ?? []).filter(
+  (f: { name: string }) => !rebuilt(f.name),
+);
 
 for (const tool of config.tools) {
   if (only && !only.includes(tool.name)) continue;
@@ -241,7 +248,7 @@ const manifest = {
   rustflags: [`-Ctarget-cpu=${targetCpu}`, ...config.rustflags],
   cflags,
   toolchain: { rustc, cargoXwin: xwin, clangCl: (await $`${realClangCl} --version`.text()).split("\n")[0] },
-  tools: entries,
+  tools: config.tools.flatMap((t) => entries.filter((e) => e.name === t.name)),
   failures,
 };
 writeFileSync(join(outDir, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");

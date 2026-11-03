@@ -11,7 +11,34 @@ verify.ts). Related: [POSIX-ON-WINDOWS.md](POSIX-ON-WINDOWS.md) (buncc providers
 
 ## Tool set
 
-<!-- tools-table -->
+| Need | Tool (fork under `vendor/`) | Pinned at | Commands | Licence |
+| --- | --- | --- | --- | --- |
+| coreutils | uutils coreutils (`uutils/coreutils`, multicall, `--features windows`) | 0.12.0+843 | `coreutils` and its applets (`ls cp mv rm cat head tail wc sort tr cut ...`) | MIT |
+| find, xargs | uutils findutils (`uutils/findutils`) | main | `find` (as `ufind`), `xargs` | MIT |
+| diff, cmp | uutils diffutils (`uutils/diffutils`, multicall) | aphrody | `diffutils`, `diff`, `cmp` | MIT OR Apache-2.0 |
+| sed | uutils sed (`uutils/sed`) | 0.3.0 | `sed` | MIT |
+| grep | uutils grep (`uutils/grep`) | main | `grep` | MIT |
+| ps, pgrep, ... | uutils procps (`uutils/procps`) | main | see Gaps | MIT |
+| bash-compatible shell | brush (`brush`) | main 18d616f3 | `brush` | MIT |
+| structured shell | nushell (`nushell`) | 0.116.1+168 | `nu` | MIT |
+| fast grep | ripgrep (`ripgrep`, with PCRE2) | 15.2.0 | `rg` | Unlicense OR MIT |
+| fast find | fd (`fd`) | v10.5.0 | `fd` | MIT OR Apache-2.0 |
+| replace | sd (`sd`) | v1.1.0 | `sd` | MIT |
+| cat with syntax, pager front end | bat (`bat`) | v0.26.1 | `bat` | MIT OR Apache-2.0 |
+| ls | eza (`eza`) | main | `eza` | EUPL-1.2 |
+| du | dust (`du-dust`, bootandy/dust; `vendor/dust` is the DS emulator) | v1.2.7 | `dust` | Apache-2.0 |
+| ps, top | procs (`procs`) | v0.14.12 | `procs` | MIT |
+| benchmark | hyperfine (`hyperfine`) | v2.0.0 | `hyperfine` | MIT OR Apache-2.0 |
+| make | just (`bun-just/vendor/just`, aphrody-labs/just branch bun) | 1.58.0 | `just` | CC0-1.0 |
+| line counts | tokei (`tokei`) | v15.0.0 | `tokei` | MIT OR Apache-2.0 |
+| cd | zoxide (`zoxide`) | v0.10.0 | `zoxide` | MIT |
+| curl, wget | xh (`xh`) | v0.26.3 | `xh`, `xhs` (HTTPS default) | MIT |
+| tar, zip, gzip, xz, bzip2, zstd, 7z, rar | ouch (`ouch`) | 0.8.3 | `ouch` | MIT |
+| prompt | starship (`starship`) | v1.27.0 | `starship` | ISC |
+| editor | helix (`helix`) | 25.07.1 | `hx` | MPL-2.0 |
+
+SSH stays Windows OpenSSH (`System32\OpenSSH\ssh.exe`, already first-party on Windows); `vendor/bun-ssh` is a Bun
+plugin, not a standalone client. Licence and notice files of every fork ship in `BunOS\userland\licenses\<tool>\`.
 
 Shell choice: **brush** (reubeno/brush, MIT) is the bash-compatible shell. It is the only maintained Rust shell that
 targets bash compatibility (functions, arrays, `[[ ]]`, brace expansion, `case`, `set -euo pipefail`, here-docs,

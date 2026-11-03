@@ -94,7 +94,7 @@
       "name": "sd",
       "path": "vendor/sd",
       "license": "MIT",
-      "cargo": ["-p", "sd", "--bin", "sd"],
+      "cargo": ["-p", "sd-cli", "--bin", "sd"],
       "bins": [{ "file": "sd", "commands": ["sd"] }]
     },
     {
