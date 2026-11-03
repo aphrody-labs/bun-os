@@ -18,6 +18,7 @@ use serde::{Deserialize, Serialize};
 
 #[cfg(windows)]
 pub mod dism;
+pub mod dispatch;
 #[cfg(windows)]
 pub mod live;
 #[cfg(windows)]

@@ -1,8 +1,8 @@
 {
   "$schema": "https://aphrody.dev/schemas/tool-migration-v1.json",
   "catalog": "src/tools.json",
-  "catalog_sha256": "4d5ff9192975bb53a0cbe79bf316ef81a8da2ab9a23161b4e097daf69e3c8cc9",
-  "catalog_tool_count": 182,
+  "catalog_sha256": "02e784a5cd460b8e9899914c06dfb919d299d7754d36a5af1251aad3f381694c",
+  "catalog_tool_count": 187,
   "state": "complete",
   "tools": [
     "analyze_pe",
@@ -186,20 +186,44 @@
     "wsl_list_distributions",
     "wsl_list_processes",
     "wsl_read_only_probe",
-    "wsl_send_signal"
+    "wsl_send_signal",
+    "tweak_catalog",
+    "tweak_plan",
+    "tweak_apply",
+    "tweak_verify",
+    "tweak_undo"
   ],
   "owner_rules": [
     {
       "owner": "bun-re",
-      "prefixes": ["analyze_pe", "aob_scan", "asar_", "binary_", "golang_scan"]
+      "prefixes": [
+        "analyze_pe",
+        "aob_scan",
+        "asar_",
+        "binary_",
+        "golang_scan"
+      ]
     },
     {
       "owner": "aphrody-proc",
-      "prefixes": ["mem_", "kill_process", "list_processes", "set_process_", "trim_process_", "perf_", "wait"]
+      "prefixes": [
+        "mem_",
+        "kill_process",
+        "list_processes",
+        "set_process_",
+        "trim_process_",
+        "perf_",
+        "wait"
+      ]
     },
     {
       "owner": "aphrody-capture",
-      "prefixes": ["computer_capture_screen", "computer_record_clip", "screenshot", "window_capture"]
+      "prefixes": [
+        "computer_capture_screen",
+        "computer_record_clip",
+        "screenshot",
+        "window_capture"
+      ]
     },
     {
       "owner": "aphrody-fsindex",
@@ -217,11 +241,15 @@
     },
     {
       "owner": "aphrody-jobs",
-      "prefixes": ["coord_"]
+      "prefixes": [
+        "coord_"
+      ]
     },
     {
       "owner": "aphrody-winclean",
-      "prefixes": ["*"]
+      "prefixes": [
+        "*"
+      ]
     }
   ],
   "dispatch": "rust",
@@ -407,8 +435,18 @@
     "gaming_mouse_delta": "rust",
     "gaming_profile_apply": "rust",
     "gaming_profile_status": "rust",
-    "gaming_steam_launch": "rust"
+    "gaming_steam_launch": "rust",
+    "tweak_catalog": "rust",
+    "tweak_plan": "rust",
+    "tweak_apply": "rust",
+    "tweak_verify": "rust",
+    "tweak_undo": "rust"
   },
-  "native_rust_tools": ["winml_get_version", "winml_inspect_onnx", "winml_list_providers", "winml_run_float32"],
-  "note": "The catalog is frozen for compatibility. Ownership is selected by the first matching rule; all 182 tools are implemented and dispatched by the Rust owner. dispatch_overrides and native_rust_tools remain as explicit migration evidence for compatibility tooling."
+  "native_rust_tools": [
+    "winml_get_version",
+    "winml_inspect_onnx",
+    "winml_list_providers",
+    "winml_run_float32"
+  ],
+  "note": "The catalog is frozen for compatibility. Ownership is selected by the first matching rule; all 187 tools are implemented and dispatched by the Rust owner. dispatch_overrides and native_rust_tools remain as explicit migration evidence for compatibility tooling."
 }

@@ -7,7 +7,7 @@ use serde::Serialize;
 use crate::{Result, ToolResult, Winclean};
 
 /// Every tool name exposed by the Rust WinClean compatibility surface.
-pub const TOOL_NAMES: [&str; 182] = [
+pub const TOOL_NAMES: [&str; 187] = [
     "analyze_pe",
     "aob_scan",
     "asar_list",
@@ -190,6 +190,11 @@ pub const TOOL_NAMES: [&str; 182] = [
     "wsl_list_processes",
     "wsl_read_only_probe",
     "wsl_send_signal",
+    "tweak_catalog",
+    "tweak_plan",
+    "tweak_apply",
+    "tweak_verify",
+    "tweak_undo",
 ];
 
 /// Arguments for [`Winclean::analyze_pe`] (`analyze_pe`).
@@ -6496,6 +6501,153 @@ impl WslSendSignalArgs {
     }
 }
 
+/// Arguments for [`Winclean::tweak_catalog`] (`tweak_catalog`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct TweakCatalogArgs {
+    /// Only tweaks of this module id.
+    #[serde(rename = "module", skip_serializing_if = "Option::is_none")]
+    pub module: Option<String>,
+}
+
+impl TweakCatalogArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `module`.
+    #[must_use]
+    pub fn module(mut self, value: impl Into<String>) -> Self {
+        self.module = Some(value.into());
+        self
+    }
+}
+
+/// Arguments for [`Winclean::tweak_plan`] (`tweak_plan`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct TweakPlanArgs {
+    /// Inline profile TOML. Omit for the default conservative live profile.
+    #[serde(rename = "profileToml", skip_serializing_if = "Option::is_none")]
+    pub profile_toml: Option<String>,
+    /// Path to a profile .toml file (alternative to profileToml).
+    #[serde(rename = "profilePath", skip_serializing_if = "Option::is_none")]
+    pub profile_path: Option<String>,
+}
+
+impl TweakPlanArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `profileToml`.
+    #[must_use]
+    pub fn profile_toml(mut self, value: impl Into<String>) -> Self {
+        self.profile_toml = Some(value.into());
+        self
+    }
+
+    /// Sets `profilePath`.
+    #[must_use]
+    pub fn profile_path(mut self, value: impl Into<String>) -> Self {
+        self.profile_path = Some(value.into());
+        self
+    }
+}
+
+/// Arguments for [`Winclean::tweak_apply`] (`tweak_apply`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct TweakApplyArgs {
+    /// Path of a plan from tweak_plan. Omit to build one from the profile first.
+    #[serde(rename = "planPath", skip_serializing_if = "Option::is_none")]
+    pub plan_path: Option<String>,
+    /// Inline profile TOML when no planPath is given.
+    #[serde(rename = "profileToml", skip_serializing_if = "Option::is_none")]
+    pub profile_toml: Option<String>,
+    /// Must be true to apply.
+    ///
+    /// Default: `false`.
+    #[serde(rename = "confirm")]
+    pub confirm: bool,
+}
+
+impl TweakApplyArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `planPath`.
+    #[must_use]
+    pub fn plan_path(mut self, value: impl Into<String>) -> Self {
+        self.plan_path = Some(value.into());
+        self
+    }
+
+    /// Sets `profileToml`.
+    #[must_use]
+    pub fn profile_toml(mut self, value: impl Into<String>) -> Self {
+        self.profile_toml = Some(value.into());
+        self
+    }
+
+    /// Sets `confirm`.
+    #[must_use]
+    pub fn confirm(mut self, value: bool) -> Self {
+        self.confirm = value;
+        self
+    }
+}
+
+/// Arguments for [`Winclean::tweak_verify`] (`tweak_verify`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct TweakVerifyArgs {
+    /// Journal path. Omit to use the newest journal under %LOCALAPPDATA%unoswin11journal.
+    #[serde(rename = "journalPath", skip_serializing_if = "Option::is_none")]
+    pub journal_path: Option<String>,
+}
+
+impl TweakVerifyArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `journalPath`.
+    #[must_use]
+    pub fn journal_path(mut self, value: impl Into<String>) -> Self {
+        self.journal_path = Some(value.into());
+        self
+    }
+}
+
+/// Arguments for [`Winclean::tweak_undo`] (`tweak_undo`).
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct TweakUndoArgs {
+    /// Journal path. Omit to use the newest journal.
+    #[serde(rename = "journalPath", skip_serializing_if = "Option::is_none")]
+    pub journal_path: Option<String>,
+}
+
+impl TweakUndoArgs {
+    /// Creates arguments with every field at its default.
+    #[must_use]
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Sets `journalPath`.
+    #[must_use]
+    pub fn journal_path(mut self, value: impl Into<String>) -> Self {
+        self.journal_path = Some(value.into());
+        self
+    }
+}
+
 impl Winclean {
     /// Performs static analysis and symbol recovery on a target Windows PE binary (.exe or .dll).
     /// Recovers sections, imports, entry point disassembly, and maps symbols using heuristics (no
@@ -9915,5 +10067,98 @@ impl Winclean {
     /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
     pub async fn wsl_send_signal_async(&self, args: &WslSendSignalArgs) -> Result<ToolResult> {
         self.call_async("wsl_send_signal", args).await
+    }
+
+    /// Lists the Bun OS Windows tweak catalog (catalog/tweaks.toml): modules and tweaks with id,
+    /// module, title, level (conservative|standard|aggressive), targets (live|offline) and
+    /// operation count. The single source of truth for bunos-win11 and Bun OS Tweaks. Read-only.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn tweak_catalog(&self, args: &TweakCatalogArgs) -> Result<ToolResult> {
+        self.call("tweak_catalog", args)
+    }
+
+    /// Async variant of [`Winclean::tweak_catalog`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn tweak_catalog_async(&self, args: &TweakCatalogArgs) -> Result<ToolResult> {
+        self.call_async("tweak_catalog", args).await
+    }
+
+    /// Builds a tweak plan for the running Windows from a profile (archinstall-style: target,
+    /// level, modules, include, exclude) without changing anything. Detects each operation, marks
+    /// it change|ok|skip|refused, saves the plan JSON under %LOCALAPPDATA%unoswin11 and returns
+    /// the path and a per-module summary. Guarded operations (Defender, Windows Update,
+    /// WSL/Hyper-V, Store, WebView2, networking, aphrody/ssh/WireGuard) are always refused.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn tweak_plan(&self, args: &TweakPlanArgs) -> Result<ToolResult> {
+        self.call("tweak_plan", args)
+    }
+
+    /// Async variant of [`Winclean::tweak_plan`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn tweak_plan_async(&self, args: &TweakPlanArgs) -> Result<ToolResult> {
+        self.call_async("tweak_plan", args).await
+    }
+
+    /// Applies a previously built plan (or a profile) to the running Windows. Creates a System
+    /// Restore point, exports every touched registry key to .reg, and journals every change so
+    /// tweak_undo reverts it. Requires confirm=true; machine-wide changes require an elevated
+    /// process. Returns the journal path and the number of changes applied.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn tweak_apply(&self, args: &TweakApplyArgs) -> Result<ToolResult> {
+        self.call("tweak_apply", args)
+    }
+
+    /// Async variant of [`Winclean::tweak_apply`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn tweak_apply_async(&self, args: &TweakApplyArgs) -> Result<ToolResult> {
+        self.call_async("tweak_apply", args).await
+    }
+
+    /// Re-detects every change recorded in a journal and returns the ids of tweaks whose state no
+    /// longer matches (drift). Read-only.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn tweak_verify(&self, args: &TweakVerifyArgs) -> Result<ToolResult> {
+        self.call("tweak_verify", args)
+    }
+
+    /// Async variant of [`Winclean::tweak_verify`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn tweak_verify_async(&self, args: &TweakVerifyArgs) -> Result<ToolResult> {
+        self.call_async("tweak_verify", args).await
+    }
+
+    /// Reverts a journal in place: replays every applied change backwards, restoring each registry
+    /// value, service start type, scheduled task and power scheme to its recorded previous state,
+    /// and re-registers removed per-user appx packages. Irreversible operations (offline
+    /// file/capability removals) are reported, not reverted.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub fn tweak_undo(&self, args: &TweakUndoArgs) -> Result<ToolResult> {
+        self.call("tweak_undo", args)
+    }
+
+    /// Async variant of [`Winclean::tweak_undo`]; runs on the library thread pool.
+    ///
+    /// # Errors
+    /// Returns an error when the arguments cannot be serialised or the result cannot be decoded.
+    pub async fn tweak_undo_async(&self, args: &TweakUndoArgs) -> Result<ToolResult> {
+        self.call_async("tweak_undo", args).await
     }
 }

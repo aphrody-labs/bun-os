@@ -1857,7 +1857,12 @@ pub fn call_rust(tool: &str, arguments: Value) -> Result<Value, SubsystemError> 
             .map_err(failed)?,
         )
         .map_err(failed),
-        _ => Err(SubsystemError::UnknownTool(tool.to_owned())),
+        other => {
+            if let Some(result) = crate::tweaks::dispatch::call(other, &arguments) {
+                return result;
+            }
+            Err(SubsystemError::UnknownTool(tool.to_owned()))
+        }
     }
 }
 

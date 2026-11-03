@@ -11,7 +11,9 @@
             "type": "string"
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -34,7 +36,10 @@
             "default": 50
           }
         },
-        "required": ["path", "pattern"]
+        "required": [
+          "path",
+          "pattern"
+        ]
       }
     },
     {
@@ -48,7 +53,9 @@
             "type": "string"
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -74,7 +81,12 @@
             "type": "string"
           }
         },
-        "required": ["inputPath", "outputPath", "keyHex", "ivHex"]
+        "required": [
+          "inputPath",
+          "outputPath",
+          "keyHex",
+          "ivHex"
+        ]
       }
     },
     {
@@ -93,7 +105,9 @@
             "default": 4096
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -117,7 +131,9 @@
             "default": 1000
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -131,7 +147,9 @@
             "type": "string"
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -150,7 +168,9 @@
             "default": 500
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -164,7 +184,9 @@
             "type": "string"
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -183,11 +205,17 @@
           },
           "outputPath": {
             "description": "Output binary path. Empty = auto in %TEMP%.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         },
-        "required": ["path", "sectionName"]
+        "required": [
+          "path",
+          "sectionName"
+        ]
       }
     },
     {
@@ -209,7 +237,11 @@
             "type": "string"
           }
         },
-        "required": ["inputPath", "outputPath", "keyHex"]
+        "required": [
+          "inputPath",
+          "outputPath",
+          "keyHex"
+        ]
       }
     },
     {
@@ -237,7 +269,10 @@
             "default": 1
           }
         },
-        "required": ["x", "y"]
+        "required": [
+          "x",
+          "y"
+        ]
       }
     },
     {
@@ -282,7 +317,11 @@
             "default": true
           }
         },
-        "required": ["windowHandle", "x", "y"]
+        "required": [
+          "windowHandle",
+          "x",
+          "y"
+        ]
       }
     },
     {
@@ -297,22 +336,34 @@
           },
           "automationId": {
             "description": "Exact UIA AutomationId, when available.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "name": {
             "description": "Exact UIA Name, case-insensitive.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "className": {
             "description": "Exact UIA className, case-insensitive.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "controlType": {
             "description": "Exact UIA controlType, case-insensitive.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "occurrence": {
@@ -326,7 +377,9 @@
             "default": true
           }
         },
-        "required": ["windowHandle"]
+        "required": [
+          "windowHandle"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -379,7 +432,13 @@
             "default": true
           }
         },
-        "required": ["windowHandle", "fromX", "fromY", "toX", "toY"]
+        "required": [
+          "windowHandle",
+          "fromX",
+          "fromY",
+          "toX",
+          "toY"
+        ]
       }
     },
     {
@@ -402,7 +461,10 @@
             "default": true
           }
         },
-        "required": ["windowHandle", "shortcut"]
+        "required": [
+          "windowHandle",
+          "shortcut"
+        ]
       }
     },
     {
@@ -428,7 +490,10 @@
           },
           "outputPath": {
             "description": "Optional PNG export path. When set, the captured observation is also written there.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         }
@@ -455,7 +520,10 @@
           },
           "language": {
             "description": "Windows OCR language tag, for example fr-FR or en-US. Null uses the user profile languages.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "regionX": {
@@ -485,12 +553,18 @@
           },
           "outputPath": {
             "description": "Optional JSON/Markdown export path.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "audioPath": {
             "description": "Optional WAV export path when speak=true; otherwise a temporary WAV is created.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         }
@@ -512,7 +586,10 @@
           },
           "outputPath": {
             "description": "Output AVI path; null creates a timestamped file in the user temp directory.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "durationMs": {
@@ -570,7 +647,11 @@
             "default": true
           }
         },
-        "required": ["windowHandle", "x", "y"]
+        "required": [
+          "windowHandle",
+          "x",
+          "y"
+        ]
       }
     },
     {
@@ -585,11 +666,16 @@
           },
           "audioPath": {
             "description": "Optional WAV export path; otherwise a temporary WAV is created.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         },
-        "required": ["text"]
+        "required": [
+          "text"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -633,7 +719,12 @@
             "default": true
           }
         },
-        "required": ["windowHandle", "text", "x", "y"]
+        "required": [
+          "windowHandle",
+          "text",
+          "x",
+          "y"
+        ]
       }
     },
     {
@@ -647,7 +738,9 @@
             "type": "string"
           }
         },
-        "required": ["markdown"]
+        "required": [
+          "markdown"
+        ]
       }
     },
     {
@@ -669,7 +762,9 @@
             "type": "string"
           }
         },
-        "required": ["agent"]
+        "required": [
+          "agent"
+        ]
       }
     },
     {
@@ -695,7 +790,10 @@
             "type": "string"
           }
         },
-        "required": ["agent", "status"]
+        "required": [
+          "agent",
+          "status"
+        ]
       }
     },
     {
@@ -718,7 +816,10 @@
             "default": false
           }
         },
-        "required": ["path", "destination"]
+        "required": [
+          "path",
+          "destination"
+        ]
       }
     },
     {
@@ -737,7 +838,9 @@
             "default": false
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -752,11 +855,16 @@
           },
           "name": {
             "description": "Value name; null/empty deletes the entire key.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -770,7 +878,9 @@
             "type": "string"
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -787,7 +897,9 @@
             "type": "string"
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -818,7 +930,9 @@
             "type": "integer"
           }
         },
-        "required": ["slot"]
+        "required": [
+          "slot"
+        ]
       }
     },
     {
@@ -857,7 +971,10 @@
             "default": 100
           }
         },
-        "required": ["slot", "buttonMask"]
+        "required": [
+          "slot",
+          "buttonMask"
+        ]
       }
     },
     {
@@ -905,7 +1022,10 @@
             "default": 0
           }
         },
-        "required": ["slot", "buttons"]
+        "required": [
+          "slot",
+          "buttons"
+        ]
       }
     },
     {
@@ -1053,7 +1173,9 @@
             }
           }
         },
-        "required": ["events"]
+        "required": [
+          "events"
+        ]
       }
     },
     {
@@ -1227,7 +1349,9 @@
             "default": true
           }
         },
-        "required": ["appId"]
+        "required": [
+          "appId"
+        ]
       }
     },
     {
@@ -1298,7 +1422,9 @@
             "type": "string"
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -1356,7 +1482,10 @@
             "type": "string"
           }
         },
-        "required": ["path", "name"]
+        "required": [
+          "path",
+          "name"
+        ]
       }
     },
     {
@@ -1386,7 +1515,9 @@
             "default": 200
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -1400,7 +1531,9 @@
             "type": "integer"
           }
         },
-        "required": ["vk"]
+        "required": [
+          "vk"
+        ]
       }
     },
     {
@@ -1414,7 +1547,9 @@
             "type": "integer"
           }
         },
-        "required": ["vk"]
+        "required": [
+          "vk"
+        ]
       }
     },
     {
@@ -1438,7 +1573,9 @@
             "default": false
           }
         },
-        "required": ["scanCode"]
+        "required": [
+          "scanCode"
+        ]
       }
     },
     {
@@ -1449,12 +1586,18 @@
         "properties": {
           "pid": {
             "description": "Process ID. Takes precedence over name when set.",
-            "type": ["integer", "null"],
+            "type": [
+              "integer",
+              "null"
+            ],
             "default": null
           },
           "name": {
             "description": "Process name (no .exe extension required). Used when pid is null.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "force": {
@@ -1477,16 +1620,24 @@
           },
           "args": {
             "description": "Optional command-line arguments (space-separated, shell-escaped).",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "workingDirectory": {
             "description": "Working directory for the new process.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         },
-        "required": ["target"]
+        "required": [
+          "target"
+        ]
       }
     },
     {
@@ -1501,7 +1652,10 @@
           },
           "pattern": {
             "description": "Glob pattern filter, e.g. '*.txt'. Empty = all entries.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "recursive": {
@@ -1524,7 +1678,9 @@
             "default": []
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -1551,7 +1707,10 @@
         "properties": {
           "name": {
             "description": "Substring filter on process name (case-insensitive). Empty = no filter.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "sortBy": {
@@ -1578,7 +1737,9 @@
             "type": "string"
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       }
     },
     {
@@ -1606,12 +1767,18 @@
         "properties": {
           "nameFilter": {
             "description": "Substring filter on service name (case-insensitive). Empty = no filter.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "statusFilter": {
             "description": "Status filter: Running, Stopped, Paused, StartPending, StopPending. Empty = any.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         }
@@ -1625,7 +1792,10 @@
         "properties": {
           "stateFilter": {
             "description": "Optional state filter (case-insensitive). Empty = all states.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         }
@@ -1659,7 +1829,10 @@
             "default": "rw"
           }
         },
-        "required": ["pid", "size"]
+        "required": [
+          "pid",
+          "size"
+        ]
       }
     },
     {
@@ -1682,7 +1855,10 @@
           },
           "outputPath": {
             "description": "Output file path. Empty = auto in %TEMP%.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "suspend": {
@@ -1691,7 +1867,11 @@
             "default": false
           }
         },
-        "required": ["pid", "address", "size"]
+        "required": [
+          "pid",
+          "address",
+          "size"
+        ]
       }
     },
     {
@@ -1717,7 +1897,10 @@
             "type": "integer"
           }
         },
-        "required": ["pid", "address"]
+        "required": [
+          "pid",
+          "address"
+        ]
       }
     },
     {
@@ -1735,7 +1918,10 @@
             "type": "string"
           }
         },
-        "required": ["pid", "moduleName"]
+        "required": [
+          "pid",
+          "moduleName"
+        ]
       }
     },
     {
@@ -1749,7 +1935,9 @@
             "type": "integer"
           }
         },
-        "required": ["pid"]
+        "required": [
+          "pid"
+        ]
       }
     },
     {
@@ -1789,7 +1977,12 @@
             "type": "string"
           }
         },
-        "required": ["pid", "address", "size", "protect"]
+        "required": [
+          "pid",
+          "address",
+          "size",
+          "protect"
+        ]
       }
     },
     {
@@ -1807,7 +2000,10 @@
             "type": "integer"
           }
         },
-        "required": ["pid", "address"]
+        "required": [
+          "pid",
+          "address"
+        ]
       }
     },
     {
@@ -1829,7 +2025,11 @@
             "type": "integer"
           }
         },
-        "required": ["pid", "address", "length"]
+        "required": [
+          "pid",
+          "address",
+          "length"
+        ]
       }
     },
     {
@@ -1852,7 +2052,10 @@
             "default": 256
           }
         },
-        "required": ["pid", "address"]
+        "required": [
+          "pid",
+          "address"
+        ]
       }
     },
     {
@@ -1870,7 +2073,10 @@
             "type": "integer"
           }
         },
-        "required": ["pid", "address"]
+        "required": [
+          "pid",
+          "address"
+        ]
       }
     },
     {
@@ -1888,7 +2094,10 @@
             "type": "integer"
           }
         },
-        "required": ["pid", "address"]
+        "required": [
+          "pid",
+          "address"
+        ]
       }
     },
     {
@@ -1906,7 +2115,10 @@
             "type": "integer"
           }
         },
-        "required": ["pid", "address"]
+        "required": [
+          "pid",
+          "address"
+        ]
       }
     },
     {
@@ -1924,7 +2136,10 @@
             "type": "integer"
           }
         },
-        "required": ["pid", "address"]
+        "required": [
+          "pid",
+          "address"
+        ]
       }
     },
     {
@@ -1947,7 +2162,10 @@
             "default": 256
           }
         },
-        "required": ["pid", "address"]
+        "required": [
+          "pid",
+          "address"
+        ]
       }
     },
     {
@@ -1961,7 +2179,9 @@
             "type": "integer"
           }
         },
-        "required": ["pid"]
+        "required": [
+          "pid"
+        ]
       }
     },
     {
@@ -1988,7 +2208,11 @@
             "default": 10
           }
         },
-        "required": ["pid", "moduleName", "pattern"]
+        "required": [
+          "pid",
+          "moduleName",
+          "pattern"
+        ]
       }
     },
     {
@@ -2011,7 +2235,10 @@
             "default": 200
           }
         },
-        "required": ["pid", "value"]
+        "required": [
+          "pid",
+          "value"
+        ]
       }
     },
     {
@@ -2025,7 +2252,9 @@
             "type": "integer"
           }
         },
-        "required": ["pid"]
+        "required": [
+          "pid"
+        ]
       }
     },
     {
@@ -2047,7 +2276,11 @@
             "type": "string"
           }
         },
-        "required": ["pid", "address", "hex"]
+        "required": [
+          "pid",
+          "address",
+          "hex"
+        ]
       }
     },
     {
@@ -2069,7 +2302,11 @@
             "type": "number"
           }
         },
-        "required": ["pid", "address", "value"]
+        "required": [
+          "pid",
+          "address",
+          "value"
+        ]
       }
     },
     {
@@ -2091,7 +2328,11 @@
             "type": "number"
           }
         },
-        "required": ["pid", "address", "value"]
+        "required": [
+          "pid",
+          "address",
+          "value"
+        ]
       }
     },
     {
@@ -2113,7 +2354,11 @@
             "type": "integer"
           }
         },
-        "required": ["pid", "address", "value"]
+        "required": [
+          "pid",
+          "address",
+          "value"
+        ]
       }
     },
     {
@@ -2135,7 +2380,11 @@
             "type": "integer"
           }
         },
-        "required": ["pid", "address", "value"]
+        "required": [
+          "pid",
+          "address",
+          "value"
+        ]
       }
     },
     {
@@ -2176,7 +2425,12 @@
             "default": 250
           }
         },
-        "required": ["x1", "y1", "x2", "y2"]
+        "required": [
+          "x1",
+          "y1",
+          "x2",
+          "y2"
+        ]
       }
     },
     {
@@ -2204,7 +2458,10 @@
             "default": 200
           }
         },
-        "required": ["x", "y"]
+        "required": [
+          "x",
+          "y"
+        ]
       }
     },
     {
@@ -2227,7 +2484,10 @@
             "default": false
           }
         },
-        "required": ["x", "y"]
+        "required": [
+          "x",
+          "y"
+        ]
       }
     },
     {
@@ -2250,7 +2510,10 @@
             "default": false
           }
         },
-        "required": ["path", "destination"]
+        "required": [
+          "path",
+          "destination"
+        ]
       }
     },
     {
@@ -2268,7 +2531,10 @@
             "type": "string"
           }
         },
-        "required": ["labels", "text"]
+        "required": [
+          "labels",
+          "text"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -2285,7 +2551,9 @@
             "type": "string"
           }
         },
-        "required": ["labels"]
+        "required": [
+          "labels"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -2345,7 +2613,9 @@
             "default": "on"
           }
         },
-        "required": ["pid"]
+        "required": [
+          "pid"
+        ]
       }
     },
     {
@@ -2364,7 +2634,9 @@
             "default": 30
           }
         },
-        "required": ["command"]
+        "required": [
+          "command"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -2387,11 +2659,16 @@
           },
           "xpathFilter": {
             "description": "Optional XPath filter, e.g. \"*[System[Level=2]]\".",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         },
-        "required": ["channel"]
+        "required": [
+          "channel"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -2418,7 +2695,9 @@
             "default": 0
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -2453,7 +2732,11 @@
             "default": 0
           }
         },
-        "required": ["titleSubstring", "x", "y"]
+        "required": [
+          "titleSubstring",
+          "x",
+          "y"
+        ]
       }
     },
     {
@@ -2467,7 +2750,9 @@
             "type": "string"
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -2484,7 +2769,9 @@
             "type": "string"
           }
         },
-        "required": ["path"]
+        "required": [
+          "path"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -2501,7 +2788,9 @@
             "type": "string"
           }
         },
-        "required": ["url"]
+        "required": [
+          "url"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -2515,7 +2804,10 @@
         "properties": {
           "outputPath": {
             "description": "Output file path. If null, a timestamped file is written to %TEMP%.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         }
@@ -2551,7 +2843,10 @@
             "default": 1
           }
         },
-        "required": ["x", "y"]
+        "required": [
+          "x",
+          "y"
+        ]
       }
     },
     {
@@ -2581,7 +2876,10 @@
             }
           }
         },
-        "required": ["path", "pattern"]
+        "required": [
+          "path",
+          "pattern"
+        ]
       }
     },
     {
@@ -2595,7 +2893,9 @@
             "type": "string"
           }
         },
-        "required": ["query"]
+        "required": [
+          "query"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -2617,11 +2917,17 @@
           },
           "appId": {
             "description": "AUMID for branded toasts. Ignored in this Win32 balloon implementation.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           }
         },
-        "required": ["title", "message"]
+        "required": [
+          "title",
+          "message"
+        ]
       }
     },
     {
@@ -2635,7 +2941,9 @@
             "type": "string"
           }
         },
-        "required": ["guid"]
+        "required": [
+          "guid"
+        ]
       }
     },
     {
@@ -2649,7 +2957,9 @@
             "type": "string"
           }
         },
-        "required": ["text"]
+        "required": [
+          "text"
+        ]
       }
     },
     {
@@ -2667,7 +2977,10 @@
             "type": "string"
           }
         },
-        "required": ["exePath", "preference"]
+        "required": [
+          "exePath",
+          "preference"
+        ]
       }
     },
     {
@@ -2681,7 +2994,9 @@
             "type": "integer"
           }
         },
-        "required": ["mode"]
+        "required": [
+          "mode"
+        ]
       }
     },
     {
@@ -2699,7 +3014,10 @@
             "type": "integer"
           }
         },
-        "required": ["pid", "mask"]
+        "required": [
+          "pid",
+          "mask"
+        ]
       }
     },
     {
@@ -2717,7 +3035,10 @@
             "type": "string"
           }
         },
-        "required": ["pid", "priority"]
+        "required": [
+          "pid",
+          "priority"
+        ]
       }
     },
     {
@@ -2744,7 +3065,11 @@
             "default": "String"
           }
         },
-        "required": ["path", "name", "value"]
+        "required": [
+          "path",
+          "name",
+          "value"
+        ]
       }
     },
     {
@@ -2758,7 +3083,9 @@
             "type": "string"
           }
         },
-        "required": ["shortcut"]
+        "required": [
+          "shortcut"
+        ]
       }
     },
     {
@@ -2769,7 +3096,10 @@
         "properties": {
           "processName": {
             "description": "Optional process name filter (reserved for compatibility; use windowHandle for exact targeting).",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "maxElements": {
@@ -2799,7 +3129,9 @@
             "type": "string"
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -2820,7 +3152,9 @@
             "type": "string"
           }
         },
-        "required": ["appId"]
+        "required": [
+          "appId"
+        ]
       }
     },
     {
@@ -2835,7 +3169,10 @@
           },
           "executableName": {
             "description": "Override executable name (no .exe required). Defaults to install_dir + .exe.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "steamRoot": {
@@ -2843,7 +3180,9 @@
             "type": "string"
           }
         },
-        "required": ["appId"]
+        "required": [
+          "appId"
+        ]
       }
     },
     {
@@ -2861,7 +3200,10 @@
             "type": "string"
           }
         },
-        "required": ["appId", "executableName"]
+        "required": [
+          "appId",
+          "executableName"
+        ]
       }
     },
     {
@@ -2884,7 +3226,10 @@
             "default": 60000
           }
         },
-        "required": ["appId", "executableName"]
+        "required": [
+          "appId",
+          "executableName"
+        ]
       }
     },
     {
@@ -2898,7 +3243,9 @@
             "type": "integer"
           }
         },
-        "required": ["appId"]
+        "required": [
+          "appId"
+        ]
       }
     },
     {
@@ -2943,7 +3290,9 @@
             "type": "string"
           }
         },
-        "required": ["steamUri"]
+        "required": [
+          "steamUri"
+        ]
       }
     },
     {
@@ -2997,7 +3346,10 @@
             "default": 500
           }
         },
-        "required": ["appId", "executableName"]
+        "required": [
+          "appId",
+          "executableName"
+        ]
       }
     },
     {
@@ -3011,7 +3363,9 @@
             "type": "string"
           }
         },
-        "required": ["name"]
+        "required": [
+          "name"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -3028,7 +3382,9 @@
             "type": "string"
           }
         },
-        "required": ["titleSubstring"]
+        "required": [
+          "titleSubstring"
+        ]
       }
     },
     {
@@ -3042,7 +3398,9 @@
             "type": "integer"
           }
         },
-        "required": ["pid"]
+        "required": [
+          "pid"
+        ]
       }
     },
     {
@@ -3074,7 +3432,11 @@
             "default": false
           }
         },
-        "required": ["text", "x", "y"]
+        "required": [
+          "text",
+          "x",
+          "y"
+        ]
       }
     },
     {
@@ -3088,7 +3450,9 @@
             "type": "integer"
           }
         },
-        "required": ["seconds"]
+        "required": [
+          "seconds"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -3106,7 +3470,10 @@
           },
           "outputPath": {
             "description": "Output BMP path. Empty = auto in %TEMP%.",
-            "type": ["string", "null"],
+            "type": [
+              "string",
+              "null"
+            ],
             "default": null
           },
           "fullContent": {
@@ -3115,7 +3482,9 @@
             "default": true
           }
         },
-        "required": ["hwnd"]
+        "required": [
+          "hwnd"
+        ]
       }
     },
     {
@@ -3129,7 +3498,9 @@
             "type": "integer"
           }
         },
-        "required": ["hwnd"]
+        "required": [
+          "hwnd"
+        ]
       }
     },
     {
@@ -3172,7 +3543,9 @@
             "type": "integer"
           }
         },
-        "required": ["parentHwnd"]
+        "required": [
+          "parentHwnd"
+        ]
       }
     },
     {
@@ -3191,7 +3564,9 @@
             "default": ""
           }
         },
-        "required": ["className"]
+        "required": [
+          "className"
+        ]
       }
     },
     {
@@ -3205,7 +3580,9 @@
             "type": "integer"
           }
         },
-        "required": ["hwnd"]
+        "required": [
+          "hwnd"
+        ]
       }
     },
     {
@@ -3245,7 +3622,11 @@
             "default": 0
           }
         },
-        "required": ["hwnd", "x", "y"]
+        "required": [
+          "hwnd",
+          "x",
+          "y"
+        ]
       }
     },
     {
@@ -3273,7 +3654,10 @@
             "default": 0
           }
         },
-        "required": ["hwnd", "msg"]
+        "required": [
+          "hwnd",
+          "msg"
+        ]
       }
     },
     {
@@ -3301,7 +3685,10 @@
             "default": 0
           }
         },
-        "required": ["hwnd", "msg"]
+        "required": [
+          "hwnd",
+          "msg"
+        ]
       }
     },
     {
@@ -3324,7 +3711,10 @@
             "default": false
           }
         },
-        "required": ["hwnd", "alpha"]
+        "required": [
+          "hwnd",
+          "alpha"
+        ]
       }
     },
     {
@@ -3342,7 +3732,10 @@
             "type": "string"
           }
         },
-        "required": ["hwnd", "text"]
+        "required": [
+          "hwnd",
+          "text"
+        ]
       }
     },
     {
@@ -3361,7 +3754,9 @@
             "default": true
           }
         },
-        "required": ["hwnd"]
+        "required": [
+          "hwnd"
+        ]
       }
     },
     {
@@ -3383,7 +3778,9 @@
             "type": "string"
           }
         },
-        "required": ["modelPath"]
+        "required": [
+          "modelPath"
+        ]
       }
     },
     {
@@ -3414,7 +3811,10 @@
             "default": "cpu"
           }
         },
-        "required": ["modelPath", "inputsJson"]
+        "required": [
+          "modelPath",
+          "inputsJson"
+        ]
       }
     },
     {
@@ -3437,7 +3837,10 @@
             "default": false
           }
         },
-        "required": ["path", "content"]
+        "required": [
+          "path",
+          "content"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -3461,7 +3864,10 @@
             }
           }
         },
-        "required": ["distribution", "command"]
+        "required": [
+          "distribution",
+          "command"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -3500,7 +3906,9 @@
             "type": "string"
           }
         },
-        "required": ["distribution"]
+        "required": [
+          "distribution"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -3521,7 +3929,10 @@
             "type": "string"
           }
         },
-        "required": ["distribution", "probe"]
+        "required": [
+          "distribution",
+          "probe"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
@@ -3547,10 +3958,94 @@
             "default": "TERM"
           }
         },
-        "required": ["distribution", "processId"]
+        "required": [
+          "distribution",
+          "processId"
+        ]
       },
       "execution": {
         "taskSupport": "optional"
+      }
+    },
+    {
+      "name": "tweak_catalog",
+      "description": "Lists the Bun OS Windows tweak catalog (catalog/tweaks.toml): modules and tweaks with id, module, title, level (conservative|standard|aggressive), targets (live|offline) and operation count. The single source of truth for bunos-win11 and Bun OS Tweaks. Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "module": {
+            "description": "Only tweaks of this module id.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "tweak_plan",
+      "description": "Builds a tweak plan for the running Windows from a profile (archinstall-style: target, level, modules, include, exclude) without changing anything. Detects each operation, marks it change|ok|skip|refused, saves the plan JSON under %LOCALAPPDATA%\bunoswin11 and returns the path and a per-module summary. Guarded operations (Defender, Windows Update, WSL/Hyper-V, Store, WebView2, networking, aphrody/ssh/WireGuard) are always refused.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "profileToml": {
+            "description": "Inline profile TOML. Omit for the default conservative live profile.",
+            "type": "string"
+          },
+          "profilePath": {
+            "description": "Path to a profile .toml file (alternative to profileToml).",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "tweak_apply",
+      "description": "Applies a previously built plan (or a profile) to the running Windows. Creates a System Restore point, exports every touched registry key to .reg, and journals every change so tweak_undo reverts it. Requires confirm=true; machine-wide changes require an elevated process. Returns the journal path and the number of changes applied.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "planPath": {
+            "description": "Path of a plan from tweak_plan. Omit to build one from the profile first.",
+            "type": "string"
+          },
+          "profileToml": {
+            "description": "Inline profile TOML when no planPath is given.",
+            "type": "string"
+          },
+          "confirm": {
+            "description": "Must be true to apply.",
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "confirm"
+        ]
+      }
+    },
+    {
+      "name": "tweak_verify",
+      "description": "Re-detects every change recorded in a journal and returns the ids of tweaks whose state no longer matches (drift). Read-only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "journalPath": {
+            "description": "Journal path. Omit to use the newest journal under %LOCALAPPDATA%\bunoswin11journal.",
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "name": "tweak_undo",
+      "description": "Reverts a journal in place: replays every applied change backwards, restoring each registry value, service start type, scheduled task and power scheme to its recorded previous state, and re-registers removed per-user appx packages. Irreversible operations (offline file/capability removals) are reported, not reverted.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "journalPath": {
+            "description": "Journal path. Omit to use the newest journal.",
+            "type": "string"
+          }
+        }
       }
     }
   ]
