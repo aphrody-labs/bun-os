@@ -51,6 +51,18 @@ So a service can own the instance through WSL's public interface, without touchi
    client (the keeper) is what keeps the instance and the VM up (no idle shutdown, whatever `.wslconfig` says), and
    because the WSL session is created from session 0, a user logoff does not end it. Later interactive `wsl.exe` calls of
    the same user join the same session and VM.
+   **WSLg exception (2026-11-03).** WSLGd starts the RDP client `msrdc.exe` by interop through the Windows session that
+   created the VM. From session 0 it has no desktop: the RAIL connection stalls, msrdc drops after ~100 s
+   (`peer_recv_pdu() fail` in `/mnt/wslg/wlog.log`, `unable to checkDescriptor` in `weston.log`), Weston dies with
+   SIGSEGV and WSLGd restarts it, forever (68 crashes from 07:30 to 09:30 on the workstation; X apps on `:0` never
+   drew). So the service now prefers the owner's **interactive token** (`WTSQueryUserToken` of their active session,
+   `winsta0\default` desktop) and uses S4U only when the owner is not logged on. While running it checks every 5 s for
+   an `msrdc.exe` in session 0 (only WSLg starts one there); when it finds one and the owner has a desktop, it logs
+   "<user> logged on (session N): restarting the WSL VM from that session", runs `wsl --shutdown` and respawns the
+   keeper from that session. Trade-off: the VM now belongs to the interactive session, so a logoff ends it (WslService
+   terminates sessions by Windows session ID); the keeper's exit then respawns it headless by S4U, and the next logon
+   moves it back. A boot without logon still starts the distro before logon, as before. The unit services
+   (`proxy.rs`) use the same preference.
 3. The monitor script waits for `systemctl is-system-running --wait`, prints `READY <state> <uptime>`, then prints
    `systemctl show` for the mirrored units every 2 s and follows their journal as JSON. One wsl.exe and one pipe carry
    everything; there is no polling from Windows.
@@ -73,6 +85,11 @@ The service name is `BunOSWsl` because `BunOS` is already the bunos.sys driver s
   `WSLService`, three restart actions, reset 86400 s).
 - S4U from LocalSystem works for the Microsoft-account-linked local account `aphro`: event "up as APHRODY\aphro";
   keeper `wsl.exe` and `bunos-wsl-service.exe` run in **session 0**.
+- Session switch (2026-11-03, 09:56): installed over the S4U-owned instance, the service found `msrdc.exe` in session 0,
+  restarted the VM from session 1 (back 6.1 s after the respawn), and from then on the keeper `wsl.exe`, `wslhost.exe`
+  and `msrdc.exe` run in session 1; one Weston start and no SIGSEGV over 5 min; `xeyes` (X11 on `:0`),
+  `weston-terminal` and `glxgears` drawn as Win32 windows. Reinstalling with msrdc already in session 1 does not
+  restart the VM; the event then reads "interactive token of session 1".
 - `sc start BunOSWsl` reached RUNNING only after systemd reported `running` (numbers below).
 - Restarts: while another agent repeatedly terminated the distro (07:07-07:18), the service brought it back each time
   (seven restarts, 1.4-32.1 s each from respawn to systemd ready) and logged the wsl.exe exit code and stderr.

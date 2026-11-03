@@ -394,6 +394,20 @@ The Waydroid configuration was restored to the software path, the unit is shippe
 the CPU. Closing the gap means changing the Android side of Mesa in the Waydroid vendor image: virgl with a
 host-visible gralloc (minigbm on vtest resources) or Venus with `AHardwareBuffer` import. Both are listed under Open.
 
+### WSLg crash loop with the BunOSWsl service (fixed 2026-11-03)
+
+Symptom after the `BunOSWsl` service (docs/WSL-SERVICE.md) took over the instance at 07:30: Weston restarted every
+~100 s (68 SIGSEGV in `/mnt/wslg/stderr.log` by 09:30), X apps on `:0` never drew, Wayland clients connected but got no
+reply. Each cycle: `msrdc.exe` connects (`Accepted client` in `wlog.log`), nothing for 100 s, `peer_recv_pdu() fail`,
+`unable to checkDescriptor` in `weston.log`, SIGSEGV, WSLGd restarts Weston and msrdc. Cause, from the Windows side:
+`msrdc.exe` ran in **session 0** under a session-0 `wslhost.exe` of the service's keeper `wsl.exe`. WSLGd launches
+msrdc through the session that created the VM, and session 0 has no desktop. Ruled out by that evidence: the
+`.wslgconfig` keys, mirrored networking, the kernel's hv_sock/vsock (the RDP channel connected every time), the
+Waydroid desktop icon. Fix in `crates/bunos-wsl-service`: the owner's interactive token when they are logged on, and a
+one-time VM restart from their session when msrdc is found in session 0. Verified: msrdc in session 1, a single Weston
+start and no crash over 5 min, `xeyes`, `weston-terminal` and `glxgears` drawing as Win32 windows. The restart killed
+one Docker build of another agent (announced over `aphrody a2a`; it retried automatically).
+
 ### Undo
 
 ```sh
