@@ -191,7 +191,7 @@ export function runDesign(o: DesignOptions): string[] {
     wallPng = join(out.dir, "wallpaper/bunos-dusk-1920x1080.png");
   }
   const seed = o.seed ?? sh([o.bin, "seed", wallPng]);
-  const native = parseNativeThemeExport(JSON.parse(sh([o.bin, "theme", "--seed", seed, "--variant", "tonalSpot"])));
+  const native = parseNativeThemeExport(JSON.parse(sh([o.bin, "theme", "--seed", seed, "--variant", "tonal-spot"])));
   const input: ThemeInput = { name: "BunOS", seed, variant: "tonalSpot", contrastLevel: 0, nativeTheme: native, mode: "auto" };
   out.json("theme/native-theme.json", native);
   log.push(`seed ${seed} from ${relative(ROOT, wallSrc)}`);

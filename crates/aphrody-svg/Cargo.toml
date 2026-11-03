@@ -24,6 +24,8 @@ perf = { level = "warn", priority = -1 }
 default = ["raster", "glyph"]
 # usvg/resvg/tiny-skia: normalize, optimize, rasterize (PNG, ICO) and pixel diff.
 raster = ["dep:resvg", "dep:usvg", "dep:tiny-skia"]
+# Decode embedded PNG/JPEG/GIF/WebP `<image>` elements while rasterizing (previews, mockups).
+raster-images = ["raster", "resvg/raster-images"]
 # skrifa: font glyph outlines (TTF/OTF, variable axes) to SVG path data.
 glyph = ["dep:skrifa"]
 # Material Symbols: GSUB ligature lookup by icon name, 960-grid paths, gstatic layout, WOFF2 decoding.

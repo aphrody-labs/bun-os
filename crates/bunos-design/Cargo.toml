@@ -14,7 +14,7 @@ name = "bunos-design"
 path = "src/main.rs"
 
 [dependencies]
-aphrody-svg = { path = "../aphrody-svg", default-features = false, features = ["raster"] }
+aphrody-svg = { path = "../aphrody-svg", default-features = false, features = ["raster-images"] }
 aphrody-m3-tokens = { path = "../aphrody-m3-tokens", features = ["image", "serde"] }
 rayon = { workspace = true }
 serde = { workspace = true }
