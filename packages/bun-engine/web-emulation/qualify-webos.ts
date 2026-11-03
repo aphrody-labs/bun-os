@@ -11,13 +11,16 @@
  *   bun packages/bun-engine/web-emulation/qualify-webos.ts [--base http://127.0.0.1:8790] [--only id,id]
  *     [--frames 120] [--timeout-ms 600000] [--no-publish] [--no-run] [--watch]
  */
-import { cp, mkdir, rm } from "node:fs/promises";
+import { mkdir, rm } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { EMULATORS, type QualificationEntry, type QualificationReport } from "./emulators";
 import { Cdp, chromePath } from "./smoke.ts";
 import { stageFixtures, writeCatalog } from "./fixtures.ts";
-import { pngHasLitPixel } from "./png.ts";
+import { decodeScreenshotPng } from "./png.ts";
+import { publishQualifiedCores } from "./webos-publish.ts";
+import { verifyQualification } from "./qualification.ts";
+import { presentationProblems } from "./webos-evidence.ts";
 
 const root = resolve(import.meta.dir, "../../..");
 const dist = join(root, "dist/web-emulation");
@@ -32,25 +35,46 @@ const objects = resolve(Bun.env.WEBOS_OBJECTS ?? join(Bun.env.HOME ?? root, "app
 const frames = Number(value("--frames") ?? 120);
 const timeoutMs = Number(value("--timeout-ms") ?? 600_000);
 const only = value("--only")?.split(",");
+const unqualified = new Map<string, string>();
 
 function git(...a: string[]) {
   const r = Bun.spawnSync(["git", ...a], { cwd: root });
   return r.exitCode ? undefined : r.stdout.toString().trim();
 }
 
+function cleanSourceCommit() {
+  const paths = [
+    "packages/bun-engine/web-emulation/qualify-webos.ts",
+    "packages/bun-engine/web-emulation/webos-publish.ts",
+    "packages/bun-engine/web-emulation/webos-evidence.ts",
+    "packages/bun-engine/web-emulation/fixtures.ts",
+    "packages/bun-engine/web-emulation/emulators.ts",
+    "packages/bun-engine/web-emulation/qualification.ts",
+    "packages/bun-engine/web-emulation/png.ts",
+    "packages/bun-engine/web-emulation/smoke.ts",
+    "packages/bun-engine/web-emulation/web-emulation.lock.json",
+    "packages/bun-engine/web-emulation/qualify-page",
+    "packages/bun-engine/plugins/consoles/roms.json",
+    "packages/bun-engine/plugins/consoles/free-firmware.json",
+  ];
+  const tracked = Bun.spawnSync(["git", "ls-files", "--error-unmatch", "--", ...paths], { cwd: root });
+  const changed = Bun.spawnSync(["git", "diff", "--quiet", "HEAD", "--", ...paths], { cwd: root });
+  return tracked.exitCode === 0 && changed.exitCode === 0 ? git("rev-parse", "HEAD") : undefined;
+}
+
 async function publish() {
-  for (const dir of ["runtime", "firmware"]) {
-    if (!existsSync(join(dist, dir))) continue;
-    await rm(join(objects, "emulation", dir), { recursive: true, force: true });
-    await cp(join(dist, dir), join(objects, "emulation", dir), { recursive: true });
-  }
-  const published: string[] = [];
+  const cores: string[] = [];
   for (const emulator of EMULATORS) {
-    if (!emulator.core || !existsSync(join(dist, emulator.core, "manifest.json"))) continue;
-    await rm(join(objects, "emulation", emulator.core), { recursive: true, force: true });
-    await cp(join(dist, emulator.core), join(objects, "emulation", emulator.core), { recursive: true });
-    published.push(emulator.core);
+    if ((only && !only.includes(emulator.id)) || !emulator.core) continue;
+    if (!existsSync(join(dist, emulator.core, "manifest.json"))) continue;
+    try {
+      await verifyQualification(dist, emulator.core, { root });
+      cores.push(emulator.core);
+    } catch (error) {
+      unqualified.set(emulator.id, String(error));
+    }
   }
+  const published = await publishQualifiedCores(dist, objects, cores, root);
   console.log(`published to ${objects}/emulation: ${published.join(", ") || "(no built cores)"}`);
 }
 
@@ -75,7 +99,6 @@ async function launch() {
             "--enable-features=Vulkan",
             "--use-angle=vulkan",
             "--use-vulkan=swiftshader",
-            "--disable-vulkan-surface",
             "--use-webgpu-adapter=swiftshader",
             "--enable-unsafe-swiftshader",
             ...(process.getuid?.() === 0 ? ["--no-sandbox"] : []),
@@ -176,20 +199,23 @@ async function qualify(cdp: Cdp, id: string, fixtureSha: string | undefined): Pr
     );
     const clip = JSON.parse(box.value);
     let screenshotLit = false;
+    let screenshotHash = "";
     if (clip.width > 0 && clip.height > 0) {
       const shot = await cdp.send("Page.captureScreenshot", { format: "png", clip }, sessionId);
       const png = Buffer.from(shot.data, "base64");
       await Bun.write(join(objects, "emulators/shots", `${id}.png`), png);
       entry.screenshot = `/api/emulators/qualification/${id}.png`;
-      screenshotLit = pngHasLitPixel(png);
+      const pixels = decodeScreenshotPng(png).data;
+      for (let i = 0; i < pixels.length; i += 4)
+        if (pixels[i]! > 16 || pixels[i + 1]! > 16 || pixels[i + 2]! > 16) {
+          screenshotLit = true;
+          break;
+        }
+      screenshotHash = new Bun.CryptoHasher("sha256").update(pixels).digest("hex");
     }
     entry.frames = result.frames;
-    // Bevy presents through WebGPU, and a headless screenshot of a WebGPU canvas can come back transparent: the
-    // core's own framebuffer (software renderers) or its GPU submission counter (Dust on wgpu) is the evidence then.
-    const gpuSubmitted = result.renderer === "wgpu30-dust" && (result.gpu2d ?? 0) > 0;
-    const lit = screenshotLit || result.lit === true || gpuSubmitted;
-    entry.lit = lit;
-    entry.hash = result.hash;
+    entry.lit = screenshotLit;
+    entry.hash = screenshotHash;
     entry.audio = result.audio;
     entry.renderer = result.renderer;
     entry.saveState = result.saveState;
@@ -197,7 +223,7 @@ async function qualify(cdp: Cdp, id: string, fixtureSha: string | undefined): Pr
     const problems: string[] = [];
     if (result.error) problems.push(result.error);
     if ((result.frames ?? 0) < frames) problems.push(`only ${result.frames ?? 0} of ${frames} frames`);
-    if (!lit) problems.push("the canvas stayed black");
+    problems.push(...presentationProblems(id, screenshotLit, result.renderer, result.gpu2d));
     if (!result.audioProbe?.contexts) problems.push("no Web Audio context was created");
     if (result.saveState === "fail") problems.push("save state failed");
     if (result.stopped) problems.push(`machine stopped: ${result.stopped}`);
@@ -218,15 +244,18 @@ async function qualify(cdp: Cdp, id: string, fixtureSha: string | undefined): Pr
 // --watch: keep qualifying cores as the build-all pipeline finishes them (publish, then qualify only those).
 if (flag("--watch")) {
   const seen = new Map<string, number>();
+  const modified = (core: string) => {
+    const manifest = join(dist, core, "manifest.json");
+    const receipt = join(dist, core, "qualification.json");
+    return Math.max(Bun.file(manifest).lastModified, existsSync(receipt) ? Bun.file(receipt).lastModified : 0);
+  };
   for (;;) {
     const changed = EMULATORS.filter(e => {
       const manifest = e.core && join(dist, e.core, "manifest.json");
-      return manifest && existsSync(manifest) && Bun.file(manifest).lastModified > (seen.get(e.id) ?? 0);
+      return manifest && existsSync(manifest) && modified(e.core!) > (seen.get(e.id) ?? 0);
     });
     if (changed.length) {
-      const stamp = Object.fromEntries(
-        changed.map(e => [e.id, Bun.file(join(dist, e.core!, "manifest.json")).lastModified]),
-      );
+      const stamp = Object.fromEntries(changed.map(e => [e.id, modified(e.core!)]));
       const child = Bun.spawn(
         [
           process.execPath,
@@ -240,8 +269,7 @@ if (flag("--watch")) {
         ],
         { stdout: "inherit", stderr: "inherit" },
       );
-      await child.exited;
-      for (const [id, time] of Object.entries(stamp)) seen.set(id, time);
+      if ((await child.exited) === 0) for (const [id, time] of Object.entries(stamp)) seen.set(id, time);
     }
     await Bun.sleep(300_000);
   }
@@ -251,7 +279,7 @@ if (!flag("--no-publish")) {
   await mkdir(objects, { recursive: true });
   await publish();
 }
-const staged = await stageFixtures(objects);
+const staged = await stageFixtures(objects, only ? new Set(only) : undefined);
 await writeCatalog(objects);
 if (flag("--no-run")) process.exit(0);
 
@@ -263,7 +291,7 @@ const report: QualificationReport = {
   schemaVersion: 1,
   generatedAt: new Date().toISOString(),
   base,
-  sourceCommit: git("rev-parse", "HEAD"),
+  sourceCommit: cleanSourceCommit(),
   entries: { ...(only ? previous?.entries : {}) },
 };
 // The test page (qualify-page/) is served here; every other request (/emulation/, /api/emulators, /vm/) is proxied to
@@ -324,6 +352,14 @@ try {
         errors: [],
         detail: emulator.reason,
         testedAt: new Date().toISOString(),
+      };
+    } else if (unqualified.has(emulator.id)) {
+      entry = {
+        id: emulator.id,
+        status: "untested",
+        errors: [],
+        testedAt: new Date().toISOString(),
+        detail: `Distribution qualification missing or stale: ${unqualified.get(emulator.id)}`,
       };
     } else if (
       emulator.mode === "wasm" &&

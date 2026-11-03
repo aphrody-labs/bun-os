@@ -257,10 +257,18 @@ export async function verifyQualification(
     if (!safePath(path) || !digestPattern.test(hash)) throw new Error("Invalid qualification file digest");
   const current = await snapshotFiles(dist, core, receipt.fixtures);
   for (const path of [selected.module, selected.wasm])
-    if (!current[`${core}/${path}`]) throw new Error(`${core}: selected variant input is not in qualification files`);
+    if (!current[`${core}/${path}`] || !receipt.files[`${core}/${path}`])
+      throw new Error(`${core}: selected variant input is not in qualification files`);
   if (manifest.firmware?.length)
     current["firmware/firmware.json"] = await qualificationSHA256(join(dist, "firmware/firmware.json"));
-  if (JSON.stringify(current) !== JSON.stringify(receipt.files))
-    throw new Error(`${core}: qualification artifact set or digests changed`);
+  for (const [path, digest] of Object.entries(receipt.files))
+    if (current[path] !== digest) throw new Error(`${core}: qualification artifact set or digests changed`);
+  const selectedDirectories = new Set([selected.module, selected.wasm].map((path: string) => path.split("/")[0]));
+  for (const path of Object.keys(current)) {
+    if (receipt.files[path]) continue;
+    const match = new RegExp(`^${core}/([a-f0-9]{12})/`).exec(path);
+    if (!match || selectedDirectories.has(match[1]))
+      throw new Error(`${core}: qualification artifact set or digests changed`);
+  }
   return receipt;
 }

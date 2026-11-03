@@ -71,10 +71,14 @@ async function sourceOf(fixture: EmulatorFixture): Promise<Uint8Array> {
 const hex = (bytes: Uint8Array) => new Bun.CryptoHasher("sha256").update(bytes).digest("hex");
 
 /** Writes every fixture of the catalog under <objects>/emulation/fixtures/<pack>/<file>; returns sha256 per emulator. */
-export async function stageFixtures(objects: string): Promise<Record<string, { sha256: string; error?: string }>> {
+export async function stageFixtures(
+  objects: string,
+  selected?: ReadonlySet<string>,
+): Promise<Record<string, { sha256: string; error?: string }>> {
   const out: Record<string, { sha256: string; error?: string }> = {};
   const lock = await Bun.file(join(import.meta.dir, "web-emulation.lock.json")).json();
   for (const emulator of EMULATORS) {
+    if (selected && !selected.has(emulator.id)) continue;
     const fixture = emulator.fixture;
     if (!fixture) continue;
     try {
@@ -83,7 +87,12 @@ export async function stageFixtures(objects: string): Promise<Record<string, { s
       const pin = lock.testContent?.[fixture.pack]?.sha256;
       if (pin && pin !== sha256)
         throw new Error(`${fixture.pack}: digest ${sha256} does not match the lock pin ${pin}`);
-      await Bun.write(join(objects, "emulation/fixtures", fixture.pack, fixture.file), bytes);
+      const destination = join(objects, "emulation/fixtures", fixture.pack, fixture.file);
+      const existing = Bun.file(destination);
+      if (await existing.exists()) {
+        if (hex(new Uint8Array(await existing.arrayBuffer())) !== sha256)
+          throw new Error(`${fixture.pack}: refusing to overwrite a different staged fixture`);
+      } else await Bun.write(destination, bytes);
       out[emulator.id] = { sha256 };
     } catch (error) {
       out[emulator.id] = { sha256: "", error: String((error as Error).message ?? error) };
