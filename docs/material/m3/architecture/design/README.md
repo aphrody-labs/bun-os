@@ -46,5 +46,5 @@ Related: [`wgpu-webgpu.md`](../../reference/WASM/wgpu-webgpu.md) (pins) and
 | [Drive route parity: file kinds, jobs, redundancy](DRIVE-ROUTE-PARITY.md) | The active webview is packages/app-ui. | imported | 2026-09-29 |
 <!-- docs-hub:end -->
 
-Evidence data: [`drive-interface-source-hashes.json`](./drive-interface-source-hashes.json) and
-[`ui-dedup-baseline.json`](./ui-dedup-baseline.json) (generated inventories, historical snapshots).
+Evidence data: `drive-interface-source-hashes.json` and
+`ui-dedup-baseline.json` (generated inventories, historical snapshots).

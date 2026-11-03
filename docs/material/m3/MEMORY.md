@@ -17,7 +17,7 @@ missing workspace submodules/catalog entries; no tests were run.
 `8f4b3a5177a5919c590066bc338be3d2e2fefd79`; preexisting production source work
 and changed submodules are preserved and excluded from this owned delivery.
 
-The [finalization receipt](docs/reports/FRAMEWORK-FINALIZATION.md) records the
+The [finalization receipt](./reports/FRAMEWORK-FINALIZATION.md) records the
 commands, outcomes and remaining dependencies. Workspace exports/assets/links
 have no errors, all 27 default TypeScript checks pass, and root lint exits 0
 with existing warnings. Scoped UI qualification passes 211 tests with one

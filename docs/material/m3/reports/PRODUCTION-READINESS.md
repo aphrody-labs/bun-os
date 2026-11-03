@@ -33,13 +33,13 @@ they do not change the earlier source snapshot or measured artifact IDs.
 
 Canonical source owners remain the [M3 source plan](../plans/design/M3-PLAN.md),
 [host plan](../plans/design/M3-MULTI-HOST-PLAN.md) and
-[app-ui package](../../packages/app-ui/package.json). Historical plan checkmarks
+[app-ui package](../../../../packages/app-ui/package.json). Historical plan checkmarks
 and older reports retain their dated scope. They do not establish current
 artifact installation or activation.
 
 ## Final web artifact and browser results
 
-The final showcase manifest, produced by the [build owner](../../scripts/build.ts),
+The final showcase manifest, produced by the build owner,
 identifies M3 3.3.3, Bun 1.4.2, full minification and build
 `8f185d9c3c427bfa`. Native Bun file APIs verified all 629 declared
 file sizes and SHA-256 values. The directory contains 630 files including
@@ -95,11 +95,11 @@ with its own baseline and limits, not a new performance comparison.
 | Factory capability source                           | Commit `ead4a13b1`: 21 tests, 170 assertions, native TypeScript, strict lint and formatting pass.                                                     |
 
 The regression sources cover
-[components](../../packages/m3-primitives/test/production-contract.test.tsx),
-[front](../../packages/m3-front/test/production-contract.test.ts),
-[Material Web exports](../../vendor/material-web/test/production-exports.test.ts),
-[controlled inputs](../../packages/m3-ai/test/production-contract.test.tsx)
-and [runtime boundaries](../../apps/m3-showcase/test/runtime-api.test.ts).
+[components](../../../../packages/m3-primitives/test/production-contract.test.tsx),
+[front](../../../../packages/m3-front/test/production-contract.test.ts),
+[Material Web exports](../../../../vendor/material-web/test/production-exports.test.ts),
+[controlled inputs](../../../../packages/m3-ai/test/production-contract.test.tsx)
+and [runtime boundaries](../../../../apps/m3-showcase/test/runtime-api.test.ts).
 Measured results are preserved in this versioned receipt; source links identify
 their reproduction owners. Ignored coordination files and raw logs are not
 required to read it and are not staged.
@@ -123,14 +123,14 @@ delivered fork commit `b3b566d821b738fef19e487b3bb6860944bd01ed`,
 with 18 completed paths, a clean index/diff, the owner identity and a verified
 normal push to the existing private origin.
 
-The [bootstrap owner](../../vendor/material-web/scripts/bootstrap-types.ts)
+The [bootstrap owner](../../../../vendor/material-web/scripts/bootstrap-types.ts)
 rebuilds an isolated `types/` tree from already versioned public
 `.d.ts` files, preserving notices and declaration maps. It needs Bun
 and no compiler dependencies. Only the existing ambient declaration remains
 tracked; generated declaration output and temporary dependency links are
 not staged.
 
-The [root manifest](../../package.json) runs that owner in `postinstall`
+The [root manifest](../../../../package.json) runs that owner in `postinstall`
 for both the source package and the actual installed artifact resolved from
 the Front consumer. Final normal `bun install --frozen-lockfile`
 passes in **257 ms**, preparing **493 declarations in each target**.
@@ -153,12 +153,12 @@ stopped on an uncached `actix-codec` dependency. Neither metadata scope
 compiles a Rust engine or qualifies an artifact. Native check, test, strict
 Clippy, packaging, installation and device qualification remain open.
 
-The [factory owner](../../../packages/infra/workspace/src/build-factory.ts)
+The factory owner
 prepared fresh VPS Aphrody sources at
 `d06d00738a8f26857d8c057609a182a1e81e9994`. Native durable jobs were
 qualified and privately delivered in Aphrody commit `2c541bbd2`:
 36 tests, 363 assertions, TypeScript, strict lint and format passed.
-The [job contract](../../../docs/operations/infra/BUILD-FACTORY-JOBS.md)
+The job contract
 retains the existing locks and source pin.
 
 The old attached SSH client exited with code 255. Its orphaned waiter

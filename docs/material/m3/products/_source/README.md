@@ -1,7 +1,7 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # aphrody-ui documentation
 
-Layout, crates and commands: root [`README.md`](./README.md.8c1fe132fe5c). Agent rules:
+Layout, crates and commands: root `README.md`. Agent rules:
 [`AGENTS.md`](../../reference/AGENTS.md). Package and crate docs sit next to the code. Material 3 guidance
 comes from m3.material.io (or Context7), not from copies in this repository.
 
@@ -29,7 +29,7 @@ a provenance/release gate.
 - [`design/APHRODY-M3-CANONICAL-CONTRACT.md`](../../architecture/design/APHRODY-M3-CANONICAL-CONTRACT.md): token ownership and integration rules.
 - [`design/M3-PLAN.md`](../../plans/design/M3-PLAN.md): decisions D1-D10 and open items.
 - [`design/M3-MULTI-HOST-PLAN.md`](../../plans/design/M3-MULTI-HOST-PLAN.md): framework layers, customization contract, web/desktop/mobile delivery matrix and host qualification.
-- [`design/UI-DEDUPLICATION-PLAN.md`](../../plans/design/UI-DEDUPLICATION-PLAN.md): measured UI/package overlaps, canonical owners, migration order and removal gates.
+- `design/UI-DEDUPLICATION-PLAN.md`: measured UI/package overlaps, canonical owners, migration order and removal gates.
 - [`design/M3-FRAMEWORK.md`](../../architecture/design/M3-FRAMEWORK.md): `@aphrody/m3` packages, plugin, build and pitfalls.
 - [`design/FUSION-PLAN.md`](../../plans/design/FUSION-PLAN.md): M3 tokens to Tailwind v4 and shadcn aliases.
 - [`design/aphrody-m3-tokens.md`](../../architecture/design/aphrody-m3-tokens.md): brand colour seeds ([`aphrody-m3-theme.json`](../../architecture/design/aphrody-m3-theme.json)).

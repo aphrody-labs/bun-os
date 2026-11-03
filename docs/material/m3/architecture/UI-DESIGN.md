@@ -1,8 +1,12 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Desktop UI design
 
+> **Historical.** These rules come from the WebView-shell era and are superseded by
+> [docs/DESIGN-SYSTEM.md](../../../DESIGN-SYSTEM.md), the single Bun OS design system. They are kept as a record;
+> do not apply them to new work.
+
 This is the visual authority for the single public desktop webview in
-[`packages/m3`](../../packages/m3). [GUI](../reference/GUI.md) owns host and capability
+[`packages/m3`](../../../../packages/m3). [GUI](../reference/GUI.md) owns host and capability
 boundaries; [UX](./UX-DESIGN.md) owns flows; [UI rules](../reference/UI-RULES.md) bind shipped
 content and behavior. Descriptions here are design constraints, not proof that a
 feature is implemented.

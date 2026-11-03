@@ -1,6 +1,10 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # UI rules
 
+> **Historical.** These rules come from the WebView-shell era and are superseded by
+> [docs/DESIGN-SYSTEM.md](../../../DESIGN-SYSTEM.md), the single Bun OS design system. They are kept as a record;
+> do not apply them to new work.
+
 Binding product rules for every view of the desktop app (`packages/app-ui` (not in repo), Drive, examples).
 Target surfaces: [`GUI.md`](./GUI.md).
 

@@ -1,6 +1,10 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # Desktop UX flows
 
+> **Historical.** These rules come from the WebView-shell era and are superseded by
+> [docs/DESIGN-SYSTEM.md](../../../DESIGN-SYSTEM.md), the single Bun OS design system. They are kept as a record;
+> do not apply them to new work.
+
 This document defines the public-facing flows in the desktop webview. [UI design](./UI-DESIGN.md)
 owns layout and appearance; [GUI](../reference/GUI.md) owns runtime boundaries and evidence; [UI rules](../reference/UI-RULES.md)
 own shippable copy and behavior. Keep the webview focused on Chat, Files, Models and Settings.

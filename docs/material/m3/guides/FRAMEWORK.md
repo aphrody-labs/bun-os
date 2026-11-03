@@ -26,7 +26,7 @@ Packages use `catalog:`, `workspace:*` and explicit dependencies where declared.
 
 ## Yolo orchestration
 
-Root scripts run [scripts/yolo.ts](../../scripts/yolo.ts), which invokes `$YOLO_ROOT/bin/yolo` directly.
+Root scripts run scripts/yolo.ts, which invokes `$YOLO_ROOT/bin/yolo` directly.
 `YOLO_ROOT` defaults to `$HOME/yolo`; inspect this entry point's live help for Yolo commands.
 The wrapper sets `YOLO_HOME` to this repository, so Yolo's `web|desktop|tauri` commands select `apps/web`.
 
@@ -59,7 +59,7 @@ Aphrody repository's `scripts/build/rust/cargo-serial.sh`.
 
 ## Showcase commands
 
-Run the [adaptive showcase](../../apps/m3-showcase/README.md) from `apps/m3-showcase`:
+Run the [adaptive showcase](../../../../apps/m3-showcase/README.md) from `apps/m3-showcase`:
 
 ```sh
 bun run dev
@@ -70,7 +70,7 @@ bun run test
 bun run typecheck
 ```
 
-These commands use [m3-bun](../../packages/m3-bun/README.md) and the showcase's own configuration.
+These commands use [m3-bun](../../../../packages/m3-bun/README.md) and the showcase's own configuration.
 Its inventory step precedes development, build and compile. Root `serve` and `compile` continue to
 select `apps/web`; they do not select this app. Tauri desktop/mobile packaging additionally needs
 the target toolchains; a configuration or web build does not establish an installed native bundle.

@@ -71,15 +71,12 @@ Pour stocker et récupérer des données complexes à latence sous-milliseconde 
 
 ```ts
 import { getSharedUiCache } from "@aphrody/m3-config/cache-db";
+import { schemeFromSeed } from "@aphrody/m3-tokens/dynamic-color";
 
 const cache = getSharedUiCache();
 
-// Mettre en cache une palette de couleurs HCT
-cache.set("theme", "seed:#6750a4", {
-  primary: "#6750a4",
-  secondary: "#625b71",
-  surface: "#fffbfe",
-});
+// Mettre en cache le schéma calculé par le moteur canonique (aphrody-m3-tokens)
+cache.set("theme", "seed:#6750a4", schemeFromSeed("#6750a4"));
 
 // Récupérer la valeur typée
 const palette = cache.get<Record<string, string>>("theme", "seed:#6750a4");

@@ -2,10 +2,10 @@
 # M3 plan: contracts and qualification
 
 Source review and scoped UI checks: 2026-10-04. The canonical product architecture and
-execution rules remain in Aphrody's [PLAN](../../../../PLAN.md),
-[GOAL](../../../../GOAL.md), [AGENTS](../../../../AGENTS.md) and
-[MEMORY](../../../../MEMORY.md). Yolo owns runtime production under its
-[PLAN](../../../../../yolo/PLAN.md). This document scopes the M3 framework;
+execution rules remain in Aphrody's [PLAN](../../PLAN.md),
+[GOAL](../../GOAL.md), [AGENTS](../../AGENTS.md) and
+[MEMORY](../../MEMORY.md). Yolo owns runtime production under its
+PLAN. This document scopes the M3 framework;
 it does not close those repositories' runtime or installation milestones.
 
 Use the [framework guide](../../guides/FRAMEWORK.md) for the package map and
@@ -37,22 +37,22 @@ define API compatibility. No absent `aphrody.m3Version` or `bun:check` gate is a
 
 ## Current implementation decisions
 
-- Build, serve and compile route through [scripts/yolo.ts](../../../scripts/yolo.ts)
+- Build, serve and compile route through scripts/yolo.ts
   and the installed Yolo `bin/yolo` entry point. The wrapper sets `YOLO_HOME` to
   this repository for `apps/web`.
-- [scripts/build.ts](../../../scripts/build.ts) orchestrates package builds,
+- scripts/build.ts orchestrates package builds,
   declarations and scoped typechecks with the shared `m3-config` presets and cache.
   Root workspace scripts exclude the product-bound packages named in the manifest.
 - Next uses `m3-next`, with separate server/client entries, cookie identity checks,
   static-export configuration and an on-demand colour engine. Its runner and tests
-  are described in the [package guide](../../../packages/m3-next/README.md).
+  are described in the [package guide](../../../../../packages/m3-next/README.md).
 - Migration uses the same scaffolder as new apps. Generated shells use the
-  [TAURI_3 pins](../../../packages/scaffold/src/pins.ts); installed host versions
-  must be checked separately. [Migration requirements](../../../packages/m3-next-migrate/src/requirements.ts)
+  [TAURI_3 pins](../../../../../packages/scaffold/src/pins.ts); installed host versions
+  must be checked separately. [Migration requirements](../../../../../packages/m3-next-migrate/src/requirements.ts)
   reject activation when request, action, font or route adapters are missing.
-- `m3-design` now uses Material Color Utilities HCT in
-  [hct.ts](../../../packages/m3-design/src/hct.ts). This source observation does
-  not replace a cross-language parity test.
+- `m3-design` takes its theme from the `aphrody-m3-tokens` ThemeExport in
+  [theme.ts](../../../../../packages/m3-design/src/theme.ts); `theme.test.ts` compares every role with
+  the Rust goldens.
 - Font and icon packages retain their source/provenance records. Asset gates check
   references; they do not establish that every native application is installed.
 

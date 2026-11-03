@@ -4,7 +4,7 @@
 
 [GOAL.md](GOAL.md) owns the requested scope. [AGENTS.md](AGENTS.md) owns local
 execution rules. [MEMORY.md](MEMORY.md) records dated validation and limitations.
-The [Aphrody architecture](../PLAN.md) and [Yolo producer plan](../../yolo/PLAN.md)
+The [Aphrody architecture](../PLAN.md) and Yolo producer plan
 remain authoritative for native runtime and installed hosts.
 
 ## One framework, explicit owners
@@ -19,10 +19,10 @@ remain authoritative for native runtime and installed hosts.
 | Minimal web example / adaptive UI and API consumer                    | `apps/web` / `apps/m3-showcase`                                                                 |
 | Native artifacts and installed desktop/mobile hosts                   | Aphrody integrator and declared build factory                                                |
 
-See the [framework guide](docs/guides/FRAMEWORK.md),
-[Bun application guide](docs/guides/M3-BUN.md),
-[design plan](docs/plans/design/M3-PLAN.md) and
-[host matrix](docs/plans/design/M3-MULTI-HOST-PLAN.md).
+See the [framework guide](./guides/FRAMEWORK.md),
+[Bun application guide](./guides/M3-BUN.md),
+[design plan](./plans/design/M3-PLAN.md) and
+[host matrix](./plans/design/M3-MULTI-HOST-PLAN.md).
 
 ## Gates
 
@@ -53,7 +53,7 @@ task. Run relevant artifact gates when owning the corresponding source batch.
    the existing Aphrody `bun:check` contract.
 2. Align the package map, entrypoints, build pipeline and host matrix with source.
 3. Record workspace checks and remaining source/platform dependencies with
-   reproductions in [the finalization receipt](docs/reports/FRAMEWORK-FINALIZATION.md).
+   reproductions in [the finalization receipt](./reports/FRAMEWORK-FINALIZATION.md).
 4. Deliver the completed owned batch; leave concurrent source batches and
    unqualified host milestones open until their integrator supplies evidence.
 

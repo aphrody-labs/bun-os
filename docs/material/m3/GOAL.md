@@ -16,4 +16,4 @@ moteurs Aphrody/Yolo.
 
 [PLAN.md](PLAN.md) contient les gates et la queue bornée ; [MEMORY.md](MEMORY.md)
 contient les preuves. Les contrats natifs restent définis par le
-[plan Aphrody](../PLAN.md) et le [plan Yolo](../../yolo/PLAN.md).
+[plan Aphrody](../PLAN.md) et le plan Yolo.

@@ -11,7 +11,7 @@ own pinned consumer mount points.
   stay private.
 - Framework: `docs/guides/FRAMEWORK.md` (package map, yolo orchestration, theme install per OS). Root scripts
   `build`, `serve`, `compile`, `test`, `lint`, `typecheck`, `install:theme` run through the yolo CLI.
-- App runtime: [`@aphrody/m3-bun`](docs/guides/M3-BUN.md) shares the M3 plugin and owns the UI/API server,
+- App runtime: [`@aphrody/m3-bun`](./guides/M3-BUN.md) shares the M3 plugin and owns the UI/API server,
   executable compiler, packaging and deployment configuration. `m3 compile` delegates to this owner.
 - Package index: `@aphrody/m3` (CLI, Bun plugin), `m3-bun`, `m3-tokens`, `m3-theme`, `m3-tailwind` (Tailwind v4 preset),
   `m3-front` (web components), `m3-react`, `m3-baseui` (Base UI), `m3-os-themes` (Windows, GNOME, COSMIC,
@@ -36,7 +36,7 @@ own pinned consumer mount points.
 
 Read [GOAL.md](GOAL.md), [PLAN.md](PLAN.md) and [MEMORY.md](MEMORY.md) for the current
 finalization scope, owner gates and dated results. The
-[host matrix](docs/plans/design/M3-MULTI-HOST-PLAN.md) distinguishes tested web behavior
+[host matrix](./plans/design/M3-MULTI-HOST-PLAN.md) distinguishes tested web behavior
 from installed desktop/mobile qualification. Packages and repositories remain private.
 
 Clone: `git clone --recurse-submodules git@github-dev:aphrody-labs/aphrody-m3.git`
