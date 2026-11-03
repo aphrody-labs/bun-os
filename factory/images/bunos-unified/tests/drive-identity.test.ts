@@ -7,7 +7,7 @@ function config(token: string, root = "root-a") {
 }
 
 function account(id: string) {
-  return (async () => Response.json({ user: { permissionId: id } })) as typeof fetch;
+  return (async () => Response.json({ user: { permissionId: id } })) as unknown as typeof fetch;
 }
 
 test("cache identity follows the account and root, not rotating access tokens", async () => {
@@ -18,12 +18,14 @@ test("cache identity follows the account and root, not rotating access tokens", 
 });
 
 test("unverified identities and other providers are refused", async () => {
-  await expect(driveFingerprint(config("token"), (async () => new Response("", { status: 403 })) as typeof fetch))
-    .rejects.toThrow();
-  await expect(driveFingerprint({ gdrive: { type: "alias", token: "{}" } }, account("account-a")))
-    .rejects.toThrow();
-  await expect(driveFingerprint(config("token"), (async () => Response.json({ user: {} })) as typeof fetch))
-    .rejects.toThrow();
-  await expect(driveFingerprint({ gdrive: { type: "drive", token: "fake-secret-not-json" } }, account("account-a")))
-    .rejects.toThrow("invalid Drive token record");
+  await expect(
+    driveFingerprint(config("token"), (async () => new Response("", { status: 403 })) as unknown as typeof fetch),
+  ).rejects.toThrow();
+  await expect(driveFingerprint({ gdrive: { type: "alias", token: "{}" } }, account("account-a"))).rejects.toThrow();
+  await expect(
+    driveFingerprint(config("token"), (async () => Response.json({ user: {} })) as unknown as typeof fetch),
+  ).rejects.toThrow();
+  await expect(
+    driveFingerprint({ gdrive: { type: "drive", token: "fake-secret-not-json" } }, account("account-a")),
+  ).rejects.toThrow("invalid Drive token record");
 });
