@@ -528,17 +528,43 @@ pub fn power_shell(command: &str, timeout_seconds: u64) -> io::Result<serde_json
         ));
     }
     let timeout = timeout_seconds.clamp(1, 600);
+    let mut dotnet_root: Option<std::path::PathBuf> = None;
     let executable = if cfg!(windows) {
         // PowerShell 7 built from vendor/powershell (packages/bun-dotnet-windows install) first.
         let bunos = std::path::PathBuf::from(
             std::env::var_os("SystemRoot").unwrap_or_else(|| "C:\\Windows".into()),
         )
         .join("BunOS/dotnet-windows/pshome/pwsh.exe");
+        // That build is framework-dependent on .NET 11; its apphost finds a per-user runtime only through DOTNET_ROOT.
+        let has_net11 = |root: &std::path::Path| {
+            std::fs::read_dir(root.join("shared").join("Microsoft.NETCore.App")).is_ok_and(
+                |versions| {
+                    versions
+                        .flatten()
+                        .any(|v| v.file_name().to_string_lossy().starts_with("11."))
+                },
+            )
+        };
+        dotnet_root = std::env::var_os("LOCALAPPDATA")
+            .map(|base| {
+                std::path::PathBuf::from(base)
+                    .join("Microsoft")
+                    .join("dotnet")
+            })
+            .filter(|root| has_net11(root));
+        let machine = std::path::PathBuf::from(
+            std::env::var_os("ProgramFiles").unwrap_or_else(|| "C:\\Program Files".into()),
+        )
+        .join("dotnet");
+        let bunos_runnable = bunos.is_file() && (dotnet_root.is_some() || has_net11(&machine));
+        if !bunos_runnable {
+            dotnet_root = None;
+        }
         let modern = std::path::PathBuf::from(
             std::env::var_os("ProgramFiles").unwrap_or_else(|| "C:\\Program Files".into()),
         )
         .join("PowerShell/7/pwsh.exe");
-        if bunos.is_file() {
+        if bunos_runnable {
             bunos
         } else if modern.is_file() {
             modern
@@ -555,8 +581,12 @@ pub fn power_shell(command: &str, timeout_seconds: u64) -> io::Result<serde_json
         "[Console]::OutputEncoding = [Text.UTF8Encoding]::new($false); $OutputEncoding = [Console]::OutputEncoding; {command}"
     );
     let started = std::time::Instant::now();
+    let mut process = std::process::Command::new(executable);
+    if let Some(root) = &dotnet_root {
+        process.env("DOTNET_ROOT", root);
+    }
     let output = crate::wsl::capture(
-        std::process::Command::new(executable).no_window().args([
+        process.no_window().args([
             "-NoLogo",
             "-NoProfile",
             "-NonInteractive",
