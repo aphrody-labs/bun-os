@@ -59,16 +59,8 @@ export function Toaster({
       toastOptions={{
         style: {
           borderRadius: "3px",
-        },
-        success: {
-          style: {
-            background: "#ffffff",
-          },
-        },
-        error: {
-          style: {
-            background: "#ffffff",
-          },
+          background: "var(--md-sys-color-inverse-surface)",
+          color: "var(--md-sys-color-inverse-on-surface)",
         },
       }}
       containerStyle={{

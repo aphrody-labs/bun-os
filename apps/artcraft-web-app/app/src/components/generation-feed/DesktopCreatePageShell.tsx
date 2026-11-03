@@ -39,9 +39,7 @@ export function DesktopCreatePageShell({
   promptBox,
   bottomRight,
 }: DesktopCreatePageShellProps) {
-  const [splashState, setSplashState] = useState<
-    "visible" | "fading" | "hidden"
-  >("visible");
+  const [splashState, setSplashState] = useState<"visible" | "fading" | "hidden">("visible");
 
   useEffect(() => {
     if (hasContent && splashState === "visible") {
@@ -57,13 +55,10 @@ export function DesktopCreatePageShell({
   }, [hasContent, splashState]);
 
   return (
-    <div className="flex h-[calc(100vh-56px)] w-full bg-ui-background text-white">
+    <div className="flex h-[calc(100vh-56px)] w-full bg-ui-background text-on-surface">
       <div className="relative h-full w-full">
         {hasContent && (
-          <div
-            className="h-full w-full overflow-y-auto pt-0.5"
-            style={{ paddingBottom: bottomOffset + 24 }}
-          >
+          <div className="h-full w-full overflow-y-auto pt-0.5" style={{ paddingBottom: bottomOffset + 24 }}>
             {listContent}
           </div>
         )}
@@ -79,10 +74,7 @@ export function DesktopCreatePageShell({
               className="relative z-20 flex h-full w-full items-center justify-center px-6"
               style={{ paddingBottom: bottomOffset }}
             >
-              <CreateEmptyState
-                title={emptyStateTitle}
-                subtitle={emptyStateSubtitle}
-              />
+              <CreateEmptyState title={emptyStateTitle} subtitle={emptyStateSubtitle} />
             </div>
             {background}
           </div>
@@ -99,11 +91,7 @@ export function DesktopCreatePageShell({
 
         {promptBox}
 
-        {bottomRight && (
-          <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
-            {bottomRight}
-          </div>
-        )}
+        {bottomRight && <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">{bottomRight}</div>}
       </div>
     </div>
   );

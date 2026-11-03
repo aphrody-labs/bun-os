@@ -69,7 +69,7 @@ export const BillingSettingsPane = (_args: BillingSettingsPaneProps) => {
         </div>
 
         {/* TODO(bt): expose this information via API
-        <div className="flex items-center gap-2 text-white/50">
+        <div className="flex items-center gap-2 text-on-surface/50">
           <InfoIcon />
           Next {billingInfo.nextPayment.amount} payment due{" "}
           {billingInfo.nextPayment.date}

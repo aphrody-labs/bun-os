@@ -19,7 +19,7 @@ export function promptFolderDrop({ count, targetFolderName, onMove, onAdd }: Fol
     reminderType: "default",
     title: `Move or copy ${count} item${plural}?`,
     message: (
-      <p className="text-sm text-white/70">
+      <p className="text-sm text-on-surface/70">
         Move{dest} removes {count === 1 ? "it" : "them"} from the current folder. Add a copy keeps{" "}
         {count === 1 ? "it" : "them"} in both.
       </p>

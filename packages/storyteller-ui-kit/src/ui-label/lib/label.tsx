@@ -16,7 +16,7 @@ export const Label = ({ className, children, required, ...rest }: LabelProps) =>
     {...rest}
   >
     {children}
-    {required && <span className="ml-0.5 text-red-400">*</span>}
+    {required && <span className="ml-0.5 text-error">*</span>}
   </label>
 );
 

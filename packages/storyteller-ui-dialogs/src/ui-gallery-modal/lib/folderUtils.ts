@@ -10,16 +10,16 @@ interface SortableFolder {
 export const compareFolders = (a: SortableFolder, b: SortableFolder): number =>
   Number(!!b.hasStar) - Number(!!a.hasStar) || a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
 
-/** Preset folder colors shown in the color picker (shared by both context menus). */
+/** Preset folder colors shown in the color picker (shared by both context menus); user content swatches. */
 export const FOLDER_COLOR_PRESETS: string[] = [
-  "#ef4444", // red
-  "#f97316", // orange
-  "#eab308", // yellow
-  "#22c55e", // green
-  "#06b6d4", // cyan
-  "#3b82f6", // blue
-  "#a855f7", // purple
-  "#ec4899", // pink
+  "#ef4444", // design:content red
+  "#f97316", // design:content orange
+  "#eab308", // design:content yellow
+  "#22c55e", // design:content green
+  "#06b6d4", // design:content cyan
+  "#3b82f6", // design:content blue
+  "#a855f7", // design:content purple
+  "#ec4899", // design:content pink
 ];
 
 /** A folder thumbnail descriptor from the API (cdn_url + optional resize template). */

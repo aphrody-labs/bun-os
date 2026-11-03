@@ -26,9 +26,7 @@ export const VideoWatermarkRemover = () => {
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(1);
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
-  const [selectedGalleryVideos, setSelectedGalleryVideos] = useState<string[]>(
-    [],
-  );
+  const [selectedGalleryVideos, setSelectedGalleryVideos] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingFromGallery, setIsLoadingFromGallery] = useState(false);
 
@@ -108,8 +106,8 @@ export const VideoWatermarkRemover = () => {
   };
 
   const handleVideoSelect = (id: string) => {
-    setSelectedGalleryVideos((prev) => {
-      if (prev.includes(id)) return prev.filter((x) => x !== id);
+    setSelectedGalleryVideos(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
       const maxSelections = 1;
       if (prev.length >= maxSelections) {
         return maxSelections === 1 ? [id] : prev;
@@ -150,7 +148,7 @@ export const VideoWatermarkRemover = () => {
     if (isPlaying) {
       videoRef.current.pause();
     } else {
-      videoRef.current.play().catch((err) => {
+      videoRef.current.play().catch(err => {
         console.error("Play failed:", err);
       });
     }
@@ -200,7 +198,7 @@ export const VideoWatermarkRemover = () => {
     });
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       toast.success("Watermark removal completed!", {
         id: "watermark-removal",
       });
@@ -230,8 +228,8 @@ export const VideoWatermarkRemover = () => {
                     icon={DropletIcon}
                     title="Remove Video Watermark"
                     description="Clean up your videos by removing unwanted watermarks. Upload your video and let AI do the magic."
-                    accentBackgroundClass="bg-cyan-500/40"
-                    accentBorderClass="border-cyan-400/30"
+                    accentBackgroundClass="bg-tertiary/40"
+                    accentBorderClass="border-tertiary/30"
                     accept="video/*"
                     onFilesSelected={handleLocalVideoSelect}
                     primaryLabel="Select Video"
@@ -244,7 +242,7 @@ export const VideoWatermarkRemover = () => {
             ) : (
               <div className="flex w-full max-w-5xl flex-col gap-5">
                 <div className="w-full overflow-hidden border border-ui-panel-border bg-ui-panel">
-                  <div className="relative aspect-video w-full bg-black">
+                  <div className="relative aspect-video w-full bg-scrim">
                     <Button
                       icon={RotateCwIcon}
                       variant="action"
@@ -252,7 +250,7 @@ export const VideoWatermarkRemover = () => {
                         setVideoUrl("");
                         setCurrentTime(0);
                       }}
-                      className="absolute right-3 top-3 z-10 border border-red/50 px-3 py-1.5 text-sm hover:border-red/80 hover:bg-red/80"
+                      className="absolute right-3 top-3 z-10 border border-error/50 px-3 py-1.5 text-sm hover:border-error/80 hover:bg-error/80"
                     >
                       Switch Video
                     </Button>
@@ -264,14 +262,14 @@ export const VideoWatermarkRemover = () => {
                       preload="metadata"
                       playsInline
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-scrim/90 to-transparent p-4">
                       <div
                         ref={progressBarRef}
-                        className="group relative mb-3 h-3 cursor-pointer bg-white/15"
+                        className="group relative mb-3 h-3 cursor-pointer bg-on-surface/15"
                         onClick={handleProgressBarClick}
                       >
                         <div
-                          className="absolute h-full overflow-hidden bg-white"
+                          className="absolute h-full overflow-hidden bg-on-surface"
                           style={{
                             width: `${duration ? (currentTime / duration) * 100 : 0}%`,
                           }}
@@ -281,35 +279,32 @@ export const VideoWatermarkRemover = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => seekToFrame("first")}
-                            className="flex h-8 w-8 items-center justify-center rounded-[3px] bg-white/10 transition-colors hover:bg-white/20"
+                            className="flex h-8 w-8 items-center justify-center rounded-[3px] bg-on-surface/10 transition-colors hover:bg-on-surface/20"
                             title="First Frame"
                           >
-                            <SkipBackIcon className="text-sm text-white" />
+                            <SkipBackIcon className="text-sm text-on-surface" />
                           </button>
                           <button
                             onClick={togglePlayPause}
-                            className="flex h-9 w-9 items-center justify-center rounded-[3px] bg-white/20 transition-colors hover:bg-white/30"
+                            className="flex h-9 w-9 items-center justify-center rounded-[3px] bg-on-surface/20 transition-colors hover:bg-on-surface/30"
                           >
-                            <DynamicIcon
-                              icon={isPlaying ? PauseIcon : PlayIcon}
-                              className="text-white"
-                            />
+                            <DynamicIcon icon={isPlaying ? PauseIcon : PlayIcon} className="text-on-surface" />
                           </button>
                           <button
                             onClick={() => seekToFrame("last")}
-                            className="flex h-8 w-8 items-center justify-center rounded-[3px] bg-white/10 transition-colors hover:bg-white/20"
+                            className="flex h-8 w-8 items-center justify-center rounded-[3px] bg-on-surface/10 transition-colors hover:bg-on-surface/20"
                             title="Last Frame"
                           >
-                            <SkipForwardIcon className="text-sm text-white" />
+                            <SkipForwardIcon className="text-sm text-on-surface" />
                           </button>
-                          <div className="mx-1 h-6 w-px bg-white/20" />
+                          <div className="mx-1 h-6 w-px bg-on-surface/20" />
                           <button
                             onClick={toggleMute}
-                            className="flex h-7 w-7 items-center justify-center rounded-[3px] bg-white/10 transition-colors hover:bg-white/20"
+                            className="flex h-7 w-7 items-center justify-center rounded-[3px] bg-on-surface/10 transition-colors hover:bg-on-surface/20"
                           >
                             <DynamicIcon
                               icon={isMuted ? VolumeXIcon : Volume2Icon}
-                              className="text-sm text-white"
+                              className="text-sm text-on-surface"
                             />
                           </button>
                           <input
@@ -318,13 +313,11 @@ export const VideoWatermarkRemover = () => {
                             max="1"
                             step="0.01"
                             value={volume}
-                            onChange={(e) =>
-                              setVolume(parseFloat(e.target.value))
-                            }
-                            className="w-20 accent-white"
+                            onChange={e => setVolume(parseFloat(e.target.value))}
+                            className="w-20 accent-primary"
                           />
                         </div>
-                        <div className="font-mono text-sm tabular-nums text-white">
+                        <div className="font-mono text-sm tabular-nums text-on-surface">
                           {formatTime(currentTime)} / {formatTime(duration)}
                         </div>
                       </div>
@@ -353,21 +346,16 @@ export const VideoWatermarkRemover = () => {
                     </div>
                     <div className="space-y-3 text-sm">
                       <div className="flex items-center justify-between border-b border-ui-divider py-2">
-                        <span className="font-medium text-base-fg/70">
-                          Duration
-                        </span>
+                        <span className="font-medium text-base-fg/70">Duration</span>
                         <span className="font-mono text-lg font-semibold tabular-nums text-base-fg">
                           {formatTime(duration)}
                         </span>
                       </div>
                       {videoRef.current && (
                         <div className="flex items-center justify-between py-2">
-                          <span className="font-medium text-base-fg/70">
-                            Resolution
-                          </span>
+                          <span className="font-medium text-base-fg/70">Resolution</span>
                           <span className="font-mono font-semibold tabular-nums text-base-fg">
-                            {videoRef.current.videoWidth} ×{" "}
-                            {videoRef.current.videoHeight}
+                            {videoRef.current.videoWidth} × {videoRef.current.videoHeight}
                           </span>
                         </div>
                       )}

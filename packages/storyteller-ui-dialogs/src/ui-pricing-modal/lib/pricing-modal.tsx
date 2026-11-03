@@ -18,7 +18,7 @@ const pricingConfig = {
 };
 
 const SECONDARY_BUTTON_CLASSES =
-  "gap-2 rounded-none border border-white/15 bg-white/5 px-3.5 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-white shadow-none hover:bg-white/10";
+  "gap-2 rounded-none border border-outline-variant bg-on-surface/5 px-3.5 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-on-surface shadow-none hover:bg-on-surface/10";
 
 interface PricingContentProps {
   title?: string;
@@ -62,8 +62,8 @@ export function PricingContent({ title, subtitle }: PricingContentProps) {
   };
 
   return (
-    <div className="min-h-0 flex-1 bg-[#101014] text-white">
-      <div className="bg-primary text-white">
+    <div className="min-h-0 flex-1 bg-surface-container-lowest text-on-surface">
+      <div className="bg-primary text-on-surface">
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 py-2.5 pl-6 pr-14 md:pl-10">
           <p className="pricing-hud flex items-center gap-2 font-bold">
             <TagIcon aria-hidden className="h-3.5 w-3.5" />
@@ -78,10 +78,10 @@ export function PricingContent({ title, subtitle }: PricingContentProps) {
       <PricingSection>
         <PricingSectionLabel index="01" label="Pricing" annotation="Free & open source · Subscriptions optional†" />
         <div className="px-6 py-12 md:px-10 md:py-16">
-          <h1 className="max-w-3xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.035em] text-white sm:text-5xl md:text-6xl">
+          <h1 className="max-w-3xl font-display text-4xl font-medium leading-[1.02] tracking-[-0.035em] text-on-surface sm:text-5xl md:text-6xl">
             {title || pricingConfig.header.title}
           </h1>
-          <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/55">
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-on-surface/55">
             {subtitle || pricingConfig.header.subtitle}
           </p>
           {hasActiveSub && (
@@ -114,11 +114,11 @@ export function PricingContent({ title, subtitle }: PricingContentProps) {
       <PricingSection>
         <div className="grid md:grid-cols-2">
           <div className="p-6 md:p-10">
-            <p className="pricing-hud text-white/40">Need more credits?</p>
-            <h2 className="mt-4 font-display text-2xl font-medium tracking-[-0.02em] text-white">
+            <p className="pricing-hud text-on-surface/40">Need more credits?</p>
+            <h2 className="mt-4 font-display text-2xl font-medium tracking-[-0.02em] text-on-surface">
               One-time credit packs
             </h2>
-            <p className="mt-2 max-w-md leading-relaxed text-white/55">
+            <p className="mt-2 max-w-md leading-relaxed text-on-surface/55">
               Top up without changing your plan. Credit packs never expire.
             </p>
             <Button variant="secondary" className={`mt-6 ${SECONDARY_BUTTON_CLASSES}`} onClick={handleBuyCredits}>
@@ -126,9 +126,9 @@ export function PricingContent({ title, subtitle }: PricingContentProps) {
               Buy credits
             </Button>
           </div>
-          <div className="border-t border-white/15 p-6 md:border-l md:border-t-0 md:p-10">
-            <p className="pricing-hud text-white/40">† Footnote</p>
-            <p className="mt-4 max-w-md leading-relaxed text-white/55">
+          <div className="border-t border-outline-variant p-6 md:border-l md:border-t-0 md:p-10">
+            <p className="pricing-hud text-on-surface/40">† Footnote</p>
+            <p className="mt-4 max-w-md leading-relaxed text-on-surface/55">
               ArtCraft can be used without paying for a subscription. You can bring your own compute and third-party
               subscriptions. We hope you’ll subscribe, though, as that helps accelerate our development.
             </p>
@@ -140,7 +140,7 @@ export function PricingContent({ title, subtitle }: PricingContentProps) {
 }
 
 function PricingSection({ children }: { children: ReactNode }) {
-  return <section className="border-t border-white/15">{children}</section>;
+  return <section className="border-t border-outline-variant">{children}</section>;
 }
 
 interface PricingModalProps {}
@@ -152,13 +152,13 @@ export function PricingModal(_props: PricingModalProps = {}) {
     <Modal
       isOpen={isOpen}
       onClose={closeModal}
-      className="flex max-h-[90vh] max-w-screen-xl flex-col overflow-y-auto rounded-none border border-white/15 bg-[#101014]"
+      className="flex max-h-[90vh] max-w-screen-xl flex-col overflow-y-auto rounded-none border border-outline-variant bg-surface-container-lowest"
       allowBackgroundInteraction={false}
       showClose={true}
       closeOnOutsideClick={true}
       resizable={false}
       childPadding={false}
-      backdropClassName="bg-black/80"
+      backdropClassName="bg-scrim/80"
     >
       <PricingContent title={title} subtitle={subtitle} />
     </Modal>

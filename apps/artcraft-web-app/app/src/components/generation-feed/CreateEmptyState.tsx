@@ -1,12 +1,7 @@
 import { type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
-const CORNERS = [
-  "top-0 left-0",
-  "top-0 right-0",
-  "bottom-0 left-0",
-  "bottom-0 right-0",
-];
+const CORNERS = ["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"];
 
 interface CreateEmptyStateProps {
   title: string;
@@ -17,13 +12,7 @@ interface CreateEmptyStateProps {
 }
 
 /** A quiet editorial section with a fine border and corner registration marks. */
-export function CreateEmptyState({
-  title,
-  subtitle,
-  children,
-  compact = false,
-  className,
-}: CreateEmptyStateProps) {
+export function CreateEmptyState({ title, subtitle, children, compact = false, className }: CreateEmptyStateProps) {
   return (
     <section
       className={twMerge(
@@ -40,16 +29,10 @@ export function CreateEmptyState({
       >
         {title}
       </h1>
-      <p className="mt-4 max-w-xl text-pretty text-sm leading-relaxed text-white/60 sm:text-base">
-        {subtitle}
-      </p>
+      <p className="mt-4 max-w-xl text-pretty text-sm leading-relaxed text-on-surface/60 sm:text-base">{subtitle}</p>
       {children && <div className="mt-6">{children}</div>}
-      {CORNERS.map((corner) => (
-        <span
-          key={corner}
-          aria-hidden="true"
-          className={`frame-corner-mark ${corner}`}
-        />
+      {CORNERS.map(corner => (
+        <span key={corner} aria-hidden="true" className={`frame-corner-mark ${corner}`} />
       ))}
     </section>
   );

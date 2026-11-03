@@ -12,12 +12,7 @@ interface Props {
   onUploadProgress: (newState: UploaderState) => void;
 }
 
-export const UploadImageMedia = ({
-  fileTypes,
-  onClose,
-  title: _title,
-  onUploadProgress,
-}: Props) => {
+export const UploadImageMedia = ({ fileTypes, onClose, title: _title, onUploadProgress }: Props) => {
   const [uploadTitle, setUploadTitle] = useState<{
     value: string;
     error?: string;
@@ -33,7 +28,7 @@ export const UploadImageMedia = ({
 
   const handleSubmit = () => {
     if (!uploadTitle.value) {
-      setUploadTitle((curr) => ({
+      setUploadTitle(curr => ({
         ...curr,
         error: "Please enter a title.",
       }));
@@ -41,7 +36,7 @@ export const UploadImageMedia = ({
     }
 
     if (!assetFile.value) {
-      setAssetFile((curr) => ({
+      setAssetFile(curr => ({
         ...curr,
         error: "Please select a file to upload.",
       }));
@@ -62,7 +57,7 @@ export const UploadImageMedia = ({
           placeholder="Enter the title here"
           errorMessage={uploadTitle.error}
           value={uploadTitle.value}
-          onChange={(event) => setUploadTitle({ value: event.target.value })}
+          onChange={event => setUploadTitle({ value: event.target.value })}
           className={uploadTitle.error ? "mb-3" : ""}
         />
         <FileUploader
@@ -80,22 +75,12 @@ export const UploadImageMedia = ({
             }
           }}
         />
-        {assetFile.error && (
-          <h6 className="z-10 text-red"> {assetFile.error} </h6>
-        )}
+        {assetFile.error && <h6 className="z-10 text-error"> {assetFile.error} </h6>}
 
-        <div className="relative m-auto aspect-square w-full overflow-hidden border border-white/15 bg-ui-controls">
-          {!assetFile.value && (
-            <h6 className="absolute left-0 top-1/2 -mt-5 w-full text-center">
-              File Preview
-            </h6>
-          )}
+        <div className="relative m-auto aspect-square w-full overflow-hidden border border-outline-variant bg-ui-controls">
+          {!assetFile.value && <h6 className="absolute left-0 top-1/2 -mt-5 w-full text-center">File Preview</h6>}
           {assetFile.value && (
-            <img
-              alt="file upload preview"
-              className="m-auto max-h-full max-w-full"
-              src={assetFile.src}
-            />
+            <img alt="file upload preview" className="m-auto max-h-full max-w-full" src={assetFile.src} />
           )}
         </div>
 

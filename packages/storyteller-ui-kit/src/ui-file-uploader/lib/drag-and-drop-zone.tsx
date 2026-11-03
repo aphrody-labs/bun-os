@@ -13,8 +13,8 @@ export const DragAndDropZone = ({
 }) => {
   if (files.length === 0) {
     return (
-      <div className="flex cursor-pointer items-center gap-3.5 rounded-none border border-dashed border-white/20 bg-white/[0.02] p-3 transition-colors hover:border-white/40 hover:bg-white/[0.05]">
-        <FileUpIcon className="text-4xl text-white/60" />
+      <div className="flex cursor-pointer items-center gap-3.5 rounded-none border border-dashed border-outline-variant bg-on-surface/[0.02] p-3 transition-colors hover:border-outline hover:bg-on-surface/[0.05]">
+        <FileUpIcon className="text-4xl text-on-surface/60" />
         <div className="flex flex-col gap-0">
           <p className="font-medium">
             <u>Upload a file</u> or drop it here
@@ -35,13 +35,13 @@ export const DragAndDropZone = ({
       file.size >= 1024 * 1024 ? (file.size / 1024 / 1024).toFixed(2) + " MB" : `${Math.floor(file.size / 1024)} KB`;
 
     return (
-      <div className="flex cursor-pointer items-center justify-between gap-3.5 rounded-none border border-dashed border-white/20 bg-white/[0.02] p-3 transition-colors hover:border-white/40 hover:bg-white/[0.05]">
+      <div className="flex cursor-pointer items-center justify-between gap-3.5 rounded-none border border-dashed border-outline-variant bg-on-surface/[0.02] p-3 transition-colors hover:border-outline hover:bg-on-surface/[0.05]">
         <DynamicIcon icon={fileIcon} className="text-4xl" />
         <div className="flex grow flex-col gap-0">
           <p className="font-medium">{file.name.slice(0, file.name.lastIndexOf("."))}</p>
           <p className="flex items-center gap-2 text-sm font-normal">
             <span className="opacity-50">{`${fileName} file size: ${fileSize} `}</span>
-            <u className="transition-all hover:text-white/80">Change File</u>
+            <u className="transition-all hover:text-on-surface/80">Change File</u>
           </p>
         </div>
       </div>
@@ -49,12 +49,12 @@ export const DragAndDropZone = ({
   }
 
   return (
-    <div className="flex cursor-pointer items-center justify-between gap-3.5 rounded-none border border-dashed border-white/20 bg-white/[0.02] p-3 transition-colors hover:border-white/40 hover:bg-white/[0.05]">
+    <div className="flex cursor-pointer items-center justify-between gap-3.5 rounded-none border border-dashed border-outline-variant bg-on-surface/[0.02] p-3 transition-colors hover:border-outline hover:bg-on-surface/[0.05]">
       <DynamicIcon icon={fileIcon} className="text-4xl" />
       <div className="flex grow flex-col gap-0">
         <p className="font-medium">{files.length} files selected</p>
         <p className="flex items-center gap-2 text-sm font-normal">
-          <u className="transition-all hover:text-white/80">Change Files</u>
+          <u className="transition-all hover:text-on-surface/80">Change Files</u>
         </p>
       </div>
     </div>

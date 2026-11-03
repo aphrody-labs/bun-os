@@ -145,7 +145,7 @@ export const DownloadsSettingsPane = () => {
   return (
     <div className="space-y-4 pt-3 text-base-fg">
       {settingsError && (
-        <p role="alert" className="text-red-400">
+        <p role="alert" className="text-error">
           {settingsError}
         </p>
       )}
@@ -247,7 +247,7 @@ export const DownloadsSettingsPane = () => {
           </>
         )}
         {formatError && (
-          <p role="alert" className="text-xs text-red-400">
+          <p role="alert" className="text-xs text-error">
             {formatError}
           </p>
         )}

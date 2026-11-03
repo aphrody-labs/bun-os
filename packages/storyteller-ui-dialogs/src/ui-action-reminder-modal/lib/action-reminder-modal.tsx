@@ -80,7 +80,7 @@ export function ActionReminderModal({
       break;
     case "artcraftLogin":
       messageContent = customMessage || (
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-on-surface/70">
           Please log in or sign up to ArtCraft to proceed. This will allow you to save your work and access all
           features.
         </p>
@@ -90,7 +90,9 @@ export function ActionReminderModal({
       primaryActionBtnClassName = customPrimaryActionBtnClassName || "";
       break;
     default:
-      messageContent = customMessage || <p className="text-sm text-white/70">Please complete the required action.</p>;
+      messageContent = customMessage || (
+        <p className="text-sm text-on-surface/70">Please complete the required action.</p>
+      );
       primaryActionBtnText = customPrimaryActionText || "Proceed";
       primaryActionIcon = customPrimaryActionIcon || LogInIcon;
       primaryActionBtnClassName = customPrimaryActionBtnClassName || "";

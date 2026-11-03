@@ -22,7 +22,7 @@ const PLAN_STYLE: Record<string, { tagline: string; highlight?: keyof typeof HIG
   },
 };
 const PLAN_BUTTON_CLASSES =
-  "h-11 w-full font-mono text-[11px] font-semibold uppercase tracking-[0.12em] rounded-none bg-[var(--plan)] hover:bg-[var(--plan)] text-white hover:opacity-90";
+  "h-11 w-full font-mono text-[11px] font-semibold uppercase tracking-[0.12em] rounded-none bg-secondary text-on-secondary hover:opacity-90";
 const CONTACT_EMAIL = "hello@storyteller.ai";
 const ENTERPRISE_FEATURES = ["Bespoke credit allocation", "Secure models", "Support SLAs", "Custom integrations"];
 const TRUST_POINTS = [
@@ -67,7 +67,7 @@ export function WebsitePricingTable({
   const hasActivePlan = !!activePlanSlug && activePlanSlug !== "free";
   return (
     <>
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/15 px-6 py-4 md:px-10">
+      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-outline-variant px-6 py-4 md:px-10">
         <div className="flex flex-wrap items-center gap-3">
           <TabSelector
             tabs={BILLING_TABS}
@@ -78,19 +78,19 @@ export function WebsitePricingTable({
             indicatorClassName="rounded-none"
             tabClassName="w-24 font-mono text-[11px] uppercase tracking-[0.1em]"
           />
-          <span className="pricing-hud pricing-sale-badge bg-primary px-2 py-1 text-white">
+          <span className="pricing-hud pricing-sale-badge bg-primary px-2 py-1 text-on-surface">
             {PROMO_PCT}% off · ends soon
           </span>
           <p className="pricing-hud hidden text-primary sm:block">
             {cadence === "yearly" ? "2 months free" : "Switch to yearly, save 20%"}
           </p>
         </div>
-        <p className="pricing-hud hidden text-white/40 sm:block">
+        <p className="pricing-hud hidden text-on-surface/40 sm:block">
           {displayName ? `Signed in as ${displayName}` : "Prices in USD"}
         </p>
       </div>
 
-      <div className="grid gap-px bg-white/15 md:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-px bg-on-surface/15 md:grid-cols-2 xl:grid-cols-4">
         {plans.map((plan, i) => (
           <PlanCell
             key={plan.slug}
@@ -114,10 +114,10 @@ export function WebsitePricingTable({
         {showEnterprise && <EnterpriseCell index={String(plans.length + 1).padStart(2, "0")} onContact={onContact} />}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 border-t border-white/15 px-6 py-4 md:px-10">
+      <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-2 border-t border-outline-variant px-6 py-4 md:px-10">
         <ul className="flex flex-wrap items-center gap-x-8 gap-y-2">
           {TRUST_POINTS.map(point => (
-            <li key={point} className="pricing-hud flex items-center gap-2 text-white/55">
+            <li key={point} className="pricing-hud flex items-center gap-2 text-on-surface/55">
               <CheckIcon aria-hidden className="h-3.5 w-3.5 text-primary" />
               {point}
             </li>
@@ -128,7 +128,7 @@ export function WebsitePricingTable({
             type="button"
             onClick={onManage}
             disabled={managing}
-            className="pricing-hud text-white/55 underline underline-offset-4 hover:text-white/80 disabled:opacity-50"
+            className="pricing-hud text-on-surface/55 underline underline-offset-4 hover:text-on-surface/80 disabled:opacity-50"
           >
             {managing ? "Opening portal…" : "Manage plan"}
           </button>
@@ -168,7 +168,7 @@ function PlanCell({
   return (
     <article
       data-highlight={PLAN_STYLE[plan.slug]?.highlight || isCurrent ? "" : undefined}
-      className={`website-plan-card plan-${plan.colorScheme} flex flex-col`}
+      className="website-plan-card flex flex-col"
     >
       <CellIndexRow index={index}>
         {isCurrent ? (
@@ -186,22 +186,20 @@ function PlanCell({
 
       <div className="flex flex-1 flex-col p-6 md:p-8">
         <div className="flex items-center justify-between gap-3">
-          <h3 className="font-display text-2xl font-medium tracking-[-0.02em] text-white">{plan.name}</h3>
-          <span className="pricing-hud bg-[var(--plan)] hover:bg-[var(--plan)] px-2 py-1 font-bold text-white">
-            {PROMO_PCT}% off
-          </span>
+          <h3 className="font-display text-2xl font-medium tracking-[-0.02em] text-on-surface">{plan.name}</h3>
+          <span className="pricing-hud bg-secondary px-2 py-1 font-bold text-on-secondary">{PROMO_PCT}% off</span>
         </div>
-        <p className="mt-1 text-sm text-white/55">{PLAN_STYLE[plan.slug]?.tagline}</p>
+        <p className="mt-1 text-sm text-on-surface/55">{PLAN_STYLE[plan.slug]?.tagline}</p>
 
         <div className="mt-5 flex items-baseline gap-2">
-          <span className="font-mono text-base text-[#f05951]/80 line-through">${basePrice}</span>
-          <span className="font-display text-5xl font-medium tracking-[-0.03em] text-white">${current}</span>
-          <span className="text-white/55">/mo</span>
+          <span className="font-mono text-base text-error line-through">${basePrice}</span>
+          <span className="font-display text-5xl font-medium tracking-[-0.03em] text-on-surface">${current}</span>
+          <span className="text-on-surface/55">/mo</span>
         </div>
-        <p className="pricing-hud mt-2 text-white/40">
+        <p className="pricing-hud mt-2 text-on-surface/40">
           {cadence === "yearly" ? (
             <>
-              ${plan.yearlyPrice} billed yearly · <span className="text-[var(--plan-ink)]">Save ${yearlySavings}</span>
+              ${plan.yearlyPrice} billed yearly · <span className="text-secondary">Save ${yearlySavings}</span>
             </>
           ) : (
             "Billed monthly · cancel anytime"
@@ -219,7 +217,7 @@ function PlanCell({
           {!isCurrent && <ArrowRightIcon aria-hidden className="h-3.5 w-3.5" />}
         </Button>
 
-        <p className="pricing-hud mt-8 text-white/40">What you get</p>
+        <p className="pricing-hud mt-8 text-on-surface/40">What you get</p>
         <FeatureList items={features.map(f => f.text)} className="mt-3" />
       </div>
     </article>
@@ -228,19 +226,19 @@ function PlanCell({
 
 function EnterpriseCell({ index, onContact }: { index: string; onContact?: (mailtoUrl: string) => void }) {
   return (
-    <article id="enterprise" className="website-plan-card plan-enterprise flex flex-col">
+    <article id="enterprise" className="website-plan-card flex flex-col">
       <CellIndexRow index={index}>For teams</CellIndexRow>
 
       <div className="flex flex-1 flex-col p-6 md:p-8">
-        <h3 className="font-display text-2xl font-medium tracking-[-0.02em] text-white">Enterprise</h3>
+        <h3 className="font-display text-2xl font-medium tracking-[-0.02em] text-on-surface">Enterprise</h3>
         <div className="mt-5 flex items-baseline gap-2">
-          <span className="font-display text-5xl font-medium tracking-[-0.03em] text-white">Custom</span>
+          <span className="font-display text-5xl font-medium tracking-[-0.03em] text-on-surface">Custom</span>
         </div>
-        <p className="pricing-hud mt-2 text-white/40">Bespoke volume &amp; terms</p>
+        <p className="pricing-hud mt-2 text-on-surface/40">Bespoke volume &amp; terms</p>
 
         <ContactButtons className="mt-6" onContact={onContact} />
 
-        <p className="pricing-hud mt-8 text-white/40">Everything in Max, plus</p>
+        <p className="pricing-hud mt-8 text-on-surface/40">Everything in Max, plus</p>
         <FeatureList items={ENTERPRISE_FEATURES} className="mt-3" />
       </div>
     </article>
@@ -250,7 +248,7 @@ function EnterpriseCell({ index, onContact }: { index: string; onContact?: (mail
 // Solid plan-colored index strip at the top of every cell.
 function CellIndexRow({ index, children }: { index: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between gap-4 bg-[var(--plan)] hover:bg-[var(--plan)] px-6 py-2.5 text-white md:px-8">
+    <div className="flex items-center justify-between gap-4 bg-secondary-container px-6 py-2.5 text-on-secondary-container md:px-8">
       <p className="pricing-hud flex items-center gap-1.5 font-bold">{children}</p>
       <p className="pricing-hud opacity-70">{index}</p>
     </div>
@@ -261,7 +259,7 @@ function FeatureList({ items, className }: { items: string[]; className?: string
   return (
     <ul className={twMerge("flex flex-col gap-2.5", className)}>
       {items.map(text => (
-        <li key={text} className="flex items-start gap-2.5 text-sm text-white/80">
+        <li key={text} className="flex items-start gap-2.5 text-sm text-on-surface/80">
           <span className="website-plan-check mt-px flex h-4 w-4 shrink-0 items-center justify-center">
             <CheckIcon aria-hidden className="h-3 w-3" />
           </span>
@@ -289,7 +287,7 @@ function ContactButtons({ className, onContact }: { className?: string; onContac
   };
 
   return (
-    <div className={twMerge("flex gap-px bg-white/30", className)}>
+    <div className={twMerge("flex gap-px bg-on-surface/30", className)}>
       <Button
         as="link"
         href={mailtoUrl}

@@ -15,10 +15,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useMemo } from "react";
-import {
-  useExperimentalStore,
-  useStoryboardPageEnabled,
-} from "@storyteller/ui-settings-modal";
+import { useExperimentalStore, useStoryboardPageEnabled } from "@storyteller/ui-settings-modal";
 import { useTabStore, TabId } from "~/pages/Stores/TabState";
 
 export type AppId =
@@ -91,7 +88,7 @@ export interface FullAppItem {
   category: "generate" | "edit";
   badge?: "NEW" | "BEST" | "SOON" | "BETA";
   action?: AppId;
-  /** Legacy single-tone icon-square background (e.g. "bg-blue-600/40"). Still
+  /** Legacy single-tone icon-square background (e.g. "bg-primary/40"). Still
    *  used as the fallback for the apps-page card styling. */
   color?: string;
 }
@@ -101,130 +98,129 @@ export interface FullAppItem {
 // hover state all share a hue. Keyed by app id; falls back to a neutral tone
 // when an id is missing.
 interface AppCardPalette {
-  /** Hover tint for the card, e.g. "from-blue-500/20 to-blue-500/0". Legacy. */
+  /** Hover tint for the card, e.g. "from-primary/20 to-primary/0". Legacy. */
   accent: string;
-  /** Icon tile background + border, e.g. "bg-blue-500/20 border-blue-400/40". */
+  /** Icon tile background + border, e.g. "bg-primary/20 border-primary/40". */
   iconBg: string;
-  /** Icon glyph color, e.g. "text-blue-300". */
+  /** Icon glyph color, e.g. "text-primary". */
   iconColor: string;
-  /** Card hover border + background, e.g. "hover:border-blue-400/60 hover:bg-blue-500/10". */
+  /** Card hover border + background, e.g. "hover:border-primary/60 hover:bg-primary/10". */
   hoverStyle: string;
 }
 
 const APP_CARD_PALETTES: Record<string, AppCardPalette> = {
   "text-to-image": {
-    accent: "from-blue-500/20 to-blue-500/0",
-    iconBg: "bg-blue-500/20 border-blue-400/40",
-    iconColor: "text-blue-300",
-    hoverStyle: "hover:border-blue-400/60 hover:bg-blue-500/10",
+    accent: "from-primary/20 to-primary/0",
+    iconBg: "bg-primary/20 border-primary/40",
+    iconColor: "text-primary",
+    hoverStyle: "hover:border-primary/60 hover:bg-primary/10",
   },
   "image-to-video": {
-    accent: "from-purple-500/20 to-purple-500/0",
-    iconBg: "bg-purple-500/20 border-purple-400/40",
-    iconColor: "text-purple-300",
-    hoverStyle: "hover:border-purple-400/60 hover:bg-purple-500/10",
+    accent: "from-tertiary/20 to-tertiary/0",
+    iconBg: "bg-tertiary/20 border-tertiary/40",
+    iconColor: "text-tertiary",
+    hoverStyle: "hover:border-tertiary/60 hover:bg-tertiary/10",
   },
   "create-audio": {
-    accent: "from-pink-500/20 to-pink-500/0",
-    iconBg: "bg-pink-500/20 border-pink-400/40",
-    iconColor: "text-pink-300",
-    hoverStyle: "hover:border-pink-400/60 hover:bg-pink-500/10",
+    accent: "from-tertiary/20 to-tertiary/0",
+    iconBg: "bg-tertiary/20 border-tertiary/40",
+    iconColor: "text-tertiary",
+    hoverStyle: "hover:border-tertiary/60 hover:bg-tertiary/10",
   },
   "image-to-3d-object": {
-    accent: "from-cyan-500/20 to-cyan-500/0",
-    iconBg: "bg-cyan-500/20 border-cyan-400/40",
-    iconColor: "text-cyan-300",
-    hoverStyle: "hover:border-cyan-400/60 hover:bg-cyan-500/10",
+    accent: "from-tertiary/20 to-tertiary/0",
+    iconBg: "bg-tertiary/20 border-tertiary/40",
+    iconColor: "text-tertiary",
+    hoverStyle: "hover:border-tertiary/60 hover:bg-tertiary/10",
   },
   "image-to-3d-world": {
-    accent: "from-teal-500/20 to-teal-500/0",
-    iconBg: "bg-teal-500/20 border-teal-400/40",
-    iconColor: "text-teal-300",
-    hoverStyle: "hover:border-teal-400/60 hover:bg-teal-500/10",
+    accent: "from-success/20 to-success/0",
+    iconBg: "bg-success/20 border-success/40",
+    iconColor: "text-success",
+    hoverStyle: "hover:border-success/60 hover:bg-success/10",
   },
   "3d-editor": {
-    accent: "from-amber-500/20 to-amber-500/0",
-    iconBg: "bg-amber-500/20 border-amber-400/40",
-    iconColor: "text-amber-300",
-    hoverStyle: "hover:border-amber-400/60 hover:bg-amber-500/10",
+    accent: "from-warning/20 to-warning/0",
+    iconBg: "bg-warning/20 border-warning/40",
+    iconColor: "text-warning",
+    hoverStyle: "hover:border-warning/60 hover:bg-warning/10",
   },
   "background-change": {
-    accent: "from-emerald-500/20 to-emerald-500/0",
-    iconBg: "bg-emerald-500/20 border-emerald-400/40",
-    iconColor: "text-emerald-300",
-    hoverStyle: "hover:border-emerald-400/60 hover:bg-emerald-500/10",
+    accent: "from-success/20 to-success/0",
+    iconBg: "bg-success/20 border-success/40",
+    iconColor: "text-success",
+    hoverStyle: "hover:border-success/60 hover:bg-success/10",
   },
   "video-editor": {
-    accent: "from-rose-500/20 to-rose-500/0",
-    iconBg: "bg-rose-500/20 border-rose-400/40",
-    iconColor: "text-rose-300",
-    hoverStyle: "hover:border-rose-400/60 hover:bg-rose-500/10",
+    accent: "from-error/20 to-error/0",
+    iconBg: "bg-error/20 border-error/40",
+    iconColor: "text-error",
+    hoverStyle: "hover:border-error/60 hover:bg-error/10",
   },
   moodboard: {
-    accent: "from-indigo-500/20 to-indigo-500/0",
-    iconBg: "bg-indigo-500/20 border-indigo-400/40",
-    iconColor: "text-indigo-300",
-    hoverStyle: "hover:border-indigo-400/60 hover:bg-indigo-500/10",
+    accent: "from-primary/20 to-primary/0",
+    iconBg: "bg-primary/20 border-primary/40",
+    iconColor: "text-primary",
+    hoverStyle: "hover:border-primary/60 hover:bg-primary/10",
   },
   "video-frame-extractor": {
-    accent: "from-orange-500/20 to-orange-500/0",
-    iconBg: "bg-orange-500/20 border-orange-400/40",
-    iconColor: "text-orange-300",
-    hoverStyle: "hover:border-orange-400/60 hover:bg-orange-500/10",
+    accent: "from-warning/20 to-warning/0",
+    iconBg: "bg-warning/20 border-warning/40",
+    iconColor: "text-warning",
+    hoverStyle: "hover:border-warning/60 hover:bg-warning/10",
   },
   "edit-image": {
-    accent: "from-sky-500/20 to-sky-500/0",
-    iconBg: "bg-sky-500/20 border-sky-400/40",
-    iconColor: "text-sky-300",
-    hoverStyle: "hover:border-sky-400/60 hover:bg-sky-500/10",
+    accent: "from-primary/20 to-primary/0",
+    iconBg: "bg-primary/20 border-primary/40",
+    iconColor: "text-primary",
+    hoverStyle: "hover:border-primary/60 hover:bg-primary/10",
   },
   "2d-canvas": {
-    accent: "from-sky-500/20 to-sky-500/0",
-    iconBg: "bg-sky-500/20 border-sky-400/40",
-    iconColor: "text-sky-300",
-    hoverStyle: "hover:border-sky-400/60 hover:bg-sky-500/10",
+    accent: "from-primary/20 to-primary/0",
+    iconBg: "bg-primary/20 border-primary/40",
+    iconColor: "text-primary",
+    hoverStyle: "hover:border-primary/60 hover:bg-primary/10",
   },
   "remove-background": {
-    accent: "from-violet-500/20 to-violet-500/0",
-    iconBg: "bg-violet-500/20 border-violet-400/40",
-    iconColor: "text-violet-300",
-    hoverStyle: "hover:border-violet-400/60 hover:bg-violet-500/10",
+    accent: "from-tertiary/20 to-tertiary/0",
+    iconBg: "bg-tertiary/20 border-tertiary/40",
+    iconColor: "text-tertiary",
+    hoverStyle: "hover:border-tertiary/60 hover:bg-tertiary/10",
   },
   angles: {
-    accent: "from-lime-500/20 to-lime-500/0",
-    iconBg: "bg-lime-500/20 border-lime-400/40",
-    iconColor: "text-lime-300",
-    hoverStyle: "hover:border-lime-400/60 hover:bg-lime-500/10",
+    accent: "from-success/20 to-success/0",
+    iconBg: "bg-success/20 border-success/40",
+    iconColor: "text-success",
+    hoverStyle: "hover:border-success/60 hover:bg-success/10",
   },
   storyboard: {
-    accent: "from-fuchsia-500/20 to-fuchsia-500/0",
-    iconBg: "bg-fuchsia-500/20 border-fuchsia-400/40",
-    iconColor: "text-fuchsia-300",
-    hoverStyle: "hover:border-fuchsia-400/60 hover:bg-fuchsia-500/10",
+    accent: "from-tertiary/20 to-tertiary/0",
+    iconBg: "bg-tertiary/20 border-tertiary/40",
+    iconColor: "text-tertiary",
+    hoverStyle: "hover:border-tertiary/60 hover:bg-tertiary/10",
   },
   "video-watermark-removal": {
-    accent: "from-yellow-500/20 to-yellow-500/0",
-    iconBg: "bg-yellow-500/20 border-yellow-400/40",
-    iconColor: "text-yellow-300",
-    hoverStyle: "hover:border-yellow-400/60 hover:bg-yellow-500/10",
+    accent: "from-warning/20 to-warning/0",
+    iconBg: "bg-warning/20 border-warning/40",
+    iconColor: "text-warning",
+    hoverStyle: "hover:border-warning/60 hover:bg-warning/10",
   },
   "image-watermark-removal": {
-    accent: "from-red-500/20 to-red-500/0",
-    iconBg: "bg-red-500/20 border-red-400/40",
-    iconColor: "text-red-300",
-    hoverStyle: "hover:border-red-400/60 hover:bg-red-500/10",
+    accent: "from-error/20 to-error/0",
+    iconBg: "bg-error/20 border-error/40",
+    iconColor: "text-error",
+    hoverStyle: "hover:border-error/60 hover:bg-error/10",
   },
 };
 
 const FALLBACK_APP_CARD_PALETTE: AppCardPalette = {
-  accent: "from-white/10 to-white/0",
+  accent: "from-on-surface/10 to-on-surface/0",
   iconBg: "bg-ui-controls border-ui-controls-border",
   iconColor: "text-base-fg",
-  hoverStyle: "hover:border-white/30 hover:bg-white/10",
+  hoverStyle: "hover:border-outline hover:bg-on-surface/10",
 };
 
-export const getAppCardPalette = (id: string): AppCardPalette =>
-  APP_CARD_PALETTES[id] ?? FALLBACK_APP_CARD_PALETTE;
+export const getAppCardPalette = (id: string): AppCardPalette => APP_CARD_PALETTES[id] ?? FALLBACK_APP_CARD_PALETTE;
 
 export const ALL_APPS: FullAppItem[] = [
   {
@@ -234,7 +230,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: ImageIcon,
     category: "generate",
     action: "IMAGE",
-    color: "bg-blue-600/40",
+    color: "bg-primary/40",
   },
   {
     id: "image-to-video",
@@ -243,7 +239,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: FilmIcon,
     category: "generate",
     action: "VIDEO",
-    color: "bg-amber-500/40",
+    color: "bg-warning/40",
   },
   {
     id: "create-audio",
@@ -252,7 +248,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: MusicIcon,
     category: "generate",
     action: "AUDIO",
-    color: "bg-pink-500/40",
+    color: "bg-tertiary/40",
   },
   {
     id: "image-to-3d-object",
@@ -261,7 +257,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: BoxIcon,
     category: "generate",
     action: "IMAGE_TO_3D_OBJECT",
-    color: "bg-emerald-500/40",
+    color: "bg-success/40",
   },
   {
     id: "image-to-3d-world",
@@ -270,7 +266,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: GlobeIcon,
     category: "generate",
     action: "IMAGE_TO_3D_WORLD",
-    color: "bg-blue-500/40",
+    color: "bg-primary/40",
   },
   {
     id: "edit-image",
@@ -279,7 +275,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: PencilIcon,
     category: "edit",
     action: "2D",
-    color: "bg-purple-600/40",
+    color: "bg-tertiary/40",
   },
   {
     id: "video-frame-extractor",
@@ -288,7 +284,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: ImagesIcon,
     category: "edit",
     action: "VIDEO_FRAME_EXTRACTOR",
-    color: "bg-rose-600/40",
+    color: "bg-error/40",
   },
   {
     id: "video-watermark-removal",
@@ -297,7 +293,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: DropletIcon,
     category: "edit",
     badge: "SOON",
-    color: "bg-cyan-500/40",
+    color: "bg-tertiary/40",
   },
   {
     id: "image-watermark-removal",
@@ -306,7 +302,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: DropletIcon,
     category: "edit",
     badge: "SOON",
-    color: "bg-indigo-600/40",
+    color: "bg-primary/40",
   },
   {
     id: "remove-background",
@@ -315,7 +311,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: WandSparklesIcon,
     category: "edit",
     action: "REMOVE_BACKGROUND",
-    color: "bg-violet-500/40",
+    color: "bg-tertiary/40",
   },
   {
     id: "angles",
@@ -324,7 +320,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: CrosshairIcon,
     category: "generate",
     action: "ANGLES",
-    color: "bg-lime-500/40",
+    color: "bg-success/40",
     badge: "NEW",
   },
 
@@ -335,7 +331,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: ImagesIcon,
     category: "generate",
     action: "STORYBOARD",
-    color: "bg-fuchsia-600/40",
+    color: "bg-tertiary/40",
     badge: "NEW",
   },
   {
@@ -345,7 +341,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: GroupIcon,
     category: "generate",
     action: "MOODBOARD",
-    color: "bg-orange-500/40",
+    color: "bg-warning/40",
     badge: "BETA",
   },
   {
@@ -355,7 +351,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: SparklesIcon,
     category: "edit",
     action: "BACKGROUND_CHANGE",
-    color: "bg-orange-500/40",
+    color: "bg-warning/40",
     badge: "NEW",
   },
   {
@@ -365,7 +361,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: FilmIcon,
     category: "edit",
     action: "VIDEO_EDITOR",
-    color: "bg-teal-500/40",
+    color: "bg-success/40",
     badge: "BETA",
   },
   {
@@ -375,7 +371,7 @@ export const ALL_APPS: FullAppItem[] = [
     icon: PenToolIcon,
     category: "edit",
     action: "2D",
-    color: "bg-sky-500/40",
+    color: "bg-primary/40",
   },
   {
     id: "3d-editor",
@@ -384,20 +380,18 @@ export const ALL_APPS: FullAppItem[] = [
     icon: BoxIcon,
     category: "generate",
     action: "3D",
-    color: "bg-emerald-600/40",
+    color: "bg-success/40",
   },
 ];
 
-export const GENERATE_APPS = ALL_APPS.filter(
-  (app) => app.category === "generate",
-);
-export const EDIT_APPS = ALL_APPS.filter((app) => app.category === "edit");
+export const GENERATE_APPS = ALL_APPS.filter(app => app.category === "generate");
+export const EDIT_APPS = ALL_APPS.filter(app => app.category === "edit");
 
 export const useVisibleApps = (): FullAppItem[] => {
   const storyboardEnabled = useStoryboardPageEnabled();
   return useMemo(
     () =>
-      ALL_APPS.filter((app) => {
+      ALL_APPS.filter(app => {
         // Background Change is hidden in the desktop app for now.
         if (app.action === "BACKGROUND_CHANGE") return false;
         if (app.action === "STORYBOARD") return storyboardEnabled;
@@ -409,30 +403,24 @@ export const useVisibleApps = (): FullAppItem[] => {
 
 export const useGenerateApps = (): FullAppItem[] => {
   const visible = useVisibleApps();
-  return useMemo(
-    () => visible.filter((app) => app.category === "generate"),
-    [visible],
-  );
+  return useMemo(() => visible.filter(app => app.category === "generate"), [visible]);
 };
 
 export const useEditApps = (): FullAppItem[] => {
   const visible = useVisibleApps();
-  return useMemo(
-    () => visible.filter((app) => app.category === "edit"),
-    [visible],
-  );
+  return useMemo(() => visible.filter(app => app.category === "edit"), [visible]);
 };
 
 export const getBadgeStyles = (badge?: string) => {
   switch (badge) {
     case "NEW":
-      return "border-purple-400/40 text-purple-300";
+      return "border-tertiary/40 text-tertiary";
     case "BEST":
       return "border-primary/30 text-ui-accent-ink";
     case "SOON":
-      return "border-white/20 text-base-fg/50";
+      return "border-outline-variant text-base-fg/50";
     case "BETA":
-      return "border-amber-400/40 text-amber-300";
+      return "border-warning/40 text-warning";
     default:
       return "";
   }
@@ -461,8 +449,7 @@ export const goToApp = (action?: string) => {
     ].includes(action)
   ) {
     if (action === "STORYBOARD") {
-      const { enabled, storyboardPageEnabled } =
-        useExperimentalStore.getState();
+      const { enabled, storyboardPageEnabled } = useExperimentalStore.getState();
       if (!enabled || !storyboardPageEnabled) return;
     }
     useTabStore.getState().setActiveTab(action as TabId);

@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { BoxIcon, ImagesIcon, Maximize2Icon } from "lucide-react";
-import {
-  UploadModal3D,
-  UploadModalImage,
-  UploadModalSplat,
-} from "@storyteller/ui-upload-modal";
+import { UploadModal3D, UploadModalImage, UploadModalSplat } from "@storyteller/ui-upload-modal";
 import { isPromptBoxDropZoneActive } from "@storyteller/ui-promptbox";
 import { FilterEngineCategories } from "../../enums";
 
@@ -51,12 +47,11 @@ export function GlobalFileDropHandler() {
 
       const setup = async () => {
         try {
-          const { getCurrentWebviewWindow } =
-            await import("@tauri-apps/api/webviewWindow");
+          const { getCurrentWebviewWindow } = await import("@tauri-apps/api/webviewWindow");
           const { convertFileSrc } = await import("@tauri-apps/api/core");
           const appWindow = getCurrentWebviewWindow();
 
-          const unlisten = await appWindow.onDragDropEvent(async (event) => {
+          const unlisten = await appWindow.onDragDropEvent(async event => {
             const payload = event.payload;
 
             if (payload.type === "enter") {
@@ -74,35 +69,31 @@ export function GlobalFileDropHandler() {
               // Find first path with a recognised extension
               let modalKind: ModalType = null;
               for (const p of payload.paths) {
-                modalKind = getModalTypeForFileName(
-                  p.split(/[/\\]/).pop() ?? "",
-                );
+                modalKind = getModalTypeForFileName(p.split(/[/\\]/).pop() ?? "");
                 if (modalKind) break;
               }
               if (!modalKind) return;
 
               // Keep only paths matching the detected modal type
-              const matchingPaths = payload.paths.filter((p) => {
+              const matchingPaths = payload.paths.filter(p => {
                 const name = p.split(/[/\\]/).pop() ?? "";
                 return getModalTypeForFileName(name) === modalKind;
               });
 
               const skippedCount = payload.paths.length - matchingPaths.length;
               if (skippedCount > 0) {
-                toast(
-                  `${skippedCount} file${skippedCount > 1 ? "s" : ""} skipped — unsupported or mixed types`,
-                  { icon: "⚠️" },
-                );
+                toast(`${skippedCount} file${skippedCount > 1 ? "s" : ""} skipped — unsupported or mixed types`, {
+                  icon: "⚠️",
+                });
               }
 
               try {
                 const files = await Promise.all(
-                  matchingPaths.map(async (path) => {
+                  matchingPaths.map(async path => {
                     const fileName = path.split(/[/\\]/).pop() ?? "file";
                     const assetUrl = convertFileSrc(path);
                     const response = await fetch(assetUrl);
-                    if (!response.ok)
-                      throw new Error(`HTTP ${response.status}`);
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
                     const blob = await response.blob();
                     return new File([blob], fileName);
                   }),
@@ -126,7 +117,7 @@ export function GlobalFileDropHandler() {
 
       setup();
       return () => {
-        unlisteners.forEach((fn) => fn());
+        unlisteners.forEach(fn => fn());
       };
     } else {
       // HTML5 path (browser dev mode)
@@ -168,16 +159,13 @@ export function GlobalFileDropHandler() {
         if (!modalKind) return;
 
         // Keep only files matching the detected modal type
-        const matchingFiles = allFiles.filter(
-          (f) => getModalTypeForFileName(f.name) === modalKind,
-        );
+        const matchingFiles = allFiles.filter(f => getModalTypeForFileName(f.name) === modalKind);
 
         const skippedCount = allFiles.length - matchingFiles.length;
         if (skippedCount > 0) {
-          toast(
-            `${skippedCount} file${skippedCount > 1 ? "s" : ""} skipped — unsupported or mixed types`,
-            { icon: "⚠️" },
-          );
+          toast(`${skippedCount} file${skippedCount > 1 ? "s" : ""} skipped — unsupported or mixed types`, {
+            icon: "⚠️",
+          });
         }
 
         setModalType(modalKind);
@@ -199,15 +187,11 @@ export function GlobalFileDropHandler() {
   return (
     <>
       {isDragging && modalType === null && (
-        <div className="pointer-events-none fixed inset-0 z-[9999] flex items-center justify-center bg-black/70">
-          <div className="flex flex-col items-center gap-3 border border-dashed border-white/60 bg-ui-panel px-16 py-12 text-white">
+        <div className="pointer-events-none fixed inset-0 z-[9999] flex items-center justify-center bg-scrim/70">
+          <div className="flex flex-col items-center gap-3 border border-dashed border-outline bg-ui-panel px-16 py-12 text-on-surface">
             <Maximize2Icon className="text-3xl opacity-60" />
-            <div className="font-display text-2xl tracking-tight">
-              Drop to Upload
-            </div>
-            <div className="hud-label text-white/50">
-              GLB, PNG, JPG, JPEG, SPZ
-            </div>
+            <div className="font-display text-2xl tracking-tight">Drop to Upload</div>
+            <div className="hud-label text-on-surface/50">GLB, PNG, JPG, JPEG, SPZ</div>
           </div>
         </div>
       )}

@@ -34,18 +34,12 @@ export const VideoFrameExtractor = () => {
   const [numFrames, setNumFrames] = useState(10);
   const [frameDistance, setFrameDistance] = useState(100);
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
-  const [selectedGalleryVideos, setSelectedGalleryVideos] = useState<string[]>(
-    [],
-  );
-  const [extractedFrames, setExtractedFrames] = useState<
-    { id: string; url: string; timestamp: number }[]
-  >([]);
+  const [selectedGalleryVideos, setSelectedGalleryVideos] = useState<string[]>([]);
+  const [extractedFrames, setExtractedFrames] = useState<{ id: string; url: string; timestamp: number }[]>([]);
   const [isExtracting, setIsExtracting] = useState(false);
   const [savingFrames, setSavingFrames] = useState<Set<string>>(new Set());
   const [savedFrames, setSavedFrames] = useState<Set<string>>(new Set());
-  const [convertingFrames, setConvertingFrames] = useState<Set<string>>(
-    new Set(),
-  );
+  const [convertingFrames, setConvertingFrames] = useState<Set<string>>(new Set());
   const [isLoadingFromGallery, setIsLoadingFromGallery] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -127,8 +121,8 @@ export const VideoFrameExtractor = () => {
   };
 
   const handleVideoSelect = (id: string) => {
-    setSelectedGalleryVideos((prev) => {
-      if (prev.includes(id)) return prev.filter((x) => x !== id);
+    setSelectedGalleryVideos(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
       const maxSelections = 1;
       if (prev.length >= maxSelections) {
         return maxSelections === 1 ? [id] : prev;
@@ -174,7 +168,7 @@ export const VideoFrameExtractor = () => {
     if (isPlaying) {
       videoRef.current.pause();
     } else {
-      videoRef.current.play().catch((err) => {
+      videoRef.current.play().catch(err => {
         console.error("Play failed:", err);
       });
     }
@@ -247,7 +241,7 @@ export const VideoFrameExtractor = () => {
         };
 
         video.addEventListener("loadeddata", handleLoadedData);
-      }).catch((error) => {
+      }).catch(error => {
         console.error("Video loading error:", error);
         setIsExtracting(false);
         return;
@@ -281,7 +275,7 @@ export const VideoFrameExtractor = () => {
 
       video.currentTime = timestamp;
 
-      await new Promise<void>((resolve) => {
+      await new Promise<void>(resolve => {
         const handleSeeked = () => {
           try {
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -311,7 +305,7 @@ export const VideoFrameExtractor = () => {
 
     video.currentTime = originalTime;
 
-    await new Promise<void>((resolve) => {
+    await new Promise<void>(resolve => {
       const handleRestored = () => {
         video.removeEventListener("seeked", handleRestored);
         resolve();
@@ -324,9 +318,7 @@ export const VideoFrameExtractor = () => {
     }
 
     if (corsError) {
-      toast.error(
-        "CORS error: Cannot extract frames from this video. Try uploading the video file directly instead.",
-      );
+      toast.error("CORS error: Cannot extract frames from this video. Try uploading the video file directly instead.");
       setIsExtracting(false);
       return;
     }
@@ -348,16 +340,12 @@ export const VideoFrameExtractor = () => {
     }, 100);
   };
 
-  const handleSaveFrame = async (
-    frameId: string,
-    frameUrl: string,
-    timestamp: number,
-  ) => {
+  const handleSaveFrame = async (frameId: string, frameUrl: string, timestamp: number) => {
     if (savedFrames.has(frameId) || savingFrames.has(frameId)) {
       return;
     }
 
-    setSavingFrames((prev) => new Set(prev).add(frameId));
+    setSavingFrames(prev => new Set(prev).add(frameId));
 
     try {
       const response = await fetch(frameUrl);
@@ -374,15 +362,15 @@ export const VideoFrameExtractor = () => {
       });
 
       if (uploadResponse.success) {
-        setSavedFrames((prev) => new Set(prev).add(frameId));
-        setSavingFrames((prev) => {
+        setSavedFrames(prev => new Set(prev).add(frameId));
+        setSavingFrames(prev => {
           const next = new Set(prev);
           next.delete(frameId);
           return next;
         });
         toast.success("Frame saved to library!");
       } else {
-        setSavingFrames((prev) => {
+        setSavingFrames(prev => {
           const next = new Set(prev);
           next.delete(frameId);
           return next;
@@ -390,7 +378,7 @@ export const VideoFrameExtractor = () => {
         toast.error(uploadResponse.errorMessage || "Failed to save frame");
       }
     } catch (error) {
-      setSavingFrames((prev) => {
+      setSavingFrames(prev => {
         const next = new Set(prev);
         next.delete(frameId);
         return next;
@@ -400,16 +388,12 @@ export const VideoFrameExtractor = () => {
     }
   };
 
-  const handleTurnIntoVideo = async (
-    frameId: string,
-    frameUrl: string,
-    timestamp: number,
-  ) => {
+  const handleTurnIntoVideo = async (frameId: string, frameUrl: string, timestamp: number) => {
     if (convertingFrames.has(frameId)) {
       return;
     }
 
-    setConvertingFrames((prev) => new Set(prev).add(frameId));
+    setConvertingFrames(prev => new Set(prev).add(frameId));
 
     try {
       const response = await fetch(frameUrl);
@@ -438,23 +422,21 @@ export const VideoFrameExtractor = () => {
         usePromptVideoStore.getState().setReferenceImages([referenceImage]);
         useTabStore.getState().setActiveTab("VIDEO");
 
-        setConvertingFrames((prev) => {
+        setConvertingFrames(prev => {
           const next = new Set(prev);
           next.delete(frameId);
           return next;
         });
       } else {
-        setConvertingFrames((prev) => {
+        setConvertingFrames(prev => {
           const next = new Set(prev);
           next.delete(frameId);
           return next;
         });
-        toast.error(
-          uploadResponse.errorMessage || "Failed to convert to video",
-        );
+        toast.error(uploadResponse.errorMessage || "Failed to convert to video");
       }
     } catch (error) {
-      setConvertingFrames((prev) => {
+      setConvertingFrames(prev => {
         const next = new Set(prev);
         next.delete(frameId);
         return next;
@@ -482,8 +464,8 @@ export const VideoFrameExtractor = () => {
                     icon={ImagesIcon}
                     title="Extract Video Frames"
                     description="Capture perfect moments from your videos. Select frames at precise timestamps and save them as images."
-                    accentBackgroundClass="bg-rose-500/40"
-                    accentBorderClass="border-rose-400/30"
+                    accentBackgroundClass="bg-error/40"
+                    accentBorderClass="border-error/30"
                     accept="video/*"
                     onFilesSelected={handleLocalVideoSelect}
                     primaryLabel="Select Video"
@@ -496,7 +478,7 @@ export const VideoFrameExtractor = () => {
             ) : (
               <div className="flex w-full max-w-5xl flex-col gap-5">
                 <div className="w-full overflow-hidden border border-ui-panel-border bg-ui-panel">
-                  <div className="relative aspect-video w-full bg-black">
+                  <div className="relative aspect-video w-full bg-scrim">
                     <Button
                       icon={RotateCwIcon}
                       variant="action"
@@ -509,47 +491,43 @@ export const VideoFrameExtractor = () => {
                         setSavedFrames(new Set());
                         setConvertingFrames(new Set());
                       }}
-                      className="absolute right-3 top-3 z-10 border border-red/50 px-3 py-1.5 text-sm hover:border-red/80 hover:bg-red/80"
+                      className="absolute right-3 top-3 z-10 border border-error/50 px-3 py-1.5 text-sm hover:border-error/80 hover:bg-error/80"
                     >
                       Switch Video
                     </Button>
                     <video
                       ref={videoRef}
                       src={videoUrl}
-                      className="h-full w-full bg-black"
+                      className="h-full w-full bg-scrim"
                       onClick={togglePlayPause}
                       preload="metadata"
                       playsInline
                       crossOrigin="anonymous"
                     />
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-scrim/90 to-transparent p-4">
                       <div
                         ref={progressBarRef}
-                        className="group relative mb-3 h-3 cursor-pointer bg-white/15"
+                        className="group relative mb-3 h-3 cursor-pointer bg-on-surface/15"
                         onClick={handleProgressBarClick}
                       >
                         <div
-                          className="absolute h-full overflow-hidden bg-white"
+                          className="absolute h-full overflow-hidden bg-on-surface"
                           style={{
                             width: `${duration ? (currentTime / duration) * 100 : 0}%`,
                           }}
                         />
                         <div
-                          className="absolute top-1/2 h-6 w-1.5 -translate-y-1/2 cursor-ew-resize bg-yellow-400"
+                          className="absolute top-1/2 h-6 w-1.5 -translate-y-1/2 cursor-ew-resize bg-warning"
                           style={{
                             left: `${duration ? (startTime / duration) * 100 : 0}%`,
                           }}
-                          onMouseDown={(e) => {
+                          onMouseDown={e => {
                             e.stopPropagation();
                             const handleMouseMove = (moveEvent: MouseEvent) => {
                               if (!progressBarRef.current || !duration) return;
-                              const rect =
-                                progressBarRef.current.getBoundingClientRect();
+                              const rect = progressBarRef.current.getBoundingClientRect();
                               const moveX = moveEvent.clientX - rect.left;
-                              const percentage = Math.max(
-                                0,
-                                Math.min(1, moveX / rect.width),
-                              );
+                              const percentage = Math.max(0, Math.min(1, moveX / rect.width));
                               const newTime = percentage * duration;
                               setStartTime(newTime);
                               if (videoRef.current) {
@@ -558,19 +536,10 @@ export const VideoFrameExtractor = () => {
                               }
                             };
                             const handleMouseUp = () => {
-                              document.removeEventListener(
-                                "mousemove",
-                                handleMouseMove,
-                              );
-                              document.removeEventListener(
-                                "mouseup",
-                                handleMouseUp,
-                              );
+                              document.removeEventListener("mousemove", handleMouseMove);
+                              document.removeEventListener("mouseup", handleMouseUp);
                             };
-                            document.addEventListener(
-                              "mousemove",
-                              handleMouseMove,
-                            );
+                            document.addEventListener("mousemove", handleMouseMove);
                             document.addEventListener("mouseup", handleMouseUp);
                           }}
                         />
@@ -579,35 +548,32 @@ export const VideoFrameExtractor = () => {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => seekToFrame("first")}
-                            className="flex h-8 w-8 items-center justify-center rounded-[3px] bg-white/10 transition-colors hover:bg-white/20"
+                            className="flex h-8 w-8 items-center justify-center rounded-[3px] bg-on-surface/10 transition-colors hover:bg-on-surface/20"
                             title="First Frame"
                           >
-                            <SkipBackIcon className="text-sm text-white" />
+                            <SkipBackIcon className="text-sm text-on-surface" />
                           </button>
                           <button
                             onClick={togglePlayPause}
-                            className="flex h-9 w-9 items-center justify-center rounded-[3px] bg-white/20 transition-colors hover:bg-white/30"
+                            className="flex h-9 w-9 items-center justify-center rounded-[3px] bg-on-surface/20 transition-colors hover:bg-on-surface/30"
                           >
-                            <DynamicIcon
-                              icon={isPlaying ? PauseIcon : PlayIcon}
-                              className="text-white"
-                            />
+                            <DynamicIcon icon={isPlaying ? PauseIcon : PlayIcon} className="text-on-surface" />
                           </button>
                           <button
                             onClick={() => seekToFrame("last")}
-                            className="flex h-8 w-8 items-center justify-center rounded-[3px] bg-white/10 transition-colors hover:bg-white/20"
+                            className="flex h-8 w-8 items-center justify-center rounded-[3px] bg-on-surface/10 transition-colors hover:bg-on-surface/20"
                             title="Last Frame"
                           >
-                            <SkipForwardIcon className="text-sm text-white" />
+                            <SkipForwardIcon className="text-sm text-on-surface" />
                           </button>
-                          <div className="mx-1 h-6 w-px bg-white/20" />
+                          <div className="mx-1 h-6 w-px bg-on-surface/20" />
                           <button
                             onClick={toggleMute}
-                            className="flex h-7 w-7 items-center justify-center rounded-[3px] bg-white/10 transition-colors hover:bg-white/20"
+                            className="flex h-7 w-7 items-center justify-center rounded-[3px] bg-on-surface/10 transition-colors hover:bg-on-surface/20"
                           >
                             <DynamicIcon
                               icon={isMuted ? VolumeXIcon : Volume2Icon}
-                              className="text-sm text-white"
+                              className="text-sm text-on-surface"
                             />
                           </button>
                           <input
@@ -616,13 +582,11 @@ export const VideoFrameExtractor = () => {
                             max="1"
                             step="0.01"
                             value={volume}
-                            onChange={(e) =>
-                              setVolume(parseFloat(e.target.value))
-                            }
-                            className="w-20 accent-white"
+                            onChange={e => setVolume(parseFloat(e.target.value))}
+                            className="w-20 accent-primary"
                           />
                         </div>
-                        <div className="font-mono text-sm tabular-nums text-white">
+                        <div className="font-mono text-sm tabular-nums text-on-surface">
                           {formatTime(currentTime)} / {formatTime(duration)}
                         </div>
                       </div>
@@ -654,7 +618,7 @@ export const VideoFrameExtractor = () => {
                           {formatTimePrecise(startTime)}
                         </div>
                         <div className="mt-3 flex items-center gap-2 text-xs text-base-fg/60">
-                          <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-yellow-400" />
+                          <div className="h-2.5 w-2.5 animate-pulse rounded-full bg-warning" />
                           <span>Adjust via the yellow marker on the video</span>
                         </div>
                       </div>
@@ -667,21 +631,16 @@ export const VideoFrameExtractor = () => {
                         </div>
                         <div className="space-y-3 text-sm">
                           <div className="flex items-center justify-between border-b border-ui-divider py-2">
-                            <span className="font-medium text-base-fg/70">
-                              Duration
-                            </span>
+                            <span className="font-medium text-base-fg/70">Duration</span>
                             <span className="font-mono text-lg font-semibold tabular-nums text-base-fg">
                               {formatTime(duration)}
                             </span>
                           </div>
                           {videoRef.current && (
                             <div className="flex items-center justify-between py-2">
-                              <span className="font-medium text-base-fg/70">
-                                Resolution
-                              </span>
+                              <span className="font-medium text-base-fg/70">Resolution</span>
                               <span className="font-mono font-semibold tabular-nums text-base-fg">
-                                {videoRef.current.videoWidth} ×{" "}
-                                {videoRef.current.videoHeight}
+                                {videoRef.current.videoWidth} × {videoRef.current.videoHeight}
                               </span>
                             </div>
                           )}
@@ -699,10 +658,7 @@ export const VideoFrameExtractor = () => {
 
                       <div className="space-y-5">
                         <div>
-                          <label
-                            htmlFor="numFrames"
-                            className="mb-1.5 block text-xs font-medium text-base-fg/60"
-                          >
+                          <label htmlFor="numFrames" className="mb-1.5 block text-xs font-medium text-base-fg/60">
                             Number of Frames
                           </label>
                           <input
@@ -711,23 +667,13 @@ export const VideoFrameExtractor = () => {
                             min="1"
                             max="50"
                             value={numFrames}
-                            onChange={(e) =>
-                              setNumFrames(
-                                Math.max(
-                                  1,
-                                  Math.min(50, parseInt(e.target.value) || 1),
-                                ),
-                              )
-                            }
-                            className="w-full rounded-[3px] border border-white/15 bg-ui-controls px-3 py-2 text-sm tabular-nums text-base-fg focus:border-white/60 focus:outline-none"
+                            onChange={e => setNumFrames(Math.max(1, Math.min(50, parseInt(e.target.value) || 1)))}
+                            className="w-full rounded-[3px] border border-outline-variant bg-ui-controls px-3 py-2 text-sm tabular-nums text-base-fg focus:border-outline focus:outline-none"
                           />
                         </div>
 
                         <div>
-                          <label
-                            htmlFor="frameDistance"
-                            className="mb-1.5 block text-xs font-medium text-base-fg/60"
-                          >
+                          <label htmlFor="frameDistance" className="mb-1.5 block text-xs font-medium text-base-fg/60">
                             Distance (ms)
                           </label>
                           <input
@@ -736,18 +682,13 @@ export const VideoFrameExtractor = () => {
                             min="1"
                             max="10000"
                             value={frameDistance}
-                            onChange={(e) =>
-                              setFrameDistance(
-                                Math.max(1, parseInt(e.target.value) || 1),
-                              )
-                            }
-                            className="w-full rounded-[3px] border border-white/15 bg-ui-controls px-3 py-2 text-sm tabular-nums text-base-fg focus:border-white/60 focus:outline-none"
+                            onChange={e => setFrameDistance(Math.max(1, parseInt(e.target.value) || 1))}
+                            className="w-full rounded-[3px] border border-outline-variant bg-ui-controls px-3 py-2 text-sm tabular-nums text-base-fg focus:border-outline focus:outline-none"
                           />
                         </div>
 
                         <div className="text-xs leading-relaxed text-base-fg/60">
-                          Extracting multiple frames helps capture a sharp,
-                          non-blurred frame.
+                          Extracting multiple frames helps capture a sharp, non-blurred frame.
                         </div>
                       </div>
                     </div>
@@ -755,28 +696,24 @@ export const VideoFrameExtractor = () => {
                 </div>
 
                 {extractedFrames.length > 0 && (
-                  <div
-                    ref={extractedFramesRef}
-                    className="border border-ui-panel-border bg-ui-panel p-6"
-                  >
+                  <div ref={extractedFramesRef} className="border border-ui-panel-border bg-ui-panel p-6">
                     <div>
                       <div className="mb-4 flex items-center justify-between">
                         <h3 className="flex items-center gap-2 text-sm font-semibold text-base-fg">
                           <ImagesIcon className="text-ui-accent-ink" />
                           Extracted Frames
                         </h3>
-                        <div className="border border-white/20 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.12em] text-base-fg/70">
-                          {extractedFrames.length}{" "}
-                          {extractedFrames.length === 1 ? "Frame" : "Frames"}
+                        <div className="border border-outline-variant px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.12em] text-base-fg/70">
+                          {extractedFrames.length} {extractedFrames.length === 1 ? "Frame" : "Frames"}
                         </div>
                       </div>
                       <div className="grid grid-cols-2 gap-3">
                         {extractedFrames.map((frame, index) => (
                           <div
                             key={frame.id}
-                            className="group relative overflow-hidden border border-ui-panel-border bg-ui-background transition-colors hover:border-white/30"
+                            className="group relative overflow-hidden border border-ui-panel-border bg-ui-background transition-colors hover:border-outline"
                           >
-                            <div className="aspect-video overflow-hidden bg-black">
+                            <div className="aspect-video overflow-hidden bg-scrim">
                               <img
                                 src={frame.url}
                                 alt={`Frame ${index + 1}`}
@@ -785,7 +722,7 @@ export const VideoFrameExtractor = () => {
                             </div>
                             <div className="space-y-2 border-t border-ui-panel-border/60 bg-ui-background p-3">
                               <div className="flex items-center justify-between">
-                                <span className="border border-white/20 px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.12em] text-base-fg/70">
+                                <span className="border border-outline-variant px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.12em] text-base-fg/70">
                                   #{index + 1}
                                 </span>
                                 <div className="font-mono text-xs tabular-nums text-base-fg/70">
@@ -803,17 +740,8 @@ export const VideoFrameExtractor = () => {
                                         : SaveIcon
                                   }
                                   loading={savingFrames.has(frame.id)}
-                                  onClick={() =>
-                                    handleSaveFrame(
-                                      frame.id,
-                                      frame.url,
-                                      frame.timestamp,
-                                    )
-                                  }
-                                  disabled={
-                                    savingFrames.has(frame.id) ||
-                                    savedFrames.has(frame.id)
-                                  }
+                                  onClick={() => handleSaveFrame(frame.id, frame.url, frame.timestamp)}
+                                  disabled={savingFrames.has(frame.id) || savedFrames.has(frame.id)}
                                   className="flex-1 px-3 py-1.5 text-xs font-semibold"
                                 >
                                   {savingFrames.has(frame.id)
@@ -824,19 +752,9 @@ export const VideoFrameExtractor = () => {
                                 </Button>
                                 <Button
                                   variant="primary"
-                                  icon={
-                                    convertingFrames.has(frame.id)
-                                      ? undefined
-                                      : VideoIcon
-                                  }
+                                  icon={convertingFrames.has(frame.id) ? undefined : VideoIcon}
                                   loading={convertingFrames.has(frame.id)}
-                                  onClick={() =>
-                                    handleTurnIntoVideo(
-                                      frame.id,
-                                      frame.url,
-                                      frame.timestamp,
-                                    )
-                                  }
+                                  onClick={() => handleTurnIntoVideo(frame.id, frame.url, frame.timestamp)}
                                   disabled={convertingFrames.has(frame.id)}
                                   className="flex-1 px-3 py-1.5 text-xs font-semibold"
                                 >

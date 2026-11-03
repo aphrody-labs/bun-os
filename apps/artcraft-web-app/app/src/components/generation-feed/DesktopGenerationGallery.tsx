@@ -1,12 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  ArrowDownToLineIcon,
-  CheckIcon,
-  LinkIcon,
-  LoaderCircleIcon,
-  RotateCwIcon,
-  VideoIcon,
-} from "lucide-react";
+import { ArrowDownToLineIcon, CheckIcon, LinkIcon, LoaderCircleIcon, RotateCwIcon, VideoIcon } from "lucide-react";
 import { DynamicIcon } from "@storyteller/icons";
 import { Tooltip } from "@storyteller/ui-tooltip";
 import { toast } from "@storyteller/ui-toaster";
@@ -64,9 +57,9 @@ export function DesktopGenerationGallery({
   selectionBarBottomOffset,
   ...feedProps
 }: DesktopGenerationGalleryProps) {
-  const viewMode = useGalleryViewStore((s) => s.viewMode);
-  const selectionActive = useGallerySelectionStore((s) => s.active);
-  const selectedIds = useGallerySelectionStore((s) => s.ids);
+  const viewMode = useGalleryViewStore(s => s.viewMode);
+  const selectionActive = useGallerySelectionStore(s => s.active);
+  const selectedIds = useGallerySelectionStore(s => s.ids);
 
   // The selection store is global (like the view-mode store) — drop select
   // mode when the page unmounts (tab switch) so it can't leak elsewhere.
@@ -152,17 +145,13 @@ function SelectionDownloadBar({
   galleryItems: GalleryItem[];
   bottomOffset?: number;
 }) {
-  const ids = useGallerySelectionStore((s) => s.ids);
+  const ids = useGallerySelectionStore(s => s.ids);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const selectedItems = useMemo(() => {
-    const byId = new Map(
-      [...newlyCompletedItems, ...galleryItems].map(
-        (it) => [it.id, it] as const,
-      ),
-    );
+    const byId = new Map([...newlyCompletedItems, ...galleryItems].map(it => [it.id, it] as const));
     return Array.from(ids)
-      .map((id) => byId.get(id))
+      .map(id => byId.get(id))
       .filter((it): it is GalleryItem => !!it?.fullImage);
   }, [newlyCompletedItems, galleryItems, ids]);
 
@@ -187,7 +176,7 @@ function SelectionDownloadBar({
         type="button"
         onClick={handleDownload}
         disabled={isDownloading || selectedItems.length === 0}
-        className="flex items-center gap-2 border border-white/15 bg-ui-controls/60 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-ui-controls/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 disabled:opacity-60"
+        className="flex items-center gap-2 border border-outline-variant bg-ui-controls/60 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-on-surface transition-colors hover:bg-ui-controls/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-outline disabled:opacity-60"
       >
         <DynamicIcon
           icon={isDownloading ? LoaderCircleIcon : ArrowDownToLineIcon}
@@ -223,18 +212,14 @@ function ItemActions({
   const is3D = item.mediaClass === "dimensional";
   const isAudio = item.mediaClass === "audio";
   // Audio v1: no recreate / make-video — share + download only.
-  const recreateMediaClass: "image" | "video" | null = isVideo
-    ? "video"
-    : is3D || isAudio
-      ? null
-      : "image";
+  const recreateMediaClass: "image" | "video" | null = isVideo ? "video" : is3D || isAudio ? null : "image";
   const canRecreate = !!promptToken && !!recreateMediaClass;
   const canMakeVideo = !!enableMakeVideo && !isVideo && !is3D && !isAudio;
 
   const buttonClass =
     variant === "card"
-      ? "flex h-7 w-7 items-center justify-center text-white/85 transition-colors hover:bg-white/15 hover:text-white disabled:opacity-60"
-      : "flex h-8 w-8 items-center justify-center text-white/70 transition-colors hover:bg-white/10 hover:text-white disabled:opacity-60";
+      ? "flex h-7 w-7 items-center justify-center text-on-surface/85 transition-colors hover:bg-on-surface/15 hover:text-on-surface disabled:opacity-60"
+      : "flex h-8 w-8 items-center justify-center text-on-surface/70 transition-colors hover:bg-on-surface/10 hover:text-on-surface disabled:opacity-60";
 
   const handleRecreate = useCallback(
     async (e: React.MouseEvent) => {
@@ -278,11 +263,7 @@ function ItemActions({
       if (!item.fullImage || isDownloading) return;
       setIsDownloading(true);
       try {
-        await downloadMediaFileToDisk(
-          item.fullImage,
-          item.mediaClass,
-          item.modelId,
-        );
+        await downloadMediaFileToDisk(item.fullImage, item.mediaClass, item.modelId);
       } finally {
         setIsDownloading(false);
       }
@@ -310,27 +291,14 @@ function ItemActions({
       )}
       {canMakeVideo && (
         <Tooltip content="Make Video" position="top">
-          <button
-            type="button"
-            onClick={handleMakeVideo}
-            aria-label="Make Video"
-            className={buttonClass}
-          >
+          <button type="button" onClick={handleMakeVideo} aria-label="Make Video" className={buttonClass}>
             <VideoIcon className="text-sm" />
           </button>
         </Tooltip>
       )}
       <Tooltip content={shareCopied ? "Copied" : "Share"} position="top">
-        <button
-          type="button"
-          onClick={handleShare}
-          aria-label="Share"
-          className={buttonClass}
-        >
-          <DynamicIcon
-            icon={shareCopied ? CheckIcon : LinkIcon}
-            className="text-sm"
-          />
+        <button type="button" onClick={handleShare} aria-label="Share" className={buttonClass}>
+          <DynamicIcon icon={shareCopied ? CheckIcon : LinkIcon} className="text-sm" />
         </button>
       </Tooltip>
       {item.fullImage && (

@@ -148,7 +148,7 @@ const AnimatedBackdrop = ({
         style={{
           opacity: styles.opacity,
           pointerEvents: "none",
-          background: "rgba(0, 0, 0, 0.7)",
+          background: "color-mix(in oklab, var(--md-sys-color-scrim) 70%, transparent)",
         }}
       />
     </Dialog.Overlay>
@@ -186,7 +186,7 @@ const ExpandButton = ({ className, size = "md" }: ExpandButtonProps) => {
       aria-label={expanded ? "Restore modal size" : "Expand modal"}
       onClick={toggleExpanded}
       className={twMerge(
-        "flex items-center justify-center rounded-[3px] bg-black/40 text-white/60 transition-colors hover:bg-white hover:text-black",
+        "flex items-center justify-center rounded-[3px] bg-scrim/40 text-on-surface/60 transition-colors hover:bg-on-surface hover:text-surface",
         sizeClasses[size],
         "relative z-[70]",
         className,

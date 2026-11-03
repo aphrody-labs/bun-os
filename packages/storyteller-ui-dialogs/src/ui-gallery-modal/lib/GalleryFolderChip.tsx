@@ -66,7 +66,7 @@ export const GalleryFolderChip: React.FC<GalleryFolderChipProps> = ({ folder, ch
       ) : hasCollage && collageUrls.length === 1 ? (
         <ChipImg src={collageUrls[0]} className="absolute inset-0 h-full w-full object-cover" />
       ) : hasCollage ? (
-        <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-px bg-black/20">
+        <div className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-px bg-scrim/20">
           {Array.from({ length: 4 }).map((_, i) =>
             collageUrls[i] ? (
               <ChipImg key={i} src={collageUrls[i]} className="h-full w-full object-cover" />
@@ -86,12 +86,12 @@ export const GalleryFolderChip: React.FC<GalleryFolderChipProps> = ({ folder, ch
 
       {/* Legibility scrim for the label over cover/collage art */}
       {hasArt && (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/75 to-transparent" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-scrim/75 to-transparent" />
       )}
 
       {/* Star (favorite) */}
       {hasStar && (
-        <StarIcon className="absolute left-2 top-2 text-sm text-amber-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)]" />
+        <StarIcon className="absolute left-2 top-2 text-sm text-warning drop-shadow-[0_1px_2px_color-mix(in_oklab,var(--md-sys-color-shadow)_60%,transparent)]" />
       )}
 
       {/* Name + subfolder count */}
@@ -102,7 +102,7 @@ export const GalleryFolderChip: React.FC<GalleryFolderChipProps> = ({ folder, ch
           {hasArt && (
             <FolderIcon
               className={twMerge(
-                "flex-shrink-0 text-sm drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]",
+                "flex-shrink-0 text-sm drop-shadow-[0_1px_2px_color-mix(in_oklab,var(--md-sys-color-shadow)_70%,transparent)]",
                 colorCode ? "" : "text-primary",
               )}
               style={colorCode ? { color: colorCode } : undefined}
@@ -111,14 +111,16 @@ export const GalleryFolderChip: React.FC<GalleryFolderChipProps> = ({ folder, ch
           <span
             className={twMerge(
               "line-clamp-2 break-words text-left text-sm font-medium",
-              hasArt ? "text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.7)]" : "text-base-fg/90",
+              hasArt
+                ? "text-on-surface drop-shadow-[0_1px_2px_color-mix(in_oklab,var(--md-sys-color-shadow)_70%,transparent)]"
+                : "text-base-fg/90",
             )}
           >
             {name}
           </span>
         </div>
         {childCount > 0 && (
-          <span className={twMerge("text-left text-[10px]", hasArt ? "text-white/70" : "text-base-fg/40")}>
+          <span className={twMerge("text-left text-[10px]", hasArt ? "text-on-surface/70" : "text-base-fg/40")}>
             {childCount} folder{childCount === 1 ? "" : "s"}
           </span>
         )}
@@ -135,7 +137,7 @@ export const GalleryFolderChip: React.FC<GalleryFolderChipProps> = ({ folder, ch
             e.stopPropagation();
             openMenuAt(e.currentTarget as HTMLElement);
           }}
-          className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-[3px] bg-black/40 text-white opacity-0 transition-opacity hover:bg-black/60 group-hover/chip:opacity-100 [@media(pointer:coarse)]:opacity-100"
+          className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-[3px] bg-scrim/40 text-on-surface opacity-0 transition-opacity hover:bg-scrim/60 group-hover/chip:opacity-100 [@media(pointer:coarse)]:opacity-100"
         >
           <EllipsisIcon className="text-sm" />
         </span>

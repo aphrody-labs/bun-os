@@ -50,8 +50,8 @@ function createDragPreview(count: number) {
     min-width: 22px;
     height: 22px;
     border-radius: 11px;
-    background: var(--primary, #ffb500);
-    color: #000;
+    background: var(--md-sys-color-primary);
+    color: var(--md-sys-color-on-primary);
     font-size: 12px;
     font-weight: 700;
     display: flex;
@@ -59,7 +59,7 @@ function createDragPreview(count: number) {
     justify-content: center;
     padding: 0 6px;
     line-height: 1;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 8px color-mix(in oklab, var(--md-sys-color-shadow) 30%, transparent);
   `;
 
   document.body.appendChild(el);
@@ -97,7 +97,7 @@ function spawnDropRipple(x: number, y: number) {
     margin-left: -15px;
     margin-top: -15px;
     border-radius: 9999px;
-    border: 2px solid var(--primary, #2d81ff);
+    border: 2px solid var(--md-sys-color-primary);
     pointer-events: none;
   `;
   document.body.appendChild(ring);

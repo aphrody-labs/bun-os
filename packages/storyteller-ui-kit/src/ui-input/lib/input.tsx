@@ -42,10 +42,10 @@ export const Input = React.forwardRef(
             className={twMerge(
               "h-10 w-full rounded-[3px] px-3 py-2.5 outline-none",
               "bg-ui-panel text-base-fg placeholder-base-fg/40",
-              "border border-ui-panel-border transition-colors duration-150 ease-in-out hover:border-white/40 focus:border-white focus:!outline-none",
+              "border border-ui-panel-border transition-colors duration-150 ease-in-out hover:border-outline focus:border-outline focus:!outline-none",
               "disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:border-ui-panel-border",
               icon && "pl-10",
-              isError && "border-red-500 focus:border-red-500",
+              isError && "border-error focus:border-error",
               inputClassName,
             )}
             onFocus={(e: React.FocusEvent<HTMLInputElement>) => {
@@ -60,7 +60,7 @@ export const Input = React.forwardRef(
             }}
             {...rest}
           />
-          {errorMessage && <h6 className="absolute z-10 text-red-400">{errorMessage}</h6>}
+          {errorMessage && <h6 className="absolute z-10 text-error">{errorMessage}</h6>}
         </div>
       </div>
     );

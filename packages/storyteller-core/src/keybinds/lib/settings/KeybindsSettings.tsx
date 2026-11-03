@@ -161,8 +161,8 @@ export function KeybindsSettings({ onOpenVideoEditorShortcuts }: { onOpenVideoEd
           Deliberately reset-free: destructive actions live with their scope
           (section headers) or in the danger row at the bottom, never beside
           the search field where a stray click can nuke every override. */}
-      <div className="sticky top-0 z-10 -mt-2 flex flex-col gap-3 border-b border-white/[0.06] bg-ui-modal py-3">
-        <div className="flex items-center gap-1.5 rounded-none bg-white/[0.04] p-1.5 ring-1 ring-white/15">
+      <div className="sticky top-0 z-10 -mt-2 flex flex-col gap-3 border-b border-outline-variant bg-ui-modal py-3">
+        <div className="flex items-center gap-1.5 rounded-none bg-on-surface/[0.04] p-1.5 ring-1 ring-outline-variant">
           <ModeToggle mode={searchMode} onChange={switchMode} />
           {searchMode === "name" ? (
             <NameSearchField value={nameSearch} onChange={setNameSearch} />
@@ -247,7 +247,7 @@ export function KeybindsSettings({ onOpenVideoEditorShortcuts }: { onOpenVideoEd
           and gated behind a two-step confirm. Hidden when there is nothing to
           destroy. ─────────────────────────────────────────────────────────── */}
       {overriddenCount > 0 && (
-        <div className="flex items-center justify-between gap-4 rounded-none bg-red/[0.04] p-4 ring-1 ring-red/20">
+        <div className="flex items-center justify-between gap-4 rounded-none bg-error/[0.04] p-4 ring-1 ring-error/20">
           <div className="flex min-w-0 flex-col gap-0.5">
             <span className="text-[13px] font-medium text-base-fg/90">Reset all customizations</span>
             <span className="text-xs leading-relaxed text-base-fg/50">
@@ -267,7 +267,7 @@ export function KeybindsSettings({ onOpenVideoEditorShortcuts }: { onOpenVideoEd
       )}
 
       {/* ── Video editor lives in its own customizer ───────────────────────── */}
-      <div className="flex items-start gap-3 rounded-none bg-white/[0.02] p-4 text-[13px] leading-relaxed text-base-fg/55 ring-1 ring-white/15">
+      <div className="flex items-start gap-3 rounded-none bg-on-surface/[0.02] p-4 text-[13px] leading-relaxed text-base-fg/55 ring-1 ring-outline-variant">
         <InfoIcon className="mt-0.5 h-4 w-4 shrink-0 text-base-fg/35" />
         <span>
           Video editor shortcuts are managed in the video editor itself
@@ -321,7 +321,7 @@ function PresetDropdown({ value, onChange }: { value: PresetId; onChange: (id: P
         aria-haspopup="listbox"
         aria-expanded={open}
         className={twMerge(
-          "flex w-full items-center gap-3 rounded-none bg-white/[0.04] p-1.5 text-left ring-1 ring-white/15 transition-all hover:bg-white/[0.06] active:scale-[0.995]",
+          "flex w-full items-center gap-3 rounded-none bg-on-surface/[0.04] p-1.5 text-left ring-1 ring-outline-variant transition-all hover:bg-on-surface/[0.06] active:scale-[0.995]",
           EASE,
           open && "ring-primary/40",
         )}
@@ -343,7 +343,7 @@ function PresetDropdown({ value, onChange }: { value: PresetId; onChange: (id: P
         role="listbox"
         aria-label="Preset"
         className={twMerge(
-          "absolute left-0 right-0 top-full z-20 mt-2 origin-top rounded-none bg-ui-modal shadow-[0_20px_50px_-16px_rgba(0,0,0,0.7)] ring-1 ring-white/10 transition-all duration-200 overflow-hidden",
+          "absolute left-0 right-0 top-full z-20 mt-2 origin-top rounded-none bg-ui-modal shadow-[0_20px_50px_-16px_color-mix(in_oklab,var(--md-sys-color-shadow)_70%,transparent)] ring-1 ring-outline-variant transition-all duration-200 overflow-hidden",
           EASE,
           open ? "scale-100 opacity-100" : "pointer-events-none scale-95 opacity-0",
         )}
@@ -364,12 +364,12 @@ function PresetDropdown({ value, onChange }: { value: PresetId; onChange: (id: P
               className={twMerge(
                 "flex w-full items-start gap-3 px-3 py-2.5 text-left transition-colors",
                 EASE,
-                selected ? "bg-primary/[0.08]" : "hover:bg-white/[0.04]",
+                selected ? "bg-primary/[0.08]" : "hover:bg-on-surface/[0.04]",
               )}
             >
               <span
                 className={twMerge(
-                  "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full text-white transition-all",
+                  "mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full text-on-surface transition-all",
                   selected ? "bg-primary opacity-100" : "opacity-0",
                 )}
               >
@@ -414,7 +414,7 @@ function ModeToggle({ mode, onChange }: { mode: SearchMode; onChange: (mode: Sea
             "rounded-[3px] px-3 py-1.5 text-[12px] font-medium capitalize transition-all",
             EASE,
             mode === m
-              ? "bg-white/10 text-base-fg shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+              ? "bg-on-surface/10 text-base-fg shadow-[inset_0_1px_0_color-mix(in_oklab,var(--md-sys-color-on-surface)_6%,transparent)]"
               : "text-base-fg/50 hover:text-base-fg/80",
           )}
         >
@@ -448,7 +448,7 @@ function NameSearchField({ value, onChange }: { value: string; onChange: (v: str
           onClick={() => onChange("")}
           aria-label="Clear search"
           className={twMerge(
-            "mr-1.5 grid h-7 w-7 shrink-0 place-items-center rounded-[3px] text-base-fg/40 transition-all hover:bg-white/10 hover:text-base-fg active:scale-90",
+            "mr-1.5 grid h-7 w-7 shrink-0 place-items-center rounded-[3px] text-base-fg/40 transition-all hover:bg-on-surface/10 hover:text-base-fg active:scale-90",
             EASE,
           )}
         >
@@ -497,7 +497,7 @@ function KeySearchField({
           onClick={onClear}
           aria-label="Clear key filter"
           className={twMerge(
-            "mr-1.5 grid h-7 w-7 shrink-0 place-items-center rounded-[3px] text-base-fg/40 transition-all hover:bg-white/10 hover:text-base-fg active:scale-90",
+            "mr-1.5 grid h-7 w-7 shrink-0 place-items-center rounded-[3px] text-base-fg/40 transition-all hover:bg-on-surface/10 hover:text-base-fg active:scale-90",
             EASE,
           )}
         >
@@ -532,7 +532,7 @@ function CollapsibleSurface({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-none bg-white/[0.04] ring-1 ring-white/15">
+    <div className="rounded-none bg-on-surface/[0.04] ring-1 ring-outline-variant">
       <div className="overflow-hidden rounded-[3px] bg-ui-modal/40">
         {/* The toggle and the (destructive) section reset are sibling buttons —
             a nested button is invalid HTML and a mis-click on "reset" must
@@ -546,7 +546,7 @@ function CollapsibleSurface({
             className={twMerge(
               "flex min-w-0 grow items-center gap-3 py-3 pl-4 text-left transition-colors",
               EASE,
-              locked ? "cursor-default" : "hover:bg-white/[0.03]",
+              locked ? "cursor-default" : "hover:bg-on-surface/[0.03]",
             )}
           >
             <ChevronIcon
@@ -572,7 +572,7 @@ function CollapsibleSurface({
               onConfirm={onReset}
             />
           )}
-          <span className="shrink-0 rounded-[3px] bg-white/[0.06] px-2 py-0.5 text-xs tabular-nums text-base-fg/55">
+          <span className="shrink-0 rounded-[3px] bg-on-surface/[0.06] px-2 py-0.5 text-xs tabular-nums text-base-fg/55">
             {count}
           </span>
         </div>
@@ -668,11 +668,11 @@ function ConfirmResetButton({
         prominent ? "h-9 px-4 text-[13px]" : "h-7 px-2.5 text-[12px]",
         armed
           ? ready
-            ? "bg-red/25 text-white shadow-[0_0_0_3px_rgba(0,0,0,0.15)]"
-            : "cursor-wait bg-white/[0.06] text-base-fg/55 ring-1 ring-white/15"
+            ? "bg-error/25 text-on-surface shadow-[0_0_0_3px_color-mix(in_oklab,var(--md-sys-color-shadow)_15%,transparent)]"
+            : "cursor-wait bg-on-surface/[0.06] text-base-fg/55 ring-1 ring-outline-variant"
           : prominent
-            ? "bg-red/10 text-red ring-1 ring-red/30 hover:bg-red/[0.18]"
-            : "text-base-fg/45 hover:bg-red/10 hover:text-red",
+            ? "bg-error/10 text-error ring-1 ring-error/30 hover:bg-error/[0.18]"
+            : "text-base-fg/45 hover:bg-error/10 hover:text-error",
       )}
     >
       {/* Timer made visible: lockout charges toward armed, then the armed red
@@ -680,9 +680,9 @@ function ConfirmResetButton({
           fresh transition. */}
       {armed &&
         (ready ? (
-          <TimedFill key="drain" from={1} to={0} durationMs={DISARM_MS} className="bg-red" />
+          <TimedFill key="drain" from={1} to={0} durationMs={DISARM_MS} className="bg-error" />
         ) : (
-          <TimedFill key="charge" from={0} to={1} durationMs={confirmDelayMs} className="bg-red/40" />
+          <TimedFill key="charge" from={0} to={1} durationMs={confirmDelayMs} className="bg-error/40" />
         ))}
       <span className="relative">{armed ? confirmLabel : idleLabel}</span>
     </button>
@@ -749,7 +749,7 @@ function ActionRow({
       className={twMerge(
         "group/row flex items-center gap-3 rounded-[3px] px-3 py-2 transition-colors",
         EASE,
-        "hover:bg-white/[0.03]",
+        "hover:bg-on-surface/[0.03]",
       )}
     >
       <span
@@ -777,7 +777,7 @@ function ActionRow({
           title="Revert to preset default"
           aria-label="Revert to preset default"
           className={twMerge(
-            "grid h-7 w-7 shrink-0 place-items-center rounded-[3px] text-base-fg/40 transition-all hover:bg-white/10 hover:text-base-fg active:scale-90",
+            "grid h-7 w-7 shrink-0 place-items-center rounded-[3px] text-base-fg/40 transition-all hover:bg-on-surface/10 hover:text-base-fg active:scale-90",
             EASE,
           )}
         >
@@ -799,7 +799,10 @@ function ConflictAlert({
   onCancel: () => void;
 }) {
   return (
-    <div role="alert" className="flex flex-col gap-2.5 rounded-none bg-red/[0.08] p-3.5 text-[13px] ring-1 ring-red/30">
+    <div
+      role="alert"
+      className="flex flex-col gap-2.5 rounded-none bg-error/[0.08] p-3.5 text-[13px] ring-1 ring-error/30"
+    >
       <span className="leading-relaxed text-base-fg/80">
         <KbdBindings bindings={[pending.binding]} /> is already used by{" "}
         <strong className="font-medium text-base-fg">{pending.conflicts.map(c => ACTIONS[c]?.label).join(", ")}</strong>
@@ -810,7 +813,7 @@ function ConflictAlert({
           type="button"
           onClick={onConfirm}
           className={twMerge(
-            "rounded-[3px] bg-red px-4 py-1.5 text-[13px] font-medium text-white transition-all hover:bg-red/85 active:scale-[0.97]",
+            "rounded-[3px] bg-error px-4 py-1.5 text-[13px] font-medium text-on-surface transition-all hover:bg-error/85 active:scale-[0.97]",
             EASE,
           )}
         >
@@ -820,7 +823,7 @@ function ConflictAlert({
           type="button"
           onClick={onCancel}
           className={twMerge(
-            "rounded-[3px] bg-white/[0.06] px-4 py-1.5 text-[13px] text-base-fg/80 transition-all hover:bg-white/10 active:scale-[0.97]",
+            "rounded-[3px] bg-on-surface/[0.06] px-4 py-1.5 text-[13px] text-base-fg/80 transition-all hover:bg-on-surface/10 active:scale-[0.97]",
             EASE,
           )}
         >
@@ -833,7 +836,7 @@ function ConflictAlert({
 
 function EmptyState({ mode, query, binding }: { mode: SearchMode; query: string; binding: Binding | null }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-none bg-white/[0.06] px-6 py-12 text-center ring-1 ring-white/15">
+    <div className="flex flex-col items-center gap-3 rounded-none bg-on-surface/[0.06] px-6 py-12 text-center ring-1 ring-outline-variant">
       {mode === "key" ? (
         <KeyIcon className="h-6 w-6 text-base-fg/25" />
       ) : (

@@ -106,8 +106,8 @@ export const UploadEntryCard = ({
   return (
     <div
       className={twMerge(
-        "relative flex h-full flex-col items-center justify-center gap-6 overflow-hidden rounded-[3px] border border-dashed border-white/15 bg-ui-background p-8 text-center transition-colors hover:border-white/40",
-        isDragActive && "border-white bg-white/10 hover:border-white",
+        "relative flex h-full flex-col items-center justify-center gap-6 overflow-hidden rounded-[3px] border border-dashed border-outline-variant bg-ui-background p-8 text-center transition-colors hover:border-outline",
+        isDragActive && "border-outline bg-on-surface/10 hover:border-outline",
         disabled && "pointer-events-none opacity-60",
       )}
       onDragEnter={handleDragEnter}
@@ -132,13 +132,11 @@ export const UploadEntryCard = ({
             accentBorderClass,
           )}
         >
-          <DynamicIcon icon={icon} className="text-xl text-white" />
+          <DynamicIcon icon={icon} className="text-xl text-on-surface" />
         </div>
         <div>
           <h3 className="text-lg font-semibold text-base-fg">{title}</h3>
-          <p className="mx-auto mt-1 max-w-md text-sm text-base-fg/60">
-            {description}
-          </p>
+          <p className="mx-auto mt-1 max-w-md text-sm text-base-fg/60">{description}</p>
         </div>
         <div className="mt-2 flex flex-wrap justify-center gap-2">
           <Button

@@ -9,7 +9,7 @@ export function Kbd({ binding }: { binding: Binding }) {
       {formatBindingTokens(binding).map((token, i) => (
         <kbd
           key={i}
-          className="inline-flex min-w-[1.4em] items-center justify-center rounded border border-white/15 bg-white/10 px-1.5 py-0.5 text-[11px] font-medium leading-none text-base-fg/90"
+          className="inline-flex min-w-[1.4em] items-center justify-center rounded border border-outline-variant bg-on-surface/10 px-1.5 py-0.5 text-[11px] font-medium leading-none text-base-fg/90"
         >
           {token}
         </kbd>

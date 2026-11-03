@@ -114,7 +114,7 @@ const SkeletonGrid = ({ columns }: { columns: number }) => {
     <div className="space-y-6 p-4 animate-in fade-in duration-200">
       {/* Fake date heading */}
       <div>
-        <div className="h-4 w-24 bg-white/[0.06] mb-3" />
+        <div className="h-4 w-24 bg-on-surface/[0.06] mb-3" />
         <div
           className={twMerge("grid", gapClass)}
           style={{
@@ -124,7 +124,7 @@ const SkeletonGrid = ({ columns }: { columns: number }) => {
           {Array.from({ length: SKELETON_COUNT }).map((_, i) => (
             <div key={i} className="aspect-square overflow-hidden">
               <div
-                className="h-full w-full bg-white/[0.06]"
+                className="h-full w-full bg-on-surface/[0.06]"
                 style={{
                   animation: `pulse 1.8s ease-in-out ${i * 0.07}s infinite`,
                 }}
@@ -383,7 +383,7 @@ function TagCloudView({ tags, onOpen }: { tags: TagDetails[]; onOpen: (tagToken:
             title={`${tag.use_count} file${tag.use_count === 1 ? "" : "s"}`}
             style={{ fontSize: `${Math.round(15 + weight * 33)}px` }}
             className={twMerge(
-              "max-w-full truncate leading-none transition-all duration-200 hover:scale-110 hover:text-violet-400",
+              "max-w-full truncate leading-none transition-all duration-200 hover:scale-110 hover:text-tertiary",
               hashString(tag.tag_token) % 2 === 0 ? "hover:rotate-2" : "hover:-rotate-2",
               weight > 0.66
                 ? "font-bold text-base-fg"
@@ -408,12 +408,12 @@ const BulkThumb = ({ thumbnail, placeholderIcon }: { thumbnail: string | null; p
   const showImage = !!thumbnail && !failed;
 
   return (
-    <div className="h-8 w-8 overflow-hidden border-2 border-ui-panel bg-black/30 flex-shrink-0">
+    <div className="h-8 w-8 overflow-hidden border-2 border-ui-panel bg-scrim/30 flex-shrink-0">
       {showImage ? (
         <img src={thumbnail} alt="" className="h-full w-full object-cover" onError={() => setFailed(true)} />
       ) : (
-        <div className="h-full w-full flex items-center justify-center bg-black/50">
-          <DynamicIcon icon={placeholderIcon} className="text-xs text-white/50" />
+        <div className="h-full w-full flex items-center justify-center bg-scrim/50">
+          <DynamicIcon icon={placeholderIcon} className="text-xs text-on-surface/50" />
         </div>
       )}
     </div>
@@ -456,7 +456,7 @@ const FolderContextMenuItems = ({
       className="flex w-full items-center gap-2 rounded-[3px] px-2 py-2 hover:bg-ui-controls/60 text-sm text-base-fg"
       onClick={() => onToggleStar(folderId, !hasStar)}
     >
-      <StarIcon className={twMerge("w-4", hasStar ? "text-amber-400" : "text-base-fg/40")} />
+      <StarIcon className={twMerge("w-4", hasStar ? "text-warning" : "text-base-fg/40")} />
       <span>{hasStar ? "Unstar" : "Star"}</span>
     </button>
     <FolderColorRow colorCode={colorCode} onSetColor={c => onSetColor(folderId, c)} />
@@ -479,7 +479,7 @@ const FolderContextMenuItems = ({
     </button>
     <button
       type="button"
-      className="flex w-full items-center gap-2 rounded-[3px] px-2 py-2 hover:bg-ui-controls/60 text-sm text-red"
+      className="flex w-full items-center gap-2 rounded-[3px] px-2 py-2 hover:bg-ui-controls/60 text-sm text-error"
       onClick={() => onDelete(folderId)}
     >
       <Trash2Icon className="w-4" />
@@ -1456,14 +1456,14 @@ export const GalleryModal = React.memo(
         reminderType: "default",
         title: `Delete ${count} item${count > 1 ? "s" : ""}?`,
         message: (
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-on-surface/70">
             This will permanently remove {count} item{count > 1 ? "s" : ""} from your library. This action cannot be
             undone.
           </p>
         ),
         primaryActionText: "Delete",
         secondaryActionText: "Cancel",
-        primaryActionBtnClassName: "bg-red text-white hover:bg-red/90",
+        primaryActionBtnClassName: "bg-error text-on-surface hover:bg-error/90",
         onPrimaryAction: async () => {
           try {
             const ids = Array.from(bulkSelectedIds);
@@ -1838,7 +1838,7 @@ export const GalleryModal = React.memo(
           reminderType: "default",
           title: `Delete "${folder.name}"?`,
           message: (
-            <p className="text-sm text-white/70">
+            <p className="text-sm text-on-surface/70">
               {hasSubfolders
                 ? "This folder will be deleted and its subfolders moved to the top level. "
                 : "This folder will be deleted. "}
@@ -1847,7 +1847,7 @@ export const GalleryModal = React.memo(
           ),
           primaryActionText: "Delete",
           secondaryActionText: "Cancel",
-          primaryActionBtnClassName: "bg-red text-white hover:bg-red/90",
+          primaryActionBtnClassName: "bg-error text-on-surface hover:bg-error/90",
           onPrimaryAction: async () => {
             // Optimistic: drop this folder and reparent its direct children to
             // root (mirrors the server orphaning them), and forget its media cache.
@@ -2333,7 +2333,7 @@ export const GalleryModal = React.memo(
                         Tags
                       </button>
                       <span className="text-base-fg/30">/</span>
-                      <TagIcon className="text-sm text-violet-400" />
+                      <TagIcon className="text-sm text-tertiary" />
                       <h2 className="text-lg font-semibold truncate max-w-[16rem]">{activeTag.tag_value}</h2>
                       <span className="text-base-fg/40 text-sm">
                         {activeTag.use_count} file
@@ -2351,7 +2351,7 @@ export const GalleryModal = React.memo(
                   ) : tagBrowserOpen ? (
                     /* ── All-tags browser header ── */
                     <div className="flex items-center gap-2 relative z-[51]">
-                      <TagIcon className="text-sm text-violet-400" />
+                      <TagIcon className="text-sm text-tertiary" />
                       <h2 className="text-lg font-semibold">Tags</h2>
                       <button
                         type="button"
@@ -2639,7 +2639,7 @@ export const GalleryModal = React.memo(
                             style={folder.colorCode ? { color: folder.colorCode } : undefined}
                           />
                           <span className="truncate">{folder.name}</span>
-                          {folder.hasStar && <StarIcon className="ml-auto text-[10px] text-amber-400" />}
+                          {folder.hasStar && <StarIcon className="ml-auto text-[10px] text-warning" />}
                         </button>
                       ))
                     )}
@@ -2666,7 +2666,7 @@ export const GalleryModal = React.memo(
                                 : "text-base-fg/70 hover:bg-ui-controls/30 hover:text-base-fg",
                             )}
                           >
-                            <TagIcon className="text-xs w-4 text-violet-400" />
+                            <TagIcon className="text-xs w-4 text-tertiary" />
                             <span className="truncate">{tag.tag_value}</span>
                             <span className="ml-auto text-[10px] text-base-fg/40">{tag.use_count}</span>
                           </button>
@@ -2708,8 +2708,8 @@ export const GalleryModal = React.memo(
                     </div>
                   ) : activeTagItems.length === 0 ? (
                     <div className="flex h-full flex-col items-center justify-center gap-3">
-                      <div className="flex h-16 w-16 items-center justify-center bg-violet-400/10">
-                        <TagIcon className="text-violet-400 text-2xl" />
+                      <div className="flex h-16 w-16 items-center justify-center bg-tertiary/10">
+                        <TagIcon className="text-tertiary text-2xl" />
                       </div>
                       <div className="text-base-fg font-semibold">No files carry this tag</div>
                       <div className="text-base-fg/40 text-sm text-center max-w-[16rem]">
@@ -2782,8 +2782,8 @@ export const GalleryModal = React.memo(
                   /* ── All-tags word cloud ── */
                   userTags.length === 0 ? (
                     <div className="flex h-full flex-col items-center justify-center gap-3">
-                      <div className="flex h-16 w-16 items-center justify-center bg-violet-400/10">
-                        <TagIcon className="text-violet-400 text-2xl" />
+                      <div className="flex h-16 w-16 items-center justify-center bg-tertiary/10">
+                        <TagIcon className="text-tertiary text-2xl" />
                       </div>
                       <div className="text-base-fg font-semibold">No tags yet</div>
                       <div className="text-base-fg/40 text-sm text-center max-w-[16rem]">
@@ -2920,14 +2920,14 @@ export const GalleryModal = React.memo(
                           <div className="text-base-fg/60">Log in to browse and use your library.</div>
                           {onLoginClick ? (
                             <button
-                              className="rounded-[3px] bg-primary px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                              className="rounded-[3px] bg-primary px-5 py-2 text-sm font-semibold text-on-surface transition-colors hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
                               onClick={() => onLoginClick()}
                             >
                               Log in
                             </button>
                           ) : (
                             <button
-                              className="text-xs text-blue-400 underline hover:text-blue-300"
+                              className="text-xs text-primary underline hover:text-primary"
                               onClick={() => {
                                 setUsernameError(false);
                                 setUsernameRetryCount(c => c + 1);
@@ -2945,13 +2945,13 @@ export const GalleryModal = React.memo(
                           <div className="text-xs text-base-fg/40 font-mono break-all">{itemsLoadError}</div>
                           <div className="flex gap-3">
                             <button
-                              className="text-xs text-blue-400 hover:text-blue-300 underline"
+                              className="text-xs text-primary hover:text-primary underline"
                               onClick={() => navigator.clipboard?.writeText(itemsLoadError!)}
                             >
                               Copy error
                             </button>
                             <button
-                              className="text-xs text-blue-400 hover:text-blue-300 underline"
+                              className="text-xs text-primary hover:text-primary underline"
                               onClick={() => refreshGallery()}
                             >
                               Retry
@@ -3082,8 +3082,10 @@ export const GalleryModal = React.memo(
                     })}
                   </div>
                   {bulkSelectedItems.length > 4 && (
-                    <div className="h-8 w-8 overflow-hidden border-2 border-ui-panel bg-black/20 flex-shrink-0 flex items-center justify-center">
-                      <span className="text-[11px] font-normal text-white/70">+{bulkSelectedItems.length - 4}</span>
+                    <div className="h-8 w-8 overflow-hidden border-2 border-ui-panel bg-scrim/20 flex-shrink-0 flex items-center justify-center">
+                      <span className="text-[11px] font-normal text-on-surface/70">
+                        +{bulkSelectedItems.length - 4}
+                      </span>
                     </div>
                   )}
                   <span className="ms-2.5 text-sm font-medium text-base-fg/80">{bulkSelectedIds.size} selected</span>

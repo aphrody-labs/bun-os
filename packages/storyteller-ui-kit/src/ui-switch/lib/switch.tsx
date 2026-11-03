@@ -28,7 +28,7 @@ export function Switch({
           id={id}
           className={clsx(
             "group inline-flex h-6 w-11 items-center rounded-[3px] border transition-colors",
-            checked ? "border-white bg-white" : (offClassName ?? "border-ui-controls-border bg-transparent"),
+            checked ? "border-outline bg-on-surface" : (offClassName ?? "border-ui-controls-border bg-transparent"),
             disabled && "cursor-not-allowed opacity-50",
             className,
           )}
@@ -37,7 +37,7 @@ export function Switch({
           <span
             className={clsx(
               "size-4 rounded-[2px] transition",
-              checked ? "translate-x-[22px] bg-black" : "translate-x-1 bg-white/70",
+              checked ? "translate-x-[22px] bg-scrim" : "translate-x-1 bg-on-surface/70",
             )}
           />
         </button>

@@ -320,15 +320,15 @@ function RichListRow({ item, onClick, active = false, rightNode }: RichListRowPr
       }}
       className={twMerge(
         "group flex cursor-pointer items-center gap-3 rounded-[3px] px-2 py-2 transition-colors",
-        item.selected ? "bg-white/10" : "hover:bg-white/5",
-        !item.selected && active ? "bg-white/5" : "",
+        item.selected ? "bg-on-surface/10" : "hover:bg-on-surface/5",
+        !item.selected && active ? "bg-on-surface/5" : "",
         item.disabled ? "!cursor-not-allowed opacity-50" : "",
       )}
     >
       <span
         className={twMerge(
           "flex h-9 w-9 shrink-0 items-center justify-center rounded-none border text-base-fg/80 transition-colors",
-          item.selected ? "border-white bg-white/10" : "border-ui-controls-border bg-white/5",
+          item.selected ? "border-outline bg-on-surface/10" : "border-ui-controls-border bg-on-surface/5",
         )}
       >
         {item.icon}
@@ -360,7 +360,7 @@ function RichListRow({ item, onClick, active = false, rightNode }: RichListRowPr
         (item.selected &&
           (item.selectedRight ?? (
             <span className="ml-1 flex h-5 w-5 shrink-0 items-center justify-center">
-              <CheckIcon aria-hidden="true" className="h-4 w-4 text-white" strokeWidth={2.5} />
+              <CheckIcon aria-hidden="true" className="h-4 w-4 text-on-surface" strokeWidth={2.5} />
             </span>
           )))}
     </div>
@@ -786,7 +786,7 @@ export const PopoverMenu = ({
 
   const className = twMerge(
     "text-sm font-medium rounded-[3px] px-2.5 py-1.5",
-    "flex gap-2 items-center justify-center focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white/60",
+    "flex gap-2 items-center justify-center focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-outline",
     "transition-colors duration-150",
     "bg-ui-controls px-3 text-base-fg border border-ui-controls-border",
     NEUTRAL_BUTTON_HOVER_CLASSES,
@@ -1058,7 +1058,7 @@ export const PopoverMenu = ({
                                       rightNode={<ChevronRightIcon className="ml-1 shrink-0 text-xs text-base-fg/50" />}
                                     />
                                   </SubmenuFlyout>
-                                  {item.divider && <div className="my-1 border-t border-white/10" />}
+                                  {item.divider && <div className="my-1 border-t border-outline-variant" />}
                                 </div>
                               );
                             }
@@ -1092,7 +1092,7 @@ export const PopoverMenu = ({
                                 ) : (
                                   itemRow
                                 )}
-                                {item.divider && <div className="my-1 border-t border-white/10" />}
+                                {item.divider && <div className="my-1 border-t border-outline-variant" />}
                               </div>
                             );
                           })}
@@ -1145,8 +1145,10 @@ export const PopoverMenu = ({
                                 }}
                                 className={twMerge(
                                   "group flex cursor-pointer items-start gap-2 rounded-[3px] px-2 py-2 transition-all",
-                                  item.selected ? "bg-white/10 border-l-2 border-white" : "hover:bg-white/5",
-                                  !item.selected && openTooltipIdx === index ? "bg-white/5" : "",
+                                  item.selected
+                                    ? "bg-on-surface/10 border-l-2 border-outline"
+                                    : "hover:bg-on-surface/5",
+                                  !item.selected && openTooltipIdx === index ? "bg-on-surface/5" : "",
                                   item.disabled ? "!cursor-not-allowed opacity-50" : "",
                                 )}
                                 style={{ minHeight: 48 }}
@@ -1190,7 +1192,7 @@ export const PopoverMenu = ({
 
                                   {item.selected &&
                                     (item.selectedRight ?? (
-                                      <span className="text-white text-xl flex items-center justify-center mr-1">
+                                      <span className="text-on-surface text-xl flex items-center justify-center mr-1">
                                         <CheckIcon aria-hidden="true" className="h-4 w-4 shrink-0" strokeWidth={2.5} />
                                       </span>
                                     ))}
@@ -1229,7 +1231,7 @@ export const PopoverMenu = ({
                                 ) : (
                                   itemRow
                                 )}
-                                {item.divider && <div className="my-1 border-t border-white/10" />}
+                                {item.divider && <div className="my-1 border-t border-outline-variant" />}
                               </div>
                             );
                           })}
@@ -1245,8 +1247,8 @@ export const PopoverMenu = ({
                             className={twMerge(
                               "w-full mb-0.5 mt-2 border-none py-1",
                               disableAddButton
-                                ? "cursor-not-allowed bg-[#7B7B84]/50 opacity-50"
-                                : "bg-[#7B7B84] hover:bg-[#8c8c96]",
+                                ? "cursor-not-allowed bg-surface-container-highest opacity-50"
+                                : "bg-surface-container-highest hover:bg-surface-bright",
                             )}
                             onClick={onAdd}
                             disabled={disableAddButton}
@@ -1278,8 +1280,8 @@ export const PopoverMenu = ({
                                   className={twMerge(
                                     "flex w-full items-center shadow-none justify-between px-1.5",
                                     "font-sans text-sm font-medium normal-case tracking-normal",
-                                    "bg-transparent hover:bg-white/5",
-                                    openTooltipIdx === index ? "bg-white/5" : "",
+                                    "bg-transparent hover:bg-on-surface/5",
+                                    openTooltipIdx === index ? "bg-on-surface/5" : "",
                                     mode === "toggle" && item.selected ? "hover:bg-ui-controls/80" : "",
                                     item.disabled ? "!cursor-not-allowed opacity-50" : "",
                                     "border-0",
@@ -1313,7 +1315,7 @@ export const PopoverMenu = ({
                                       {item.selected && (
                                         <CheckIcon
                                           aria-hidden="true"
-                                          className="h-4 w-4 text-white"
+                                          className="h-4 w-4 text-on-surface"
                                           strokeWidth={2.5}
                                         />
                                       )}
@@ -1326,7 +1328,7 @@ export const PopoverMenu = ({
                                 className={twMerge(
                                   "flex w-full items-center shadow-none justify-between px-1.5",
                                   "font-sans text-sm font-medium normal-case tracking-normal",
-                                  "bg-transparent hover:bg-white/5",
+                                  "bg-transparent hover:bg-on-surface/5",
                                   mode === "toggle" && item.selected ? "hover:bg-ui-controls/80" : "",
                                   item.disabled ? "!cursor-not-allowed opacity-50" : "",
                                   "border-0",
@@ -1356,13 +1358,17 @@ export const PopoverMenu = ({
                                 {mode === "toggle" && (
                                   <span className="ml-2 flex h-5 w-5 shrink-0 items-center justify-center">
                                     {item.selected && (
-                                      <CheckIcon aria-hidden="true" className="h-4 w-4 text-white" strokeWidth={2.5} />
+                                      <CheckIcon
+                                        aria-hidden="true"
+                                        className="h-4 w-4 text-on-surface"
+                                        strokeWidth={2.5}
+                                      />
                                     )}
                                   </span>
                                 )}
                               </Button>
                             )}
-                            {item.divider && <div className="my-1 border-t border-white/10" />}
+                            {item.divider && <div className="my-1 border-t border-outline-variant" />}
                           </div>
                         ))}
                         {showAddButton && onAdd && (

@@ -295,7 +295,7 @@ const glbLoader = ({
       // data.scene.children mid-loop and would skip every other child.
       const addedRoots: THREE.Object3D[] = [];
       [...data.scene.children].forEach(child => {
-        child.userData["color"] = "#FFFFFF";
+        child.userData["color"] = "#FFFFFF"; // design:content: neutral material tint of the imported model
         scene.add(child);
         addedRoots.push(child);
       });

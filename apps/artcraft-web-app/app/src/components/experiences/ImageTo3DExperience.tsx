@@ -31,10 +31,7 @@ import {
   useSelectedModel,
   useSelectedProviderForModel,
 } from "@storyteller/ui-model-selector";
-import {
-  CostCalculatorButton,
-  useCostBreakdownModalStore,
-} from "@storyteller/ui-pricing-modal";
+import { CostCalculatorButton, useCostBreakdownModalStore } from "@storyteller/ui-pricing-modal";
 import { HelpMenuButton } from "@storyteller/ui-help-menu";
 import { CreateEmptyState } from "~/components/generation-feed/CreateEmptyState";
 
@@ -69,36 +66,21 @@ const formatTime = (timestamp: number) => {
 };
 
 const generateId = () =>
-  typeof crypto !== "undefined" && crypto.randomUUID
-    ? crypto.randomUUID()
-    : Math.random().toString(36).slice(2, 10);
+  typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2, 10);
 
 const WORLD_MODEL_PAGE = ModelPage.ImageTo3DWorld;
 const OBJECT_MODEL_PAGE = ModelPage.ImageTo3DObject;
 const DEFAULT_OBJECT_MODEL_ID = EnqueueImageTo3dObjectModel.Hunyuan3d3;
 
-export const ImageTo3DExperience = ({
-  title,
-  subtitle,
-  variant,
-  backgroundImage,
-}: ImageTo3DExperienceProps) => {
+export const ImageTo3DExperience = ({ title, subtitle, variant, backgroundImage }: ImageTo3DExperienceProps) => {
   const [activeMode, setActiveMode] = useState<Mode>("image");
   const selectedWorldModel = useSelectedModel(WORLD_MODEL_PAGE);
-  const selectedWorldProvider = useSelectedProviderForModel(
-    WORLD_MODEL_PAGE,
-    selectedWorldModel?.id,
-  );
+  const selectedWorldProvider = useSelectedProviderForModel(WORLD_MODEL_PAGE, selectedWorldModel?.id);
   const selectedObjectModel = useSelectedModel(OBJECT_MODEL_PAGE);
   const selectedObjectModelId =
-    (selectedObjectModel?.id as EnqueueImageTo3dObjectModel | undefined) ??
-    DEFAULT_OBJECT_MODEL_ID;
-  const worldCredits = useCostBreakdownModalStore(
-    (s) => s.estimatedCreditsByPage[WORLD_MODEL_PAGE],
-  );
-  const objectCredits = useCostBreakdownModalStore(
-    (s) => s.estimatedCreditsByPage[OBJECT_MODEL_PAGE],
-  );
+    (selectedObjectModel?.id as EnqueueImageTo3dObjectModel | undefined) ?? DEFAULT_OBJECT_MODEL_ID;
+  const worldCredits = useCostBreakdownModalStore(s => s.estimatedCreditsByPage[WORLD_MODEL_PAGE]);
+  const objectCredits = useCostBreakdownModalStore(s => s.estimatedCreditsByPage[OBJECT_MODEL_PAGE]);
   const [uploadedPreview, setUploadedPreview] = useState<string | null>(null);
   const [uploadedName, setUploadedName] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
@@ -116,46 +98,34 @@ export const ImageTo3DExperience = ({
   const [selectedResultId, setSelectedResultId] = useState<string | null>(null);
   const promptContentRef = useRef<HTMLDivElement>(null);
   const [promptHeight, setPromptHeight] = useState<number>(400);
-  const [vh, setVh] = useState<number>(
-    typeof window !== "undefined" ? window.innerHeight : 800,
-  );
+  const [vh, setVh] = useState<number>(typeof window !== "undefined" ? window.innerHeight : 800);
 
-  const objectResults = useImageTo3DStore((s) => s.results);
-  const objectStartGeneration = useImageTo3DStore((s) => s.startGeneration);
-  const objectFailGeneration = useImageTo3DStore((s) => s.failGeneration);
-  const objectReset = useImageTo3DStore((s) => s.reset);
+  const objectResults = useImageTo3DStore(s => s.results);
+  const objectStartGeneration = useImageTo3DStore(s => s.startGeneration);
+  const objectFailGeneration = useImageTo3DStore(s => s.failGeneration);
+  const objectReset = useImageTo3DStore(s => s.reset);
 
-  const worldResults = useImageTo3DWorldStore((s) => s.results);
-  const worldStartGeneration = useImageTo3DWorldStore((s) => s.startGeneration);
-  const worldFailGeneration = useImageTo3DWorldStore((s) => s.failGeneration);
-  const worldReset = useImageTo3DWorldStore((s) => s.reset);
-  const pendingExternalImage = useImageTo3DWorldStore(
-    (s) => s.pendingExternalImage,
-  );
-  const clearPendingExternalImage = useImageTo3DWorldStore(
-    (s) => s.clearPendingExternalImage,
-  );
-  const pendingObjectImage = useImageTo3DStore((s) => s.pendingExternalImage);
-  const clearPendingObjectImage = useImageTo3DStore(
-    (s) => s.clearPendingExternalImage,
-  );
+  const worldResults = useImageTo3DWorldStore(s => s.results);
+  const worldStartGeneration = useImageTo3DWorldStore(s => s.startGeneration);
+  const worldFailGeneration = useImageTo3DWorldStore(s => s.failGeneration);
+  const worldReset = useImageTo3DWorldStore(s => s.reset);
+  const pendingExternalImage = useImageTo3DWorldStore(s => s.pendingExternalImage);
+  const clearPendingExternalImage = useImageTo3DWorldStore(s => s.clearPendingExternalImage);
+  const pendingObjectImage = useImageTo3DStore(s => s.pendingExternalImage);
+  const clearPendingObjectImage = useImageTo3DStore(s => s.clearPendingExternalImage);
 
   const results = variant === "object" ? objectResults : worldResults;
   const resetResults = variant === "object" ? objectReset : worldReset;
-  const [uploadedMediaToken, setUploadedMediaToken] = useState<string | null>(
-    null,
-  );
+  const [uploadedMediaToken, setUploadedMediaToken] = useState<string | null>(null);
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
-  const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>(
-    [],
-  );
+  const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>([]);
 
   useEffect(() => {
     // Read from store directly to avoid Strict Mode double-execution adding the image twice
     if (variant === "world") {
       const pending = useImageTo3DWorldStore.getState().pendingExternalImage;
       if (pending) {
-        setWorldImages((prev) => {
+        setWorldImages(prev => {
           if (prev.length >= MAX_WORLD_IMAGES) return prev;
           return [
             ...prev,
@@ -179,13 +149,7 @@ export const ImageTo3DExperience = ({
         clearPendingObjectImage();
       }
     }
-  }, [
-    variant,
-    pendingExternalImage,
-    clearPendingExternalImage,
-    pendingObjectImage,
-    clearPendingObjectImage,
-  ]);
+  }, [variant, pendingExternalImage, clearPendingExternalImage, pendingObjectImage, clearPendingObjectImage]);
 
   useEffect(() => {
     const onResize = () => setVh(window.innerHeight);
@@ -224,7 +188,7 @@ export const ImageTo3DExperience = ({
     setIsUploading(true);
 
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = e => {
       const dataUrl = e.target?.result as string;
       setUploadedPreview(dataUrl);
     };
@@ -272,21 +236,19 @@ export const ImageTo3DExperience = ({
 
   const handleWorldFiles = async (files: File[]) => {
     const remaining = MAX_WORLD_IMAGES - worldImages.length;
-    const imageFiles = files
-      .filter((f) => f.type.startsWith("image/"))
-      .slice(0, remaining);
+    const imageFiles = files.filter(f => f.type.startsWith("image/")).slice(0, remaining);
 
     await Promise.all(
-      imageFiles.map(async (file) => {
+      imageFiles.map(async file => {
         const imageId = generateId();
 
-        const preview = await new Promise<string>((resolve) => {
+        const preview = await new Promise<string>(resolve => {
           const reader = new FileReader();
-          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onload = e => resolve(e.target?.result as string);
           reader.readAsDataURL(file);
         });
 
-        setWorldImages((prev) => [
+        setWorldImages(prev => [
           ...prev,
           {
             id: imageId,
@@ -309,28 +271,26 @@ export const ImageTo3DExperience = ({
             throw new Error("Upload failed");
           }
 
-          setWorldImages((prev) =>
-            prev.map((img) =>
-              img.id === imageId
-                ? { ...img, mediaToken: uploadResult.data!, isUploading: false }
-                : img,
+          setWorldImages(prev =>
+            prev.map(img =>
+              img.id === imageId ? { ...img, mediaToken: uploadResult.data!, isUploading: false } : img,
             ),
           );
         } catch {
           toast.error(`Failed to upload ${file.name}`);
-          setWorldImages((prev) => prev.filter((img) => img.id !== imageId));
+          setWorldImages(prev => prev.filter(img => img.id !== imageId));
         }
       }),
     );
   };
 
   const removeWorldImage = (imageId: string) => {
-    setWorldImages((prev) => prev.filter((img) => img.id !== imageId));
+    setWorldImages(prev => prev.filter(img => img.id !== imageId));
   };
 
   const handleImageSelect = (id: string) => {
-    setSelectedGalleryImages((prev) => {
-      if (prev.includes(id)) return prev.filter((x) => x !== id);
+    setSelectedGalleryImages(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
       if (variant === "world") {
         const max = MAX_WORLD_IMAGES - worldImages.length;
         if (prev.length >= max) return prev;
@@ -345,15 +305,15 @@ export const ImageTo3DExperience = ({
       const remaining = MAX_WORLD_IMAGES - worldImages.length;
       const newImages: WorldImage[] = selectedItems
         .slice(0, remaining)
-        .filter((item) => item.fullImage)
-        .map((item) => ({
+        .filter(item => item.fullImage)
+        .map(item => ({
           id: generateId(),
           preview: item.fullImage!,
           mediaToken: item.id,
           name: item.label || "Library Image",
           isUploading: false,
         }));
-      setWorldImages((prev) => [...prev, ...newImages]);
+      setWorldImages(prev => [...prev, ...newImages]);
       setIsGalleryModalOpen(false);
       setSelectedGalleryImages([]);
       return;
@@ -379,9 +339,7 @@ export const ImageTo3DExperience = ({
     if (isGenerating) return;
 
     if (variant === "world") {
-      const readyTokens = worldImages
-        .filter((img) => img.mediaToken && !img.isUploading)
-        .map((img) => img.mediaToken!);
+      const readyTokens = worldImages.filter(img => img.mediaToken && !img.isUploading).map(img => img.mediaToken!);
       if (readyTokens.length === 0) return;
     } else {
       if (isUploading) return;
@@ -394,12 +352,8 @@ export const ImageTo3DExperience = ({
 
     try {
       if (variant === "world") {
-        const readyTokens = worldImages
-          .filter((img) => img.mediaToken && !img.isUploading)
-          .map((img) => img.mediaToken!);
-        const note =
-          worldPrompt.trim() ||
-          `${worldImages.length} image${worldImages.length !== 1 ? "s" : ""}`;
+        const readyTokens = worldImages.filter(img => img.mediaToken && !img.isUploading).map(img => img.mediaToken!);
+        const note = worldPrompt.trim() || `${worldImages.length} image${worldImages.length !== 1 ? "s" : ""}`;
         const firstPreview = worldImages[0]?.preview;
 
         worldStartGeneration("image", note, firstPreview, subscriberId);
@@ -407,9 +361,7 @@ export const ImageTo3DExperience = ({
 
         window.__storeTaskEnqueueMeta?.({
           prompt: worldPrompt.trim() || undefined,
-          refImageUrls: worldImages
-            .map((img) => img.preview)
-            .filter(Boolean) as string[],
+          refImageUrls: worldImages.map(img => img.preview).filter(Boolean) as string[],
           modelType:
             (selectedWorldModel as any)?.tauriId ||
             (SPLAT_MODELS[0] as any)?.tauriId ||
@@ -429,18 +381,9 @@ export const ImageTo3DExperience = ({
         const snapshotPrompt = prompt.trim();
         const snapshotPreview = uploadedPreview || undefined;
         const snapshotName = uploadedName;
-        const note =
-          activeMode === "text"
-            ? snapshotPrompt
-            : snapshotName || "Generated Model";
+        const note = activeMode === "text" ? snapshotPrompt : snapshotName || "Generated Model";
 
-        objectStartGeneration(
-          activeMode,
-          note,
-          snapshotPreview,
-          false,
-          subscriberId,
-        );
+        objectStartGeneration(activeMode, note, snapshotPreview, false, subscriberId);
         setSelectedResultId(subscriberId);
 
         window.__storeTaskEnqueueMeta?.({
@@ -452,10 +395,7 @@ export const ImageTo3DExperience = ({
 
         await GenerateMesh({
           prompt: snapshotPrompt || undefined,
-          reference_image_media_tokens:
-            activeMode === "image" && uploadedMediaToken
-              ? [uploadedMediaToken]
-              : undefined,
+          reference_image_media_tokens: activeMode === "image" && uploadedMediaToken ? [uploadedMediaToken] : undefined,
           model: selectedObjectModel?.tauriId ?? selectedObjectModelId,
           frontend_caller: "mini_app",
           frontend_subscriber_id: subscriberId,
@@ -466,10 +406,7 @@ export const ImageTo3DExperience = ({
         }
       }
     } catch (error) {
-      const errorMessage = commandErrorMessage(
-        error,
-        "An unexpected error occurred",
-      );
+      const errorMessage = commandErrorMessage(error, "An unexpected error occurred");
       toast.error(`Failed to generate 3D model: ${errorMessage}`);
       if (variant === "world") {
         worldFailGeneration(subscriberId);
@@ -484,7 +421,7 @@ export const ImageTo3DExperience = ({
   const canGenerate = useMemo(() => {
     if (isGenerating) return false;
     if (variant === "world") {
-      return worldImages.some((img) => img.mediaToken && !img.isUploading);
+      return worldImages.some(img => img.mediaToken && !img.isUploading);
     }
     if (isUploading) return false;
     if (activeMode === "image") {
@@ -494,15 +431,7 @@ export const ImageTo3DExperience = ({
       return prompt.trim().length > 3;
     }
     return true;
-  }, [
-    variant,
-    activeMode,
-    uploadedMediaToken,
-    prompt,
-    isGenerating,
-    isUploading,
-    worldImages,
-  ]);
+  }, [variant, activeMode, uploadedMediaToken, prompt, isGenerating, isUploading, worldImages]);
 
   const hasResults = results.length > 0;
   const showPromptAtBottom = hasResults;
@@ -514,9 +443,7 @@ export const ImageTo3DExperience = ({
   const centerTop = vh / 2 - promptHeight / 2 + 80;
   const bottomTop = vh - bottomOffsetPx;
 
-  const targetTop = showPromptAtBottom
-    ? Math.max(0, bottomTop)
-    : Math.max(0, centerTop);
+  const targetTop = showPromptAtBottom ? Math.max(0, bottomTop) : Math.max(0, centerTop);
 
   const promptAnim = useSpring({
     top: targetTop,
@@ -531,20 +458,10 @@ export const ImageTo3DExperience = ({
       zIndex={50}
       content={
         <div className="flex flex-col gap-1.5 text-left">
-          <Button
-            variant="primary"
-            icon={UploadIcon}
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full"
-          >
+          <Button variant="primary" icon={UploadIcon} onClick={() => fileInputRef.current?.click()} className="w-full">
             Upload image
           </Button>
-          <Button
-            variant="action"
-            icon={ImagesIcon}
-            onClick={handlePickFromLibrary}
-            className="w-full"
-          >
+          <Button variant="action" icon={ImagesIcon} onClick={handlePickFromLibrary} className="w-full">
             Pick from library
           </Button>
         </div>
@@ -554,20 +471,20 @@ export const ImageTo3DExperience = ({
         role="button"
         tabIndex={0}
         className={twMerge(
-          "flex flex-col items-center justify-center border border-dashed border-white/20 bg-white/[0.015] text-center text-xs transition-all hover:border-white/40 hover:bg-white/5 focus:border-white/60 focus:outline-none",
+          "flex flex-col items-center justify-center border border-dashed border-outline-variant bg-on-surface/[0.015] text-center text-xs transition-all hover:border-outline hover:bg-on-surface/5 focus:border-outline focus:outline-none",
           hasResults ? "aspect-square w-24" : "aspect-square w-48",
-          dragActive && "border-white/60 bg-white/5",
+          dragActive && "border-outline bg-on-surface/5",
         )}
-        onDragEnter={(event) => {
+        onDragEnter={event => {
           event.preventDefault();
           event.stopPropagation();
           setDragActive(true);
         }}
-        onDragOver={(event) => {
+        onDragOver={event => {
           event.preventDefault();
           event.stopPropagation();
         }}
-        onDragLeave={(event) => {
+        onDragLeave={event => {
           event.preventDefault();
           event.stopPropagation();
           if (!event.currentTarget.contains(event.relatedTarget as Node)) {
@@ -576,19 +493,14 @@ export const ImageTo3DExperience = ({
         }}
         onDrop={handleDrop}
         onClick={() => fileInputRef.current?.click()}
-        onKeyDown={(event) => {
+        onKeyDown={event => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
             fileInputRef.current?.click();
           }
         }}
       >
-        <PlusIcon
-          className={twMerge(
-            "text-base-fg opacity-80",
-            hasResults ? "text-2xl" : "text-4xl",
-          )}
-        />
+        <PlusIcon className={twMerge("text-base-fg opacity-80", hasResults ? "text-2xl" : "text-4xl")} />
         {!hasResults && (
           <span className="mt-3 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-base-fg/60">
             Add Image
@@ -603,7 +515,7 @@ export const ImageTo3DExperience = ({
       {uploadedPreview ? (
         <div
           className={twMerge(
-            "group relative cursor-pointer overflow-hidden border border-white/30 bg-black/30 transition-all hover:border-white/60",
+            "group relative cursor-pointer overflow-hidden border border-outline bg-scrim/30 transition-all hover:border-outline",
             hasResults ? "aspect-square w-24" : "aspect-square w-48",
           )}
           onClick={() => !isUploading && fileInputRef.current?.click()}
@@ -611,21 +523,18 @@ export const ImageTo3DExperience = ({
           <img
             src={uploadedPreview}
             alt="Reference"
-            className={twMerge(
-              "h-full w-full object-cover transition-opacity",
-              isUploading && "opacity-50",
-            )}
+            className={twMerge("h-full w-full object-cover transition-opacity", isUploading && "opacity-50")}
           />
           {isUploading && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-white/30 border-t-white" />
+              <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-outline-variant border-t-on-surface" />
             </div>
           )}
           {!isUploading && (
             <button
               type="button"
-              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-[3px] bg-black/60 text-white opacity-0 transition-all hover:bg-black group-hover:opacity-100"
-              onClick={(event) => {
+              className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-[3px] bg-scrim/60 text-on-surface opacity-0 transition-all hover:bg-scrim group-hover:opacity-100"
+              onClick={event => {
                 event.stopPropagation();
                 setUploadedPreview(null);
                 setUploadedName(null);
@@ -653,7 +562,7 @@ export const ImageTo3DExperience = ({
         className="text-md max-h-[5.5em] w-full resize-none overflow-y-auto rounded-[3px] bg-transparent pr-2 pt-1 text-base-fg placeholder-base-fg/60 focus:outline-none"
         value={prompt}
         placeholder="Describe any object you want to generate from scratch..."
-        onChange={(event) => setPrompt(event.target.value)}
+        onChange={event => setPrompt(event.target.value)}
       />
     </div>
   );
@@ -681,12 +590,7 @@ export const ImageTo3DExperience = ({
                   >
                     Upload images
                   </Button>
-                  <Button
-                    variant="action"
-                    icon={ImagesIcon}
-                    onClick={handlePickFromLibrary}
-                    className="w-full"
-                  >
+                  <Button variant="action" icon={ImagesIcon} onClick={handlePickFromLibrary} className="w-full">
                     Pick from library
                   </Button>
                 </div>
@@ -696,37 +600,32 @@ export const ImageTo3DExperience = ({
                 role="button"
                 tabIndex={0}
                 className={twMerge(
-                  "flex h-32 w-32 flex-col items-center justify-center border border-dashed border-white/20 bg-white/[0.015] transition-all hover:border-white/40 hover:bg-white/5 focus:border-white/60 focus:outline-none",
-                  dragActive && "border-white/60 bg-white/5",
+                  "flex h-32 w-32 flex-col items-center justify-center border border-dashed border-outline-variant bg-on-surface/[0.015] transition-all hover:border-outline hover:bg-on-surface/5 focus:border-outline focus:outline-none",
+                  dragActive && "border-outline bg-on-surface/5",
                 )}
-                onDragEnter={(e) => {
+                onDragEnter={e => {
                   e.preventDefault();
                   e.stopPropagation();
                   setDragActive(true);
                 }}
-                onDragOver={(e) => {
+                onDragOver={e => {
                   e.preventDefault();
                   e.stopPropagation();
                 }}
-                onDragLeave={(e) => {
+                onDragLeave={e => {
                   e.preventDefault();
                   e.stopPropagation();
-                  if (!e.currentTarget.contains(e.relatedTarget as Node))
-                    setDragActive(false);
+                  if (!e.currentTarget.contains(e.relatedTarget as Node)) setDragActive(false);
                 }}
-                onDrop={(e) => {
+                onDrop={e => {
                   e.preventDefault();
                   e.stopPropagation();
                   setDragActive(false);
                   if (e.dataTransfer?.files)
-                    handleWorldFiles(
-                      Array.from(e.dataTransfer.files).filter((f) =>
-                        f.type.startsWith("image/"),
-                      ),
-                    );
+                    handleWorldFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith("image/")));
                 }}
                 onClick={() => worldFileInputRef.current?.click()}
-                onKeyDown={(e) => {
+                onKeyDown={e => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     worldFileInputRef.current?.click();
@@ -743,11 +642,11 @@ export const ImageTo3DExperience = ({
           <textarea
             ref={worldTextareaRef}
             rows={2}
-            className="w-full resize-none overflow-y-auto rounded-[3px] border border-white/15 bg-ui-controls px-3 py-2.5 text-base text-base-fg placeholder-base-fg/60 transition-colors focus:border-white/60 focus:outline-none"
+            className="w-full resize-none overflow-y-auto rounded-[3px] border border-outline-variant bg-ui-controls px-3 py-2.5 text-base text-base-fg placeholder-base-fg/60 transition-colors focus:border-outline focus:outline-none"
             style={{ maxHeight: "5em" }}
             value={worldPrompt}
             placeholder="Describe your 3D world (optional)..."
-            onChange={(e) => setWorldPrompt(e.target.value)}
+            onChange={e => setWorldPrompt(e.target.value)}
           />
         </div>
       );
@@ -757,32 +656,27 @@ export const ImageTo3DExperience = ({
       <div
         key={img.id}
         className={twMerge(
-          "group relative aspect-square overflow-hidden rounded-[3px] border border-white/30 bg-black/30 transition-all",
+          "group relative aspect-square overflow-hidden rounded-[3px] border border-outline bg-scrim/30 transition-all",
           hasResults ? "w-10" : "w-auto",
-          img.isUploading
-            ? "cursor-default"
-            : "cursor-pointer hover:cursor-zoom-in hover:border-white/80",
+          img.isUploading ? "cursor-default" : "cursor-pointer hover:cursor-zoom-in hover:border-outline",
         )}
         onClick={() => !img.isUploading && setPreviewImage(img.preview)}
       >
         <img
           src={img.preview}
           alt={img.name}
-          className={twMerge(
-            "h-full w-full object-cover",
-            img.isUploading && "opacity-50 blur-sm",
-          )}
+          className={twMerge("h-full w-full object-cover", img.isUploading && "opacity-50 blur-sm")}
         />
         {img.isUploading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+          <div className="absolute inset-0 flex items-center justify-center bg-scrim/20">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-outline-variant border-t-on-surface" />
           </div>
         )}
         {!img.isUploading && (
           <button
             type="button"
-            className="absolute right-[2px] top-[2px] flex h-4 w-4 cursor-pointer items-center justify-center rounded-[3px] bg-black/60 text-white opacity-0 transition-colors hover:bg-red/70 group-hover:opacity-100"
-            onClick={(e) => {
+            className="absolute right-[2px] top-[2px] flex h-4 w-4 cursor-pointer items-center justify-center rounded-[3px] bg-scrim/60 text-on-surface opacity-0 transition-colors hover:bg-error/70 group-hover:opacity-100"
+            onClick={e => {
               e.stopPropagation();
               removeWorldImage(img.id);
             }}
@@ -809,12 +703,7 @@ export const ImageTo3DExperience = ({
             >
               Upload images
             </Button>
-            <Button
-              variant="action"
-              icon={ImagesIcon}
-              onClick={handlePickFromLibrary}
-              className="w-full"
-            >
+            <Button variant="action" icon={ImagesIcon} onClick={handlePickFromLibrary} className="w-full">
               Pick from library
             </Button>
           </div>
@@ -823,17 +712,12 @@ export const ImageTo3DExperience = ({
         <Button
           variant="action"
           className={twMerge(
-            "aspect-square overflow-hidden rounded-[3px] border border-dashed border-black/15 bg-white/5 transition-all hover:border-white/40 hover:bg-white/10 dark:border-white/25",
+            "aspect-square overflow-hidden rounded-[3px] border border-dashed border-outline-variant/15 bg-on-surface/5 transition-all hover:border-outline hover:bg-on-surface/10 dark:border-outline-variant",
             hasResults ? "w-10" : "w-14",
           )}
           onClick={() => worldFileInputRef.current?.click()}
         >
-          <PlusIcon
-            className={twMerge(
-              "text-base-fg opacity-80",
-              hasResults ? "text-lg" : "text-2xl",
-            )}
-          />
+          <PlusIcon className={twMerge("text-base-fg opacity-80", hasResults ? "text-lg" : "text-2xl")} />
         </Button>
       </Tooltip>
     );
@@ -858,20 +742,17 @@ export const ImageTo3DExperience = ({
       return (
         <div className="space-y-2">
           <div className="flex items-stretch gap-3">
-            <div
-              className="flex shrink-0 flex-wrap items-center gap-1.5"
-              style={{ maxWidth: "234px" }}
-            >
+            <div className="flex shrink-0 flex-wrap items-center gap-1.5" style={{ maxWidth: "234px" }}>
               {worldImages.map(worldImageThumbnail)}
               {addButton}
             </div>
             <textarea
               ref={worldTextareaRef}
               rows={1}
-              className="flex-1 resize-none overflow-y-auto rounded-[3px] border border-white/15 bg-ui-controls px-3 py-2 text-sm text-base-fg placeholder-base-fg/60 transition-colors focus:border-white/60 focus:outline-none"
+              className="flex-1 resize-none overflow-y-auto rounded-[3px] border border-outline-variant bg-ui-controls px-3 py-2 text-sm text-base-fg placeholder-base-fg/60 transition-colors focus:border-outline focus:outline-none"
               value={worldPrompt}
               placeholder="Describe world (optional)..."
-              onChange={(e) => setWorldPrompt(e.target.value)}
+              onChange={e => setWorldPrompt(e.target.value)}
             />
           </div>
           {imageCountRow}
@@ -890,11 +771,11 @@ export const ImageTo3DExperience = ({
         <textarea
           ref={worldTextareaRef}
           rows={2}
-          className="w-full resize-none overflow-y-auto rounded-[3px] border border-white/15 bg-ui-controls px-3 py-2.5 text-base text-base-fg placeholder-base-fg/60 transition-colors focus:border-white/60 focus:outline-none"
+          className="w-full resize-none overflow-y-auto rounded-[3px] border border-outline-variant bg-ui-controls px-3 py-2.5 text-base text-base-fg placeholder-base-fg/60 transition-colors focus:border-outline focus:outline-none"
           style={{ maxHeight: "5em" }}
           value={worldPrompt}
           placeholder="Describe your 3D world (optional)..."
-          onChange={(e) => setWorldPrompt(e.target.value)}
+          onChange={e => setWorldPrompt(e.target.value)}
         />
       </div>
     );
@@ -906,23 +787,22 @@ export const ImageTo3DExperience = ({
     return renderImageMode();
   };
 
-  const activeResult =
-    results.find((r) => r.id === selectedResultId) || results[0];
+  const activeResult = results.find(r => r.id === selectedResultId) || results[0];
 
   return (
     <div className="flex h-[calc(100vh-56px)] w-full bg-ui-background text-base-fg">
       {backgroundImage && !hasResults && (
         <>
-          <div className="pointer-events-none fixed inset-0 z-[1] overflow-hidden bg-[radial-gradient(50%_50%_at_50%_50%,_transparent_49%,_rgb(from_var(--st-controls-color)_r_g_b_/_var(--st-gallery-vignette-alpha))_100%)]" />
+          <div className="pointer-events-none fixed inset-0 z-[1] overflow-hidden bg-[radial-gradient(50%_50%_at_50%_50%,_transparent_49%,_color-mix(in_oklab,_var(--md-sys-color-surface-container-highest)_60%,_transparent)_100%)]" />
           <div className="fixed inset-0 z-0 overflow-hidden">
             <div
               className="h-full w-full opacity-30 transition-opacity duration-1000"
               style={{
-                backgroundImage: `linear-gradient(0deg, rgb(var(--st-photo-tint-rgb) / var(--st-photo-tint-alpha)), rgb(var(--st-photo-tint-rgb) / var(--st-photo-tint-alpha))), url(${backgroundImage})`,
+                backgroundImage: `url(${backgroundImage})`,
                 backgroundRepeat: "no-repeat",
                 backgroundSize: "cover",
                 backgroundPosition: "center",
-                filter: "grayscale(var(--st-photo-grayscale))",
+                filter: "grayscale(1)",
               }}
             />
           </div>
@@ -932,11 +812,7 @@ export const ImageTo3DExperience = ({
       <div className="relative z-10 h-full w-full p-8">
         {!hasResults && (
           <div className="pointer-events-none absolute left-0 top-[calc(50%-280px)] flex w-full justify-center">
-            <CreateEmptyState
-              title={title}
-              subtitle={subtitle}
-              className="py-8 sm:py-8"
-            />
+            <CreateEmptyState title={title} subtitle={subtitle} className="py-8 sm:py-8" />
           </div>
         )}
 
@@ -991,14 +867,11 @@ export const ImageTo3DExperience = ({
                     variant="action"
                     icon={BoxIcon}
                     onClick={() => {
-                      toast.promise(
-                        downloadFileFromUrl(activeResult.modelUrl!),
-                        {
-                          loading: "Downloading GLB...",
-                          success: "Downloaded GLB file",
-                          error: "Failed to download file",
-                        },
-                      );
+                      toast.promise(downloadFileFromUrl(activeResult.modelUrl!), {
+                        loading: "Downloading GLB...",
+                        success: "Downloaded GLB file",
+                        error: "Failed to download file",
+                      });
                     }}
                   >
                     GLB
@@ -1016,7 +889,7 @@ export const ImageTo3DExperience = ({
                 {results.length > 0 && (
                   <button
                     onClick={resetResults}
-                    className="rounded-[3px] border border-red/40 bg-red/10 px-3 py-1 text-xs text-white/70 transition-colors hover:bg-red/20"
+                    className="rounded-[3px] border border-error/40 bg-error/10 px-3 py-1 text-xs text-on-surface/70 transition-colors hover:bg-error/20"
                   >
                     Clear Session
                   </button>
@@ -1024,7 +897,7 @@ export const ImageTo3DExperience = ({
               </div>
               <div className="flex-1 overflow-y-auto p-3">
                 <div className="space-y-3">
-                  {results.map((result) => {
+                  {results.map(result => {
                     const isPending = result.status === "pending";
                     const isSelected = selectedResultId === result.id;
                     return (
@@ -1032,13 +905,13 @@ export const ImageTo3DExperience = ({
                         key={result.id}
                         onClick={() => setSelectedResultId(result.id)}
                         className={twMerge(
-                          "group flex w-full items-center gap-3 rounded-none border p-2 text-left transition-all hover:bg-white/5",
+                          "group flex w-full items-center gap-3 rounded-none border p-2 text-left transition-all hover:bg-on-surface/5",
                           isSelected
-                            ? "border-white bg-white/10"
-                            : "border-white/10 bg-transparent hover:border-white/30",
+                            ? "border-outline bg-on-surface/10"
+                            : "border-outline-variant bg-transparent hover:border-outline",
                         )}
                       >
-                        <div className="relative aspect-square h-14 w-14 shrink-0 overflow-hidden border border-white/10 bg-black/30">
+                        <div className="relative aspect-square h-14 w-14 shrink-0 overflow-hidden border border-outline-variant bg-scrim/30">
                           {result.previewUrl ? (
                             <img
                               src={result.previewUrl}
@@ -1054,8 +927,8 @@ export const ImageTo3DExperience = ({
                             </div>
                           )}
                           {isPending && (
-                            <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                              <div className="h-5 w-5 animate-spin rounded-full border-2 border-white/20 border-t-white" />
+                            <div className="absolute inset-0 flex items-center justify-center bg-scrim/30">
+                              <div className="h-5 w-5 animate-spin rounded-full border-2 border-outline-variant border-t-on-surface" />
                             </div>
                           )}
                         </div>
@@ -1065,9 +938,7 @@ export const ImageTo3DExperience = ({
                           </div>
                           <div className="mt-1 flex items-center gap-1.5 text-xs">
                             {isPending ? (
-                              <span className="text-base-fg/55">
-                                Generating…
-                              </span>
+                              <span className="text-base-fg/55">Generating…</span>
                             ) : (
                               <span className="font-mono tabular-nums text-base-fg/45">
                                 {formatTime(result.timestamp)}
@@ -1088,38 +959,19 @@ export const ImageTo3DExperience = ({
         <animated.div
           className={twMerge(
             "fixed left-1/2 z-20 w-full -translate-x-1/2",
-            variant === "world"
-              ? hasResults
-                ? "max-w-2xl"
-                : "max-w-lg"
-              : "max-w-md",
+            variant === "world" ? (hasResults ? "max-w-2xl" : "max-w-lg") : "max-w-md",
           )}
           style={promptAnim}
         >
           <div ref={promptContentRef}>
-            <div
-              className={twMerge("glass w-full", hasResults ? "p-3" : "p-5")}
-            >
-              <div className={hasResults ? "space-y-3" : "space-y-5"}>
-                {renderActiveMode()}
-              </div>
+            <div className={twMerge("glass w-full", hasResults ? "p-3" : "p-5")}>
+              <div className={hasResults ? "space-y-3" : "space-y-5"}>{renderActiveMode()}</div>
 
-              <div
-                className={twMerge(
-                  "flex items-center justify-between gap-2.5",
-                  hasResults ? "mt-3" : "mt-3",
-                )}
-              >
+              <div className={twMerge("flex items-center justify-between gap-2.5", hasResults ? "mt-3" : "mt-3")}>
                 <ClassyModelSelector
                   variant="embedded"
-                  items={
-                    variant === "world"
-                      ? IMAGE_TO_3D_WORLD_PAGE_MODEL_LIST
-                      : IMAGE_TO_3D_OBJECT_PAGE_MODEL_LIST
-                  }
-                  page={
-                    variant === "world" ? WORLD_MODEL_PAGE : OBJECT_MODEL_PAGE
-                  }
+                  items={variant === "world" ? IMAGE_TO_3D_WORLD_PAGE_MODEL_LIST : IMAGE_TO_3D_OBJECT_PAGE_MODEL_LIST}
+                  page={variant === "world" ? WORLD_MODEL_PAGE : OBJECT_MODEL_PAGE}
                 />
                 <GenerateButton
                   variant="primary"
@@ -1139,9 +991,9 @@ export const ImageTo3DExperience = ({
                 <TabSelector
                   tabs={MODE_TABS}
                   activeTab={activeMode}
-                  onTabChange={(tabId) => setActiveMode(tabId as Mode)}
+                  onTabChange={tabId => setActiveMode(tabId as Mode)}
                   className="w-fit"
-                  indicatorClassName="bg-white/15"
+                  indicatorClassName="bg-on-surface/15"
                 />
               </div>
             )}
@@ -1149,29 +1001,19 @@ export const ImageTo3DExperience = ({
         </animated.div>
 
         <div className="absolute bottom-4 right-4 z-20 flex items-center gap-2">
-          <CostCalculatorButton
-            modelPage={
-              variant === "world" ? WORLD_MODEL_PAGE : OBJECT_MODEL_PAGE
-            }
-          />
+          <CostCalculatorButton modelPage={variant === "world" ? WORLD_MODEL_PAGE : OBJECT_MODEL_PAGE} />
           <HelpMenuButton />
         </div>
       </div>
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={handleFileChange}
-      />
+      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
       <input
         ref={worldFileInputRef}
         type="file"
         accept="image/*"
         multiple
         className="hidden"
-        onChange={(e) => {
+        onChange={e => {
           if (e.target.files) {
             handleWorldFiles(Array.from(e.target.files));
           }
@@ -1188,9 +1030,7 @@ export const ImageTo3DExperience = ({
         mode="select"
         selectedItemIds={selectedGalleryImages}
         onSelectItem={handleImageSelect}
-        maxSelections={
-          variant === "world" ? MAX_WORLD_IMAGES - worldImages.length : 1
-        }
+        maxSelections={variant === "world" ? MAX_WORLD_IMAGES - worldImages.length : 1}
         onUseSelected={handleGallerySelect}
         onDownloadClicked={downloadFileFromUrl}
         forceFilter="image"
@@ -1198,12 +1038,12 @@ export const ImageTo3DExperience = ({
 
       {previewImage && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/90"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-scrim/90"
           onClick={() => setPreviewImage(null)}
         >
           <button
             type="button"
-            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-[3px] border border-white/15 bg-black/60 text-white transition-colors hover:border-white/30 hover:bg-black"
+            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-[3px] border border-outline-variant bg-scrim/60 text-on-surface transition-colors hover:border-outline hover:bg-scrim"
             onClick={() => setPreviewImage(null)}
           >
             <XIcon className="h-4 w-4" />
@@ -1211,8 +1051,8 @@ export const ImageTo3DExperience = ({
           <img
             src={previewImage}
             alt="Preview"
-            className="max-h-[80vh] max-w-[80vw] border border-white/15 object-contain"
-            onClick={(e) => e.stopPropagation()}
+            className="max-h-[80vh] max-w-[80vw] border border-outline-variant object-contain"
+            onClick={e => e.stopPropagation()}
           />
         </div>
       )}

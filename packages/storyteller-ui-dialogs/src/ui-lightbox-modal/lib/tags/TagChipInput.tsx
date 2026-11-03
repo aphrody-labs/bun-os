@@ -118,7 +118,7 @@ export function TagChipInput({ chips, suggestions, disabled, dropUp, onAdd, onRe
   };
 
   const chipClass = (value: string) =>
-    `flex items-center gap-1 break-all text-left rounded-[3px] border border-white/15 bg-white/5 px-2.5 py-1 text-[11px] font-medium text-base-fg/80 transition-all ${
+    `flex items-center gap-1 break-all text-left rounded-[3px] border border-outline-variant bg-on-surface/5 px-2.5 py-1 text-[11px] font-medium text-base-fg/80 transition-all ${
       flashValue === value ? "ring-2 ring-primary" : ""
     }`;
 
@@ -145,7 +145,7 @@ export function TagChipInput({ chips, suggestions, disabled, dropUp, onAdd, onRe
                 onRemove(value);
               }}
               title={`Remove "${value}"`}
-              className={`group/tag ${chipClass(value)} hover:bg-red/15 hover:text-red focus:outline-none focus-visible:ring-2 focus-visible:ring-red`}
+              className={`group/tag ${chipClass(value)} hover:bg-error/15 hover:text-error focus:outline-none focus-visible:ring-2 focus-visible:ring-error`}
             >
               {value}
               <XIcon className="h-2.5 w-2.5" />

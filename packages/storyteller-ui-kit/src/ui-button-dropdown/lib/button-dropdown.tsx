@@ -98,14 +98,14 @@ export const ButtonDropdown = ({
             <div>
               {options.map((option, index) => (
                 <Fragment key={index}>
-                  {option.divider && <div className="my-1.5 border-t border-white/15" />}
+                  {option.divider && <div className="my-1.5 border-t border-outline-variant" />}
                   <Menu.Item>
                     {({ active }) => (
                       <button
                         disabled={option.disabled}
                         className={twMerge(
                           "rounded-[3px] bg-transparent font-medium text-base-fg transition-colors duration-150",
-                          active ? "bg-white/10" : "",
+                          active ? "bg-on-surface/10" : "",
                           option.disabled ? "pointer-events-none opacity-40" : "",
                           "group flex w-full items-center gap-2 px-2.5 py-2 text-sm",
                           option.className,
@@ -115,7 +115,7 @@ export const ButtonDropdown = ({
                         <div className="flex w-full items-center">
                           {option.icon && <DynamicIcon icon={option.icon} className="mr-2 h-4 w-4 shrink-0" />}
                           <div className="grow text-start">{option.label}</div>
-                          <div className="ml-6 font-mono text-[11px] font-normal text-white/45">
+                          <div className="ml-6 font-mono text-[11px] font-normal text-on-surface/45">
                             {option.description}
                           </div>
                           {showSelected && (
@@ -125,11 +125,11 @@ export const ButtonDropdown = ({
                                   <path
                                     opacity="1"
                                     d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"
-                                    fill="#FC6B68"
+                                    fill="var(--md-sys-color-primary)"
                                   />
                                   <path
                                     d="M369 175c-9.4 9.4-9.4 24.6 0 33.9L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c-9.4-9.4 24.6-9.4 33.9 0z"
-                                    fill="#FFFFFF"
+                                    fill="var(--md-sys-color-on-primary)"
                                   />
                                 </svg>
                               ) : (

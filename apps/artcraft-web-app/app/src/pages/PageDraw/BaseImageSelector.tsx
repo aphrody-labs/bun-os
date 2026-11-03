@@ -10,10 +10,7 @@ import { HelpMenuButton } from "@storyteller/ui-help-menu";
 import { CostCalculatorButton } from "@storyteller/ui-pricing-modal";
 import { ModelPage } from "@storyteller/ui-model-selector";
 import { UploadEntryCard } from "~/components/media/UploadEntryCard";
-import {
-  BlankCanvasModal,
-  type BaseSelectorImage,
-} from "@storyteller/ui-pagedraw";
+import { BlankCanvasModal, type BaseSelectorImage } from "@storyteller/ui-pagedraw";
 
 const MAX_GALLERY_SELECTIONS = 1;
 
@@ -22,14 +19,9 @@ type BaseImageSelectorProps = {
   showLoading?: boolean;
 };
 
-export const BaseImageSelector = ({
-  onImageSelect,
-  showLoading = false,
-}: BaseImageSelectorProps) => {
+export const BaseImageSelector = ({ onImageSelect, showLoading = false }: BaseImageSelectorProps) => {
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
-  const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>(
-    [],
-  );
+  const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isBlankCanvasModalOpen, setIsBlankCanvasModalOpen] = useState(false);
 
@@ -41,9 +33,8 @@ export const BaseImageSelector = ({
   };
 
   const handleImageSelect = (mediaToken: string) => {
-    setSelectedGalleryImages((prev) => {
-      if (prev.includes(mediaToken))
-        return prev.filter((x) => x !== mediaToken);
+    setSelectedGalleryImages(prev => {
+      if (prev.includes(mediaToken)) return prev.filter(x => x !== mediaToken);
       if (prev.length >= MAX_GALLERY_SELECTIONS) {
         return MAX_GALLERY_SELECTIONS === 1 ? [mediaToken] : prev;
       }
@@ -81,13 +72,13 @@ export const BaseImageSelector = ({
   const handleFileUpload = (files: FileList) => {
     setIsLoading(true);
 
-    Array.from(files).forEach((file) => {
+    Array.from(files).forEach(file => {
       const reader = new FileReader();
       reader.onloadend = () => {
         uploadImage({
           title: `reference-image-${Math.random().toString(36).substring(2, 15)}`,
           assetFile: file,
-          progressCallback: (newState) => {
+          progressCallback: newState => {
             if (newState.status === UploaderStates.success && newState.data) {
               const mediaToken = newState.data || "";
               (async () => {
@@ -99,25 +90,17 @@ export const BaseImageSelector = ({
                     mediaFileToken: mediaToken,
                   });
                   if (result.success && result.data) {
-                    finalUrl =
-                      result.data.media_links?.cdn_url ||
-                      result.data.public_bucket_url ||
-                      finalUrl;
+                    finalUrl = result.data.media_links?.cdn_url || result.data.public_bucket_url || finalUrl;
                     const mediaLinks = result.data.media_links as
                       | {
                           thumbnail_template?: string;
                           maybe_thumbnail_template?: string;
                         }
                       | undefined;
-                    thumbnailUrlTemplate =
-                      mediaLinks?.thumbnail_template ||
-                      mediaLinks?.maybe_thumbnail_template;
+                    thumbnailUrlTemplate = mediaLinks?.thumbnail_template || mediaLinks?.maybe_thumbnail_template;
                   }
                 } catch (e) {
-                  console.warn(
-                    "Falling back to data URL for uploaded image",
-                    e,
-                  );
+                  console.warn("Falling back to data URL for uploaded image", e);
                 }
                 const referenceImage: BaseSelectorImage = {
                   mediaToken,
@@ -151,8 +134,8 @@ export const BaseImageSelector = ({
             icon={PencilIcon}
             title="Edit Image"
             description="Click to upload or drag and drop an image here to edit"
-            accentBackgroundClass="bg-blue-500/40"
-            accentBorderClass="border-blue-400/30"
+            accentBackgroundClass="bg-primary/40"
+            accentBorderClass="border-primary/30"
             accept="image/*"
             multiple
             onFilesSelected={handleFileUpload}

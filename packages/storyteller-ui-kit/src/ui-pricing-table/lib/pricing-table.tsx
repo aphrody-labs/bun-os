@@ -100,15 +100,15 @@ interface PricingSectionLabelProps {
 export const PricingSectionLabel = ({ index, label, annotation, className }: PricingSectionLabelProps) => (
   <div
     className={twMerge(
-      "pricing-hud flex items-center justify-between gap-4 border-b border-white/15 px-6 py-3 text-white/55 md:px-10",
+      "pricing-hud flex items-center justify-between gap-4 border-b border-outline-variant px-6 py-3 text-on-surface/55 md:px-10",
       className,
     )}
   >
     <p>
-      <span className="text-white/40">{index} / </span>
+      <span className="text-on-surface/40">{index} / </span>
       {label}
     </p>
-    {annotation && <p className="hidden text-white/40 sm:block">{annotation}</p>}
+    {annotation && <p className="hidden text-on-surface/40 sm:block">{annotation}</p>}
   </div>
 );
 

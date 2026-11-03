@@ -6,13 +6,8 @@ import { Button } from "@storyteller/ui-button";
 import { usePageSceneStore } from "@storyteller/ui-pagescene";
 
 export function ErrorDialog() {
-  const {
-    showErrorDialog,
-    errorDialogTitle,
-    errorDialogMessage,
-    setShowErrorDialog,
-  } = usePageSceneStore(
-    useShallow((s) => ({
+  const { showErrorDialog, errorDialogTitle, errorDialogMessage, setShowErrorDialog } = usePageSceneStore(
+    useShallow(s => ({
       showErrorDialog: s.showErrorDialog,
       errorDialogTitle: s.errorDialogTitle,
       errorDialogMessage: s.errorDialogMessage,
@@ -24,7 +19,7 @@ export function ErrorDialog() {
     <Modal
       title={errorDialogTitle}
       titleIcon={TriangleAlertIcon}
-      titleIconClassName="text-red-400"
+      titleIconClassName="text-error"
       isOpen={showErrorDialog}
       onClose={() => setShowErrorDialog(false)}
       showClose={false}
@@ -32,11 +27,7 @@ export function ErrorDialog() {
       <div>
         {errorDialogMessage}
         <div className="mt-4 flex justify-end">
-          <Button
-            type="button"
-            onClick={() => setShowErrorDialog(false)}
-            variant="secondary"
-          >
+          <Button type="button" onClick={() => setShowErrorDialog(false)} variant="secondary">
             Close
           </Button>
         </div>

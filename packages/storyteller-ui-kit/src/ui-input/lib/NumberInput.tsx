@@ -45,7 +45,7 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, onChange }) => 
   };
 
   const incrementButtonStyle =
-    "flex h-[15px] w-6 items-center justify-center text-[10px] text-white/80 bg-ui-controls hover:bg-white/10 outline-none focus:outline-none transition-colors active:outline-none";
+    "flex h-[15px] w-6 items-center justify-center text-[10px] text-on-surface/80 bg-ui-controls hover:bg-on-surface/10 outline-none focus:outline-none transition-colors active:outline-none";
 
   return (
     <div className="relative">
@@ -57,9 +57,9 @@ export const NumberInput: React.FC<NumberInputProps> = ({ value, onChange }) => 
         inputClassName="w-[70px] h-[30px] rounded-[3px] text-sm"
       />
 
-      <div className="absolute right-0 top-0 flex h-[30px] flex-col rounded-r-[3px] border-l border-white/15 bg-ui-controls">
+      <div className="absolute right-0 top-0 flex h-[30px] flex-col rounded-r-[3px] border-l border-outline-variant bg-ui-controls">
         <button
-          className={twMerge(incrementButtonStyle, "rounded-tr-[3px] border-b border-white/15")}
+          className={twMerge(incrementButtonStyle, "rounded-tr-[3px] border-b border-outline-variant")}
           onClick={handleIncrement}
         >
           <ChevronUpIcon />

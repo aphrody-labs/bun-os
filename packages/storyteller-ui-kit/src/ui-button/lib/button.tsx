@@ -4,7 +4,7 @@ import { DynamicIcon } from "@storyteller/icons";
 import { twMerge } from "tailwind-merge";
 import { ButtonHTMLAttributes, AnchorHTMLAttributes } from "react";
 
-export const NEUTRAL_BUTTON_HOVER_CLASSES = "hover:bg-white/[0.07] hover:border-white/25";
+export const NEUTRAL_BUTTON_HOVER_CLASSES = "hover:bg-on-surface/[0.07] hover:border-outline-variant";
 
 type AnchorProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, keyof ButtonHTMLAttributes<HTMLButtonElement>>;
 
@@ -38,22 +38,22 @@ export const Button = ({
   function getVariantClassNames(variant: string) {
     switch (variant) {
       case "secondary": {
-        // Resting bg-white/5 tint (matching the home grid cards) so the
+        // Resting bg-on-surface/5 tint (matching the home grid cards) so the
         // button reads as a surface, not a bare outline on the page bg.
-        return "bg-white/5 text-base-fg border border-ui-controls-border";
+        return "bg-on-surface/5 text-base-fg border border-ui-controls-border";
       }
       case "action": {
         return "bg-ui-controls text-base-fg border border-ui-controls-border";
       }
       case "destructive": {
-        return "bg-red-500 hover:bg-red-400 text-white";
+        return "bg-error hover:bg-error text-on-surface";
       }
       case "ghost": {
         return "bg-transparent text-base-fg/70 hover:text-base-fg";
       }
       case "primary":
       default: {
-        return "bg-white hover:bg-white/90 text-black font-bold";
+        return "bg-on-surface hover:bg-on-surface/90 text-surface font-bold";
       }
     }
   }
@@ -61,7 +61,7 @@ export const Button = ({
   const disabledClass = twMerge(disabled || loading ? "opacity-50 pointer-events-none" : "");
 
   const className = twMerge(
-    "w-fit rounded-[3px] font-mono text-xs font-semibold uppercase tracking-[0.12em] px-3.5 py-2 border border-transparent focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-white/60 transition-colors duration-150 flex gap-2 items-center justify-center",
+    "w-fit rounded-[3px] font-mono text-xs font-semibold uppercase tracking-[0.12em] px-3.5 py-2 border border-transparent focus-visible:outline focus-visible:outline-1 focus-visible:outline-offset-2 focus-visible:outline-outline transition-colors duration-150 flex gap-2 items-center justify-center",
     getVariantClassNames(propsVariant),
     (propsVariant === "secondary" || propsVariant === "action" || propsVariant === "ghost") &&
       NEUTRAL_BUTTON_HOVER_CLASSES,

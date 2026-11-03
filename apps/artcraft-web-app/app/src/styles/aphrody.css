@@ -1,15 +1,5 @@
-/* Craft component aliases follow the Aphrody-seeded M3 semantic palette. */
+/* shadcn aliases consumed by @storyteller/ui-video-editor, bound to M3 roles. */
 :root {
-  --st-bg: var(--md-sys-color-surface);
-  --st-panel: var(--md-sys-color-surface-container);
-  --st-modal: var(--md-sys-color-surface-container-high);
-  --st-controls: var(--md-sys-color-surface-container-highest);
-  --st-controls-color: var(--md-sys-color-surface-container-highest);
-  --st-sunken: var(--md-sys-color-surface-container-lowest);
-  --st-fg: var(--md-sys-color-on-surface);
-  --st-panel-border: var(--md-sys-color-outline-variant);
-  --st-controls-border: var(--md-sys-color-outline);
-  --st-divider: var(--md-sys-color-outline-variant);
   --background: var(--md-sys-color-surface);
   --foreground: var(--md-sys-color-on-surface);
   --card: var(--md-sys-color-surface-container-low);

@@ -91,9 +91,9 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             "relative inline-block shrink-0 rounded-[3px] border transition-colors",
             boxDims,
             isChecked
-              ? "border-white bg-white text-black"
-              : "border-ui-controls-border bg-transparent hover:border-white/60",
-            "peer-focus-visible:ring-1 peer-focus-visible:ring-white/60",
+              ? "border-outline bg-on-surface text-surface"
+              : "border-ui-controls-border bg-transparent hover:border-outline",
+            "peer-focus-visible:ring-1 peer-focus-visible:ring-outline",
             checkboxClassName,
           )}
         >

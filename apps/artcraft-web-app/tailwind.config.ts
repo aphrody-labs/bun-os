@@ -1,8 +1,20 @@
+import { readFileSync } from "node:fs";
 import type { Config } from "tailwindcss";
 import colors from "tailwindcss/colors";
 
-const m3Color = (role: string) =>
-  `rgb(from var(--md-sys-color-${role}) r g b / <alpha-value>)`;
+// Tailwind v3 adapter over the canonical M3 mapping: every role utility that
+// @aphrody/m3-theme/tailwind.css exposes to Tailwind v4 (--color-<role>) is
+// re-exposed here through m3Color(), so opacity modifiers keep working.
+const m3Color = (role: string, namespace: "sys" | "ext" = "sys") =>
+  `rgb(from var(--md-${namespace}-color-${role}) r g b / <alpha-value>)`;
+
+const m3Roles: Record<string, string> = Object.fromEntries(
+  [
+    ...readFileSync(new URL("../../packages/m3-theme/tailwind.css", import.meta.url), "utf8").matchAll(
+      /--color-([a-z-]+):\s*var\(\s*--md-(sys|ext)-color-([a-z-]+)/g,
+    ),
+  ].map(([, utility, namespace, role]) => [utility, m3Color(role, namespace as "sys" | "ext")]),
+);
 
 export default {
   content: [
@@ -16,14 +28,7 @@ export default {
       fontFamily: {
         "custom-font": ["Fira Sans", "sans-serif"],
         // Brutalist type system, matching artcraft-webapp.
-        mono: [
-          "Geist Mono",
-          "ui-monospace",
-          "SFMono-Regular",
-          "Menlo",
-          "Consolas",
-          "monospace",
-        ],
+        mono: ["Geist Mono", "ui-monospace", "SFMono-Regular", "Menlo", "Consolas", "monospace"],
         display: [
           "Archivo",
           "system-ui",
@@ -69,26 +74,8 @@ export default {
     colors: {
       transparent: "transparent",
       current: "currentColor",
-      white: colors.white,
-      gray: colors.gray,
-      black: colors.black,
-      blue: { ...colors.blue, DEFAULT: "#2E70FF" },
-      red: { ...colors.red, DEFAULT: "#D33242" },
-      green: { ...colors.green, DEFAULT: "#308752" },
-      yellow: colors.yellow,
-      purple: colors.purple,
-      pink: colors.pink,
-      orange: colors.orange,
-      amber: colors.amber,
-      emerald: colors.emerald,
-      teal: colors.teal,
-      cyan: colors.cyan,
-      sky: colors.sky,
-      violet: colors.violet,
-      fuchsia: colors.fuchsia,
-      rose: colors.rose,
-      indigo: colors.indigo,
-      lime: colors.lime,
+      inherit: "inherit",
+      ...m3Roles,
       primary: {
         DEFAULT: m3Color("primary"),
         "50": m3Color("primary-fixed"),
@@ -105,193 +92,67 @@ export default {
       },
       "primary-foreground": m3Color("on-primary"),
       secondary: {
-        DEFAULT: "#3E3E41",
-        "50": "#f6f6f6",
-        "100": "#e7e7e7",
-        "200": "#d1d1d1",
-        "300": "#b0b0b0",
-        "400": "#888888",
-        "500": "#6d6d6d",
-        "600": "#5d5d5d",
-        "700": "#4f4f4f",
-        "800": "#454545",
-        "900": "#3d3d3d",
-        "950": "#3E3E41",
+        DEFAULT: m3Color("secondary"),
+        container: m3Color("secondary-container"),
+        foreground: m3Color("on-secondary"),
+        border: m3Color("outline-variant"),
       },
       "brand-primary": {
-        //sunglo
-        DEFAULT: "#2d81ff", //=500
-        "50": "#eef6ff",
-        "100": "#d9ebff",
-        "200": "#bcdcff",
-        "300": "#8ec7ff",
-        "400": "#59a7ff",
-        "500": "#2d81ff",
-        "600": "#1b63f5",
-        "700": "#144ee1",
-        "800": "#173fb6",
-        "900": "#19398f",
-        "950": "#142457",
+        DEFAULT: m3Color("primary"),
+        "950": m3Color("on-primary-fixed"),
       },
       "brand-secondary": {
-        DEFAULT: "#3E3E41",
-        "50": "#f6f6f6",
-        "100": "#e7e7e7",
-        "200": "#d1d1d1",
-        "300": "#b0b0b0",
-        "400": "#888888",
-        "500": "#6d6d6d",
-        "600": "#5d5d5d",
-        "700": "#4f4f4f",
-        "800": "#454545",
-        "900": "#3d3d3d",
-        "950": "#3E3E41",
+        DEFAULT: m3Color("surface-container-highest"),
+        "500": m3Color("surface-container-high"),
+        "600": m3Color("surface-container-highest"),
+        "800": m3Color("surface-container"),
       },
-      "brand-tertiary": {
-        //Aquamarine Blue
-        DEFAULT: "#1cb6be", //=300
-        "50": "#eefdfc",
-        "100": "#d4f9f8",
-        "200": "#aef3f3",
-        "300": "#62e4e6",
-        "400": "#38d3d8",
-        "500": "#1cb6be",
-        "600": "#1a94a0",
-        "700": "#1c7682",
-        "800": "#1f616b",
-        "900": "#1e505b",
-        "950": "#0e353e",
-      },
-      danger: {
-        //copper rust
-        DEFAULT: "#8f4951", //=700
-        "50": "#fbf5f5",
-        "100": "#f7ecec",
-        "200": "#efdcdc",
-        "300": "#e2c0bf",
-        "400": "#d19b9c",
-        "500": "#bd7679",
-        "600": "#a5595f",
-        "700": "#8f4951",
-        "800": "#743d45",
-        "900": "#64373f",
-        "950": "#361b1e",
-      },
-      success: {
-        //apple
-        DEFAULT: "#40ad48", //=500
-        "50": "#f2fbf2",
-        "100": "#e2f6e3",
-        "200": "#c5edc7",
-        "300": "#98dd9d",
-        "400": "#64c46b",
-        "500": "#40ad48",
-        "600": "#2f8a35",
-        "700": "#286d2e",
-        "800": "#245728",
-        "900": "#1f4823",
-        "950": "#0c270f",
-      },
-      action: {
-        DEFAULT: "#3E3E41",
-        "50": "#f6f6f6",
-        "100": "#e7e7e7",
-        "200": "#d1d1d1",
-        "300": "#b0b0b0",
-        "400": "#888888",
-        "500": "#6d6d6d",
-        "600": "#5d5d5d",
-        "700": "#4f4f4f",
-        "800": "#454545",
-        "900": "#3d3d3d",
-        "950": "#3E3E41",
-      },
-      character: {
-        unselected: "#46527C",
-        selected: "#6384F4",
-        clip: "#7E92DA",
-        groupBg: "#2B3448",
-        titleBg: "#384763",
-        frame: "#6B83D8",
-      },
-      camera: {
-        unselected: "#466C7C",
-        selected: "#56BBC1",
-        clip: "#5F949F",
-        groupBg: "#2B393E",
-        titleBg: "#395259",
-      },
-      global_audio: {
-        unselected: "#864C68",
-        selected: "#D460A6",
-        clip: "#E37BAD",
-        groupBg: "#382940",
-        titleBg: "#5A3D65",
-      },
-      object: {
-        unselected: "#7C5646",
-        selected: "#EA8E5A",
-        clip: "#D49D75",
-        groupBg: "#372E32",
-        titleBg: "#514248",
-      },
-      prompt: {
-        unselected: "#5D4583",
-        selected: "#AD7EF9",
-        clip: "#926CCF",
-        groupBg: "#362D51",
-        titleBg: "#634E84",
-      },
-      keyframe: {
-        unselected: "#EEEEEE",
-        selected: "#FFDE67",
-      },
-      assets: {
-        background: "#242424",
-        selectedTab: "#3E3E41",
-      },
-      dnd: {
-        canDrop: "#46936E",
-        canDropBorder: "#66E4A9",
-        timeGrid: "#6375B5",
-        timeGridBorder: "#7E92DA",
-        cannotDrop: "#904948",
-        wrapper: "#39394d",
-      },
+      danger: m3Color("error"),
+      action: m3Color("surface-container-highest"),
+      // Tailwind palettes stay available for content colours (picker swatches,
+      // clip-type hues) in the Storyteller packages; chrome uses the roles above.
+      white: colors.white,
+      black: colors.black,
+      gray: colors.gray,
+      blue: { ...colors.blue, DEFAULT: m3Color("primary") },
+      red: { ...colors.red, DEFAULT: m3Color("error") },
+      green: { ...colors.green, DEFAULT: m3Color("success", "ext") },
+      yellow: colors.yellow,
+      purple: colors.purple,
+      pink: colors.pink,
+      orange: colors.orange,
+      amber: colors.amber,
+      emerald: colors.emerald,
+      teal: colors.teal,
+      cyan: colors.cyan,
+      sky: colors.sky,
+      violet: colors.violet,
+      fuchsia: colors.fuchsia,
+      rose: colors.rose,
+      indigo: colors.indigo,
+      lime: colors.lime,
       ui: {
-        // Aphrody M3 semantic roles, bridged through app/src/styles/aphrody.css.
-        background: "var(--st-bg)",
-        panel: "var(--st-panel)",
-        "panel-border": "var(--st-panel-border)",
-        border: "var(--st-panel-border)",
+        background: m3Color("surface"),
+        panel: m3Color("surface-container"),
+        "panel-border": m3Color("outline-variant"),
+        border: m3Color("outline-variant"),
+        modal: m3Color("surface-container-high"),
         controls: m3Color("surface-container-highest"),
         "controls-button": m3Color("surface-container-highest"),
-        "controls-border": "var(--st-controls-border)",
-        divider: "var(--st-divider)",
+        "controls-border": m3Color("outline"),
+        divider: m3Color("outline-variant"),
         ink: m3Color("on-surface"),
-        "accent-ink": "var(--md-sys-color-primary)",
-        sunken: "var(--st-sunken)",
+        "accent-ink": m3Color("primary"),
+        sunken: m3Color("surface-container-lowest"),
       },
       "base-fg": m3Color("on-surface"),
-      media: {
-        "audio-tts": "#6AAA88",
-        "audio-v2v": "#6691B9",
-        "audio-upload": "#9760C2",
-        "audio-demo": "#B96675",
-        "is-new": "#FFDC26",
-      },
-      inference: {
-        pending: "#6b728b",
-        generating: "#46527C",
-        error: "#924C4B",
-      },
+      // design:content: X/Y/Z axis hues of the transform gizmo and vector
+      // inputs follow the 3D convention (red X, green Y, blue Z).
       "axis-x": "#D33242",
       "axis-y": "#308752",
       "axis-z": "#2E70FF",
 
-      // shadcn tokens consumed by @storyteller/ui-video-editor. The M3
-      // semantic aliases are installed by aphrody.css for both color modes.
-      background: m3Color("surface"),
+      // shadcn aliases consumed by @storyteller/ui-video-editor.
       foreground: m3Color("on-surface"),
       card: {
         DEFAULT: m3Color("surface-container-low"),
@@ -300,6 +161,7 @@ export default {
       popover: {
         DEFAULT: m3Color("surface-container"),
         foreground: m3Color("on-surface"),
+        hover: m3Color("surface-container-high"),
       },
       muted: {
         DEFAULT: m3Color("surface-container-high"),
@@ -316,11 +178,6 @@ export default {
       border: m3Color("outline-variant"),
       input: m3Color("outline"),
       ring: m3Color("primary"),
-      facebook: "#4267b2",
-      reddit: "#ff5700",
-      whatsapp: "#25d366",
-      x: "#000000",
-      email: "#858585",
     },
   },
   plugins: [],
@@ -328,25 +185,5 @@ export default {
     // lucide-react adds this class at runtime; keep the base-layer sizing rule
     // in styles/tailwind.css from being purged.
     "lucide",
-    "bg-character-selected",
-    "bg-character-unselected",
-    "bg-character-clip",
-    "bg-camera-selected",
-    "bg-camera-unselected",
-    "bg-camera-clip",
-    "bg-global_audio-selected",
-    "bg-global_audio-unselected",
-    "bg-global_audio-clip",
-    "bg-object-selected",
-    "bg-object-unselected",
-    "bg-object-clip",
-    "bg-prompt-selected",
-    "bg-prompt-unselected",
-    "bg-prompt-clip",
-    "bg-facebook",
-    "bg-reddit",
-    "bg-whatsapp",
-    "bg-x",
-    "bg-email",
   ],
 } satisfies Config & { safelist: string[] };

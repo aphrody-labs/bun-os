@@ -55,7 +55,7 @@ const NewsView = (_props: { onBack: () => void }) => {
       <div className="flex flex-col h-[500px] overflow-y-auto pr-2 custom-scrollbar">
         <button
           onClick={() => setSelectedSlug(null)}
-          className="self-start mb-4 text-sm flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+          className="self-start mb-4 text-sm flex items-center gap-2 text-on-surface/60 hover:text-on-surface transition-colors"
         >
           <ChevronLeftIcon /> Back to News
         </button>
@@ -63,32 +63,34 @@ const NewsView = (_props: { onBack: () => void }) => {
         <div className="article-content">
           <h1 className="font-display text-2xl font-bold mb-2">{selectedPost.title}</h1>
           {selectedPost.date && (
-            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-white/50 mb-4">{selectedPost.date}</p>
+            <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-on-surface/50 mb-4">
+              {selectedPost.date}
+            </p>
           )}
 
           {selectedPost.thumbnail && (
             <img
               src={selectedPost.thumbnail}
               alt={selectedPost.title}
-              className="w-full h-48 object-cover rounded-none mb-4 border border-white/15"
+              className="w-full h-48 object-cover rounded-none mb-4 border border-outline-variant"
             />
           )}
 
-          <div dangerouslySetInnerHTML={{ __html: html }} className="text-white/80 space-y-4" />
+          <div dangerouslySetInnerHTML={{ __html: html }} className="text-on-surface/80 space-y-4" />
         </div>
         <style>{`
           .article-content h1 { font-size: 1.5rem; font-weight: 700; margin: 1rem 0 0.5rem; }
-          .article-content h2 { font-size: 1.25rem; font-weight: 700; margin: 1rem 0 0.5rem; color: #ffffff; }
+          .article-content h2 { font-size: 1.25rem; font-weight: 700; margin: 1rem 0 0.5rem; color: var(--md-sys-color-on-surface); }
           .article-content h3 { font-size: 1.1rem; font-weight: 600; margin: 0.75rem 0 0.5rem; }
           .article-content p { margin-bottom: 0.75rem; line-height: 1.6; }
           .article-content ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
           .article-content li { margin-bottom: 0.25rem; }
-          .article-content img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: 0; border: 1px solid rgba(255,255,255,0.15); margin: 1rem 0; }
-          .article-content a { color: #74aaff; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
-          .article-content a:hover { border-bottom-color: #74aaff; }
+          .article-content img { display: block; width: 100%; max-width: 100%; height: auto; border-radius: 0; border: 1px solid var(--md-sys-color-outline-variant); margin: 1rem 0; }
+          .article-content a { color: var(--md-sys-color-primary); text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; }
+          .article-content a:hover { border-bottom-color: var(--md-sys-color-primary); }
           
           /* Video embed styles */
-          .article-content .video-embed { position: relative; width: 100%; margin: 1.5rem 0; border-radius: 0; overflow: hidden; border: 1px solid rgba(255,255,255,0.15); background: #000; }
+          .article-content .video-embed { position: relative; width: 100%; margin: 1.5rem 0; border-radius: 0; overflow: hidden; border: 1px solid var(--md-sys-color-outline-variant); background: var(--md-sys-color-scrim); }
           .article-content .youtube-embed { padding-bottom: 56.25%; /* 16:9 aspect ratio */ height: 0; }
           .article-content .youtube-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
           .article-content .video-embed video { display: block; width: 100%; height: auto; max-height: 50vh; }
@@ -103,26 +105,26 @@ const NewsView = (_props: { onBack: () => void }) => {
         <div
           key={item.slug}
           onClick={() => setSelectedSlug(item.slug)}
-          className="bg-white/5 hover:bg-white/[0.07] border border-white/15 hover:border-white/25 p-4 rounded-none cursor-pointer transition-colors group"
+          className="bg-on-surface/5 hover:bg-on-surface/[0.07] border border-outline-variant hover:border-outline-variant p-4 rounded-none cursor-pointer transition-colors group"
         >
           <div className="flex justify-between items-start">
-            <h3 className="text-lg font-semibold group-hover:text-white transition-colors flex items-center gap-2">
+            <h3 className="text-lg font-semibold group-hover:text-on-surface transition-colors flex items-center gap-2">
               {item.title}
               <ArrowRightIcon
                 size="xs"
-                className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-white"
+                className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-on-surface"
               />
             </h3>
             {item.date && (
-              <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-white/40 whitespace-nowrap ml-2">
+              <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-on-surface/40 whitespace-nowrap ml-2">
                 {item.date}
               </span>
             )}
           </div>
-          <p className="text-sm text-white/60 mt-1 line-clamp-2">{item.description}</p>
+          <p className="text-sm text-on-surface/60 mt-1 line-clamp-2">{item.description}</p>
         </div>
       ))}
-      {items.length === 0 && <div className="text-center text-white/40 py-10">No news yet.</div>}
+      {items.length === 0 && <div className="text-center text-on-surface/40 py-10">No news yet.</div>}
     </div>
   );
 };
@@ -335,7 +337,7 @@ export function HelpMenuButton({ items, panelTitle = "Tutorials", className, onO
         {view === "grid" && (
           <>
             {tutorials.length === 0 ? (
-              <div className="flex items-center justify-center py-12 text-white/60">No tutorials yet.</div>
+              <div className="flex items-center justify-center py-12 text-on-surface/60">No tutorials yet.</div>
             ) : (
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {tutorials.map((item: TutorialItem) => (
@@ -343,7 +345,7 @@ export function HelpMenuButton({ items, panelTitle = "Tutorials", className, onO
                     key={item.id}
                     type="button"
                     onClick={() => viewTutorial(item)}
-                    className="group block overflow-hidden rounded-none border border-white/15 bg-white/5 transition-colors hover:border-white/25 hover:bg-white/[0.07] text-left"
+                    className="group block overflow-hidden rounded-none border border-outline-variant bg-on-surface/5 transition-colors hover:border-outline-variant hover:bg-on-surface/[0.07] text-left"
                   >
                     <div className="aspect-video w-full overflow-hidden">
                       <img
@@ -352,7 +354,7 @@ export function HelpMenuButton({ items, panelTitle = "Tutorials", className, onO
                         className="h-full w-full object-cover transition-transform group-hover:scale-[1.02]"
                       />
                     </div>
-                    <div className="p-3 text-sm text-white/90">{item.title}</div>
+                    <div className="p-3 text-sm text-on-surface/90">{item.title}</div>
                   </button>
                 ))}
               </div>
@@ -374,7 +376,7 @@ export function HelpMenuButton({ items, panelTitle = "Tutorials", className, onO
               <div className="font-display text-lg font-bold text-base-fg">Tutorial: {selected.title}</div>
             </div>
             <div className="w-full">
-              <div className="aspect-video w-full overflow-hidden rounded-none border border-white/15 bg-black">
+              <div className="aspect-video w-full overflow-hidden rounded-none border border-outline-variant bg-scrim">
                 <div ref={playerContainerRef} className="h-full w-full" />
               </div>
             </div>

@@ -31,11 +31,11 @@ export const LoadingBar = ({
   function getVariantClassNames(variant: string) {
     switch (variant) {
       case "secondary": {
-        return " bg-brand-secondary text-white ";
+        return " bg-brand-secondary text-on-surface ";
       }
       case "primary":
       default: {
-        return " bg-brand-primary text-white ";
+        return " bg-brand-primary text-on-surface ";
       }
     }
   }

@@ -27,26 +27,15 @@ const ENV = {
 };
 
 const themeRoot = document.documentElement;
-const allowedThemes = [
-  "light",
-  "dark",
-  "gray",
-  "black",
-  "aurora",
-  "sunset",
-  "gradient",
-];
 let storedTheme = "dark";
 try {
   storedTheme = (localStorage.getItem("st-theme") || "dark").trim();
 } catch {
   // A blocked localStorage should not prevent the editor from rendering.
 }
-const initialTheme = allowedThemes.includes(storedTheme)
-  ? storedTheme === "gradient"
-    ? "aurora"
-    : storedTheme
-  : "dark";
+// The M3 scheme is generated for light and dark from one seed; any other
+// stored value (retired fixed-palette themes) resolves to dark.
+const initialTheme = storedTheme === "light" ? "light" : "dark";
 for (let index = themeRoot.classList.length - 1; index >= 0; index--) {
   const themeClass = themeRoot.classList.item(index);
   if (themeClass?.startsWith("theme-")) themeRoot.classList.remove(themeClass);
@@ -151,8 +140,7 @@ createRoot(document.getElementById("root")!).render(
               textAlign: "center",
             }}
           >
-            ArtCraft browser preview. Generation and account features require
-            the desktop application.
+            ArtCraft browser preview. Generation and account features require the desktop application.
           </aside>
         )}
         <GlobalSettingsManager env={ENV} />

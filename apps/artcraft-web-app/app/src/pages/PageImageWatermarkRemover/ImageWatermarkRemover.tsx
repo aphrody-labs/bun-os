@@ -9,9 +9,7 @@ import toast from "react-hot-toast";
 export const ImageWatermarkRemover = () => {
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
-  const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>(
-    [],
-  );
+  const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoadingFromGallery, setIsLoadingFromGallery] = useState(false);
   const [imageDimensions, setImageDimensions] = useState<{
@@ -43,8 +41,8 @@ export const ImageWatermarkRemover = () => {
   };
 
   const handleImageSelect = (id: string) => {
-    setSelectedGalleryImages((prev) => {
-      if (prev.includes(id)) return prev.filter((x) => x !== id);
+    setSelectedGalleryImages(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
       const maxSelections = 1;
       if (prev.length >= maxSelections) {
         return maxSelections === 1 ? [id] : prev;
@@ -90,7 +88,7 @@ export const ImageWatermarkRemover = () => {
     });
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 2000));
       toast.success("Watermark removal completed!", {
         id: "watermark-removal",
       });
@@ -120,8 +118,8 @@ export const ImageWatermarkRemover = () => {
                     icon={DropletIcon}
                     title="Remove Image Watermark"
                     description="Erase watermarks from your images seamlessly. Upload your image and get a clean, watermark-free result."
-                    accentBackgroundClass="bg-indigo-500/40"
-                    accentBorderClass="border-indigo-400/30"
+                    accentBackgroundClass="bg-primary/40"
+                    accentBorderClass="border-primary/30"
                     accept="image/*"
                     onFilesSelected={handleLocalImageSelect}
                     primaryLabel="Select Image"
@@ -134,7 +132,7 @@ export const ImageWatermarkRemover = () => {
             ) : (
               <div className="flex w-full max-w-5xl flex-col gap-5">
                 <div className="w-full overflow-hidden border border-ui-panel-border bg-ui-panel">
-                  <div className="relative w-full bg-black">
+                  <div className="relative w-full bg-scrim">
                     <Button
                       icon={RotateCwIcon}
                       variant="action"
@@ -142,7 +140,7 @@ export const ImageWatermarkRemover = () => {
                         setImageUrl("");
                         setImageDimensions(null);
                       }}
-                      className="absolute right-3 top-3 z-10 border border-red/50 px-3 py-1.5 text-sm hover:border-red/80 hover:bg-red/80"
+                      className="absolute right-3 top-3 z-10 border border-error/50 px-3 py-1.5 text-sm hover:border-error/80 hover:bg-error/80"
                     >
                       Switch Image
                     </Button>
@@ -152,7 +150,7 @@ export const ImageWatermarkRemover = () => {
                         src={imageUrl}
                         alt="Selected pic"
                         className="max-h-[70vh] max-w-full object-contain"
-                        onLoad={(e) => {
+                        onLoad={e => {
                           const img = e.currentTarget;
                           setImageDimensions({
                             width: img.naturalWidth,
@@ -186,21 +184,15 @@ export const ImageWatermarkRemover = () => {
                     {imageDimensions ? (
                       <div className="space-y-3 text-sm">
                         <div className="flex items-center justify-between border-b border-ui-divider py-2">
-                          <span className="font-medium text-base-fg/70">
-                            Resolution
-                          </span>
+                          <span className="font-medium text-base-fg/70">Resolution</span>
                           <span className="font-mono text-lg font-semibold tabular-nums text-base-fg">
                             {imageDimensions.width} × {imageDimensions.height}
                           </span>
                         </div>
                         <div className="flex items-center justify-between py-2">
-                          <span className="font-medium text-base-fg/70">
-                            Aspect Ratio
-                          </span>
+                          <span className="font-medium text-base-fg/70">Aspect Ratio</span>
                           <span className="font-mono text-lg font-semibold tabular-nums text-base-fg">
-                            {(
-                              imageDimensions.width / imageDimensions.height
-                            ).toFixed(2)}
+                            {(imageDimensions.width / imageDimensions.height).toFixed(2)}
                             :1
                           </span>
                         </div>

@@ -21,5 +21,4 @@ export interface SubscriptionPlanDetails {
 
   features: PricingFeature[];
   isPopular?: boolean;
-  colorScheme: "dark" | "green" | "purple" | "orange";
 }

@@ -13,9 +13,10 @@ interface ArtCraftSignUpProps {
   isLoading?: boolean;
 }
 
-const FIELD_LABEL = "block font-mono text-[11px] font-semibold leading-4 uppercase tracking-[0.12em] text-white/70";
+const FIELD_LABEL =
+  "block font-mono text-[11px] font-semibold leading-4 uppercase tracking-[0.12em] text-on-surface/70";
 const FIELD_INPUT =
-  "h-10 w-full rounded-[3px] border border-white/15 bg-white/5 px-4 py-2 text-sm font-normal leading-5 text-white placeholder-white/20 outline-none transition-colors focus:border-white/40";
+  "h-10 w-full rounded-[3px] border border-outline-variant bg-on-surface/5 px-4 py-2 text-sm font-normal leading-5 text-on-surface placeholder-on-surface-variant/20 outline-none transition-colors focus:border-outline";
 
 export const ArtCraftSignUp = ({
   onSubmit,
@@ -60,7 +61,7 @@ export const ArtCraftSignUp = ({
   return (
     <form className="flex w-full flex-col gap-4" onSubmit={handleSubmit} ref={formRef}>
       {localError && (
-        <div className="flex items-center justify-center gap-2 border border-red-500/20 bg-red-500/10 px-4 py-3 text-center text-sm text-red-500">
+        <div className="flex items-center justify-center gap-2 border border-error/20 bg-error/10 px-4 py-3 text-center text-sm text-error">
           <TriangleAlertIcon />
           {localError}
         </div>
@@ -111,7 +112,7 @@ export const ArtCraftSignUp = ({
           <button
             type="button"
             onClick={() => setShowPassword(v => !v)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 transition-colors hover:text-white/60"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface/30 transition-colors hover:text-on-surface/60"
             tabIndex={-1}
           >
             <DynamicIcon icon={showPassword ? EyeOffIcon : EyeIcon} />
@@ -134,7 +135,7 @@ export const ArtCraftSignUp = ({
             <button
               type="button"
               onClick={() => setShowConfirm(v => !v)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 transition-colors hover:text-white/60"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface/30 transition-colors hover:text-on-surface/60"
               tabIndex={-1}
             >
               <DynamicIcon icon={showConfirm ? EyeOffIcon : EyeIcon} />
@@ -147,13 +148,13 @@ export const ArtCraftSignUp = ({
         <Button
           type="submit"
           disabled={isLoading}
-          className="h-10 w-full justify-center rounded-[3px] border-none bg-white font-mono text-xs font-semibold uppercase tracking-[0.12em] text-black shadow-none hover:bg-white/90"
+          className="h-10 w-full justify-center rounded-[3px] border-none bg-on-surface font-mono text-xs font-semibold uppercase tracking-[0.12em] text-surface shadow-none hover:bg-on-surface/90"
         >
           {isLoading ? <LoaderCircleIcon className="animate-spin" /> : isSignUp ? "Sign up" : "Log in"}
         </Button>
       </div>
 
-      <div className="mt-4 text-center text-sm text-white/60">
+      <div className="mt-4 text-center text-sm text-on-surface/60">
         {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
         <button
           type="button"

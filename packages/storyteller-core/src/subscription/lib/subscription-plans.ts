@@ -12,7 +12,6 @@ export const FREE_PLAN: SubscriptionPlanDetails = {
     { text: "~10 GPT-Image-1 images", included: true },
     { text: "~1 minute Kling video", included: true },
   ],
-  colorScheme: "dark" as const,
 };
 
 export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
@@ -39,7 +38,6 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       { text: "~45 seconds Kling 3.0 Pro video", included: true },
       { text: "You Own ArtCraft Forever", included: true },
     ],
-    colorScheme: "green" as const,
   },
   {
     slug: "artcraft_pro",
@@ -63,7 +61,6 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       { text: "~167 seconds Kling 3.0 Pro video", included: true },
       { text: "You Own ArtCraft Forever", included: true },
     ],
-    colorScheme: "purple" as const,
   },
   {
     slug: "artcraft_max",
@@ -87,7 +84,6 @@ export const SUBSCRIPTION_PLANS: SubscriptionPlanDetails[] = [
       { text: "~295 seconds Kling 3.0 Pro video", included: true },
       { text: "You Own ArtCraft Forever", included: true },
     ],
-    colorScheme: "orange" as const,
   },
 ];
 

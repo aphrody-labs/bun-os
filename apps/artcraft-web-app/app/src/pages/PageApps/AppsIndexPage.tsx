@@ -25,9 +25,7 @@ export const AppsIndexPage = () => {
     // wrapper instead.
     <div className="fixed inset-0 overflow-y-auto bg-ui-background pt-[56px] text-base-fg">
       <main className="mx-auto w-full max-w-6xl px-5 pb-20 pt-8 sm:px-8 sm:pt-12">
-        <p className="hud-label mb-4 text-ui-accent-ink">
-          Your creative workspace
-        </p>
+        <p className="hud-label mb-4 text-ui-accent-ink">Your creative workspace</p>
         <h1 className="max-w-3xl font-display text-3xl leading-tight tracking-tight sm:text-5xl">
           What will you <span className="text-ui-accent-ink">craft</span> today?
         </h1>
@@ -40,14 +38,11 @@ export const AppsIndexPage = () => {
         {categories.map((category, index) => (
           <section
             key={category.title}
-            className={twMerge(
-              "border-t border-ui-border pt-6",
-              index === 0 ? "mt-8 sm:mt-10" : "mt-10",
-            )}
+            className={twMerge("border-t border-ui-border pt-6", index === 0 ? "mt-8 sm:mt-10" : "mt-10")}
           >
             <h2 className="hud-label mb-4 text-base-fg/70">{category.title}</h2>
             <div className="grid auto-rows-fr gap-3 md:grid-cols-2 xl:grid-cols-3">
-              {category.apps.map((app) => (
+              {category.apps.map(app => (
                 <AppCard key={app.id} app={app} />
               ))}
             </div>
@@ -67,10 +62,8 @@ function AppCard({ app }: { app: FullAppItem }) {
       onClick={() => goToApp(app.action)}
       disabled={!enabled}
       className={twMerge(
-        "group relative flex h-full rounded-[3px] border border-ui-border bg-white/5 p-5 text-left transition-colors duration-150 focus-visible:border-primary",
-        enabled
-          ? twMerge("cursor-pointer", palette.hoverStyle)
-          : "cursor-default opacity-60",
+        "group relative flex h-full rounded-[3px] border border-ui-border bg-on-surface/5 p-5 text-left transition-colors duration-150 focus-visible:border-primary",
+        enabled ? twMerge("cursor-pointer", palette.hoverStyle) : "cursor-default opacity-60",
       )}
     >
       <div className="relative flex w-full items-start gap-4">
@@ -86,16 +79,12 @@ function AppCard({ app }: { app: FullAppItem }) {
         <div className="min-w-0 flex-1">
           <div className="flex items-center justify-between gap-2">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <h3 className="text-base font-bold uppercase tracking-tight text-ui-ink">
-                {app.label}
-              </h3>
+              <h3 className="text-base font-bold uppercase tracking-tight text-ui-ink">{app.label}</h3>
               {app.badge && (
                 <span
                   className={twMerge(
                     "shrink-0 border px-1.5 py-1 font-mono text-[9px] font-medium leading-none tracking-wider",
-                    app.badge === "SOON"
-                      ? getBadgeStyles(app.badge)
-                      : "border-primary/30 text-ui-accent-ink",
+                    app.badge === "SOON" ? getBadgeStyles(app.badge) : "border-primary/30 text-ui-accent-ink",
                   )}
                 >
                   {app.badge}
@@ -103,14 +92,12 @@ function AppCard({ app }: { app: FullAppItem }) {
               )}
             </div>
             {enabled && (
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[3px] border border-white/15 text-white/40 transition-colors duration-150 group-hover:border-white/40 group-hover:text-white">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-[3px] border border-outline-variant text-on-surface/40 transition-colors duration-150 group-hover:border-outline group-hover:text-on-surface">
                 <ArrowRightIcon className="text-xs" />
               </span>
             )}
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-base-fg/70">
-            {app.description}
-          </p>
+          <p className="mt-2 text-sm leading-relaxed text-base-fg/70">{app.description}</p>
         </div>
       </div>
     </button>

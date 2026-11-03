@@ -35,7 +35,7 @@ export const GenerateIconButton = ({ credits, loading, className, disabled, ...r
 
       <button
         type="button"
-        className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-white shadow-sm transition-all duration-150 hover:bg-primary-400 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
+        className="flex h-9 w-9 items-center justify-center rounded-full bg-primary text-on-surface shadow-sm transition-all duration-150 hover:bg-primary-400 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 disabled:active:scale-100"
         disabled={isDisabled}
         {...rest}
       >

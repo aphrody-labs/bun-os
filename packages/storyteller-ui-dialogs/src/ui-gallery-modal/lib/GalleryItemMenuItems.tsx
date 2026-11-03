@@ -181,8 +181,8 @@ export const GalleryItemMenuItems: React.FC<GalleryItemMenuItemsProps> = ({
             onDelete();
           }}
         >
-          <Trash2Icon className="text-red w-4" />
-          <span className="text-red">Delete</span>
+          <Trash2Icon className="text-error w-4" />
+          <span className="text-error">Delete</span>
         </button>
       )}
     </div>

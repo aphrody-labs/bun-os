@@ -147,10 +147,10 @@ export function LoginModal({
     if (showSuccess) {
       return (
         <div className="flex flex-1 flex-col items-center justify-center px-8 py-16 text-center">
-          <h2 className="mb-3 font-display text-3xl leading-[1.05] tracking-tight text-white sm:text-4xl">
+          <h2 className="mb-3 font-display text-3xl leading-[1.05] tracking-tight text-on-surface sm:text-4xl">
             Thank you for signing in!
           </h2>
-          <p className="mb-8 text-sm leading-relaxed text-white/60">
+          <p className="mb-8 text-sm leading-relaxed text-on-surface/60">
             You're all set to start creating amazing content.
           </p>
           <Button
@@ -158,7 +158,7 @@ export function LoginModal({
             onClick={handleClose}
             icon={ArrowRightIcon}
             iconFlip={true}
-            className="h-10 rounded-[3px] bg-white px-5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-black shadow-none hover:bg-white/90"
+            className="h-10 rounded-[3px] bg-on-surface px-5 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-surface shadow-none hover:bg-on-surface/90"
           >
             Get Started
           </Button>
@@ -169,16 +169,16 @@ export function LoginModal({
     // Discord
     return (
       <div className="flex flex-1 flex-col items-center justify-center px-8 py-16 text-center">
-        <h2 className="mb-3 font-display text-3xl leading-[1.05] tracking-tight text-white sm:text-4xl">
+        <h2 className="mb-3 font-display text-3xl leading-[1.05] tracking-tight text-on-surface sm:text-4xl">
           Join our <span className="font-serif-italic">community.</span>
         </h2>
-        <p className="mb-8 max-w-md text-sm leading-relaxed text-white/60">
+        <p className="mb-8 max-w-md text-sm leading-relaxed text-on-surface/60">
           Connect with other creators, share your work, and get the latest updates in our Discord community.
         </p>
         <div className="flex gap-3">
           <Button
             variant="secondary"
-            className="h-10 rounded-[3px] border border-white/15 bg-white/5 px-4 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-none hover:bg-white/10"
+            className="h-10 rounded-[3px] border border-outline-variant bg-on-surface/5 px-4 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-on-surface shadow-none hover:bg-on-surface/10"
             onClick={() => {
               setShowDiscord(false);
               setShowSuccess(true);
@@ -190,7 +190,7 @@ export function LoginModal({
             variant="primary"
             onClick={handleDiscordJoin}
             icon={DiscordIcon}
-            className="h-10 rounded-[3px] bg-[#5865F2] px-4 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-none hover:bg-[#6a76ff]"
+            className="h-10 rounded-[3px] bg-primary px-4 font-mono text-xs font-semibold uppercase tracking-[0.12em] text-on-primary shadow-none hover:bg-primary/90"
           >
             Join Discord
           </Button>
@@ -212,7 +212,7 @@ export function LoginModal({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 cursor-pointer bg-black/80" />
+          <div className="fixed inset-0 cursor-pointer bg-scrim/80" />
         </TransitionChild>
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <TransitionChild
@@ -228,7 +228,7 @@ export function LoginModal({
               onClick={e => e.stopPropagation()}
             >
               <div
-                className={`relative flex w-full overflow-hidden border border-white/20 bg-[#1e1f22] text-white ${loggedInUsername !== null ? "" : "lg:min-h-[560px]"}`}
+                className={`relative flex w-full overflow-hidden border border-outline-variant bg-surface-container text-on-surface ${loggedInUsername !== null ? "" : "lg:min-h-[560px]"}`}
               >
                 {loggedInUsername !== null ? (
                   <LoginSuccess username={loggedInUsername} />
@@ -256,7 +256,7 @@ export function LoginModal({
                                 </>
                               )}
                             </h1>
-                            <p className="text-sm leading-relaxed text-white/60">
+                            <p className="text-sm leading-relaxed text-on-surface/60">
                               {isSignUp
                                 ? "Sign up to start creating with ArtCraft"
                                 : "Log in to your creative workspace."}
@@ -273,8 +273,8 @@ export function LoginModal({
                             />
                           )}
                           {!isSignUp && !isChallengeActive && (
-                            <div className="mb-6 flex items-center gap-4 before:h-px before:flex-1 before:bg-white/15 after:h-px after:flex-1 after:bg-white/15">
-                              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-white/40">
+                            <div className="mb-6 flex items-center gap-4 before:h-px before:flex-1 before:bg-on-surface/15 after:h-px after:flex-1 after:bg-on-surface/15">
+                              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-on-surface/40">
                                 or
                               </span>
                             </div>
@@ -291,13 +291,13 @@ export function LoginModal({
                         </div>
                       </div>
 
-                      <div className="px-6 pb-6 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-white/25 sm:px-10">
+                      <div className="px-6 pb-6 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-on-surface/25 sm:px-10">
                         &copy; {new Date().getFullYear()} ArtCraft. All rights reserved.
                       </div>
                     </div>
 
                     {/* ── Showcase pane (desktop only) ── */}
-                    <div className="relative hidden border-l border-white/15 lg:block lg:w-1/2">
+                    <div className="relative hidden border-l border-outline-variant lg:block lg:w-1/2">
                       <LoginShowcase videoUrl={videoUrl} />
                     </div>
                   </>
@@ -318,7 +318,7 @@ export function LoginModal({
 // with a legibility gradient + caption. Mirrors the webapp auth-showcase.
 function LoginShowcase({ videoUrl }: { videoUrl: string }) {
   return (
-    <div className="absolute inset-0 overflow-hidden bg-[#1e1f22]">
+    <div className="absolute inset-0 overflow-hidden bg-surface-container">
       <video
         src={videoUrl}
         autoPlay
@@ -331,15 +331,15 @@ function LoginShowcase({ videoUrl }: { videoUrl: string }) {
 
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/90 via-black/10 to-black/25"
+        className="pointer-events-none absolute inset-0 bg-gradient-to-t from-scrim/90 via-scrim/10 to-scrim/25"
       />
 
       <div className="pointer-events-none absolute inset-x-0 bottom-0 p-8">
-        <p className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-white/70">
+        <p className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-on-surface/70">
           One of the cheapest
         </p>
         <h2 className="text-2xl font-bold leading-tight">Seedance 2.0 Video Generation</h2>
-        <p className="mt-1 max-w-sm text-sm text-white/70">Generate jaw-dropping AI videos with Seedance 2.0.</p>
+        <p className="mt-1 max-w-sm text-sm text-on-surface/70">Generate jaw-dropping AI videos with Seedance 2.0.</p>
       </div>
     </div>
   );

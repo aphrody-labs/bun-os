@@ -24,7 +24,9 @@ export const ToggleButton = ({ isActive, icon, activeIcon, label, onClick, class
         // the Button base's mono uppercase label.
         "flex h-[34px] items-center justify-center rounded-[3px] border border-ui-controls-border bg-ui-controls py-0 font-sans text-sm font-medium normal-case tracking-normal text-base-fg transition-colors",
         hasLabel ? "px-3" : "w-[34px] p-0",
-        isActive ? "border-white/40 bg-white/10 hover:border-white/40 hover:bg-white/15" : NEUTRAL_BUTTON_HOVER_CLASSES,
+        isActive
+          ? "border-outline bg-on-surface/10 hover:border-outline hover:bg-on-surface/15"
+          : NEUTRAL_BUTTON_HOVER_CLASSES,
         className,
       )}
       variant="secondary"

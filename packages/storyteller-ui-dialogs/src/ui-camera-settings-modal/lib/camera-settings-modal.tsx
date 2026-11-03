@@ -109,25 +109,27 @@ export const CameraSettingsModal = ({
       showClose={false}
     >
       <div className="grid h-full grid-cols-12 gap-3">
-        <div className="relative col-span-4 p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-white/15">
+        <div className="relative col-span-4 p-3 pt-2 after:absolute after:right-0 after:top-0 after:h-full after:w-px after:bg-on-surface/15">
           <div className="flex items-center justify-between gap-2.5 py-0.5">
             <h2 className="hud-label text-base-fg/60">Camera</h2>
             <Tooltip content="Add camera" position="top" delay={200}>
               <button
-                className="flex h-6 w-6 items-center justify-center rounded-[3px] text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+                className="flex h-6 w-6 items-center justify-center rounded-[3px] text-on-surface/70 transition-colors hover:bg-on-surface/10 hover:text-on-surface"
                 onClick={onAddCamera}
               >
                 <PlusIcon className="text-xl" />
               </button>
             </Tooltip>
           </div>
-          <hr className="my-2 w-full border-white/15" />
+          <hr className="my-2 w-full border-outline-variant" />
           <div className="space-y-1">
             {cameras.map(camera => (
               <button
                 key={camera.id}
                 className={`h-9 w-full rounded-[3px] border-l-2 p-2 text-left transition-colors duration-100 ${
-                  camera.id === selectedCameraId ? "border-white bg-white/10" : "border-transparent hover:bg-white/5"
+                  camera.id === selectedCameraId
+                    ? "border-outline bg-on-surface/10"
+                    : "border-transparent hover:bg-on-surface/5"
                 }`}
                 onClick={() => handleCameraSelect(camera)}
               >
@@ -152,8 +154,8 @@ export const CameraSettingsModal = ({
                   <button
                     className={`flex h-6 w-6 items-center justify-center rounded-[3px] transition-colors ${
                       selectedCamera?.id === "main"
-                        ? "cursor-not-allowed text-white/30"
-                        : "text-white/60 hover:bg-white/10 hover:text-white"
+                        ? "cursor-not-allowed text-on-surface/30"
+                        : "text-on-surface/60 hover:bg-on-surface/10 hover:text-on-surface"
                     }`}
                     onClick={() => selectedCamera && selectedCamera.id !== "main" && onDeleteCamera(selectedCamera.id)}
                     disabled={selectedCamera?.id === "main"}
@@ -162,7 +164,7 @@ export const CameraSettingsModal = ({
                   </button>
                 </Tooltip>
               </div>
-              <hr className="my-2 w-full border-white/15" />
+              <hr className="my-2 w-full border-outline-variant" />
               <div className="space-y-4">
                 <div className="space-y-1">
                   <Label htmlFor="camera-name">Name</Label>

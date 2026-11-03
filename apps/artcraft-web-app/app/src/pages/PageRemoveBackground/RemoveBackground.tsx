@@ -1,25 +1,11 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import {
-  DownloadIcon,
-  EyeIcon,
-  ImagesIcon,
-  PlusIcon,
-  UploadIcon,
-  WandSparklesIcon,
-} from "lucide-react";
+import { DownloadIcon, EyeIcon, ImagesIcon, PlusIcon, UploadIcon, WandSparklesIcon } from "lucide-react";
 import { Button } from "@storyteller/ui-button";
 import { GalleryItem, GalleryModal } from "@storyteller/ui-gallery-modal";
 import toast from "react-hot-toast";
 import { UploadEntryCard } from "../../components/media/UploadEntryCard";
-import {
-  useRemoveBackgroundStore,
-  ProcessedImage,
-} from "./RemoveBackgroundStore";
-import {
-  EnqueueImageBgRemoval,
-  useCanvasBgRemovedEvent,
-  downloadFileFromUrl,
-} from "@storyteller/tauri-api";
+import { useRemoveBackgroundStore, ProcessedImage } from "./RemoveBackgroundStore";
+import { EnqueueImageBgRemoval, useCanvasBgRemovedEvent, downloadFileFromUrl } from "@storyteller/tauri-api";
 import { PopoverMenu, PopoverItem } from "@storyteller/ui-popover";
 import { twMerge } from "tailwind-merge";
 import { LoadingSpinner } from "@storyteller/ui-loading-spinner";
@@ -41,9 +27,7 @@ const convertFileToBase64 = (file: File): Promise<string> => {
 
 export const RemoveBackground = () => {
   const [isGalleryModalOpen, setIsGalleryModalOpen] = useState(false);
-  const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>(
-    [],
-  );
+  const [selectedGalleryImages, setSelectedGalleryImages] = useState<string[]>([]);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
@@ -215,8 +199,7 @@ export const RemoveBackground = () => {
       }
       if (progressBarRef.current) {
         progressBarRef.current.style.left = `${progressPercent}%`;
-        progressBarRef.current.style.display =
-          progressPercent < 100 ? "block" : "none";
+        progressBarRef.current.style.display = progressPercent < 100 ? "block" : "none";
       }
 
       if (progress < 1) {
@@ -244,7 +227,7 @@ export const RemoveBackground = () => {
     };
   }, []);
 
-  useCanvasBgRemovedEvent(async (event) => {
+  useCanvasBgRemovedEvent(async event => {
     if (event.maybe_frontend_subscriber_id !== pendingJobIdRef.current) return;
 
     const newImage: ProcessedImage = {
@@ -345,19 +328,12 @@ export const RemoveBackground = () => {
         setPendingJobId(null);
       }
     },
-    [
-      setActiveImage,
-      resetAnimationState,
-      setCurrentOriginalUrl,
-      setIsProcessing,
-      setPendingJobId,
-      setImageDimensions,
-    ],
+    [setActiveImage, resetAnimationState, setCurrentOriginalUrl, setIsProcessing, setPendingJobId, setImageDimensions],
   );
 
   const handleImageSelect = useCallback((id: string) => {
-    setSelectedGalleryImages((prev) => {
-      if (prev.includes(id)) return prev.filter((x) => x !== id);
+    setSelectedGalleryImages(prev => {
+      if (prev.includes(id)) return prev.filter(x => x !== id);
       return [id];
     });
   }, []);
@@ -417,14 +393,7 @@ export const RemoveBackground = () => {
         setPendingJobId(null);
       }
     },
-    [
-      setActiveImage,
-      resetAnimationState,
-      setCurrentOriginalUrl,
-      setIsProcessing,
-      setPendingJobId,
-      setImageDimensions,
-    ],
+    [setActiveImage, resetAnimationState, setCurrentOriginalUrl, setIsProcessing, setPendingJobId, setImageDimensions],
   );
 
   const handleDownload = useCallback(async () => {
@@ -559,8 +528,8 @@ export const RemoveBackground = () => {
                     icon={WandSparklesIcon}
                     title="Remove Background"
                     description="Instantly remove backgrounds from your images with AI-powered precision."
-                    accentBackgroundClass="bg-violet-500/40"
-                    accentBorderClass="border-violet-400/30"
+                    accentBackgroundClass="bg-tertiary/40"
+                    accentBorderClass="border-tertiary/30"
                     accept="image/*"
                     onFilesSelected={handleLocalImageSelect}
                     primaryLabel="Select Image"
@@ -587,16 +556,11 @@ export const RemoveBackground = () => {
                       disabled={!activeImage || isProcessing}
                       className={twMerge(
                         "border-ui-controls-border select-none border px-6 py-2.5 text-sm font-semibold transition-all",
-                        isHoldingCompare
-                          ? "border-white bg-white/10"
-                          : "border-ui-controls-border",
-                        (!activeImage || isProcessing) &&
-                          "cursor-not-allowed opacity-50",
+                        isHoldingCompare ? "border-outline bg-on-surface/10" : "border-ui-controls-border",
+                        (!activeImage || isProcessing) && "cursor-not-allowed opacity-50",
                       )}
                     >
-                      {isHoldingCompare
-                        ? "Showing Original"
-                        : "Hold to Compare"}
+                      {isHoldingCompare ? "Showing Original" : "Hold to Compare"}
                     </Button>
                     <Button
                       variant="primary"
@@ -605,8 +569,7 @@ export const RemoveBackground = () => {
                       disabled={!activeImage || isProcessing}
                       className={twMerge(
                         "select-none px-6 py-2.5 text-sm font-semibold transition-all",
-                        (!activeImage || isProcessing) &&
-                          "cursor-not-allowed opacity-50",
+                        (!activeImage || isProcessing) && "cursor-not-allowed opacity-50",
                       )}
                     >
                       Download
@@ -615,12 +578,9 @@ export const RemoveBackground = () => {
                 )}
 
                 <div className="flex flex-1 items-center justify-center">
-                  <div
-                    className="relative overflow-hidden border border-ui-panel-border"
-                    style={imageContainerStyle}
-                  >
+                  <div className="relative overflow-hidden border border-ui-panel-border" style={imageContainerStyle}>
                     {isProcessing && (
-                      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/70">
+                      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-scrim/70">
                         {currentOriginalUrl && (
                           <img
                             src={currentOriginalUrl}
@@ -630,10 +590,10 @@ export const RemoveBackground = () => {
                         )}
                         <div className="relative z-10 flex flex-col items-center gap-4">
                           <div className="relative">
-                            <div className="h-16 w-16 animate-spin rounded-full border-2 border-white/20 border-t-white" />
-                            <WandSparklesIcon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl text-white" />
+                            <div className="h-16 w-16 animate-spin rounded-full border-2 border-outline-variant border-t-on-surface" />
+                            <WandSparklesIcon className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-2xl text-on-surface" />
                           </div>
-                          <span className="font-mono text-sm font-semibold uppercase tracking-[0.12em] text-white">
+                          <span className="font-mono text-sm font-semibold uppercase tracking-[0.12em] text-on-surface">
                             Removing Background...
                           </span>
                         </div>
@@ -645,15 +605,14 @@ export const RemoveBackground = () => {
                           className="absolute inset-0"
                           style={{
                             backgroundImage: `
-                            linear-gradient(45deg, #1a1a1a 25%, transparent 25%),
-                            linear-gradient(-45deg, #1a1a1a 25%, transparent 25%),
-                            linear-gradient(45deg, transparent 75%, #1a1a1a 75%),
-                            linear-gradient(-45deg, transparent 75%, #1a1a1a 75%)
+                            linear-gradient(45deg, var(--md-sys-color-surface-container-highest) 25%, transparent 25%),
+                            linear-gradient(-45deg, var(--md-sys-color-surface-container-highest) 25%, transparent 25%),
+                            linear-gradient(45deg, transparent 75%, var(--md-sys-color-surface-container-highest) 75%),
+                            linear-gradient(-45deg, transparent 75%, var(--md-sys-color-surface-container-highest) 75%)
                           `,
                             backgroundSize: "16px 16px",
-                            backgroundPosition:
-                              "0 0, 0 8px, 8px -8px, -8px 0px",
-                            backgroundColor: "#2a2a2a",
+                            backgroundPosition: "0 0, 0 8px, 8px -8px, -8px 0px",
+                            backgroundColor: "var(--md-sys-color-surface-container)",
                           }}
                         />
 
@@ -667,8 +626,7 @@ export const RemoveBackground = () => {
                           ref={clipLayerRef}
                           className={twMerge(
                             "absolute inset-0",
-                            animationComplete &&
-                              "transition-[clip-path] duration-300",
+                            animationComplete && "transition-[clip-path] duration-300",
                           )}
                           style={{
                             clipPath: `inset(0 0 0 ${revealProgressRef.current}%)`,
@@ -683,15 +641,11 @@ export const RemoveBackground = () => {
 
                         <div
                           ref={progressBarRef}
-                          className="absolute bottom-0 top-0 w-1 bg-white"
+                          className="absolute bottom-0 top-0 w-1 bg-on-surface"
                           style={{
                             left: `${revealProgressRef.current}%`,
                             transform: "translateX(-50%)",
-                            display:
-                              animationComplete ||
-                              revealProgressRef.current >= 100
-                                ? "none"
-                                : "block",
+                            display: animationComplete || revealProgressRef.current >= 100 ? "none" : "block",
                           }}
                         />
                       </>
@@ -715,28 +669,22 @@ export const RemoveBackground = () => {
                     position="top"
                     showIconsInList
                     buttonClassName={twMerge(
-                      "h-14 w-14 rounded-[3px] border border-dashed border-white/20 bg-white/[0.015] hover:border-white/40 hover:bg-white/5",
+                      "h-14 w-14 rounded-[3px] border border-dashed border-outline-variant bg-on-surface/[0.015] hover:border-outline hover:bg-on-surface/5",
                       isProcessing && "cursor-not-allowed opacity-50",
                     )}
                     triggerIcon={<PlusIcon className="text-xl" />}
                   />
 
-                  {images.map((img) => (
+                  {images.map(img => (
                     <button
                       key={img.id}
                       onClick={() => handleThumbnailClick(img)}
                       className={twMerge(
                         "relative h-14 w-14 overflow-hidden rounded-[3px] border transition-all",
-                        img.id === activeImageId
-                          ? "border-white"
-                          : "border-white/15 hover:border-white/30",
+                        img.id === activeImageId ? "border-outline" : "border-outline-variant hover:border-outline",
                       )}
                     >
-                      <img
-                        src={img.processedUrl}
-                        alt="Processed"
-                        className="h-full w-full object-cover"
-                      />
+                      <img src={img.processedUrl} alt="Processed" className="h-full w-full object-cover" />
                     </button>
                   ))}
                 </div>

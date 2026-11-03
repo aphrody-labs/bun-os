@@ -318,17 +318,17 @@ export const UploadFilesSplat = ({
         fileIcon={BoxIcon}
       />
 
-      {selectionError && <h6 className="z-10 text-red">{selectionError}</h6>}
+      {selectionError && <h6 className="z-10 text-error">{selectionError}</h6>}
 
       {isMulti ? (
         <Group orientation="horizontal">
           <Panel defaultSize="33%" minSize="20%">
-            <ul className="flex h-full flex-col gap-1 overflow-y-auto rounded-none border border-white/15 bg-black/30 p-2">
+            <ul className="flex h-full flex-col gap-1 overflow-y-auto rounded-none border border-outline-variant bg-scrim/30 p-2">
               {fileEntries.map((entry, i) => (
                 <li
                   key={i}
                   className={`group flex items-center justify-between gap-1.5 rounded-[3px] px-2 py-1 cursor-pointer text-sm transition-colors ${
-                    i === previewIndex ? "bg-white/10" : "hover:bg-white/5"
+                    i === previewIndex ? "bg-on-surface/10" : "hover:bg-on-surface/5"
                   }`}
                   onClick={() => setPreviewIndex(i)}
                 >
@@ -349,12 +349,12 @@ export const UploadFilesSplat = ({
                       </button>
                     )}
                     {entry.status === "uploading" && <LoaderIcon className="animate-spin opacity-60" />}
-                    {entry.status === "success" && <CheckIcon className="text-green-400" />}
+                    {entry.status === "success" && <CheckIcon className="text-success" />}
                     {entry.status === "error" && (
                       <span className="flex items-center gap-1">
-                        <CircleAlertIcon className="text-red-400" />
+                        <CircleAlertIcon className="text-error" />
                         <button
-                          className="hidden group-hover:inline-flex items-center text-xs text-white/60 hover:text-white transition-colors"
+                          className="hidden group-hover:inline-flex items-center text-xs text-on-surface/60 hover:text-on-surface transition-colors"
                           onClick={e => {
                             e.stopPropagation();
                             retrySingleFile(i);
@@ -373,14 +373,14 @@ export const UploadFilesSplat = ({
 
           <Separator className="flex w-4 items-center justify-center">
             <div
-              className="h-8 w-1 rounded-none bg-white/20 transition-colors hover:bg-white/40"
+              className="h-8 w-1 rounded-none bg-on-surface/20 transition-colors hover:bg-on-surface/40"
               onPointerDown={e => e.stopPropagation()}
             />
           </Separator>
 
           <Panel defaultSize="67%" minSize="25%">
             <div className="flex h-full flex-col gap-2">
-              <div className="relative w-full min-h-48 overflow-hidden rounded-none border border-white/15 bg-black/30">
+              <div className="relative w-full min-h-48 overflow-hidden rounded-none border border-outline-variant bg-scrim/30">
                 <canvas className="pointer-events-none h-full min-h-48 !w-full" ref={canvasCallbackRef} />
                 {!currentFile && (
                   <h6 className="pointer-events-auto absolute left-0 top-1/2 -mt-5 flex w-full items-center justify-center gap-2.5 text-center opacity-50">
@@ -419,7 +419,7 @@ export const UploadFilesSplat = ({
           </Panel>
         </Group>
       ) : (
-        <div className="relative m-auto w-full min-h-48 overflow-hidden rounded-none border border-white/15 bg-black/30">
+        <div className="relative m-auto w-full min-h-48 overflow-hidden rounded-none border border-outline-variant bg-scrim/30">
           <canvas className="pointer-events-none h-full min-h-48 !w-full" ref={canvasCallbackRef} />
           {!currentFile && (
             <h6 className="pointer-events-auto absolute left-0 top-1/2 -mt-5 flex w-full items-center justify-center gap-2.5 text-center opacity-50">
@@ -444,7 +444,7 @@ export const UploadFilesSplat = ({
       )}
 
       {!isUploading && !anyUploading && allDone && anyFailed && isMulti && (
-        <p className="text-center text-sm text-red-400">
+        <p className="text-center text-sm text-error">
           {fileEntries.filter(e => e.status === "error").length} file(s) failed to upload.
         </p>
       )}

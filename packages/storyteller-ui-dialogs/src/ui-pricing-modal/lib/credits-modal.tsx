@@ -59,20 +59,20 @@ export function CreditsModal({ isOpen = false, onClose, onPurchase }: CreditsMod
     <Modal
       isOpen={isOpen}
       onClose={onClose ?? (() => {})}
-      className="w-full max-w-2xl max-h-[100vh] overflow-y-auto overflow-x-hidden border border-white/15 bg-[#101014] p-0"
+      className="w-full max-w-2xl max-h-[100vh] overflow-y-auto overflow-x-hidden border border-outline-variant bg-surface-container-lowest p-0"
       allowBackgroundInteraction={false}
       showClose={true}
       closeOnOutsideClick={true}
       resizable={false}
       childPadding={false}
-      backdropClassName="bg-black/80"
+      backdropClassName="bg-scrim/80"
     >
       <div className="relative overflow-hidden">
         <div className="relative px-8 pt-10 pb-8 sm:px-10 sm:pt-11 sm:pb-9">
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-[34px] sm:leading-[1.1]">
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-on-surface sm:text-[34px] sm:leading-[1.1]">
             Buy <span className="text-primary">credits</span>
           </h2>
-          <p className="mt-3 text-[15px] leading-relaxed text-white/55">
+          <p className="mt-3 text-[15px] leading-relaxed text-on-surface/55">
             One-time credit packs. No subscription required.
           </p>
 
@@ -89,29 +89,29 @@ export function CreditsModal({ isOpen = false, onClose, onPurchase }: CreditsMod
                   className={twMerge(
                     "group relative flex flex-col gap-6 border p-6 text-left transition-all disabled:cursor-not-allowed disabled:opacity-60",
                     isPopular
-                      ? "border-white/60 bg-white/[0.06] hover:border-white"
-                      : "border-white/15 bg-white/[0.02] hover:border-white/30 hover:bg-white/[0.04]",
+                      ? "border-outline bg-on-surface/[0.06] hover:border-outline"
+                      : "border-outline-variant bg-on-surface/[0.02] hover:border-outline hover:bg-on-surface/[0.04]",
                   )}
                 >
                   {pack.badge && (
-                    <span className="absolute -top-2.5 right-3 bg-white px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-black">
+                    <span className="absolute -top-2.5 right-3 bg-on-surface px-2.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-surface">
                       {pack.badge}
                     </span>
                   )}
 
                   <div className="flex items-center gap-3">
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center bg-white/10">
-                      <CoinsIcon className="text-white text-lg" />
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center bg-on-surface/10">
+                      <CoinsIcon className="text-on-surface text-lg" />
                     </span>
                     <div className="min-w-0">
-                      <div className="text-4xl font-bold leading-none tracking-tight text-white">
+                      <div className="text-4xl font-bold leading-none tracking-tight text-on-surface">
                         {pack.total.toLocaleString()}
                       </div>
-                      <div className="mt-0 text-sm text-white/40">
+                      <div className="mt-0 text-sm text-on-surface/40">
                         {pack.bonus > 0 ? (
                           <>
                             {pack.base.toLocaleString()} +{" "}
-                            <span className="font-semibold text-white">{pack.bonus.toLocaleString()} bonus</span>
+                            <span className="font-semibold text-on-surface">{pack.bonus.toLocaleString()} bonus</span>
                           </>
                         ) : (
                           "credits"
@@ -121,8 +121,8 @@ export function CreditsModal({ isOpen = false, onClose, onPurchase }: CreditsMod
                   </div>
 
                   <div className="flex items-center justify-between">
-                    <span className="text-2xl font-semibold text-white/80">${pack.priceUsd}</span>
-                    <span className="flex items-center gap-1.5 text-base font-semibold text-white">
+                    <span className="text-2xl font-semibold text-on-surface/80">${pack.priceUsd}</span>
+                    <span className="flex items-center gap-1.5 text-base font-semibold text-on-surface">
                       {isLoading ? (
                         <LoaderCircleIcon className="animate-spin" />
                       ) : (
@@ -138,7 +138,7 @@ export function CreditsModal({ isOpen = false, onClose, onPurchase }: CreditsMod
             })}
           </div>
 
-          <p className="mt-6 text-center text-xs text-white/35">Secure checkout via Stripe.</p>
+          <p className="mt-6 text-center text-xs text-on-surface/35">Secure checkout via Stripe.</p>
         </div>
       </div>
     </Modal>

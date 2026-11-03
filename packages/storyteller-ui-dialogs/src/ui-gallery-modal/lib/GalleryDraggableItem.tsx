@@ -122,13 +122,13 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
       reminderType: "default",
       title: "Delete this media?",
       message: (
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-on-surface/70">
           This will permanently remove the media from your library. This action cannot be undone.
         </p>
       ),
       primaryActionText: "Delete",
       secondaryActionText: "Cancel",
-      primaryActionBtnClassName: "bg-red text-white hover:bg-red/90",
+      primaryActionBtnClassName: "bg-error text-on-surface hover:bg-error/90",
       onPrimaryAction: async () => {
         try {
           const result = await onDelete(item.id);
@@ -243,19 +243,19 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
     >
       <div className="relative h-full w-full">
         {isAudio ? (
-          <div className="flex h-full w-full flex-col bg-gradient-to-br from-white/[0.08] via-white/[0.04] to-white/[0.02]">
+          <div className="flex h-full w-full flex-col bg-gradient-to-br from-on-surface/[0.08] via-on-surface/[0.04] to-on-surface/[0.02]">
             <div className="flex min-h-0 flex-1 items-center justify-center">
-              <div className="flex h-11 w-11 items-center justify-center bg-white/10 ring-1 ring-white/15">
-                <MusicIcon className="text-lg text-white/70" />
+              <div className="flex h-11 w-11 items-center justify-center bg-on-surface/10 ring-1 ring-outline-variant">
+                <MusicIcon className="text-lg text-on-surface/70" />
               </div>
             </div>
-            <p className="line-clamp-2 shrink-0 px-2.5 pb-2.5 text-left text-xs leading-snug text-white/75">
+            <p className="line-clamp-2 shrink-0 px-2.5 pb-2.5 text-left text-xs leading-snug text-on-surface/75">
               {audioPromptText || item.label}
             </p>
           </div>
         ) : !item.thumbnail ? (
-          <div className="flex h-full w-full items-center justify-center bg-black/30">
-            <span className="text-white/60">Image not available</span>
+          <div className="flex h-full w-full items-center justify-center bg-scrim/30">
+            <span className="text-on-surface/60">Image not available</span>
           </div>
         ) : (
           <>
@@ -269,7 +269,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
               src={imgSrc}
               alt={item.label}
               className={twMerge(
-                "h-full w-full bg-black/30",
+                "h-full w-full bg-scrim/30",
                 imageFit === "contain" ? "object-contain" : "object-cover",
                 isVideo && !videoLoaded ? "opacity-0" : "",
               )}
@@ -280,7 +280,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
               onError={handleImgError}
             />
             {isVideo && !videoLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+              <div className="absolute inset-0 flex items-center justify-center bg-scrim/30">
                 <LoadingSpinner className="h-6 w-6" />
               </div>
             )}
@@ -292,7 +292,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
           </div>
         )}
         {disabled && (
-          <div className="absolute left-2 top-2 bg-black/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-white/80">
+          <div className="absolute left-2 top-2 bg-scrim/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-on-surface/80">
             Added
           </div>
         )}
@@ -388,7 +388,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
         <div
           className={twMerge(
             "absolute left-2 top-2 z-[2] flex h-5 w-5 items-center justify-center rounded-[3px] border-2 cursor-pointer transition-all duration-100",
-            bulkSelected ? "bg-primary border-primary" : "border-white/60 bg-black/40 hover:border-white",
+            bulkSelected ? "bg-primary border-primary" : "border-outline bg-scrim/40 hover:border-outline",
             bulkSelectionMode
               ? "opacity-100"
               : "opacity-0 group-hover:opacity-100 [@media(pointer:coarse)]:opacity-100",
@@ -399,12 +399,12 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
             onBulkSelectToggle?.();
           }}
         >
-          {bulkSelected && <CheckIcon className="text-[10px] text-white" />}
+          {bulkSelected && <CheckIcon className="text-[10px] text-on-surface" />}
         </div>
       )}
       {/* Media class badge on hover — bottom-left */}
       {!disableTooltipAndBadge && item.mediaClass && (
-        <div className="pointer-events-none absolute left-2 bottom-2 z-[1] bg-black/50 backdrop-blur-lg px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+        <div className="pointer-events-none absolute left-2 bottom-2 z-[1] bg-scrim/50 backdrop-blur-lg px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-on-surface opacity-0 group-hover:opacity-100 transition-opacity duration-150">
           {item.mediaClass === "dimensional" || item.mediaClass === "mesh" || item.mediaClass === "splat"
             ? "3D"
             : item.mediaClass}
@@ -412,7 +412,7 @@ export const GalleryDraggableItem: React.FC<GalleryDraggableItemProps> = ({
       )}
       {/* Upload badge — bottom-right (always visible, even in select mode) */}
       {item.isUpload && (
-        <div className="pointer-events-none absolute right-2 bottom-2 z-[1] flex h-5 w-5 items-center justify-center bg-black/50 backdrop-blur-lg text-white">
+        <div className="pointer-events-none absolute right-2 bottom-2 z-[1] flex h-5 w-5 items-center justify-center bg-scrim/50 backdrop-blur-lg text-on-surface">
           <UploadIcon className="text-[10px]" />
         </div>
       )}

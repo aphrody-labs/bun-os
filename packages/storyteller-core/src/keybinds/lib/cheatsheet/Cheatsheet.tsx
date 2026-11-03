@@ -48,15 +48,15 @@ export function Cheatsheet({ surface, visible }: { surface: Surface; visible: bo
       <div
         data-keybinds-cheatsheet
         className={twMerge(
-          "max-h-[80%] w-[min(680px,90%)] overflow-auto rounded-none border border-white/15 bg-ui-panel/95 p-6 text-white/90",
+          "max-h-[80%] w-[min(680px,90%)] overflow-auto rounded-none border border-outline-variant bg-ui-panel/95 p-6 text-on-surface/90",
           pinned && "pointer-events-auto",
         )}
       >
         <div className="mb-3 flex items-center justify-between">
-          <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-white/60">
+          <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-on-surface/60">
             Keyboard shortcuts
           </span>
-          <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-white/40">
+          <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-on-surface/40">
             {selectedPreset} preset
           </span>
         </div>
@@ -66,13 +66,13 @@ export function Cheatsheet({ surface, visible }: { surface: Surface; visible: bo
             if (!rows?.length) return null;
             return (
               <div key={group}>
-                <div className="mb-2 font-mono text-[11px] font-medium uppercase tracking-[0.13em] text-white/45">
+                <div className="mb-2 font-mono text-[11px] font-medium uppercase tracking-[0.13em] text-on-surface/45">
                   {group}
                 </div>
                 <ul className="flex flex-col gap-1.5">
                   {rows.map(a => (
                     <li key={a.id} className="flex items-center justify-between gap-3 text-sm">
-                      <span className="text-white/80">{a.label}</span>
+                      <span className="text-on-surface/80">{a.label}</span>
                       <KbdBindings bindings={forAction(a.id)} />
                     </li>
                   ))}
@@ -82,7 +82,7 @@ export function Cheatsheet({ surface, visible }: { surface: Surface; visible: bo
           })}
         </div>
         {pinned && (
-          <div className="mt-5 border-t border-white/15 pt-3 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-white/40">
+          <div className="mt-5 border-t border-outline-variant pt-3 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-on-surface/40">
             Press Esc or click outside to close
           </div>
         )}

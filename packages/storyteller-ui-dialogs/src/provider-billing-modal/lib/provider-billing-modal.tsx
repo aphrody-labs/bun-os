@@ -55,7 +55,7 @@ export function ProviderBillingModal({ isVideoPage = false }: ProviderBillingMod
       className={twMerge(
         "rounded-none border transition-all duration-300 overflow-y-auto",
         isArtcraft
-          ? "max-w-screen-xl max-h-[90vh] border-white/15 bg-[#101014]"
+          ? "max-w-screen-xl max-h-[90vh] border-outline-variant bg-surface-container-lowest"
           : "max-w-2xl max-h-[500px] border-ui-panel-border bg-ui-panel",
       )}
       childPadding={!isArtcraft}

@@ -26,7 +26,7 @@ export const Select = ({ onChange, options, placeholder, value, id, className }:
           <>
             <ListboxButton
               id={id}
-              className="relative h-10 w-full cursor-pointer rounded-[3px] bg-ui-controls text-base-fg border border-ui-controls-border py-2 pl-3 pr-10 text-left outline-none outline-offset-0 transition-colors duration-150 ease-in-out sm:text-sm focus:!outline-none hover:border-white/40"
+              className="relative h-10 w-full cursor-pointer rounded-[3px] bg-ui-controls text-base-fg border border-ui-controls-border py-2 pl-3 pr-10 text-left outline-none outline-offset-0 transition-colors duration-150 ease-in-out sm:text-sm focus:!outline-none hover:border-outline"
             >
               <span className={twMerge("block truncate", !value && "opacity-50")}>{selectedOption.label}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5">
@@ -49,8 +49,8 @@ export const Select = ({ onChange, options, placeholder, value, id, className }:
                       twMerge(
                         "relative cursor-pointer select-none py-2 pl-7 pr-2 transition-colors duration-150 ease-in-out",
                         !selected ? "text-base-fg/90" : "text-base-fg",
-                        selected && "bg-white/10",
-                        focus && "bg-white text-black",
+                        selected && "bg-on-surface/10",
+                        focus && "bg-on-surface text-surface",
                       )
                     }
                     value={option.value}

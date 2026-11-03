@@ -94,7 +94,7 @@ export const markdownToHtml = (markdown: string, basePath: string = ""): string 
     const { width, height } = parseSize(sizeStr);
 
     let style =
-      "width: 100%; max-width: 100%; border-radius: 0.75rem; border: 1px solid rgba(255,255,255,0.1); margin: 2rem 0; display: block;";
+      "width: 100%; max-width: 100%; border-radius: 0.75rem; border: 1px solid var(--md-sys-color-outline-variant); margin: 2rem 0; display: block;";
     let attrs = "";
 
     if (width) {

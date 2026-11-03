@@ -17,16 +17,16 @@ export const PricingPromoBanner = ({ className }: PricingPromoBannerProps) => (
     <div aria-hidden className="pointer-events-none absolute -right-16 -top-20 h-64 w-64 bg-primary/25 blur-3xl" />
 
     <div className="relative flex flex-col gap-3">
-      <span className="inline-flex w-fit items-center gap-1.5 bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-white">
+      <span className="inline-flex w-fit items-center gap-1.5 bg-primary px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-on-surface">
         <TagIcon className="text-[10px]" />
         Limited-time offer
       </span>
 
-      <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight tracking-[-0.02em] text-white">
+      <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight tracking-[-0.02em] text-on-surface">
         Save <span className="text-primary-300">{PROMO_PCT}%</span> on all monthly &amp; yearly plans
       </h2>
 
-      <p className="max-w-2xl text-sm sm:text-base text-white/60">
+      <p className="max-w-2xl text-sm sm:text-base text-on-surface/60">
         Every ArtCraft plan is discounted for a limited time - lock in the lowest price and start creating.
       </p>
     </div>

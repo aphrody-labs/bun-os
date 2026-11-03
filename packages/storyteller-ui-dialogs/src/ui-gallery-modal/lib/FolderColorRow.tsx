@@ -3,6 +3,8 @@ import { XIcon } from "lucide-react";
 import { twMerge } from "tailwind-merge";
 import { FOLDER_COLOR_PRESETS } from "./folderUtils";
 
+const NATIVE_PICKER_DEFAULT = "#888888"; // design:content: neutral start value of the native colour input
+
 interface FolderColorRowProps {
   colorCode?: string | null;
   onSetColor: (color: string | null) => void;
@@ -22,8 +24,8 @@ export const FolderColorRow: React.FC<FolderColorRowProps> = ({ colorCode, onSet
         onClick={() => onSetColor(c)}
         style={{ backgroundColor: c }}
         className={twMerge(
-          "h-5 w-5 rounded-[3px] border border-black/20 transition-transform hover:scale-110",
-          colorCode === c && "ring-2 ring-white ring-offset-1 ring-offset-ui-panel",
+          "h-5 w-5 rounded-[3px] border border-outline-variant/20 transition-transform hover:scale-110",
+          colorCode === c && "ring-2 ring-outline ring-offset-1 ring-offset-ui-panel",
         )}
       />
     ))}
@@ -34,7 +36,7 @@ export const FolderColorRow: React.FC<FolderColorRowProps> = ({ colorCode, onSet
       onClick={() => onSetColor(null)}
       className={twMerge(
         "flex h-5 w-5 items-center justify-center rounded-[3px] border border-ui-panel-border text-base-fg/50 hover:text-base-fg",
-        !colorCode && "ring-2 ring-white ring-offset-1 ring-offset-ui-panel",
+        !colorCode && "ring-2 ring-outline ring-offset-1 ring-offset-ui-panel",
       )}
     >
       <XIcon className="text-[10px]" />
@@ -49,7 +51,7 @@ export const FolderColorRow: React.FC<FolderColorRowProps> = ({ colorCode, onSet
     >
       <input
         type="color"
-        value={colorCode && /^#[0-9a-fA-F]{6}$/.test(colorCode) ? colorCode : "#888888"}
+        value={colorCode && /^#[0-9a-fA-F]{6}$/.test(colorCode) ? colorCode : NATIVE_PICKER_DEFAULT}
         onChange={e => onSetColor(e.target.value)}
         className="absolute -inset-1 h-[150%] w-[150%] cursor-pointer opacity-0"
       />
