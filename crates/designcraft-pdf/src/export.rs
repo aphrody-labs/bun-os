@@ -1497,7 +1497,7 @@ impl Exporter<'_> {
     /// file goes in as 1.6 (its header relabelled, as `qpdf --force-version=1.6` does). A newer
     /// file is left out and the export fails naming it ([`Exporter::check_placed_versions`]).
     fn placed_pdf(&mut self, asset: &designcraft_doc::Asset) -> Option<krilla::pdf::PdfDocument> {
-        use hayro_syntax::PdfVersion as V;
+        use krilla_hayro_syntax::PdfVersion as V;
         let Ok(pdf) = krilla::pdf::Pdf::new(asset.data.clone()) else {
             self.warn(format!("{}: can't read the placed PDF", asset.name));
             return None;

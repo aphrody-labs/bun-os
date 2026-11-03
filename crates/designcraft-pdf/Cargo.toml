@@ -21,6 +21,8 @@ designcraft-doc = { path = "../designcraft-doc", version = "0.7.1" }
 designcraft-fonts = { path = "../designcraft-fonts", version = "0.7.1" }
 designcraft-compose = { path = "../designcraft-compose", version = "0.7.1" }
 krilla = { version = "0.8", features = ["pdf"] }
+# The hayro-syntax krilla parses placed PDFs with (its `pdf::Pdf::version()` type), not the aphrody fork.
+krilla-hayro-syntax = { package = "hayro-syntax", version = "0.7.2" }
 krilla-svg = "0.8"
 designcraft-images = { path = "../designcraft-images", version = "0.7.1" }
 image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "gif", "tiff", "bmp"] }
