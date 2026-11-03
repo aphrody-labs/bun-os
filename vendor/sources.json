@@ -845,7 +845,9 @@
     "zebar": {
       "origin": "https://github.com/aphrody-labs/zebar.git",
       "upstream": "https://github.com/glzr-io/zebar.git",
-      "path": "zebar"
+      "path": "zebar",
+      "branch": "bunos",
+      "patches": "bunos branch = upstream + bun.lock/bunfig.toml (hoisted linker) for bun install"
     },
     "tacky-borders": {
       "origin": "https://github.com/aphrody-labs/tacky-borders.git",
@@ -855,12 +857,16 @@
     "flow-launcher": {
       "origin": "https://github.com/aphrody-labs/Flow.Launcher.git",
       "upstream": "https://github.com/Flow-Launcher/Flow.Launcher.git",
-      "path": "flow-launcher"
+      "path": "flow-launcher",
+      "branch": "bunos",
+      "patches": "bunos branch = upstream + global.json rollForward latestMajor (.NET 10 SDK)"
     },
     "altsnap": {
       "origin": "https://github.com/aphrody-labs/AltSnap.git",
       "upstream": "https://github.com/RamonUnch/AltSnap.git",
-      "path": "altsnap"
+      "path": "altsnap",
+      "branch": "bunos",
+      "patches": "bunos branch = upstream + MakefileX64 -lshell32 for hooks.dll (current mingw-w64)"
     },
     "detours": {
       "origin": "https://github.com/aphrody-labs/Detours.git",
@@ -889,7 +895,7 @@
   "rootGitOwners": [
     {
       "path": "altsnap",
-      "revision": "e35ef154354260beea85cace25fede4f2758f0b7",
+      "revision": "2f8399a12051a7b2b6a08ac8664b7acf76d01dd1",
       "origin": "https://github.com/aphrody-labs/AltSnap.git",
       "initialized": true
     },
@@ -1045,7 +1051,7 @@
     },
     {
       "path": "flow-launcher",
-      "revision": "947ba49f4f05d06843f9dc7114bc6c207a9c4fde",
+      "revision": "49c1f0780f0e9d493a98e1775a753d1a35cf2341",
       "origin": "https://github.com/aphrody-labs/Flow.Launcher.git",
       "initialized": true
     },
@@ -1411,7 +1417,7 @@
     },
     {
       "path": "zebar",
-      "revision": "5f90d341867122175cb4a57af594a44752885056",
+      "revision": "f5ec0548164574ad51bc1e49201a74ecd9b8cf84",
       "origin": "https://github.com/aphrody-labs/zebar.git",
       "initialized": true
     },

@@ -1744,6 +1744,7 @@
 	path = vendor/zebar
 	url = https://github.com/aphrody-labs/zebar.git
 	shallow = true
+	branch = bunos
 [submodule "vendor/tacky-borders"]
 	path = vendor/tacky-borders
 	url = https://github.com/aphrody-labs/tacky-borders.git
@@ -1752,7 +1753,9 @@
 	path = vendor/flow-launcher
 	url = https://github.com/aphrody-labs/Flow.Launcher.git
 	shallow = true
+	branch = bunos
 [submodule "vendor/altsnap"]
 	path = vendor/altsnap
 	url = https://github.com/aphrody-labs/AltSnap.git
 	shallow = true
+	branch = bunos
