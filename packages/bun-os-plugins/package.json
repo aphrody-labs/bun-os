@@ -15,7 +15,10 @@
     "./define": "./src/define.ts",
     "./preload": "./src/preload.ts",
     "./commands": "./src/commands/index.ts",
-    "./devtools": "./src/devtools/devtools.ts"
+    "./devtools": "./src/devtools/devtools.ts",
+    "./dotnet": "./src/dotnet/dotnet.ts",
+    "./dotnet/hostfxr": "./src/dotnet/hostfxr.ts",
+    "./dotnet/plugin": "./src/dotnet/plugin.ts"
   },
   "bin": {
     "bun-os-plugins": "./src/cli.ts",

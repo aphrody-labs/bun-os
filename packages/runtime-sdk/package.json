@@ -34,7 +34,8 @@
     "./gpu": "./src/gpu.ts",
     "./python": "./src/python.ts",
     "./desktop-artifact": "./src/desktop-artifact.ts",
-    "./src/*": "./src/*"
+    "./src/*": "./src/*",
+    "./bun-plugin": "./src/bun-plugin.ts"
   },
   "publishConfig": {
     "access": "public"
