@@ -1,13 +1,16 @@
 # SPDX-License-Identifier: 0BSD
 # Bun OS linux-bun: derived from the Arch Linux `linux` PKGBUILD (Maintainer: Jan Alexander
-# Steffens (heftig) <heftig@archlinux.org>), packaging commit 0c178d550ec6392265d3a443333229823634bd08
-# ("7.2.11.arch1-1", 2026-10-16) of https://gitlab.archlinux.org/archlinux/packaging/packages/linux.
-# Differences from Arch are listed in ../README.md; in short: pkgbase=linux-bun, the aphrody-bun.config
-# fragment merged in prepare() and enforced by check-config.sh, no -docs package / htmldocs, no `replaces`,
-# the mkinitcpio preset and Limine template installed under /usr/share/linux-bun.
+# Steffens (heftig) <heftig@archlinux.org>), packaging commit a6ef53be1f83078a3311939f9b7df866853d2a04
+# ("7.2.15.arch1-1", 2026-11-03) of https://gitlab.archlinux.org/archlinux/packaging/packages/linux.
+# Differences from Arch are listed in ../README.md; in short: pkgbase=linux-bun, Linus mainline (an -rc from his
+# signed tag) or the newest stable, built with LLVM=1, the aphrody-bun.config and android.config fragments merged in
+# prepare() and enforced by check-config.sh, no -docs package / htmldocs, no `replaces`, the mkinitcpio preset and
+# Limine template installed under /usr/share/linux-bun. factory/kernel/build.sh sets _kver/pkgver and the sums.
 
 pkgbase=linux-bun
-pkgver=7.2.11.arch1
+# kernel.org version (7.4-rc1, 7.4, 7.4.1); pkgver drops the dash so pacman orders 7.4rc1 < 7.4 < 7.4.1.
+_kver=7.4-rc1
+pkgver=7.4rc1
 pkgrel=1
 pkgdesc='Linux (Bun OS)'
 url='https://github.com/archlinux/linux'
@@ -27,6 +30,9 @@ makedepends=(
   pahole
   perl
   python
+  clang
+  lld
+  llvm
   rust
   rust-bindgen
   rust-src
@@ -40,45 +46,35 @@ options=(
   !debug
   !strip
 )
-_srcname=linux-${pkgver%.*}
-_srctag=v${pkgver%.*}-${pkgver##*.}
-source=(
-  https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/${_srcname}.tar.{xz,sign}
-  $url/releases/download/$_srctag/linux-$_srctag.patch.zst{,.sig}
-)
+_srcname=linux-${_kver}
+# A release candidate has no kernel.org tarball signature: build.sh fetches Linus's annotated tag, requires a
+# VALIDSIG by his key (validpgpkeys[0]) with `git verify-tag`, and archives it as ${_srcname}.tar.gz. A release
+# comes from cdn.kernel.org with its .sign, verified by makepkg against validpgpkeys.
+case $_kver in
+  *-rc*) source=("${_srcname}.tar.gz") ;;
+  *) source=(https://cdn.kernel.org/pub/linux/kernel/v${_kver%%.*}.x/${_srcname}.tar.{xz,sign}) ;;
+esac
 source_x86_64=(
-  config.x86_64  # verbatim Arch config of 7.2.11.arch1-1
+  config.x86_64  # verbatim Arch config of 7.2.15.arch1-1 (packaging commit a6ef53be1f83)
   aphrody-bun.config
+  android.config
   check-config.sh
   linux-bun.preset
   limine-linux-bun.conf.template
+  linux-bun-nova.conf
 )
 validpgpkeys=(
   ABAF11C65A2970B130ABE3C479BE3E4300411886  # Linus Torvalds
   647F28654894E3BD457199BE38DBBDC86092693E  # Greg Kroah-Hartman
   83BC8889351B5DEBBB68416EB8AC08600F108CDF  # Jan Alexander Steffens (heftig)
 )
-b2sums=('36a455379876a3f452dce7347211ac34ddfda9a445b0b8c0ee92664429a8ea85d2f1a101126b6d748545aaf18e3534f8db53d6110952f3d5487d029ff0f9a800'
-        'SKIP'
-        '06f49715b71884a0cbad51ab4b526c1516926cb2429e7a6e485aa48ebf277811dec391ae2264501245654275a84af1df3780bf8bf8df755cf47670d6c9397703'
-        'SKIP')
-b2sums_x86_64=('58babcf7bed396598de1a7c010292aebb56b2c726f9d8d28344049646d5ed814489db0e22a4e62718e5e6dcc94c581858c17b235e88dc3263fa78934d2a84104'
-               '047db2fb837d594d36df867cb1b47cc0a7285efd2c616772076be76ed27c1a407314e916ff21cdc827421c57052a9ab1cbd816fcc277eaf61b3bf274473d2bd4'
-               'd97c21330780d437490d1a184c1b3fe1d9933946587bb6a31bc329c2a259c42d1d3a82bf823a49d0b7117940c3d69b05237c954ea695c091bbeb26d3aaf9996d'
-               '71490e1675c76d8b6def25a93f8fb332364cdb54984e3bd3c76a877fde78efc3f2dcaa04241a5f3c37ed2962781ad6247a30416f61fc42cfc409ef7194b63df1'
-               'eec070bd77e621dd624dac33d3f5916c05a517314e21a0da8da7c5c2538af4d94fbb9bdd663410b3c27ac33fecc621d7b716b676a1656d860d5518c38e52ec26')
+# Set by factory/kernel/build.sh (updpkgsums in the build container) for the version it builds.
+b2sums=(SKIP)
+b2sums_x86_64=(SKIP SKIP SKIP SKIP SKIP SKIP SKIP)
 
-# https://www.kernel.org/pub/linux/kernel/v7.x/sha256sums.asc (tarball), release asset (patch)
-sha256sums=('fd0fc479f983a8c05313f13e9c36330fe6651cf725396748c40d5cd93fa1e6a4'
-            'SKIP'
-            '741d473c4db335d97d9e1d9b8be9337090522550804fe6454ba336d21e580fd6'
-            'SKIP')
-sha256sums_x86_64=('f16adcb6dc1dc241ea90e23ca920697d00e4618df1b72d914ff15bc55ab4051f'
-                   '6e95066b3bbf0b7c974d2c72538fadd3db3ade4032344411440a8f6ca908a1a7'
-                   'c3b397bb82b4cf6eb21abc1c72cf4f17942bbc1c280f4aba725c6a3b0273cf1d'
-                   '683c9a8ae2a0b4174c3e26a399de444885f88e4de3b95e0380b338f5f4d931eb'
-                   'aac0e110e53fec6d179aaf2c5a5bf9fc2fe6f28058176c82687f1aa3b1710e59')
-
+# Clang, LLD and the LLVM binutils for C, as rustc already uses LLVM (Documentation/kbuild/llvm.rst); also meets
+# Android's CC_IS_CLANG, LD_IS_LLD and AS_IS_LLVM requirements and enables CFI.
+export LLVM=1
 export KBUILD_BUILD_HOST=bunos
 export KBUILD_BUILD_USER=$pkgbase
 export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
@@ -101,12 +97,13 @@ prepare() {
   done
 
   echo "Setting config..."
-  # Arch's config first, the Bun OS fragment over it (-m: merge only), then resolve dependencies.
-  scripts/kconfig/merge_config.sh -m "../config.$CARCH" ../aphrody-bun.config
+  # Arch's config first, the Bun OS fragments over it (-m: merge only), then resolve dependencies.
+  scripts/kconfig/merge_config.sh -m "../config.$CARCH" ../aphrody-bun.config ../android.config
   make olddefconfig
   diff -u ../config.$CARCH .config || :
   # merge_config.sh only warns about fragment values that olddefconfig dropped; fail instead.
   bash ../check-config.sh ../aphrody-bun.config .config
+  bash ../check-config.sh ../android.config .config
 
   # Fail early with the reason when rustc/bindgen/libclang do not meet this kernel's minimum.
   make rustavailable
@@ -164,6 +161,8 @@ _package() {
   install -Dm644 ../linux-bun.preset "$pkgdir/usr/share/$pkgbase/linux-bun.preset"
   install -Dm644 ../limine-linux-bun.conf.template "$pkgdir/usr/share/$pkgbase/limine-linux-bun.conf.template"
   install -Dm644 ../aphrody-bun.config "$pkgdir/usr/share/$pkgbase/aphrody-bun.config"
+  install -Dm644 ../android.config "$pkgdir/usr/share/$pkgbase/android.config"
+  install -Dm644 ../linux-bun-nova.conf "$pkgdir/usr/lib/modprobe.d/$pkgbase-nova.conf"
 }
 
 _package-headers() {
