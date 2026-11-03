@@ -4,57 +4,49 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Material 3 showcase</title>
+    <link rel="stylesheet" href="../../packages/m3-fonts/src/fonts.css" />
+    <link rel="stylesheet" href="../../packages/m3-tokens/src/m3-tokens.css" />
+    <link rel="stylesheet" href="../../packages/m3-theme/tokens.css" />
     <style>
-      :root {
-        color-scheme: light;
-        --primary: #65558f; --on-primary: #fff; --primary-container: #e9ddff;
-        --on-primary-container: #201047; --surface: #fdf7ff; --surface-low: #f8f2fa;
-        --surface-container: #f2ecf4; --surface-high: #ece6ee; --on-surface: #1d1b20;
-        --on-surface-variant: #49454e; --outline: #7a757f; --outline-variant: #cac4cf;
-        --tertiary-container: #ffd9e3; --on-tertiary-container: #31101d;
-      }
-      :root.dark { color-scheme: dark; --primary: #cfbdfe; --on-primary: #36275d;
-        --primary-container: #4d3d75; --on-primary-container: #e9ddff; --surface: #141218;
-        --surface-low: #1d1b20; --surface-container: #211f24; --surface-high: #2b292f;
-        --on-surface: #e6e0e9; --on-surface-variant: #cac4cf; --outline: #948f99;
-        --outline-variant: #49454e; --tertiary-container: #633b48; --on-tertiary-container: #ffd9e3; }
+      /* Every colour, typeface, shape, motion and state value comes from the generated M3 sheets above. */
       * { box-sizing: border-box; }
-      body { margin: 0; background: var(--surface); color: var(--on-surface); font: 400 16px/1.5 Inter, system-ui, sans-serif; }
+      body { margin: 0; background: var(--md-sys-color-surface); color: var(--md-sys-color-on-surface); font: 400 16px/1.5 var(--md-ref-typeface-plain); }
       .shell { max-width: 1180px; margin: auto; padding: 24px; }
       header { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 8px 0 40px; }
       .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: .01em; }
-      .mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 14px; background: var(--primary); color: var(--on-primary); }
+      .mark { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
       button { border: 0; cursor: pointer; font: inherit; }
-      .icon { width: 44px; height: 44px; border-radius: 50%; background: transparent; color: var(--on-surface); }
-      .icon:hover { background: color-mix(in srgb, var(--primary) 12%, transparent); }
       main { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr); gap: 24px; align-items: stretch; }
-      .hero, .card { border-radius: 28px; padding: clamp(24px, 5vw, 48px); }
-      .hero { background: var(--primary-container); color: var(--on-primary-container); min-height: 380px; display: flex; flex-direction: column; justify-content: end; }
-      .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: 12px; font-weight: 700; opacity: .8; }
-      h1 { max-width: 650px; margin: 12px 0; font-size: clamp(42px, 7vw, 76px); line-height: .98; letter-spacing: -.045em; }
+      .hero, .card { border-radius: var(--md-sys-shape-corner-extra-large); padding: clamp(24px, 5vw, 48px); }
+      .hero { background: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); min-height: 380px; display: flex; flex-direction: column; justify-content: end; }
+      .eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: 12px; font-weight: 700; }
+      h1 { max-width: 650px; margin: 12px 0; font-family: var(--md-ref-typeface-brand); font-size: clamp(42px, 7vw, 76px); line-height: .98; letter-spacing: -.045em; }
       .hero p { max-width: 560px; font-size: 18px; }
       .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
-      .filled, .tonal, .outlined { min-height: 48px; border-radius: 999px; padding: 0 22px; font-weight: 700; white-space: nowrap; }
-      .filled { background: var(--primary); color: var(--on-primary); }
-      .tonal { background: var(--surface-high); color: var(--on-surface); }
-      .outlined { border: 1px solid var(--outline); background: transparent; color: var(--on-surface); }
-      .filled, .tonal, .outlined { position: relative; overflow: hidden; }
-      .filled::after, .tonal::after, .outlined::after { content: ""; position: absolute; inset: 0; background: currentColor; opacity: 0; transition: opacity 160ms ease; pointer-events: none; }
-      .filled:hover::after, .tonal:hover::after, .outlined:hover::after { opacity: .08; }
-      .filled:focus-visible, .tonal:focus-visible, .outlined:focus-visible, .icon:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
-      .card { transition: transform 180ms ease, box-shadow 180ms ease; }
-      .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px color-mix(in srgb, var(--on-surface) 12%, transparent); }
-      .card { background: var(--surface-container); padding: 28px; }
+      .icon { width: 48px; height: 48px; border-radius: var(--md-sys-shape-corner-full); background: transparent; color: var(--md-sys-color-on-surface-variant); }
+      .filled, .outlined { min-height: 48px; border-radius: var(--md-sys-shape-corner-full); padding: 0 24px; font-weight: 700; white-space: nowrap; }
+      .filled { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+      .outlined { border: 1px solid var(--md-sys-color-outline); background: transparent; color: var(--md-sys-color-primary); }
+      /* State layers: the content colour (the on-role) at the M3 state opacity over the container. */
+      .icon, .filled, .outlined { position: relative; overflow: hidden; }
+      .icon::after, .filled::after, .outlined::after { content: ""; position: absolute; inset: 0; background: currentColor; opacity: 0; transition: opacity var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard); pointer-events: none; }
+      :is(.icon, .filled, .outlined):hover::after { opacity: var(--md-sys-state-hover-state-layer-opacity); }
+      :is(.icon, .filled, .outlined):focus-visible::after { opacity: var(--md-sys-state-focus-state-layer-opacity); }
+      :is(.icon, .filled, .outlined):active::after { opacity: var(--md-sys-state-pressed-state-layer-opacity); }
+      :is(.icon, .filled, .outlined):focus-visible { outline: 2px solid var(--md-sys-color-secondary); outline-offset: 2px; }
+      .card { background: var(--md-sys-color-surface-container); padding: 28px; }
       .card h2 { margin: 0 0 8px; font-size: 24px; }
-      .card p { color: var(--on-surface-variant); }
-      .metric { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid var(--outline-variant); }
+      .card p { color: var(--md-sys-color-on-surface-variant); }
+      .metric { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; border-bottom: 1px solid var(--md-sys-color-outline-variant); }
       .metric:last-child { border-bottom: 0; }
       .metric strong { font-size: 26px; }
       .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
-      .chip { padding: 8px 14px; border: 1px solid var(--outline); border-radius: 10px; color: var(--on-surface-variant); }
-      .chip.active { border-color: transparent; background: var(--tertiary-container); color: var(--on-tertiary-container); }
-      footer { margin-top: 24px; padding: 20px 4px; color: var(--on-surface-variant); }
+      .chip { padding: 8px 14px; border: 1px solid var(--md-sys-color-outline); border-radius: var(--md-sys-shape-corner-small); color: var(--md-sys-color-on-surface-variant); }
+      .chip.active { border-color: transparent; background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+      footer { margin-top: 24px; padding: 20px 4px; color: var(--md-sys-color-on-surface-variant); }
       @media (max-width: 760px) { .shell { padding: 16px; } header { padding-bottom: 24px; } main { grid-template-columns: 1fr; } .hero { min-height: 470px; } }
+      @media (forced-colors: active) { :focus-visible { outline-color: CanvasText; } }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } }
     </style>
   </head>
   <body>
@@ -66,6 +58,14 @@
       </main>
       <footer>Material Design 3 reference showcase · semantic roles over component-local colors</footer>
     </div>
-    <script>document.getElementById('theme').onclick = () => document.documentElement.classList.toggle('dark');</script>
+    <script>
+      // tokens.css follows prefers-color-scheme; the toggle pins the opposite mode with .dark or .light.
+      document.getElementById("theme").onclick = () => {
+        const root = document.documentElement;
+        const dark = root.classList.contains("dark") || (!root.classList.contains("light") && matchMedia("(prefers-color-scheme: dark)").matches);
+        root.classList.toggle("dark", !dark);
+        root.classList.toggle("light", dark);
+      };
+    </script>
   </body>
 </html>

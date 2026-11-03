@@ -101,7 +101,8 @@ Parses a raw natural-language prompt into structured design directives, extracti
 `crates/aphrody-m3-tokens` through `@aphrody/m3-tokens`. The package computes no colour itself.
 
 - **Stylesheet**: `cssCustomProperties` declares every `--md-sys-color-*` role, light by default, dark under
-  `prefers-color-scheme: dark` and `[data-theme="dark"]`.
+  `prefers-color-scheme: dark` and `[data-theme="dark"]`. A dark-first brief ("dark", "sombre") makes the dark
+  roles the `:root` default instead, with `[data-theme="light"]` opting back into light.
 - **Design tokens**: `src/tokens.json` is W3C design-token JSON keyed `color.<mode>.<role>`.
 - **Parity**: `src/theme.test.ts` compares every role with the Rust goldens in
   `crates/aphrody-m3-tokens/tests/fixtures`.
@@ -114,7 +115,7 @@ The core code-generation engine. It processes the parsed `DesignBrief` and compi
 - **Layout Adapters**: mutates scaffolding structures (e.g. strips the navigation rail and adds a bottom app bar for mobile targets; restructures list items into slide sequences for deck outputs).
 - **Self-Contained Primitives**: when a brief enables them, inline definitions for `ThinkingIndicator`, `StreamingText`, and the `useStreamingText` hook are injected directly into the artifact so the output compiles without external dependencies beyond `@aphrody/m3-react`.
 - **Action Router / Registry**: when delegation is requested, a single root-level event handler dispatches `data-action` / `data-id` interactions through a central registry (see below).
-- **Environment Injectors**: injects dark-mode classes and desaturates colors for additive environments (such as translucent AR/XR overlays).
+- **Environment Injectors**: labels additive environments (such as translucent AR/XR overlays). Dark-first briefs keep the role classes; the dark scheme comes from the stylesheet.
 - **Self-Critique Engine**: runs static analysis on the artifact and grades it across 5 axes: `philosophy`, `hierarchy`, `detail`, `functionalParity`, and `innovation`.
 
 ### 4. Server / CLI (`src/server.ts`)

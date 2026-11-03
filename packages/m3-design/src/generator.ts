@@ -6,6 +6,10 @@ import { generateTheme } from "./theme.ts";
 import { SEED_TEMPLATE } from "./prompts.ts";
 import type { DesignBrief, GenerationResult, GeneratedFile, M3Theme, SpecValidator } from "./types.ts";
 
+/** Whether the brief asks for a dark-first artifact. */
+const darkFirst = (brief: DesignBrief): boolean =>
+  brief.constraints.includes("Dark mode first") || brief.rawBrief.includes("dark") || brief.rawBrief.includes("sombre");
+
 export class DesignCompiler {
   private readonly validateSpec?: SpecValidator;
 
@@ -33,7 +37,7 @@ export class DesignCompiler {
     }
 
     // 2. Canonical ThemeExport for the seed
-    const theme = generateTheme(brief.seedColor);
+    const theme = generateTheme(brief.seedColor, { darkFirst: darkFirst(brief) });
 
     // 3. Assemble generated files
     const files: GeneratedFile[] = [];
@@ -432,21 +436,14 @@ export class DesignCompiler {
       code = code.replace("  // GENERATED FEATURE HOOKS\n", "");
     }
 
-    // Apply constraints
-    if (
-      brief.constraints.includes("Dark mode first") ||
-      brief.rawBrief.includes("dark") ||
-      brief.rawBrief.includes("sombre")
-    ) {
-      code = code.replace(
-        'className="min-h-screen bg-background text-on-surface flex flex-col font-sans transition-colors duration-200"',
-        'className="min-h-screen bg-neutral-900 text-neutral-100 flex flex-col font-sans transition-colors duration-200"',
-      );
-    }
-
-    if (brief.constraints.includes("Transparent screens")) {
-      code = code.replace("#6750A4", "Additive (AR/XR desaturated)");
-    }
+    // Dark-first briefs keep the role classes: src/theme.css makes the dark roles the default.
+    // The settings pane shows the brief's seed; additive (AR/XR) screens are labelled instead.
+    code = code.replace(
+      '<span className="text-primary font-semibold">#6750A4</span>',
+      `<span className="text-primary font-semibold">${
+        brief.constraints.includes("Transparent screens") ? "Additive (AR/XR desaturated)" : brief.seedColor
+      }</span>`,
+    );
 
     // Keep only wrapper aliases used by JSX or a component type reference.
     const wrapperImport = /import \{([\s\S]*?)\} from '@aphrody\/m3-react';/;

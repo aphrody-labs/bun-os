@@ -1178,6 +1178,8 @@ function snippetTokens(tokenSet: DesignSystem["token_set"]) {
       overlayBlur: "",
       /** M3 outlined button: primary label on an outline-role border. */
       outlined: "var(--md-sys-color-outline)",
+      /** M3 interaction: state layers over the container and the secondary focus ring. */
+      states: true,
     };
   }
   return {
@@ -1192,7 +1194,31 @@ function snippetTokens(tokenSet: DesignSystem["token_set"]) {
     overlay: "rgba(0, 0, 0, 0.5)",
     overlayBlur: "4px",
     outlined: "",
+    states: false,
   };
+}
+
+type StateLayer = "hover" | "focus" | "pressed";
+
+/** M3 state layer: the on-role at the state opacity of `@aphrody/m3-tokens/m3-tokens.css` over the container. */
+function stateLayer(onRole: string, state: StateLayer, container: string): string {
+  return `color-mix(in srgb, ${onRole} calc(var(--md-sys-state-${state}-state-layer-opacity) * 100%), ${container})`;
+}
+
+/** Hover, focus and pressed rules of one M3 component, with the 2px secondary focus ring outside it. */
+function stateRules(selector: string, onRole: string, container: string, focusRing = true): string[] {
+  const rules: string[] = [];
+  for (const [pseudo, state] of [
+    ["hover", "hover"],
+    ["focus-visible", "focus"],
+    ["active", "pressed"],
+  ] as const) {
+    rules.push(`${selector}:${pseudo} {`, `  background: ${stateLayer(onRole, state, container)};`);
+    if (pseudo === "focus-visible" && focusRing)
+      rules.push("  outline: 2px solid var(--md-sys-color-secondary);", "  outline-offset: 2px;");
+    rules.push("}", "");
+  }
+  return rules;
 }
 
 export function formatMasterMd(designSystem: DesignSystem): string {
@@ -1297,11 +1323,9 @@ export function formatMasterMd(designSystem: DesignSystem): string {
     "  cursor: pointer;",
     "}",
     "",
-    ".btn-primary:hover {",
-    "  opacity: 0.9;",
-    "  transform: translateY(-1px);",
-    "}",
-    "",
+    ...(tokens.states
+      ? stateRules(".btn-primary", "var(--md-sys-color-on-primary)", colors["cta"] || primary)
+      : [".btn-primary:hover {", "  opacity: 0.9;", "  transform: translateY(-1px);", "}", ""]),
     "/* Secondary Button */",
     ".btn-secondary {",
     "  background: transparent;",
@@ -1314,13 +1338,20 @@ export function formatMasterMd(designSystem: DesignSystem): string {
     "  cursor: pointer;",
     "}",
     "",
-    "/* Keyboard focus, including Windows High Contrast (forced colors) */",
-    ".btn-primary:focus-visible,",
-    ".btn-secondary:focus-visible {",
-    `  outline: 2px solid ${colors["ring"] || primary};`,
-    "  outline-offset: 2px;",
-    "}",
-    "",
+    ...(tokens.states
+      ? [
+          ...stateRules(".btn-secondary", primary, "transparent"),
+          "/* Windows High Contrast (forced colors) keeps the focus ring visible */",
+        ]
+      : [
+          "/* Keyboard focus, including Windows High Contrast (forced colors) */",
+          ".btn-primary:focus-visible,",
+          ".btn-secondary:focus-visible {",
+          `  outline: 2px solid ${colors["ring"] || primary};`,
+          "  outline-offset: 2px;",
+          "}",
+          "",
+        ]),
     "@media (forced-colors: active) {",
     "  :focus-visible { outline-color: CanvasText; }",
     "}",
@@ -1338,10 +1369,9 @@ export function formatMasterMd(designSystem: DesignSystem): string {
     "  cursor: pointer;",
     "}",
     "",
-    ".card:hover {",
-    "  box-shadow: var(--shadow-lg);",
-    "  transform: translateY(-2px);",
-    "}",
+    ...(tokens.states
+      ? stateRules(".card", "var(--md-sys-color-on-surface)", colors["card"] || colors["background"] || "").slice(0, -1)
+      : [".card:hover {", "  box-shadow: var(--shadow-lg);", "  transform: translateY(-2px);", "}"]),
     "```",
     "",
     "### Inputs",
@@ -1355,11 +1385,21 @@ export function formatMasterMd(designSystem: DesignSystem): string {
     `  transition: border-color ${tokens.transition};`,
     "}",
     "",
-    ".input:focus {",
-    `  border-color: ${primary};`,
-    "  outline: none;",
-    `  box-shadow: 0 0 0 3px color-mix(in srgb, ${colors["ring"] || primary} 12%, transparent);`,
-    "}",
+    ...(tokens.states
+      ? [
+          ".input:focus-visible {",
+          `  border-color: ${primary};`,
+          "  outline: 2px solid var(--md-sys-color-secondary);",
+          "  outline-offset: 2px;",
+          "}",
+        ]
+      : [
+          ".input:focus {",
+          `  border-color: ${primary};`,
+          "  outline: none;",
+          `  box-shadow: 0 0 0 3px color-mix(in srgb, ${colors["ring"] || primary} 12%, transparent);`,
+          "}",
+        ]),
     "```",
     "",
     "### Modals",

@@ -77,6 +77,29 @@ describe("DesignCompiler React code generation", () => {
     expect(code).not.toContain("document.querySelector");
   });
 
+  test("dark briefs keep the role classes and make the dark roles the stylesheet default", () => {
+    const result = compiler.compile("Make a dark, compact dashboard in blue");
+    const code = result.files.find(f => f.path === "src/index.tsx")?.content || "";
+    const css = result.files.find(f => f.path === "src/theme.css")?.content || "";
+    expect(code).toContain("bg-background text-on-surface");
+    expect(code).not.toMatch(/\b(bg|text)-neutral-\d/);
+    const block = (selector: string) => css.slice(css.indexOf(`${selector} {`)).split("}")[0]!;
+    const dark = block("\n:root");
+    const light = block(':root[data-theme="light"]');
+    expect(dark).toContain("color-scheme: dark;");
+    expect(dark).toContain(`--md-sys-color-primary: ${result.theme.themeExport.dark.primary};`);
+    expect(light).toContain("color-scheme: light;");
+    expect(light).toContain(`--md-sys-color-primary: ${result.theme.themeExport.light.primary};`);
+    expect(css).not.toContain("prefers-color-scheme");
+  });
+
+  test("the settings pane shows the brief's seed colour", () => {
+    const result = compiler.compile("Crée un layout standard", "#0F52BA");
+    const code = result.files.find(f => f.path === "src/index.tsx")?.content || "";
+    expect(code).toContain('<span className="text-primary font-semibold">#0F52BA</span>');
+    expect(code).not.toContain("#6750A4");
+  });
+
   test("should export W3C tokens.json configuration alongside theme.css", () => {
     const result = compiler.compile("Crée un layout standard");
     const tokensFile = result.files.find(f => f.path === "src/tokens.json");

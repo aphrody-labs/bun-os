@@ -7,7 +7,7 @@
 ---
 
 **Project:** Bun OS Play
-**Generated:** 2026-11-03 22:50:01
+**Generated:** 2026-11-03 23:17:17
 **Category:** Gaming
 **Design Dials:** Variance 6/10 (Balanced / Modern) | Motion 6/10 (Standard) | Density 6/10 (Standard)
 
@@ -94,8 +94,17 @@
 }
 
 .btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%), var(--md-sys-color-primary));
+}
+
+.btn-primary:focus-visible {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) calc(var(--md-sys-state-focus-state-layer-opacity) * 100%), var(--md-sys-color-primary));
+  outline: 2px solid var(--md-sys-color-secondary);
+  outline-offset: 2px;
+}
+
+.btn-primary:active {
+  background: color-mix(in srgb, var(--md-sys-color-on-primary) calc(var(--md-sys-state-pressed-state-layer-opacity) * 100%), var(--md-sys-color-primary));
 }
 
 /* Secondary Button */
@@ -110,13 +119,21 @@
   cursor: pointer;
 }
 
-/* Keyboard focus, including Windows High Contrast (forced colors) */
-.btn-primary:focus-visible,
+.btn-secondary:hover {
+  background: color-mix(in srgb, var(--md-sys-color-primary) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%), transparent);
+}
+
 .btn-secondary:focus-visible {
-  outline: 2px solid var(--md-sys-color-primary);
+  background: color-mix(in srgb, var(--md-sys-color-primary) calc(var(--md-sys-state-focus-state-layer-opacity) * 100%), transparent);
+  outline: 2px solid var(--md-sys-color-secondary);
   outline-offset: 2px;
 }
 
+.btn-secondary:active {
+  background: color-mix(in srgb, var(--md-sys-color-primary) calc(var(--md-sys-state-pressed-state-layer-opacity) * 100%), transparent);
+}
+
+/* Windows High Contrast (forced colors) keeps the focus ring visible */
 @media (forced-colors: active) {
   :focus-visible { outline-color: CanvasText; }
 }
@@ -135,8 +152,17 @@
 }
 
 .card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-hover-state-layer-opacity) * 100%), var(--md-sys-color-surface-container-low));
+}
+
+.card:focus-visible {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-focus-state-layer-opacity) * 100%), var(--md-sys-color-surface-container-low));
+  outline: 2px solid var(--md-sys-color-secondary);
+  outline-offset: 2px;
+}
+
+.card:active {
+  background: color-mix(in srgb, var(--md-sys-color-on-surface) calc(var(--md-sys-state-pressed-state-layer-opacity) * 100%), var(--md-sys-color-surface-container-low));
 }
 ```
 
@@ -151,10 +177,10 @@
   transition: border-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
 }
 
-.input:focus {
+.input:focus-visible {
   border-color: var(--md-sys-color-primary);
-  outline: none;
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--md-sys-color-primary) 12%, transparent);
+  outline: 2px solid var(--md-sys-color-secondary);
+  outline-offset: 2px;
 }
 ```
 

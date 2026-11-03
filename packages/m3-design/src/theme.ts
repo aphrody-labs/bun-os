@@ -12,6 +12,8 @@ export interface ThemeOptions {
   variant?: SchemeVariant;
   /** Contrast level in `[-1, 1]` (default 0). */
   contrastLevel?: number;
+  /** Dark-first stylesheet: the dark roles apply to `:root`, `:root[data-theme="light"]` opts back into light. */
+  darkFirst?: boolean;
 }
 
 /** `tonalSpot` -> `tonal-spot`, the ThemeExport variant spelling. */
@@ -36,5 +38,8 @@ export function generateTheme(seedHex: string, options: ThemeOptions = {}): M3Th
     light: roles(false),
     dark: roles(true),
   });
-  return { seed, themeExport, cssCustomProperties: cssFromSeed(seed, scheme) };
+  const css = options.darkFirst
+    ? cssFromSeed(seed, { ...scheme, lightSelector: ':root[data-theme="light"]', darkSelector: ":root" })
+    : cssFromSeed(seed, scheme);
+  return { seed, themeExport, cssCustomProperties: css };
 }
