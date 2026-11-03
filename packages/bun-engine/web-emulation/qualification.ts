@@ -45,10 +45,13 @@ const harnessPaths = [
 export function qualificationHarnessRevision(root: string, baseline = "HEAD"): string {
   if (baseline !== "HEAD" && !/^[a-f0-9]{40}$/.test(baseline))
     throw new Error("Invalid qualification harness baseline");
-  const revision = Bun.spawnSync(["git", "-C", root, "rev-parse", "--verify", `${baseline}^{commit}`]);
+  const revision = Bun.spawnSync(["git", "-C", root, "rev-parse", "--verify", baseline]);
   const value = revision.stdout.toString().trim();
   if (revision.exitCode !== 0 || !/^[a-f0-9]{40}$/.test(value))
     throw new Error("Cannot resolve qualification harness revision");
+  const type = Bun.spawnSync(["git", "-C", root, "cat-file", "-t", value]);
+  if (type.exitCode !== 0 || type.stdout.toString().trim() !== "commit")
+    throw new Error("Qualification harness baseline is not a commit");
   const tracked = Bun.spawnSync(["git", "-C", root, "ls-files", "--error-unmatch", "--", ...harnessPaths]);
   if (tracked.exitCode !== 0) throw new Error("Qualification harness files are not all tracked");
   const diff = Bun.spawnSync(["git", "-C", root, "diff", "--quiet", value, "--", ...harnessPaths]);
