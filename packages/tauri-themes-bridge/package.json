@@ -1,12 +1,13 @@
 {
   "name": "@aphrody/tauri-theme",
   "version": "1.4.7",
-  "description": "Native window effects (Mica, Acrylic, vibrancy, transparency) for the three Aphrody themes in every Tauri app",
+  "description": "Native window effects (Mica, Liquid Glass) and M3 shape presets for the m3, fluent and apple skins of every Tauri app; colours come from @aphrody/m3-tokens",
   "license": "Apache-2.0 OR MIT",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./boot": "./src/boot.ts"
+    "./boot": "./src/boot.ts",
+    "./window-effects.json": "./src/window-effects.json"
   },
   "scripts": {
     "test": "bun test",
