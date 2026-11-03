@@ -4,8 +4,8 @@ import { avcCodecString } from "./scrcpy.ts";
 /**
  * <android-screen src="ws://host/stream?token=..." api="http://host" serial="emulator-5554">
  * Shows the Android display streamed by the gateway (H.264 through WebCodecs) and sends touch, keyboard,
- * clipboard and APK drops back. Colors come from the Material 3 system tokens of @aphrody/themes
- * (--md-sys-color-*), with neutral fallbacks.
+ * clipboard and APK drops back. Colours, shape and type come from the Material 3 system tokens
+ * (--md-sys-*) of the page's @aphrody/m3-tokens sheet.
  */
 
 /** Android KeyEvent keycodes for the keys that have no printable text. */
@@ -36,12 +36,15 @@ export interface FrameStats {
 }
 
 const STYLE = `
-:host { display: inline-block; position: relative; background: var(--md-sys-color-surface-container, #1d1b20);
-  border-radius: var(--md-sys-shape-corner-large, 16px); overflow: hidden; outline: none; touch-action: none; }
+:host { display: inline-block; position: relative; background: var(--md-sys-color-surface-container);
+  border-radius: var(--md-sys-shape-corner-large); overflow: hidden; outline: none; touch-action: none; }
 canvas { display: block; width: 100%; height: 100%; object-fit: contain; }
-.status { position: absolute; inset: auto 8px 8px 8px; font: 12px/1.4 var(--md-sys-typescale-body-small-font, system-ui);
-  color: var(--md-sys-color-on-surface-variant, #cac4d0); pointer-events: none; }
-:host(.drop) { box-shadow: inset 0 0 0 3px var(--md-sys-color-primary, #d0bcff); }
+.status { position: absolute; inset: auto 8px 8px 8px; font-family: var(--md-sys-typescale-body-small-font);
+  font-size: var(--md-sys-typescale-body-small-size); line-height: var(--md-sys-typescale-body-small-line-height);
+  letter-spacing: var(--md-sys-typescale-body-small-tracking); font-weight: var(--md-sys-typescale-body-small-weight);
+  color: var(--md-sys-color-on-surface-variant); pointer-events: none; }
+:host(:focus-visible) { outline: 2px solid var(--md-sys-color-secondary); outline-offset: 2px; }
+:host(.drop) { box-shadow: inset 0 0 0 3px var(--md-sys-color-primary); }
 `;
 
 export class AndroidScreen extends HTMLElement {
