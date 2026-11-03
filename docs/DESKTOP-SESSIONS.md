@@ -111,9 +111,23 @@ To install in the distro (owner of the package lists: `factory/wsl/`): add `[bun
 `/etc/pacman.conf`, then `pacman -Syu bunos-cli bunos-desktop` and the desktops wanted, for example
 `pacman -S bunos-omarchy` or `pacman -S cosmic-session cosmic-comp`; then `bunos-session`.
 
-## Status
+## Status (2026-11-03)
 
-Build results of the packages and what is queued are recorded in the commit that runs `factory/desktop/build.sh`.
-Not verified yet: any session running under WSLg (the workstation does not start WSL from this track; the WSL track
-runs the bundle). Open: porting Omarchy's menus and commands from bash to Bun/nushell, a Walker package, Omarchy's
-WSL guest adaptations (animations off on CPU rendering, clipboard and time zone follow Windows).
+Built on vps by `factory/desktop/build.sh` into `~/build/storage/artifacts/pacman/bunos-testing/x86_64`, all from the
+pinned forks: the 24 `bunos-cli` tools and the meta-package, `bunos-desktop`, `bunos-design-m3` (design artifact
+`3b89bb26a8f4`), `bunos-omarchy` 4.0.0.alpha, `cosmic-comp` and `cosmic-session` 1.11.0, `hyprland` 0.57.0 (+ `hyprpm`),
+`hyprland-plugin-hyprbars` 0.57.0, `wlvncc`, `mutter` 51.1 (+ `mutter-devkit`) and `gnome-shell` 51.1. Nothing is queued.
+
+Verified: a clean `archlinux:base` container with `[bunos-testing]` first installs `bunos-cli bunos-desktop bunos-omarchy
+cosmic-session gnome-shell mutter-devkit` without conflicts (the first run found `/usr/share/cosmic` owned by
+cosmic-settings, now fixed) and every tool answers `--version` (Hyprland 0.57.0 at `0aa6745f`, GNOME Shell 51.1, rg 15.2.0,
+nushell, uutils, helix, zellij, atuin, yazi, bottom, delta, gitui, just 1.59.0, rio, eza, starship). `bunos-session --list`
+/ `--plan` and `bunos-theme --gtk` run against the committed manifest and Omarchy themes; `cargo test -p bunos-win11`
+locks the manifest to the profiles.
+
+Not verified yet: any session running under WSLg (that needs the WSL bundle with the vgem render node, run by the WSL
+track). Pins behind the newest release: rio (`v0.5.28`+2; `v0.5.29` is out), cosmic-comp/cosmic-session (epoch 1.11 base
+3 and 1 commits behind the tag, plus Bun OS defaults). Open: porting Omarchy's menus and commands from bash to
+Bun/nushell, a Walker package, Omarchy's WSL guest adaptations (animations off on CPU rendering, clipboard and time zone
+follow Windows), Lua forms of the design track's Hyprland chrome for Hyprland 0.57 / Omarchy quattro, rebuilding the
+COSMIC applications against the patched libcosmic.
