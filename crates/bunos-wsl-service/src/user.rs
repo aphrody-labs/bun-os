@@ -7,6 +7,12 @@
 //! loads the owner's profile (HKCU hive), and starts wsl.exe with `CreateProcessAsUserW`. The session it creates has
 //! session ID 0, which WslService never terminates on a user logoff (only on service stop), and later interactive
 //! `wsl.exe` calls of the same user land in the same session and VM.
+//!
+//! WSLg constrains that: WSLGd starts its RDP client (`msrdc.exe`) by interop through the Windows session that created
+//! the VM. A VM created from session 0 puts msrdc in session 0, which has no desktop: the RAIL connection never
+//! completes, the client drops after ~100 s, Weston crashes on the dead peer and no Linux window ever draws. So when the
+//! owner has an active interactive session, the service uses that session's token (`WTSQueryUserToken`) on the
+//! `winsta0\default` desktop; S4U stays the fallback before logon (instance.rs moves the VM at the owner's logon).
 
 use crate::units::{command_line, decode_wsl};
 use anyhow::{Context, Result, bail};
@@ -30,6 +36,15 @@ use windows_sys::Win32::{
     },
     Storage::FileSystem::{
         CreateFileW, FILE_GENERIC_READ, FILE_SHARE_READ, FILE_SHARE_WRITE, OPEN_EXISTING,
+    },
+    System::Diagnostics::ToolHelp::{
+        CreateToolhelp32Snapshot, PROCESSENTRY32W, Process32FirstW, Process32NextW,
+        TH32CS_SNAPPROCESS,
+    },
+    System::RemoteDesktop::{
+        ProcessIdToSessionId, WTS_CURRENT_SERVER_HANDLE, WTS_INFO_CLASS, WTS_SESSION_INFOW,
+        WTSActive, WTSDomainName, WTSEnumerateSessionsW, WTSFreeMemory,
+        WTSQuerySessionInformationW, WTSQueryUserToken, WTSUserName,
     },
     System::{
         Environment::{CreateEnvironmentBlock, DestroyEnvironmentBlock},
@@ -58,26 +73,131 @@ pub struct UserSession {
     env: *mut c_void,
     profile_dir: Vec<u16>,
     pub account: String,
+    /// The owner's interactive Windows session (token from `WTSQueryUserToken`); None for the S4U session 0.
+    pub interactive: Option<u32>,
 }
 
 // The handles are process-wide kernel objects; access is read-only after construction.
 unsafe impl Send for UserSession {}
 unsafe impl Sync for UserSession {}
 
+/// `user`, `.\user` or `COMPUTER\user` -> (domain, user).
+fn split_account(account: &str) -> (String, String) {
+    let computer = || std::env::var("COMPUTERNAME").unwrap_or_default();
+    match account.split_once('\\') {
+        Some((d, u)) if d != "." => (d.to_string(), u.to_string()),
+        Some((_, u)) => (computer(), u.to_string()),
+        None => (computer(), account.to_string()),
+    }
+}
+
+/// A WTS string property (user or domain name) of a session.
+fn wts_string(id: u32, class: WTS_INFO_CLASS) -> String {
+    unsafe {
+        let mut buf: *mut u16 = null_mut();
+        let mut bytes = 0u32;
+        if WTSQuerySessionInformationW(WTS_CURRENT_SERVER_HANDLE, id, class, &mut buf, &mut bytes)
+            == 0
+            || buf.is_null()
+        {
+            return String::new();
+        }
+        let len = (0..).take_while(|&i| *buf.add(i) != 0).count();
+        let s = String::from_utf16_lossy(std::slice::from_raw_parts(buf, len));
+        WTSFreeMemory(buf as *mut c_void);
+        s
+    }
+}
+
+/// The active interactive Windows session (console or remote) in which `account` is logged on, if any.
+pub fn active_session_of(account: &str) -> Option<u32> {
+    let (domain, user) = split_account(account);
+    unsafe {
+        let mut list: *mut WTS_SESSION_INFOW = null_mut();
+        let mut count = 0u32;
+        if WTSEnumerateSessionsW(WTS_CURRENT_SERVER_HANDLE, 0, 1, &mut list, &mut count) == 0 {
+            return None;
+        }
+        let found = std::slice::from_raw_parts(list, count as usize)
+            .iter()
+            .filter(|s| s.SessionId != 0 && s.State == WTSActive)
+            .map(|s| s.SessionId)
+            .find(|&id| {
+                wts_string(id, WTSUserName).eq_ignore_ascii_case(&user)
+                    && wts_string(id, WTSDomainName).eq_ignore_ascii_case(&domain)
+            });
+        WTSFreeMemory(list as *mut c_void);
+        found
+    }
+}
+
+/// True when an `msrdc.exe` runs in session 0: only WSLg starts the Remote Desktop client there, and it means the VM
+/// was created from session 0 (S4U) so its Linux windows cannot reach any desktop.
+pub fn wslg_client_in_session0() -> bool {
+    unsafe {
+        let snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+        if snap == INVALID_HANDLE_VALUE {
+            return false;
+        }
+        let mut e: PROCESSENTRY32W = std::mem::zeroed();
+        e.dwSize = size_of::<PROCESSENTRY32W>() as u32;
+        let mut found = false;
+        let mut ok = Process32FirstW(snap, &mut e) != 0;
+        while ok && !found {
+            let len = e
+                .szExeFile
+                .iter()
+                .position(|&c| c == 0)
+                .unwrap_or(e.szExeFile.len());
+            if String::from_utf16_lossy(&e.szExeFile[..len]).eq_ignore_ascii_case("msrdc.exe") {
+                let mut sid = u32::MAX;
+                found = ProcessIdToSessionId(e.th32ProcessID, &mut sid) != 0 && sid == 0;
+            }
+            ok = Process32NextW(snap, &mut e) != 0;
+        }
+        CloseHandle(snap);
+        found
+    }
+}
+
 impl UserSession {
+    /// The owner's token in their active interactive session (`WTSQueryUserToken`, needs LocalSystem), so wsl.exe
+    /// and the VM's interop (WSLg's msrdc) run on the user's desktop. Ok(None) when the owner is not logged on.
+    pub fn interactive(account: &str) -> Result<Option<Self>> {
+        let Some(id) = active_session_of(account) else {
+            return Ok(None);
+        };
+        let (domain, user) = split_account(account);
+        unsafe {
+            let mut token: HANDLE = null_mut();
+            if WTSQueryUserToken(id, &mut token) == 0 {
+                bail!("WTSQueryUserToken(session {id}): Win32 {}", GetLastError());
+            }
+            let mut env: *mut c_void = null_mut();
+            if CreateEnvironmentBlock(&mut env, token, 0) == 0 {
+                env = null_mut();
+            }
+            let mut len = 0u32;
+            GetUserProfileDirectoryW(token, null_mut(), &mut len);
+            let mut dir = vec![0u16; len.max(1) as usize];
+            if GetUserProfileDirectoryW(token, dir.as_mut_ptr(), &mut len) == 0 {
+                dir = wide("C:\\");
+            }
+            Ok(Some(Self {
+                token,
+                // The interactive logon already loaded the profile: nothing to unload.
+                profile: null_mut(),
+                env,
+                profile_dir: dir,
+                account: format!("{domain}\\{user}"),
+                interactive: Some(id),
+            }))
+        }
+    }
+
     /// S4U logon of a local account (`user` or `COMPUTER\user`; Microsoft-account users are local accounts too).
     pub fn s4u(account: &str) -> Result<Self> {
-        let (domain, user) = match account.split_once('\\') {
-            Some((d, u)) if d != "." => (d.to_string(), u.to_string()),
-            Some((_, u)) => (
-                std::env::var("COMPUTERNAME").unwrap_or_default(),
-                u.to_string(),
-            ),
-            None => (
-                std::env::var("COMPUTERNAME").unwrap_or_default(),
-                account.to_string(),
-            ),
-        };
+        let (domain, user) = split_account(account);
         unsafe {
             let name = b"BunOSWsl";
             let process_name = LSA_STRING {
@@ -213,6 +333,7 @@ impl UserSession {
                 env,
                 profile_dir: dir,
                 account: format!("{domain}\\{user}"),
+                interactive: None,
             })
         }
     }
@@ -224,7 +345,9 @@ impl Drop for UserSession {
             if !self.env.is_null() {
                 DestroyEnvironmentBlock(self.env);
             }
-            UnloadUserProfile(self.token, self.profile);
+            if !self.profile.is_null() {
+                UnloadUserProfile(self.token, self.profile);
+            }
             CloseHandle(self.token);
         }
     }
@@ -313,8 +436,16 @@ impl Runner {
                 0,
                 null_mut(),
             );
+            // An interactive token starts wsl.exe on the owner's desktop (their session, winsta0\default).
+            let mut desktop = wide("winsta0\\default");
+            let on_desktop = matches!(self, Runner::As(s) if s.interactive.is_some());
             let si = STARTUPINFOW {
                 cb: size_of::<STARTUPINFOW>() as u32,
+                lpDesktop: if on_desktop {
+                    desktop.as_mut_ptr()
+                } else {
+                    null_mut()
+                },
                 dwFlags: STARTF_USESTDHANDLES,
                 hStdInput: if nul == INVALID_HANDLE_VALUE {
                     null_mut()

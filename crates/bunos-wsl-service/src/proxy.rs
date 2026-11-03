@@ -99,7 +99,13 @@ fn runner(cfg: &Config, cache: &mut Option<Runner>) -> Result<Runner> {
     if let Some(r) = cache {
         return Ok(r.clone());
     }
-    let r = Runner::As(Arc::new(UserSession::s4u(&cfg.user)?));
+    // Same preference as the instance: the owner's desktop session when logged on, so a unit service that happens to
+    // create the VM does not put WSLg's msrdc in session 0 (user.rs).
+    let session = match UserSession::interactive(&cfg.user) {
+        Ok(Some(s)) => s,
+        _ => UserSession::s4u(&cfg.user)?,
+    };
+    let r = Runner::As(Arc::new(session));
     *cache = Some(r.clone());
     Ok(r)
 }

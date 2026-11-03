@@ -7,7 +7,7 @@ use crate::{
     config::{self, Config},
     eventlog::{EventLog, ID_JOURNAL, ID_UNIT_STATE, Level},
     units::{Line, SERVICE_NAME, UnitState, classify, monitor_script, parse_show, windows_name},
-    user::{Proc, Runner, UserSession},
+    user::{Proc, Runner, UserSession, active_session_of, wslg_client_in_session0},
 };
 use anyhow::Result;
 use std::{
@@ -149,6 +149,16 @@ fn spawn_keeper(
     })
 }
 
+/// The owner's interactive session when they are logged on (WSLg needs it, see user.rs), else an S4U session 0.
+fn pick_session(user: &str, log: &EventLog) -> Result<UserSession> {
+    match UserSession::interactive(user) {
+        Ok(Some(s)) => return Ok(s),
+        Ok(None) => {}
+        Err(e) => log.warn(&format!("interactive token unavailable, using S4U: {e:#}")),
+    }
+    UserSession::s4u(user)
+}
+
 /// Caps journal forwarding so a chatty unit cannot flood the Application log.
 struct RateLimit {
     window: Instant,
@@ -180,7 +190,7 @@ fn run(
             return ServiceExitCode::ServiceSpecific(EXIT_CONFIG);
         }
     };
-    let session = match UserSession::s4u(&cfg.user) {
+    let mut session = match pick_session(&cfg.user, log) {
         Ok(s) => Arc::new(s),
         Err(e) => {
             log.error(&format!("{e:#}"));
@@ -188,7 +198,8 @@ fn run(
         }
     };
     let logon_ms = start.elapsed().as_millis();
-    let runner = Runner::As(session.clone());
+    let mut runner = Runner::As(session.clone());
+    let mut session_checked = Instant::now();
     config::set_status("LastStart", &config::now_ms().to_string());
     config::set_status("LastReadyMs", "");
 
@@ -244,8 +255,14 @@ fn run(
                                 Duration::ZERO,
                             );
                             log.info(&format!(
-                            "Bun OS distro '{}' is up as {} (systemd {state}): {ms} ms from service start to systemd ready                              (S4U logon and profile {logon_ms} ms, guest uptime {uptime_s:.2} s, keeper wsl.exe PID {}).",
-                            cfg.distro, session.account, k.proc.pid
+                            "Bun OS distro '{}' is up as {} (systemd {state}): {ms} ms from service start to systemd ready ({} {logon_ms} ms, guest uptime {uptime_s:.2} s, keeper wsl.exe PID {}).",
+                            cfg.distro,
+                            session.account,
+                            match session.interactive {
+                                Some(id) => format!("interactive token of session {id}"),
+                                None => "S4U logon and profile".into(),
+                            },
+                            k.proc.pid
                         ));
                         } else if !k.reload {
                             log.info(&format!(
@@ -342,6 +359,14 @@ fn run(
         if retry_at.is_some_and(|t| Instant::now() >= t) {
             retry_at = None;
             generation += 1;
+            // After a logoff the interactive token is dead: respawn from whatever session the owner has now.
+            if session.interactive.is_some()
+                && active_session_of(&cfg.user) != session.interactive
+                && let Ok(s) = pick_session(&cfg.user, log)
+            {
+                session = Arc::new(s);
+                runner = Runner::As(session.clone());
+            }
             match spawn_keeper(&runner, &cfg, config::units(), generation, &tx) {
                 Ok(k) => keeper = Some(k),
                 Err(e) => {
@@ -369,6 +394,41 @@ fn run(
                         show.clear();
                     }
                     Err(e) => log.error(&format!("reloading the unit list: {e:#}")),
+                }
+            }
+        }
+        // The VM was created from session 0 (S4U before logon, or by an older service build): WSLg's msrdc runs there
+        // and no Linux window can draw (user.rs). Once the owner has a desktop, recreate the VM from their session.
+        if ready && session_checked.elapsed() > Duration::from_secs(5) {
+            session_checked = Instant::now();
+            if wslg_client_in_session0()
+                && let Ok(Some(s)) = UserSession::interactive(&cfg.user)
+            {
+                let s = Arc::new(s);
+                let next = Runner::As(s.clone());
+                log.info(&format!(
+                    "{} logged on (session {}): restarting the WSL VM from that session so WSLg can show windows.",
+                    s.account,
+                    s.interactive.unwrap_or_default()
+                ));
+                if let Some(k) = keeper.take() {
+                    k.proc.kill();
+                }
+                if let Err(e) = next.output(&["--shutdown".into()], Duration::from_secs(60)) {
+                    log.warn(&format!("wsl --shutdown: {e:#}"));
+                }
+                session = s;
+                runner = next;
+                show.clear();
+                generation += 1;
+                match spawn_keeper(&runner, &cfg, config::units(), generation, &tx) {
+                    Ok(k) => keeper = Some(k),
+                    Err(e) => {
+                        log.error(&format!(
+                            "starting the instance in the owner's session: {e:#}"
+                        ));
+                        break ServiceExitCode::ServiceSpecific(EXIT_INSTANCE);
+                    }
                 }
             }
         }
