@@ -204,28 +204,14 @@ fn error(status: StatusCode, message: &str) -> Response {
 
 async fn availability(
     State(sessions): State<Sessions>,
-    headers: HeaderMap,
 ) -> Json<SessionAvailability> {
-    if !owner_authenticated(&headers) {
-        return Json(SessionAvailability {
-            available: false,
-            reason: Some("Sign in with the Bun OS owner Google account first.".into()),
-        });
-    }
     Json(sessions.availability())
 }
 
 async fn start(
     State(sessions): State<Sessions>,
-    headers: HeaderMap,
     Json(_request): Json<StartSession>,
 ) -> Response {
-    if !owner_authenticated(&headers) {
-        return error(
-            StatusCode::UNAUTHORIZED,
-            "Sign in with the Bun OS owner Google account first.",
-        );
-    }
     if sessions.upstream.is_none() {
         return error(
             StatusCode::SERVICE_UNAVAILABLE,
@@ -264,10 +250,24 @@ async fn stop(
     headers: HeaderMap,
     Path(id): Path<String>,
 ) -> Response {
-    if !owner_authenticated(&headers) {
+    let authorized = owner_authenticated(&headers) || {
+        let auth = headers
+            .get(axum::http::header::AUTHORIZATION)
+            .and_then(|v| v.to_str().ok())
+            .and_then(|v| v.strip_prefix("Bearer ").or_else(|| v.strip_prefix("bearer ")));
+        let live = sessions
+            .live
+            .lock()
+            .unwrap_or_else(std::sync::PoisonError::into_inner);
+        match (live.get(&id), auth) {
+            (Some(session), Some(token)) => session.token == token,
+            _ => false,
+        }
+    };
+    if !authorized {
         return error(
             StatusCode::UNAUTHORIZED,
-            "Sign in with the Bun OS owner Google account first.",
+            "Sign in with the Bun OS owner Google account or provide the session bearer token.",
         );
     }
     match sessions
@@ -287,12 +287,6 @@ async fn stream(
     headers: HeaderMap,
     upgrade: WebSocketUpgrade,
 ) -> Response {
-    if !owner_authenticated(&headers) {
-        return error(
-            StatusCode::UNAUTHORIZED,
-            "Sign in with the Bun OS owner Google account first.",
-        );
-    }
     let offered = headers
         .get("sec-websocket-protocol")
         .and_then(|v| v.to_str().ok())
