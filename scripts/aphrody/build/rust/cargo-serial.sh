@@ -88,7 +88,12 @@ if [[ -n "${APHRODY_CARGO_TARGET_DIR:-}" ]]; then
     done
     export CARGO_TARGET_DIR="$APHRODY_CARGO_TARGET_DIR"
 fi
-if [[ "${APHRODY_CARGO_INCREMENTAL:-0}" == 1 ]]; then unset CARGO_INCREMENTAL; else export CARGO_INCREMENTAL=0; fi
+# Allow incremental compilation for development builds to accelerate iterative compiling; disabled for clean release
+if [[ "${*:-}" == *--release* ]]; then
+    export CARGO_INCREMENTAL=0
+else
+    export CARGO_INCREMENTAL="${APHRODY_CARGO_INCREMENTAL:-1}"
+fi
 export CARGO_BUILD_JOBS="$jobs" CARGO_TERM_COLOR=never
 if command -v nice >/dev/null 2>&1; then exec nice -n 10 bun "$source_root/scripts/cargo.ts" exec -- "$@"; fi
 exec bun "$source_root/scripts/cargo.ts" exec -- "$@"

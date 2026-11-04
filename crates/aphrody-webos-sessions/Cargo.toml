@@ -14,7 +14,6 @@ publish = false
 [dependencies]
 anyhow = { workspace = true, features = ["std"] }
 aphrody-webos-protocol = { path = "../aphrody-webos-protocol", version = "1.4.7" }
-axum = { workspace = true, features = ["json", "tokio", "http1"] }
 bollard = "0.18"
 getrandom = { workspace = true, features = ["std"] }
 serde = { workspace = true }

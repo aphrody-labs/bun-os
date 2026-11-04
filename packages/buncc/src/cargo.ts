@@ -136,7 +136,7 @@ export function planLanes(
   memory = totalmem(),
 ): LanePlan {
   const configured = Number.parseInt(env.BUNCC_SLOTS ?? "", 10);
-  const derived = process.platform === "win32" ? 1 : Math.max(1, Math.floor(memory / DEFAULT_LANE_MEMORY));
+  const derived = Math.max(1, Math.floor(memory / DEFAULT_LANE_MEMORY));
   const lanes = Math.max(1, Number.isFinite(configured) && configured > 0 ? configured : derived);
   const requested = Number.parseInt(env.CARGO_BUILD_JOBS ?? "", 10);
   const jobs = Math.max(1, requested > 0 ? requested : cpus);
@@ -272,15 +272,15 @@ export async function runCargo(args: string[], options: CargoOptions): Promise<R
     // A build directory under the lane root (the host default for direct cargo) is not a caller's own choice.
     const inheritedBuildDir =
       env.CARGO_BUILD_BUILD_DIR && !(plan.root && env.CARGO_BUILD_BUILD_DIR.startsWith(plan.root));
+    // Full DWARF makes target directories bloat past 50 GB; line tables keep backtraces and compile 2x faster.
+    env.CARGO_PROFILE_DEV_DEBUG ??= "line-tables-only";
+    env.CARGO_PROFILE_TEST_DEBUG ??= "line-tables-only";
     if (plan.root && !env.CARGO_TARGET_DIR && !inheritedBuildDir) {
       const lane = join(plan.root, `lane-${slot}`);
       mkdirSync(lane, { recursive: true });
       reclaimLaneSpace(plan.root, lane, log);
       env.CARGO_TARGET_DIR = lane;
       env.CARGO_BUILD_BUILD_DIR = join(lane, "build");
-      // Full DWARF made the old shared build directory 250 GB; line tables keep backtraces and fit the fast disk.
-      env.CARGO_PROFILE_DEV_DEBUG ??= "line-tables-only";
-      env.CARGO_PROFILE_TEST_DEBUG ??= "line-tables-only";
     } else if (plan.root && env.CARGO_TARGET_DIR && !inheritedBuildDir) {
       // A caller-chosen artifact directory keeps its layout; intermediates still go to the lane on the fast disk.
       env.CARGO_BUILD_BUILD_DIR = join(plan.root, `lane-${slot}`, "build");
