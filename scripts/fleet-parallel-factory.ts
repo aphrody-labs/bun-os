@@ -152,12 +152,12 @@ export async function purgeHostBuildArtifacts(host: string, execute = false): Pr
   const cleanupScripts = [
     // 1. Docker builder cache & dangling images (prune)
     execute 
-      ? `docker system prune -f --volumes 2>/dev/null; docker builder prune -f 2>/dev/null || true`
+      ? `docker system prune -af --volumes 2>/dev/null; docker builder prune -af 2>/dev/null || true`
       : `docker system df 2>/dev/null || true`,
-    // 2. Old target directories & intermediate logs
+    // 2. Old target directories & intermediate work trees (bun-os and bun-ui builds)
     execute
-      ? `rm -rf ~/build/storage/targets/photocraft-* ~/build/storage/artifacts/*-work 2>/dev/null || true`
-      : `ls -d ~/build/storage/targets/* 2>/dev/null || true`,
+      ? `rm -rf ~/build/wsl-kernel-work ~/build/docker-cli-work ~/build/bun-ui ~/build/target/bun-ui* ~/build/storage/artifacts/*-work ~/build/storage/targets/photocraft-* /tmp/bun-ui* /tmp/target 2>/dev/null || true`
+      : `ls -d ~/build/wsl-kernel-work ~/build/docker-cli-work ~/build/storage/targets/* 2>/dev/null || true`,
     // 3. Clear transient sccache build artifacts if exceeding capacity
     execute
       ? `sccache --cleanup 2>/dev/null || true`
