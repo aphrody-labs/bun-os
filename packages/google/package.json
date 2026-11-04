@@ -39,6 +39,7 @@
     "build": "bun build ./src/index.ts --outdir ./dist --target bun --format esm",
     "google:status": "bun ./src/cli.ts drive status",
     "google:sync": "bun ./src/cli.ts drive sync",
+    "search:server": "bun run ./src/search-server.ts",
     "test": "bun test ./test",
     "verify": "bun run test && bun run build"
   },

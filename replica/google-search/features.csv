@@ -1,12 +1,12 @@
 id,area,feature,priority,original,clone,notes
-F01,home,Minimalist Search Input Bar,must,yes,no,Capsule container with input field
-F02,home,Voice and Visual Lens Search Triggers,should,yes,no,Microphone and camera icons in search box
-F03,home,Quick Action Buttons,should,yes,no,Recherche Google and Feeling Lucky buttons
-F04,suggest,Real-time Autocomplete Dropdown,must,yes,no,Query suggestions matching input keystrokes
-F05,suggest,Keyboard Arrow Key Navigation,must,yes,no,Up and Down selects suggestions Enter submits
-F06,serp,Organic Result Snippet Cards,must,yes,no,Favicon domain breadcrumb title and snippet
-F07,serp,Category Filter Tabs,must,yes,no,Tous Images Videos Actualites Shopping
-F08,serp,Search Tools Bar (Outils),should,yes,no,Time filters past 24h past week past year
-F09,serp,Pagination Controls,must,yes,no,Numbered pages and Next button
-F10,mobile,Responsive 390px Mobile Viewport,must,yes,no,Horizontal carousel chips and sticky search pill
-F11,privacy,Zero-Ad and Private Search Mode,must,no,no,Ad-free sovereign search queries
+F01,home,Minimalist Search Input Bar,must,yes,yes,Capsule container with input field
+F02,home,Voice and Visual Lens Search Triggers,should,yes,yes,Microphone and camera icons in search box
+F03,home,Quick Action Buttons,should,yes,yes,Recherche and Feeling Lucky buttons
+F04,suggest,Real-time Autocomplete Dropdown,must,yes,yes,Query suggestions matching input keystrokes
+F05,suggest,Keyboard Arrow Key Navigation,must,yes,yes,Up and Down selects suggestions Enter submits
+F06,serp,Organic Result Snippet Cards,must,yes,yes,Favicon domain breadcrumb title and snippet
+F07,serp,Category Filter Tabs,must,yes,yes,Tous Images Videos Actualites Shopping
+F08,serp,Search Tools Bar (Outils),should,yes,yes,Time filters past 24h past week past year
+F09,serp,Pagination Controls,must,yes,yes,Numbered pages and Next button
+F10,mobile,Responsive 390px Mobile Viewport,must,yes,yes,Horizontal carousel chips and sticky search pill
+F11,privacy,Zero-Ad and Private Search Mode,must,no,yes,Ad-free sovereign search queries

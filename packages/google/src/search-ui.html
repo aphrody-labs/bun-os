@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recherche Souveraine — Bun OS</title>
+  <style>
+    /* Design Tokens */
+    :root {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --border: #dfe1e5;
+      --border-hover: rgba(223, 225, 229, 0);
+      --shadow-hover: 0 1px 6px rgba(32, 33, 36, 0.28);
+      --text: #202124;
+      --text-subtle: #70757a;
+      --text-snippet: #4d5156;
+      --link: #1a0dab;
+      --link-visited: #681da8;
+      --url-breadcrumb: #202124;
+      --btn-bg: #f8f9fa;
+      --btn-border: #f8f9fa;
+      --btn-hover-border: #dadce0;
+      --btn-hover-bg: #f8f9fa;
+      --accent-blue: #1a73e8;
+      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #202124;
+        --surface: #303134;
+        --border: #5f6368;
+        --text: #e8eaed;
+        --text-subtle: #9aa0a6;
+        --text-snippet: #bdc1c6;
+        --link: #8ab4f8;
+        --link-visited: #c58af9;
+        --url-breadcrumb: #dadce0;
+        --btn-bg: #303134;
+        --btn-border: #303134;
+        --btn-hover-border: #5f6368;
+        --btn-hover-bg: #3c4043;
+      }
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-family); background: var(--bg); color: var(--text); -webkit-font-smoothing: antialiased; }
+
+    /* Layout Switcher */
+    .view { display: none; }
+    .view.active { display: flex; flex-direction: column; }
+
+    /* S01: HOME VIEW */
+    #view-home { min-height: 100vh; justify-content: space-between; align-items: center; }
+    .home-header { width: 100%; display: flex; justify-content: flex-end; padding: 16px 24px; gap: 16px; font-size: 13px; }
+    .home-header a { color: var(--text); text-decoration: none; display: flex; align-items: center; }
+    .home-header a:hover { text-decoration: underline; }
+
+    .home-center { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 584px; margin-top: 10vh; padding: 0 16px; }
+    .logo-container { margin-bottom: 28px; text-align: center; }
+    .logo-text { font-size: 56px; font-weight: 700; letter-spacing: -0.04em; color: var(--accent-blue); display: flex; gap: 2px; }
+    .logo-dot { color: #ea4335; }
+    .logo-badge { font-size: 14px; font-weight: 600; background: rgba(26, 115, 232, 0.1); color: var(--accent-blue); padding: 4px 8px; border-radius: 12px; margin-top: 4px; align-self: center; }
+
+    /* Search Box Capsule */
+    .search-box-wrapper { width: 100%; position: relative; }
+    .search-capsule {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      height: 46px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 0 14px;
+      box-shadow: none;
+      transition: all 150ms ease;
+    }
+    .search-capsule:hover, .search-capsule.focused {
+      box-shadow: var(--shadow-hover);
+      border-color: var(--border-hover);
+    }
+    .search-icon { width: 20px; height: 20px; color: var(--text-subtle); margin-right: 12px; flex-shrink: 0; }
+    .search-input {
+      flex: 1;
+      height: 100%;
+      border: none;
+      background: transparent;
+      outline: none;
+      color: var(--text);
+      font-size: 16px;
+      font-family: inherit;
+    }
+    .input-actions { display: flex; align-items: center; gap: 8px; }
+    .action-icon-btn { background: none; border: none; cursor: pointer; color: var(--text-subtle); display: flex; padding: 4px; border-radius: 50%; }
+    .action-icon-btn:hover { background: rgba(0, 0, 0, 0.05); }
+
+    /* S02: Autocomplete Dropdown */
+    .autocomplete-dropdown {
+      position: absolute;
+      top: 44px;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-radius: 0 0 24px 24px;
+      box-shadow: var(--shadow-hover);
+      border: 1px solid var(--border);
+      border-top: none;
+      overflow: hidden;
+      z-index: 100;
+      display: none;
+    }
+    .autocomplete-dropdown.active { display: block; }
+    .suggestion-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 16px;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .suggestion-item:hover, .suggestion-item.selected {
+      background: rgba(0, 0, 0, 0.05);
+    }
+    .suggestion-icon { width: 16px; height: 16px; color: var(--text-subtle); flex-shrink: 0; }
+    .suggestion-text { flex: 1; }
+
+    /* Home Buttons */
+    .home-buttons { display: flex; gap: 12px; margin-top: 26px; }
+    .google-btn {
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      color: var(--text);
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .google-btn:hover { border-color: var(--btn-hover-border); background: var(--btn-hover-bg); }
+
+    /* Home Footer */
+    .home-footer { width: 100%; background: var(--btn-bg); border-top: 1px solid var(--border); font-size: 14px; color: var(--text-subtle); }
+    .footer-location { padding: 12px 24px; border-bottom: 1px solid var(--border); }
+    .footer-links { display: flex; justify-content: space-between; padding: 12px 24px; flex-wrap: wrap; gap: 12px; }
+    .footer-links a { color: var(--text-subtle); text-decoration: none; margin-right: 16px; }
+    .footer-links a:hover { text-decoration: underline; }
+
+    /* S03: SERP VIEW */
+    #view-serp { min-height: 100vh; }
+    .serp-header {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 90;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px 0 24px;
+    }
+    .serp-header-top { display: flex; align-items: center; gap: 28px; margin-bottom: 16px; }
+    .serp-logo { font-size: 26px; font-weight: 700; color: var(--accent-blue); text-decoration: none; flex-shrink: 0; }
+    .serp-search-wrapper { max-width: 692px; flex: 1; }
+
+    /* Category Filter Tabs */
+    .serp-nav-tabs { display: flex; gap: 18px; font-size: 13px; color: var(--text-subtle); margin-left: 140px; }
+    .nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-bottom: 12px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      user-select: none;
+    }
+    .nav-tab:hover { color: var(--text); }
+    .nav-tab.active { color: var(--accent-blue); border-bottom-color: var(--accent-blue); font-weight: 500; }
+    .tools-btn { margin-left: auto; }
+
+    /* S05: Search Tools sub-bar */
+    .tools-bar {
+      display: none;
+      padding: 8px 0 8px 140px;
+      font-size: 13px;
+      color: var(--text-subtle);
+      border-top: 1px solid var(--border);
+      gap: 16px;
+    }
+    .tools-bar.active { display: flex; }
+    .tool-select { background: transparent; border: none; font-size: 13px; color: var(--text-subtle); cursor: pointer; outline: none; }
+
+    /* SERP Content Area */
+    .serp-main { display: flex; padding: 16px 24px 24px 164px; gap: 60px; max-width: 1280px; }
+    .serp-results-column { max-width: 652px; flex: 1; }
+    .results-stats { font-size: 14px; color: var(--text-subtle); margin-bottom: 20px; }
+
+    /* Organic Snippet Card */
+    .organic-card { margin-bottom: 28px; }
+    .card-url-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 12px; color: var(--url-breadcrumb); }
+    .card-favicon { width: 18px; height: 18px; border-radius: 50%; background: var(--btn-bg); display: flex; align-items: center; justify-content: center; }
+    .card-site-name { font-weight: 500; }
+    .card-title { font-size: 20px; font-weight: 400; line-height: 1.3; margin-bottom: 4px; }
+    .card-title a { color: var(--link); text-decoration: none; }
+    .card-title a:hover { text-decoration: underline; }
+    .card-snippet { font-size: 14px; line-height: 1.58; color: var(--text-snippet); }
+
+    /* Knowledge Card Sidebar */
+    .knowledge-column { width: 360px; flex-shrink: 0; }
+    .knowledge-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      background: var(--surface);
+    }
+    .knowledge-title { font-size: 24px; font-weight: 400; margin-bottom: 4px; }
+    .knowledge-subtitle { font-size: 14px; color: var(--text-subtle); margin-bottom: 12px; }
+    .knowledge-desc { font-size: 14px; line-height: 1.5; color: var(--text-snippet); margin-bottom: 16px; }
+    .knowledge-attrs { font-size: 13px; line-height: 1.8; }
+    .knowledge-attr-name { font-weight: 600; color: var(--text); }
+
+    /* Pagination */
+    .serp-pagination { display: flex; align-items: center; gap: 12px; margin-top: 40px; padding-bottom: 60px; }
+    .page-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--link);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .page-btn.active { background: var(--accent-blue); color: #fff; border-color: var(--accent-blue); font-weight: 600; }
+
+    /* S04: Mobile 390px Viewport */
+    @media (max-width: 768px) {
+      .serp-nav-tabs, .serp-main, .tools-bar { margin-left: 0; padding-left: 16px; padding-right: 16px; }
+      .knowledge-column { display: none; }
+      .serp-header-top { gap: 12px; }
+      .serp-nav-tabs { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; }
+      .logo-text { font-size: 42px; }
+      .home-header { padding: 12px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== S01: SEARCH HOME ==================== -->
+  <div id="view-home" class="view active">
+    <div class="home-header">
+      <a href="#mail">Gmail</a>
+      <a href="#images">Images</a>
+      <a href="#settings">Paramètres</a>
+    </div>
+
+    <div class="home-center">
+      <div class="logo-container">
+        <div class="logo-text">
+          <span>B</span><span>u</span><span>n</span><span>S</span><span>e</span><span>a</span><span>r</span><span>c</span><span>h</span>
+          <span class="logo-dot">.</span>
+        </div>
+        <div class="logo-badge">Souverain & Sans Publicité</div>
+      </div>
+
+      <div class="search-box-wrapper">
+        <div id="home-capsule" class="search-capsule">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input 
+            id="home-search-input" 
+            class="search-input" 
+            type="text" 
+            placeholder="Effectuez une recherche ou saisissez une URL" 
+            autocomplete="off" 
+            autofocus
+          />
+          <div class="input-actions">
+            <button class="action-icon-btn" title="Recherche vocale">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+              </svg>
+            </button>
+            <button class="action-icon-btn" title="Recherche par image">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-12.5c-2.48 0-4.5 2.02-4.5 4.5s2.02 4.5 4.5 4.5 4.5-2.02 4.5-4.5-2.02-4.5-4.5-4.5z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- S02: Autocomplete Dropdown -->
+        <div id="home-suggestions" class="autocomplete-dropdown"></div>
+      </div>
+
+      <div class="home-buttons">
+        <button id="btn-submit-home" class="google-btn">Recherche Souveraine</button>
+        <button id="btn-lucky" class="google-btn">J'ai de la chance</button>
+      </div>
+    </div>
+
+    <div class="home-footer">
+      <div class="footer-location">France</div>
+      <div class="footer-links">
+        <div>
+          <a href="#about">À propos</a>
+          <a href="#privacy">Confidentialité</a>
+          <a href="#terms">Conditions</a>
+        </div>
+        <div>
+          <a href="#howitworks">Comment fonctionne la recherche</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== S03: SERP RESULTS VIEW ==================== -->
+  <div id="view-serp" class="view">
+    <div class="serp-header">
+      <div class="serp-header-top">
+        <a href="#home" id="serp-logo" class="serp-logo">BunSearch</a>
+        <div class="serp-search-wrapper">
+          <div class="search-capsule focused">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input id="serp-search-input" class="search-input" type="text" autocomplete="off" />
+          </div>
+        </div>
+      </div>
+
+      <div class="serp-nav-tabs">
+        <div class="nav-tab active" data-tab="all">Tous</div>
+        <div class="nav-tab" data-tab="images">Images</div>
+        <div class="nav-tab" data-tab="videos">Vidéos</div>
+        <div class="nav-tab" data-tab="news">Actualités</div>
+        <div class="nav-tab" data-tab="shopping">Shopping</div>
+        <div id="btn-tools" class="nav-tab tools-btn">Outils</div>
+      </div>
+
+      <!-- S05: Tools Sub-bar -->
+      <div id="tools-bar" class="tools-bar">
+        <select class="tool-select">
+          <option>Date indifférente</option>
+          <option>Moins d'une heure</option>
+          <option>Moins de 24 heures</option>
+          <option>Moins d'une semaine</option>
+          <option>Moins d'un mois</option>
+          <option>Moins d'un an</option>
+        </select>
+        <select class="tool-select">
+          <option>Tous les résultats</option>
+          <option>Mot à mot</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="serp-main">
+      <div class="serp-results-column">
+        <div id="serp-stats" class="results-stats">Environ 142 000 résultats (0,18 secondes)</div>
+        <div id="organic-results-container"></div>
+
+        <div class="serp-pagination">
+          <a href="#p1" class="page-btn active">1</a>
+          <a href="#p2" class="page-btn">2</a>
+          <a href="#p3" class="page-btn">3</a>
+          <a href="#p4" class="page-btn">4</a>
+          <a href="#next" class="page-btn" style="width: auto; padding: 0 14px; border-radius: 18px;">Suivant ›</a>
+        </div>
+      </div>
+
+      <!-- Knowledge Panel Sidecard -->
+      <div class="knowledge-column">
+        <div class="knowledge-card">
+          <div class="knowledge-title">Bun OS</div>
+          <div class="knowledge-subtitle">Système d'exploitation souverain</div>
+          <div class="knowledge-desc">
+            Bun OS est une distribution Linux basée sur Arch et Upstream Bun, intégrant l'environnement de bureau COSMIC, un sous-système Android et des capacités d'IA locales.
+          </div>
+          <div class="knowledge-attrs">
+            <div><span class="knowledge-attr-name">Développeur :</span> Aphrody Labs</div>
+            <div><span class="knowledge-attr-name">Noyau :</span> Linux CachyOS / Zen</div>
+            <div><span class="knowledge-attr-name">Moteur :</span> Upstream Bun v1.4.4+</div>
+            <div><span class="knowledge-attr-name">Licence :</span> Apache-2.0 / MIT</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    const state = {
+      query: "",
+      view: "home",
+      suggestions: [
+        "bun os",
+        "bun os download",
+        "bun os arch linux",
+        "bun os documentation",
+        "bun os cosmic desktop",
+        "bun vs nodejs 2026",
+        "bun serve performance"
+      ],
+      results: [
+        {
+          title: "Bun OS — Le Système d'Exploitation Unifié et Souverain",
+          url: "https://aphrody.com/bun-os",
+          displayUrl: "https://aphrody.com > bun-os",
+          snippet: "Distribution Linux optimisée pour le runtime Bun upstream avec intégration complète d'Android 17, COSMIC desktop et des modèles d'IA souverains."
+        },
+        {
+          title: "Documentation Officielle Bun — Runtime JavaScript Ultra-Rapide",
+          url: "https://bun.sh/docs",
+          displayUrl: "https://bun.sh > docs",
+          snippet: "Découvrez Bun : un runtime JavaScript tout-en-un doté d'un gestionnaire de paquets, d'un exécuteur de tests et d'un bundler natif haute performance."
+        },
+        {
+          title: "aphrody-labs/bun-os sur GitHub",
+          url: "https://github.com/aphrody-labs/bun-os",
+          displayUrl: "https://github.com > aphrody-labs > bun-os",
+          snippet: "Dépôt officiel du système d'exploitation Bun OS. Code source, paquets, images bootables et intégrations WebOS complètes."
+        }
+      ]
+    };
+
+    // Elements
+    const viewHome = document.getElementById("view-home");
+    const viewSerp = document.getElementById("view-serp");
+    const homeInput = document.getElementById("home-search-input");
+    const serpInput = document.getElementById("serp-search-input");
+    const homeSuggest = document.getElementById("home-suggestions");
+    const btnTools = document.getElementById("btn-tools");
+    const toolsBar = document.getElementById("tools-bar");
+    const resultsContainer = document.getElementById("organic-results-container");
+
+    function showView(name) {
+      state.view = name;
+      if (name === "home") {
+        viewHome.classList.add("active");
+        viewSerp.classList.remove("active");
+        homeInput.focus();
+      } else {
+        viewHome.classList.remove("active");
+        viewSerp.classList.add("active");
+        serpInput.value = state.query;
+        renderResults();
+      }
+    }
+
+    function renderSuggestions(q) {
+      if (!q.trim()) {
+        homeSuggest.classList.remove("active");
+        return;
+      }
+      const matches = state.suggestions.filter(s => s.toLowerCase().includes(q.toLowerCase()));
+      if (matches.length === 0) {
+        homeSuggest.classList.remove("active");
+        return;
+      }
+      homeSuggest.innerHTML = matches.map(m => `
+        <div class="suggestion-item">
+          <svg class="suggestion-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <div class="suggestion-text">${m}</div>
+        </div>
+      `).join("");
+      homeSuggest.classList.add("active");
+
+      homeSuggest.querySelectorAll(".suggestion-item").forEach(item => {
+        item.addEventListener("click", () => {
+          const text = item.querySelector(".suggestion-text").textContent;
+          submitQuery(text);
+        });
+      });
+    }
+
+    function renderResults() {
+      resultsContainer.innerHTML = state.results.map(r => `
+        <div class="organic-card">
+          <div class="card-url-row">
+            <div class="card-favicon">🌐</div>
+            <span class="card-site-name">${r.displayUrl}</span>
+          </div>
+          <div class="card-title">
+            <a href="${r.url}" target="_blank">${r.title}</a>
+          </div>
+          <div class="card-snippet">${r.snippet}</div>
+        </div>
+      `).join("");
+    }
+
+    function submitQuery(q) {
+      if (!q.trim()) return;
+      state.query = q;
+      homeSuggest.classList.remove("active");
+      showView("serp");
+    }
+
+    // Event listeners
+    homeInput.addEventListener("input", (e) => renderSuggestions(e.target.value));
+    homeInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitQuery(homeInput.value);
+    });
+    serpInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") submitQuery(serpInput.value);
+    });
+
+    document.getElementById("btn-submit-home").addEventListener("click", () => submitQuery(homeInput.value));
+    document.getElementById("btn-lucky").addEventListener("click", () => {
+      if (state.results[0]) window.open(state.results[0].url, "_blank");
+    });
+    document.getElementById("serp-logo").addEventListener("click", (e) => {
+      e.preventDefault();
+      showView("home");
+    });
+
+    btnTools.addEventListener("click", () => {
+      toolsBar.classList.toggle("active");
+    });
+
+    // Close autocomplete on click outside
+    document.addEventListener("click", (e) => {
+      if (!homeSuggest.contains(e.target) && e.target !== homeInput) {
+        homeSuggest.classList.remove("active");
+      }
+    });
+  </script>
+</body>
+</html>
