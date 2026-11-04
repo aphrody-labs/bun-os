@@ -1,0 +1,345 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/**
+ * Craft Pro Hub — Elite 2026 Design System
+ * Tri-System Convergence: Microsoft Fluent 2 + Google Material 3 Expressive + Craft Studio UI
+ * OKLCH Perceptual Gamut, Gemini Light Blue Spectrum & Byron Love Sovereign Aesthetics.
+ */
+
+:root {
+  /* Gemini Light Blue Core */
+  --gemini-primary: #8ab4f8;
+  --gemini-secondary: #c2e7ff;
+  --gemini-tertiary: #7cd8e8;
+  --gemini-surface-deep: #0f141c;
+  --gemini-surface-container: #171d26;
+  --gemini-surface-high: #1f2733;
+  --gemini-surface-highest: #283240;
+  --gemini-outline: rgba(138, 180, 248, 0.24);
+  --gemini-outline-variant: rgba(194, 231, 255, 0.12);
+
+  /* Byron Love Divine Gold Highlights */
+  --byron-gold: #fce881;
+  --byron-gold-dim: #f5c451;
+  --byron-gold-aura: rgba(252, 232, 129, 0.18);
+
+  /* OKLCH Dynamic Chromatic Tokens */
+  --surface-abyss: oklch(0.12 0.03 245);
+  --surface-glass: oklch(0.18 0.04 245 / 0.72);
+  --surface-glass-border: oklch(0.85 0.08 240 / 0.22);
+  --text-vivid: oklch(0.96 0.02 240);
+  --text-muted: oklch(0.78 0.04 240);
+  --text-subtle: oklch(0.60 0.04 240);
+
+  /* Spring Physics Timings */
+  --spring-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 180ms;
+  --duration-normal: 280ms;
+  --duration-slow: 480ms;
+
+  /* Typography */
+  --font-display: "Google Sans Display", "Google Sans Flex", -apple-system, sans-serif;
+  --font-body: "Google Sans Text", "Inter", -apple-system, sans-serif;
+  --font-mono: "Fira Code", "JetBrains Mono", monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--gemini-surface-deep);
+  color: var(--text-vivid);
+  font-family: var(--font-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+/* Background Celestial Mesh */
+.ambient-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: 
+    radial-gradient(ellipse 60% 40% at 20% 10%, rgba(138, 180, 248, 0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 50% at 85% 85%, rgba(124, 216, 232, 0.10) 0%, transparent 60%),
+    radial-gradient(circle 350px at 50% 50%, rgba(252, 232, 129, 0.03) 0%, transparent 70%);
+  z-index: 0;
+}
+
+/* Navigation & Fluent 2 Ribbon */
+.craft-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 28px;
+  background: var(--surface-glass);
+  backdrop-filter: blur(28px) saturate(180%);
+  border-bottom: 1px solid var(--surface-glass-border);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.brand-suite {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  object-fit: cover;
+  border: 2px solid var(--byron-gold);
+  box-shadow: 0 0 16px var(--byron-gold-aura);
+  transition: transform var(--duration-fast) var(--spring-bounce);
+}
+
+.brand-avatar:hover {
+  transform: scale(1.12) rotate(4deg);
+}
+
+.brand-text h1 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--gemini-secondary) 0%, var(--gemini-primary) 50%, var(--byron-gold) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-text span {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* Action Chips & Presence Pill */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.presence-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--gemini-surface-container);
+  border: 1px solid var(--gemini-outline);
+  border-radius: 9999px;
+  font-size: 12px;
+  color: var(--gemini-secondary);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--gemini-tertiary);
+  box-shadow: 0 0 10px var(--gemini-tertiary);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  background: linear-gradient(135deg, var(--gemini-primary), var(--gemini-tertiary));
+  color: var(--gemini-surface-deep);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--spring-bounce), box-shadow var(--duration-fast) var(--spring-ease);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(138, 180, 248, 0.4);
+}
+
+/* Hero Section */
+.hero-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1240px;
+  margin: 64px auto 48px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  background: rgba(138, 180, 248, 0.10);
+  border: 1px solid var(--gemini-outline);
+  border-radius: 9999px;
+  font-size: 12px;
+  color: var(--gemini-secondary);
+  margin-bottom: 24px;
+  backdrop-filter: blur(12px);
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-size: clamp(38px, 6vw, 68px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 20px;
+}
+
+.hero-title .glow-text {
+  background: linear-gradient(135deg, #ffffff 0%, var(--gemini-secondary) 50%, var(--gemini-primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-subtitle {
+  font-size: clamp(16px, 2vw, 20px);
+  color: var(--text-muted);
+  max-width: 760px;
+  margin: 0 auto 36px;
+  line-height: 1.6;
+}
+
+/* Studio Grid Matrix */
+.studios-matrix {
+  position: relative;
+  z-index: 1;
+  max-width: 1280px;
+  margin: 0 auto 80px;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.studio-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  background: var(--gemini-surface-container);
+  border: 1px solid var(--gemini-outline-variant);
+  border-radius: 20px;
+  backdrop-filter: blur(16px);
+  transition: transform var(--duration-fast) var(--spring-bounce), border-color var(--duration-fast) var(--spring-ease), box-shadow var(--duration-fast) var(--spring-ease);
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.studio-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gemini-primary), transparent);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--spring-ease);
+}
+
+.studio-card:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: var(--gemini-outline);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4), 0 0 24px rgba(138, 180, 248, 0.12);
+}
+
+.studio-card:hover::before {
+  opacity: 1;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.studio-glyph {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--gemini-surface-high);
+  color: var(--gemini-primary);
+  font-weight: 700;
+  font-size: 15px;
+  border: 1px solid var(--gemini-outline);
+}
+
+.studio-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 9999px;
+  background: rgba(124, 216, 232, 0.15);
+  color: var(--gemini-tertiary);
+  border: 1px solid rgba(124, 216, 232, 0.3);
+}
+
+.studio-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #ffffff;
+}
+
+.studio-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-bottom: 18px;
+  flex: 1;
+}
+
+.studio-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--gemini-outline-variant);
+  font-size: 12px;
+  color: var(--gemini-secondary);
+}
+
+.studio-footer span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Footer Banner */
+.craft-footer {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 40px 24px;
+  border-top: 1px solid var(--gemini-outline-variant);
+  background: var(--gemini-surface-deep);
+  color: var(--text-subtle);
+  font-size: 13px;
+}

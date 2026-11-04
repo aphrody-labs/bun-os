@@ -1,0 +1,20 @@
+{
+  "name": "@aphrody/craft-hub",
+  "version": "1.0.0",
+  "description": "Sovereign Craft Pro Suite Hub (craft.aphrody.app) orchestrating all 14 studios with WebGPU WASM parity, Fluent UI Ribbon, M3 Expressive, and Byron Love sovereign theme.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "dev": "bun run ./src/index.ts",
+    "build": "bun build ./src/app.ts --outdir ./dist --minify",
+    "check": "bun check"
+  },
+  "dependencies": {
+    "@aphrody/auth": "workspace:*",
+    "@aphrody/m3-os-themes": "workspace:*"
+  },
+  "devDependencies": {
+    "bun-types": "catalog:"
+  }
+}

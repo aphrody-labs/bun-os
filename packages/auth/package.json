@@ -1,0 +1,17 @@
+{
+  "name": "@aphrody/auth",
+  "version": "1.4.7",
+  "description": "Sovereign Better Auth session architecture, passkeys (WebAuthn), session cookies, owner identity verification, and multi-account presence for Bun OS.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "check": "bun check",
+    "test": "bun test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "bun-types": "catalog:"
+  }
+}

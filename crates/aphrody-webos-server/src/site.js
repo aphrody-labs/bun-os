@@ -311,40 +311,40 @@ function initShowcasePlayer() {
   const tagsEl = document.getElementById("detail-tags");
 
   const featureData = {
-    calm: {
-      badge: "Feature 1 • Core Sanctuary",
-      title: "Celestial Calm — Zero Distraction, Pure Focus",
-      text: "Every pixel of Aphrody is deliberately arranged to preserve mental serenity. No intrusive notifications, no unsolicited updates, no telemetry trackers. Just a restorative, velvety canvas where your best ideas flow uninhibited.",
-      tags: ["Distraction-Free Workspace", "174Hz Harmonic Soundscape", "OLED Pure Surface"],
+    android: {
+      badge: "Pillar 1 • Native Mobility",
+      title: "Android 17 In-Browser — Waydroid Multi-Window",
+      text: "Run Android 17 applications natively inside your browser tab without emulated slow-downs. Powered by Waydroid containerization with full Google Play, F-Droid, APK side-loading, and seamless clipboard sharing alongside desktop windows.",
+      tags: ["Android 17 Container", "Waydroid Multi-Window", "Play Store & F-Droid", "Zero-Latency Input"],
     },
-    canvas: {
-      badge: "Feature 2 • Creative Suite",
-      title: "Fluid Creative Canvas — WordCraft, DeckCraft, GridCraft, VectorCraft",
-      text: "Four signature creative environments working in seamless harmony. Seamlessly compose prose, design cinematic kinetic slide decks, build reactive spatial spreadsheet models, and sculpt precision vector curves without ever leaving the flow.",
-      tags: ["WordCraft Prose", "DeckCraft Keynotes", "GridCraft Spatial", "VectorCraft Curves"],
+    emulators: {
+      badge: "Pillar 2 • Universal Emulation",
+      title: "Consoles & Retro Emulators — Pure WASM & WebGPU",
+      text: "Play classic and modern video game consoles right in your browser. Real vendor cores running at 60 FPS: Dust Nintendo DS (WebGPU), StarPSX (PlayStation 1), Zakuro (Nintendo Switch), RustBoyAdvance (GBA), TetaNES (NES), PCSX2, and RPCS3.",
+      tags: ["Nintendo Switch (Zakuro)", "PlayStation (StarPSX)", "Nintendo DS (Dust WebGPU)", "GBA & Retro"],
     },
-    intelligence: {
-      badge: "Feature 3 • Ambient Mind",
-      title: "Ambient Multimodal Intelligence — Gemini Light Blue Radiant Aura",
-      text: "A radiant ambient intelligence woven into the shell with a tranquil light blue aura. Experience instant whispered natural voice reasoning, spatial screen comprehension, and zero latency assistance that never interrupts your creative flow.",
-      tags: ["Gemini Light Blue Aura", "Instant Spoken Voice", "Spatial Document Vision"],
+    cosmic: {
+      badge: "Pillar 3 • Modern Desktop",
+      title: "COSMIC Desktop & Rust Base — 60 FPS WebGPU Streaming",
+      text: "The full Pop!_OS COSMIC desktop environment streamed over WebGPU in HDR. Featuring Helium browser, Spacedrive sovereign file manager, and Rio GPU-accelerated terminal on top of memory-safe Rust system components.",
+      tags: ["COSMIC Desktop Shell", "Helium Web Browser", "Rio Terminal", "Spacedrive Files"],
     },
-    continuum: {
-      badge: "Feature 4 • Unified Flow",
-      title: "Unified Continuum — Instant Phone to Desktop Casting",
-      text: "Effortless continuity across devices. Cast documents and workspaces from your mobile pocket companion to your ultra-wide workstation canvas with zero latency, shared clipboard, and instant sensory state synchronization.",
-      tags: ["Zero-Latency Casting", "Unified Clipboard", "Aphrody Pocket Sync"],
+    craft: {
+      badge: "Pillar 4 • Creative Canvas",
+      title: "Craft Pro Studio Suite — High-Performance Creative Tools",
+      text: "WordCraft typography studio, DeckCraft kinetic keynote stage, GridCraft reactive multidimensional spreadsheets, and VectorCraft precision curves. Built with WebAssembly and WebGPU for distraction-free creation.",
+      tags: ["WordCraft Prose", "DeckCraft Keynotes", "GridCraft Reactive", "VectorCraft Curves"],
     },
-    byron: {
-      badge: "Feature 5 • Sovereign Mascot",
-      title: "Byron Love (Aphrodi) — The Sovereign Soul of Aphrody",
-      text: "The sole mascot and divine guardian of Aphrody. Byron Love embodies divine grace, radiant golden composure, and God Knows precision. A reminder that technology can be noble, beautiful, and completely sovereign.",
-      tags: ["Divine Grace", "Golden Radiance", "God Knows Precision", "Sovereign Soul"],
+    gemini: {
+      badge: "Pillar 5 • Ambient Intelligence",
+      title: "Gemini Multimodal Core — Ambient System Intelligence",
+      text: "Gemini is at the center of Bun OS: embedded into the launcher, terminal, and file manager with real-time whispered voice reasoning, spatial screen comprehension, and zero latency system actions.",
+      tags: ["Gemini Voice Reasoning", "Launcher Integration", "Spatial Understanding", "System Actions"],
     },
   };
 
-  const featureKeys = ["calm", "canvas", "intelligence", "continuum", "byron"];
-  let activeFeature = "calm";
+  const featureKeys = ["android", "emulators", "cosmic", "craft", "gemini"];
+  let activeFeature = "android";
   let isPlaying = true;
   let progress = 12; // in seconds (0 to 45)
   const totalDuration = 45;
@@ -569,39 +569,176 @@ function initShowcasePlayer() {
   renderMotionFrame();
 }
 
-// Theme Switcher (Derived from Material 3 Tonal Spot Schemes)
+// Theme Switcher & Dynamic Runtime Engine (Gemini Light Blue Sovereign + Byron Love Gold)
+const APHRODY_THEMES = {
+  "gemini-lightblue": {
+    name: "Gemini Light Blue",
+    surface: "#0f141c",
+    surfaceContainerLow: "#141a24",
+    surfaceContainer: "#1a222f",
+    surfaceContainerHigh: "#222c3c",
+    surfaceContainerHighest: "#2c384c",
+    onSurface: "#f1f5fd",
+    onSurfaceVariant: "#c2d1e8",
+    accent1: "#8ab4f8",
+    accent2: "#c2e7ff",
+    accent3: "#7cd8e8",
+    byronGold: "#fce881",
+    byronGoldRadiance: "#f5c451",
+    brandGlow: "radial-gradient(circle, rgba(138, 180, 248, 0.26) 0%, rgba(124, 216, 232, 0.14) 40%, transparent 70%)",
+  },
+  "obsidian-gold": {
+    name: "Obsidian Gold",
+    surface: "#13100a",
+    surfaceContainerLow: "#1a160e",
+    surfaceContainer: "#221d13",
+    surfaceContainerHigh: "#2c2518",
+    surfaceContainerHighest: "#3a3220",
+    onSurface: "#fbf5eb",
+    onSurfaceVariant: "#d5c8b5",
+    accent1: "#f5c451",
+    accent2: "#e0a938",
+    accent3: "#fcd888",
+    byronGold: "#fce881",
+    byronGoldRadiance: "#f5c451",
+    brandGlow: "radial-gradient(circle, rgba(245, 196, 81, 0.2) 0%, rgba(224, 169, 56, 0.12) 40%, transparent 70%)",
+  },
+  solitude: {
+    name: "Solitude",
+    surface: "#101422",
+    surfaceContainerLow: "#151a2d",
+    surfaceContainer: "#1c223a",
+    surfaceContainerHigh: "#242c4b",
+    surfaceContainerHighest: "#2f3960",
+    onSurface: "#f0f3ff",
+    onSurfaceVariant: "#b9c3e6",
+    accent1: "#7aa2f7",
+    accent2: "#bb9af7",
+    accent3: "#89ddff",
+    byronGold: "#fce881",
+    byronGoldRadiance: "#f5c451",
+    brandGlow: "radial-gradient(circle, rgba(122, 162, 247, 0.22) 0%, rgba(187, 154, 247, 0.14) 40%, transparent 70%)",
+  },
+  "nordic-fog": {
+    name: "Nordic Fog",
+    surface: "#1e222a",
+    surfaceContainerLow: "#242933",
+    surfaceContainer: "#2e3440",
+    surfaceContainerHigh: "#3b4252",
+    surfaceContainerHighest: "#434c5e",
+    onSurface: "#eceff4",
+    onSurfaceVariant: "#d8dee9",
+    accent1: "#88c0d0",
+    accent2: "#81a1c1",
+    accent3: "#5e81ac",
+    byronGold: "#fce881",
+    byronGoldRadiance: "#f5c451",
+    brandGlow: "radial-gradient(circle, rgba(136, 192, 208, 0.18) 0%, rgba(129, 161, 193, 0.12) 40%, transparent 70%)",
+  },
+  "tokyo-dusk": {
+    name: "Tokyo Dusk",
+    surface: "#16161e",
+    surfaceContainerLow: "#1f2335",
+    surfaceContainer: "#24283b",
+    surfaceContainerHigh: "#2f354f",
+    surfaceContainerHighest: "#3b4263",
+    onSurface: "#c0caf5",
+    onSurfaceVariant: "#9aa5ce",
+    accent1: "#bb9af7",
+    accent2: "#f7768e",
+    accent3: "#7aa2f7",
+    byronGold: "#fce881",
+    byronGoldRadiance: "#f5c451",
+    brandGlow: "radial-gradient(circle, rgba(187, 154, 247, 0.2) 0%, rgba(247, 118, 142, 0.14) 40%, transparent 70%)",
+  },
+  sakura: {
+    name: "Sakura",
+    surface: "#1c151b",
+    surfaceContainerLow: "#231c24",
+    surfaceContainer: "#2b222d",
+    surfaceContainerHigh: "#372b3a",
+    surfaceContainerHighest: "#47384a",
+    onSurface: "#f9eef6",
+    onSurfaceVariant: "#d8c2d5",
+    accent1: "#f6c177",
+    accent2: "#eb6f92",
+    accent3: "#ea9a97",
+    byronGold: "#fce881",
+    byronGoldRadiance: "#f5c451",
+    brandGlow: "radial-gradient(circle, rgba(246, 193, 119, 0.2) 0%, rgba(235, 111, 146, 0.14) 40%, transparent 70%)",
+  },
+};
+
+function applyTheme(themeName) {
+  const theme = APHRODY_THEMES[themeName] || APHRODY_THEMES["gemini-lightblue"];
+  const resolvedName = APHRODY_THEMES[themeName] ? themeName : "gemini-lightblue";
+
+  // Swap data-theme attributes without reload
+  document.body.dataset.theme = resolvedName;
+  document.documentElement.dataset.theme = resolvedName;
+
+  // Emit synced CSS variables directly onto root style for instantaneous sync
+  const root = document.documentElement;
+  root.style.setProperty("--md-sys-color-surface", theme.surface);
+  root.style.setProperty("--md-sys-color-surface-container-low", theme.surfaceContainerLow);
+  root.style.setProperty("--md-sys-color-surface-container", theme.surfaceContainer);
+  root.style.setProperty("--md-sys-color-surface-container-high", theme.surfaceContainerHigh);
+  root.style.setProperty("--md-sys-color-surface-container-highest", theme.surfaceContainerHighest);
+  root.style.setProperty("--md-sys-color-on-surface", theme.onSurface);
+  root.style.setProperty("--md-sys-color-on-surface-variant", theme.onSurfaceVariant);
+  root.style.setProperty("--accent-color-1", theme.accent1);
+  root.style.setProperty("--accent-color-2", theme.accent2);
+  root.style.setProperty("--accent-color-3", theme.accent3);
+  root.style.setProperty("--byron-gold", theme.byronGold);
+  root.style.setProperty("--byron-gold-radiance", theme.byronGoldRadiance);
+  root.style.setProperty("--brand-glow", theme.brandGlow);
+
+  // Sync meta theme-color tag
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
+  if (metaTheme) metaTheme.setAttribute("content", theme.surface);
+
+  // Sync UI pills
+  const pills = document.querySelectorAll(".theme-picker-row .theme-pill");
+  pills.forEach(p => {
+    const isActive = p.dataset.themeName === resolvedName;
+    p.classList.toggle("active", isActive);
+    p.setAttribute("aria-checked", isActive ? "true" : "false");
+  });
+
+  try {
+    localStorage.setItem("aphrody.theme", resolvedName);
+  } catch {}
+
+  // Broadcast event for all components, canvases, and iframes
+  window.dispatchEvent(
+    new CustomEvent("bunos:themechange", {
+      detail: { theme: resolvedName, tokens: theme },
+    }),
+  );
+}
+
+// Global theme switcher hook for Bun OS surfaces
+window.AphrodyTheme = {
+  apply: applyTheme,
+  get: () => document.documentElement.dataset.theme || "gemini-lightblue",
+  themes: APHRODY_THEMES,
+};
+
 function initThemes() {
   const pills = document.querySelectorAll(".theme-picker-row .theme-pill");
   pills.forEach(pill => {
     pill.addEventListener("click", () => {
-      pills.forEach(p => {
-        p.classList.remove("active");
-        p.setAttribute("aria-checked", "false");
-      });
-      pill.classList.add("active");
-      pill.setAttribute("aria-checked", "true");
       const theme = pill.dataset.themeName;
-      document.body.dataset.theme = theme;
-      try {
-        localStorage.setItem("aphrody.theme", theme);
-      } catch {}
+      applyTheme(theme);
     });
   });
+
   try {
-    const saved = localStorage.getItem("aphrody.theme");
-    if (saved) {
-      document.body.dataset.theme = saved;
-      const target = document.querySelector(`.theme-picker-row [data-theme-name="${saved}"]`);
-      if (target) {
-        pills.forEach(p => {
-          p.classList.remove("active");
-          p.setAttribute("aria-checked", "false");
-        });
-        target.classList.add("active");
-        target.setAttribute("aria-checked", "true");
-      }
-    }
-  } catch {}
+    const saved = localStorage.getItem("aphrody.theme") || "gemini-lightblue";
+    applyTheme(saved);
+  } catch {
+    applyTheme("gemini-lightblue");
+  }
 }
 
 // Ambient Soundscape Player (Synthesized 174Hz Relaxing Audio)
