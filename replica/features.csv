@@ -1,78 +1,13 @@
 feature,area,priority,original,clone,notes
-Boot straight into the full-screen session (no desktop),session,must,yes,partial,S01; shell --session borderless window + HKCU Run autostart; Explorer still starts; Linux defers to Gamescope
-Startup transition into home,session,should,yes,no,S01; SteamOS startup movie / PS5 boot; own animation only
-Lock screen with controller PIN on boot and wake,session,should,yes,no,S02; SteamOS lock screen update and Xbox profile PIN
-User select for several players,session,could,yes,no,S02; PS5 user select
-Home with hero art and a rail of recent games,home,must,yes,yes,S03; shell spawn_home HeroBg + RailTrack + GameTile
-Home focuses the last played game with Resume as the default action,home,must,yes,partial,S03 F02; shell orders played first and shows Resume cards; target is one press
-Dynamic colour re-tinted from the focused game's art,home,should,no,no,DIRECTION.md one bold thing; shell uses fixed Theme::default; play uses a fixed SYSTEM_TINT table
-Status bar (time / controller battery / network / download indicator),home,must,yes,partial,S03; shell Bind::Clock and Bind::Gpu; no battery or network
-What's new / activity row on home,home,could,yes,partial,S03; shell activity row (Last played); no news feed
-Welcome hub widgets,home,could,yes,no,S26; PS5 24.06+
-Game hub with hero + logo overlay and primary action,hub,must,yes,partial,S04; shell spawn_hub; logo overlay and parallax missing
-Hub states: install / update / downloading / running / stream from another host,hub,must,yes,partial,S04; shell shows installed flag; no update or remote-host state
-Play time and last played in the hub,hub,must,yes,yes,S04; shell details() play count and last played
-Compatibility rating badge per game,hub,should,yes,no,S04 S05; Steam Deck Verified/Playable/Unsupported; ours would be a measured rating on this PC
-Achievements / trophies view and unlock toast,hub,could,yes,no,S25; engine-core steam/stats.rs read-only stub
-Library with all games and tabs on bumpers,library,must,yes,partial,S05; shell spawn_library chips All/Steam/Emulators/Web with PrevTab/NextTab
-Installed-only filter,library,must,yes,no,S05; hub knows Kind::Steam{installed} but no filter
-Sort (alphabetical / recent / size / play time),library,should,yes,no,S05; PS5 Filter and Sort
-Hide games,library,could,yes,no,S05; PS5 Hidden Items
-Collections (static and dynamic),library,should,yes,no,S06; Steam collections; PS5 gamelists; Xbox groups
-Typographic tile when no art exists,library,must,yes,partial,DIRECTION.md assets rule; play renders text tiles; shell Cover fallback to check
-Emulated systems and ROM library,library,must,no,yes,Bun OS addition; shell library.rs load_bep; play systems catalog and web cores
-Launch Steam games,launch,must,yes,yes,F02; shell runtime.rs play via steam://rungameid
-Launch native PC games outside Steam (exe shortcuts),launch,should,yes,no,Steam non-Steam shortcuts; shell has no arbitrary exe kind
-Resume / suspend a running game,launch,must,yes,partial,S24; save states for in-process emulators (machine.rs Suspended); external games only refocused
-Switcher between several suspended games,launch,could,yes,no,S24; PS5 Switcher; Xbox Quick Resume (pin up to two)
-Exit / force-close the running game,launch,must,yes,yes,F06; shell QuickAction::CloseGame
-Main menu on the Guide button outside a game,navigation,must,yes,partial,S07; shell screens reachable but no side menu drawer
-Quick menu on the Guide button in game,quick menu,must,yes,yes,S08; shell overlay.rs spawn_quick via Intent::Guide
-Game pauses while the quick menu is open,quick menu,must,yes,partial,S09; emulators pause (pause_for_overlay); external games keep running
-Quick settings: volume / output device / brightness,quick menu,must,yes,partial,S08; shell volume up/down only; no output device or brightness
-Quick toggles: Wi-Fi / Bluetooth,quick menu,should,yes,no,S08; SteamOS quick settings; Switch flight mode
-Customise quick menu order and hide items,quick menu,could,yes,no,S08; PS5 Control Center Options to move/hide
-Performance HUD levels,performance,must,yes,yes,S10; shell Bind::Hud UI fps/p99 + GPU temp/MHz/load/W; no CPU or frametime graph
-Frame limit and refresh rate / VRR,performance,must,yes,partial,S08 S23; shell FrameLimit + profile fps limit; nvidia.rs reads G-SYNC/VRR; no refresh-rate switch
-Power limit (TDP equivalent) and GPU clock,performance,could,yes,no,S08; Deck TDP slider; ours would be NVIDIA power limit via NVML (admin)
-Upscaling filter (FSR / NIS / integer),performance,should,yes,partial,S08; shell QuickAction Scaling for emulators; engine-core fsr1
-Per-game performance profile,performance,must,yes,yes,S23; shell profiles.rs Profile fps limit / scaler / borderless / instant resume / HUD
-NVIDIA status panel (driver / clocks / P-state),performance,should,no,yes,Bun OS addition; shell nvidia.rs NVAPI/NVML + NvidiaPanel
-Power menu: sleep / restart / shut down / leave session,power,must,yes,yes,S11; shell spawn_power PowerAction
-Sleep and wake back into the running game,power,should,yes,partial,F07; Sleep exists; no wake-to-game guarantee or controller wake
-Downloads queue with progress,downloads,must,yes,partial,S12; shell spawn_downloads Steam transfers + bep packages; play shows rate/state without a bar
-Pause / resume / reorder downloads,downloads,should,yes,no,S12; PS5 Pause/Resume and Try Again; Steam up-next order
-Download error info and retry,downloads,should,yes,no,S12; PS5 View Error Info / Try Again
-Install a game from the hub with a drive picker,downloads,must,yes,no,F04; bun-steam steamcmd appUpdate and remoteDownload exist; no shell action
-Storage manager: drives / move / uninstall,downloads,should,yes,partial,S13; bun-steam listLibraries / candidateDisks / moveLibrary; play libraries table; no uninstall; nothing in the shell
-Stream a game from another host (client side),streaming,must,yes,partial,S21 F09; play /stream WebRTC client; engine-core Moonlight client; not launched from the shell hub
-Host a stream session for another device,streaming,should,yes,partial,S21; VPS gamescope session (WebRTC/Wolf) and bun-steam remotePlayState; no host session from the Windows shell
-Pair a device with a code,streaming,should,yes,partial,S21; engine-core Moonlight PIN pairing; PS5 Pair Device
-Wake the host from sleep to stream,streaming,could,yes,no,PS5 Enable Turning on PS5 from Network
-Controller-first focus navigation with glyph hints,navigation,must,yes,yes,shell ui.rs Intent Move/Accept/Back/Guide/PrevTab/NextTab; play client/spatial.ts
-Haptic and sound feedback while navigating,navigation,should,yes,yes,PS5 24.01; shell Feedback + rumble and Sounds/Haptics settings
-Glyphs per controller family (Xbox / PlayStation / Switch / keyboard),navigation,should,yes,no,Steamworks compat input criteria; check shell hint bar
-Per-game controller remap,navigation,should,yes,partial,S19; engine-core steam/input.rs action sets; no remap UI
-On-screen keyboard for search and in-game text,navigation,must,yes,no,S20; Steam+X and ShowFloatingGamepadTextInput
-Universal search (library first),navigation,should,yes,partial,S15; play library search; bun-steam searchApps; none in the shell
-Toast notifications,notifications,must,yes,yes,S17; shell Shell::toast + ToastBox
-Notification history with actions,notifications,should,yes,no,S17; QAM Notifications tab; PS5 Notifications control
-Do-not-disturb while playing,notifications,could,yes,no,S17 edge
-Settings: display / audio / controllers / network / accessibility / power,settings,must,yes,partial,S18; shell spawn_settings covers sounds / haptics / motion / HUD / session; display and NVIDIA read-only
-Accessibility: reduced motion / text size / contrast,settings,should,yes,partial,S18; shell MotionPref + UI scale; no text size or contrast
-Screenshots and clips,captures,should,yes,partial,S22 F13; shell Screenshot/Record with Media Foundation hardware encoders
-Media gallery,captures,could,yes,no,S22; Steam Media; PS5 Media Gallery; Switch Album
-Per-game compatibility tool and launch options,settings,should,yes,partial,S23 F12; bun-steam setCompatTool / setLaunchOptions; play Proton list; not in the shell
-Cloud saves,settings,could,yes,partial,engine-core steam/cloud.rs for emulator saves; Steam games handled by Steam
-First-run setup,session,should,yes,no,S27
-System update for the OS and shell,settings,should,yes,no,S28
-Sign-in to the web app,session,must,no,yes,play-only; Steam OpenID + mesh tunnel (server/auth.ts)
-Store catalogue and purchases,store,could,yes,skip,licensed catalogue and partner deals; deep-link to Steam instead
-Friends / chat / parties / Game Base,social,could,yes,skip,the network and its users
-Share Screen / GameChat / Remote Play Together,social,could,yes,skip,depends on the platform networks
-Subscription catalogues and cloud gaming (PS Plus / Game Pass / GeForce NOW),store,could,yes,skip,licensed content and partner deals
-Game Help videos / guides / Workshop layouts,hub,could,yes,skip,community content owned by the platforms
-Platform trophies servers,hub,could,yes,skip,only Steam Web API data for the user's own games is reachable
-DualSense adaptive triggers / Deck TDP hardware / rest-mode charging,hardware,could,yes,skip,console hardware
-Startup movies / button names / glyph art / system sounds,brand,could,yes,skip,trade dress; use own assets
-Parental controls / family,settings,could,yes,skip,single-player product; out of slice
+Hero Manifesto Positioning,brand,must,yes,yes,"Calm human-first emotional hook, no raw library dump"
+Instant Browser Launch,runtime,must,no,yes,"Aphrody's killer advantage: WebGPU stream in 1 click"
+Live Aesthetic Theme Switcher,ui,must,yes,yes,"Instant theme morphing with 5 curated moods"
+Built-in Ambient Soundscape / Music Capsule,media,should,yes,yes,"Physical product feel with audio player capsule"
+Agentic AI Companion (Gemini / Magic Pointer),ai,must,yes,yes,"Proactive screen-aware AI assistant without CLI friction"
+Native Mobile Apps Compatibility,subsystem,must,yes,yes,"Run Android apps side-by-side with desktop apps"
+Legacy / Windows Software Compatibility,subsystem,should,yes,yes,"'Il fait même tourner Windows' consumer framing"
+Hardware Freedom (Runs on Any PC/Mac/Browser),hardware,must,yes,yes,"Works on modest hardware and high-end silicon"
+Playful Virtual Pet Companion (Aphrody),delight,should,yes,yes,"Interactive desktop pet companion and widgets"
+Zero-Maintenance Cloud Continuity,cloud,should,yes,yes,"Instant sync with Google account and cloud storage"
+Privacy & Local-First Freedom,security,must,yes,yes,"No trackers, no telemetry, your computer belongs to you"
+Clean-Room Typography & Visual Polish,design,must,yes,yes,"Google Sans / Plus Jakarta Sans typography and M3 palette"

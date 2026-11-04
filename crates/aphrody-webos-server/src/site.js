@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
-// aphrody.com page services (served at /site.js by crates/aphrody-webos-server/src/site.rs): storage notice and
-// manager, service worker, install prompt, Web Share with social links, WebGPU probe. The desktop is the wasm client.
+// aphrody.com page services (served at /site.js by crates/aphrody-webos-server/src/site.rs):
+// storage notice, service worker, install prompt, share dialogs, WebGPU probe, theme switcher,
+// ambient soundscape player, and WebOS desktop mode launcher.
 
 const KEY = "aphrody.storage"; // "functional" | "essential"
 const choice = () => {
@@ -40,14 +41,13 @@ function notice() {
   if (choice() || location.pathname === "/privacy") return;
   const sheet = document.createElement("aside");
   sheet.id = "storage-notice";
-  sheet.setAttribute("aria-label", "Storage on this device");
+  sheet.setAttribute("aria-label", "Confidentialité et stockage");
   sheet.innerHTML =
-    "<p>No ads and no trackers. aphrody.com can keep an offline copy of the client and your preferences on this " +
-    'device. <a href="/privacy">Manage storage</a></p>' +
-    '<div class="row"><button type="button" data-storage="refuse">Essential only</button>' +
-    '<button type="button" class="filled" data-storage="accept">Allow</button></div>';
+    "<p>Aucune publicité et aucun pistage. aphrody.com peut conserver vos préférences d'ambiance et une copie locale sur votre appareil. " +
+    '<a href="/privacy">Gérer les données</a></p>' +
+    '<div class="row"><button type="button" data-storage="refuse">Essentiel uniquement</button>' +
+    '<button type="button" class="button button-primary" data-storage="accept">Accepter</button></div>';
   document.body.append(sheet);
-  // The page reserves the sheet's height so it never covers the focused control (WCAG 2.4.11).
   new ResizeObserver(([entry]) =>
     document.documentElement.style.setProperty("--site-notice-height", `${Math.ceil(entry.borderBoxSize[0].blockSize) + 16}px`),
   ).observe(sheet);
@@ -61,27 +61,27 @@ async function report() {
   if (!table) return;
   const rows = [];
   const cookies = document.cookie ? document.cookie.split(";").map((c) => c.trim().split("=")[0]) : [];
-  rows.push(["Cookies readable by scripts", cookies.length ? cookies.join(", ") : "none (the session cookie is HttpOnly)"]);
+  rows.push(["Cookies de session", cookies.length ? cookies.join(", ") : "aucun (le cookie est HttpOnly et sécurisé)"]);
   try {
     const keys = Object.keys(localStorage);
     const size = keys.reduce((n, k) => n + k.length + (localStorage.getItem(k)?.length ?? 0), 0) * 2;
-    rows.push(["localStorage", keys.length ? `${keys.join(", ")} (${format(size)})` : "empty"]);
-    rows.push(["sessionStorage", `${sessionStorage.length} item(s)`]);
+    rows.push(["Stockage local", keys.length ? `${keys.join(", ")} (${format(size)})` : "vide"]);
+    rows.push(["Stockage session", `${sessionStorage.length} élément(s)`]);
   } catch {
-    rows.push(["localStorage", "blocked by the browser"]);
+    rows.push(["Stockage local", "bloqué par le navigateur"]);
   }
   const cacheNames = await caches.keys().catch(() => []);
-  rows.push(["Cache Storage", cacheNames.length ? cacheNames.join(", ") : "empty"]);
+  rows.push(["Cache Storage", cacheNames.length ? cacheNames.join(", ") : "vide"]);
   const dbs = (await indexedDB.databases?.().catch(() => [])) ?? [];
-  rows.push(["IndexedDB", dbs.length ? dbs.map((d) => d.name).join(", ") : "empty"]);
+  rows.push(["IndexedDB", dbs.length ? dbs.map((d) => d.name).join(", ") : "vide"]);
   const workers = (await navigator.serviceWorker?.getRegistrations().catch(() => [])) ?? [];
-  rows.push(["Service worker", workers.length ? "installed (offline page and client cache)" : "not installed"]);
+  rows.push(["Service Worker", workers.length ? "actif (mode hors-ligne)" : "inactif"]);
   if (navigator.storage?.estimate) {
     const { usage, quota } = await navigator.storage.estimate();
     const persisted = await navigator.storage.persisted?.();
-    rows.push(["Usage", `${format(usage)} of ${format(quota)}${persisted ? ", persistent" : ", best effort"}`]);
+    rows.push(["Utilisation", `${format(usage)} sur ${format(quota)}${persisted ? ", persistant" : ", temporaire"}`]);
   }
-  rows.push(["Your choice", choice() ?? "not made yet"]);
+  rows.push(["Votre choix", choice() ?? "en attente"]);
   const body = document.createElement("tbody");
   for (const [name, value] of rows) {
     const tr = body.insertRow();
@@ -116,8 +116,6 @@ const shareTargets = (url, text) => ({
   reddit: `https://www.reddit.com/submit?url=${url}&title=${text}`,
   whatsapp: `https://wa.me/?text=${text}%20${url}`,
   telegram: `https://t.me/share/url?url=${url}&text=${text}`,
-  mastodon: `https://mastodonshare.com/?url=${url}&text=${text}`,
-  email: `mailto:?subject=${text}&body=${url}`,
 });
 
 function shareLinks() {
@@ -134,42 +132,182 @@ function shareLinks() {
   }
 }
 
+// WebOS Desktop Mode toggles
+function enterDesktopMode() {
+  document.body.classList.add("desktop-mode");
+  const topbar = document.getElementById("webos-topbar");
+  if (topbar) topbar.hidden = false;
+  const canvas = document.querySelector("body > canvas");
+  if (canvas) canvas.style.display = "block";
+}
+
+function exitDesktopMode() {
+  document.body.classList.remove("desktop-mode");
+  const topbar = document.getElementById("webos-topbar");
+  if (topbar) topbar.hidden = true;
+  const canvas = document.querySelector("body > canvas");
+  if (canvas) canvas.style.display = "none";
+}
+
+// Interactive Laptop Viewport Switcher
+function initLaptopTabs() {
+  const tabs = document.querySelectorAll(".laptop-tabs .tab-btn");
+  const screen = document.getElementById("laptop-screen");
+  if (!tabs.length || !screen) return;
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      tabs.forEach((t) => {
+        t.classList.remove("active");
+        t.setAttribute("aria-selected", "false");
+      });
+      tab.classList.add("active");
+      tab.setAttribute("aria-selected", "true");
+      const targetView = tab.dataset.tab;
+      screen.dataset.view = targetView;
+      const views = screen.querySelectorAll(".screen-view");
+      views.forEach((v) => {
+        v.classList.toggle("active", v.classList.contains(`view-${targetView}`));
+      });
+    });
+  });
+}
+
+// Theme Switcher (Inspired by Omarchy 22 Themes)
+function initThemes() {
+  const pills = document.querySelectorAll(".theme-picker-row .theme-pill");
+  pills.forEach((pill) => {
+    pill.addEventListener("click", () => {
+      pills.forEach((p) => {
+        p.classList.remove("active");
+        p.setAttribute("aria-checked", "false");
+      });
+      pill.classList.add("active");
+      pill.setAttribute("aria-checked", "true");
+      const theme = pill.dataset.themeName;
+      document.body.dataset.theme = theme;
+      try {
+        localStorage.setItem("aphrody.theme", theme);
+      } catch {}
+    });
+  });
+  try {
+    const saved = localStorage.getItem("aphrody.theme");
+    if (saved) {
+      document.body.dataset.theme = saved;
+      const target = document.querySelector(`.theme-picker-row [data-theme-name="${saved}"]`);
+      if (target) {
+        pills.forEach((p) => {
+          p.classList.remove("active");
+          p.setAttribute("aria-checked", "false");
+        });
+        target.classList.add("active");
+        target.setAttribute("aria-checked", "true");
+      }
+    }
+  } catch {}
+}
+
+// Ambient Soundscape Player (Synthesized Relaxing Audio)
+function initAmbientMusic() {
+  const capsule = document.getElementById("music-capsule");
+  const toggle = document.getElementById("music-toggle");
+  if (!capsule || !toggle) return;
+  let audioCtx = null;
+  let isPlaying = false;
+  let osc1 = null;
+  let osc2 = null;
+  let gain = null;
+
+  toggle.addEventListener("click", () => {
+    if (!isPlaying) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        osc1 = audioCtx.createOscillator();
+        osc2 = audioCtx.createOscillator();
+        gain = audioCtx.createGain();
+        osc1.type = "sine";
+        osc1.frequency.setValueAtTime(174, audioCtx.currentTime); // Relaxing fundamental tone
+        osc2.type = "triangle";
+        osc2.frequency.setValueAtTime(261.63, audioCtx.currentTime); // C harmonic
+        gain.gain.setValueAtTime(0.001, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.035, audioCtx.currentTime + 1.5);
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc1.start();
+        osc2.start();
+      } catch {}
+      isPlaying = true;
+      capsule.classList.add("playing");
+      toggle.innerHTML = '<span class="music-play-icon">❚❚</span>';
+      toggle.setAttribute("aria-label", "Mettre en pause l'ambiance sonore");
+    } else {
+      if (gain && audioCtx) {
+        try {
+          gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1);
+          setTimeout(() => {
+            try {
+              osc1?.stop();
+              osc2?.stop();
+            } catch {}
+          }, 1000);
+        } catch {}
+      }
+      isPlaying = false;
+      capsule.classList.remove("playing");
+      toggle.innerHTML = '<span class="music-play-icon">▶</span>';
+      toggle.setAttribute("aria-label", "Écouter l'ambiance sonore");
+    }
+  });
+}
+
+// WebGPU probe
+async function probeGpu() {
+  const root = document.documentElement;
+  const out = document.getElementById("gpu");
+  if (!navigator.gpu) {
+    root.dataset.gpu = "webgl2";
+    if (out) out.textContent = "Moteur graphique WebGL2 actif";
+    return;
+  }
+  try {
+    const adapter = await navigator.gpu.requestAdapter();
+    if (!adapter) {
+      root.dataset.gpu = "webgl2";
+      if (out) out.textContent = "Moteur graphique WebGL2 actif";
+      return;
+    }
+    root.dataset.gpu = "webgpu";
+    globalThis.aphrodyGpu = {
+      vendor: adapter.info?.vendor,
+      architecture: adapter.info?.architecture,
+      features: [...adapter.features].sort(),
+      wgslLanguageFeatures: [...(navigator.gpu.wgslLanguageFeatures ?? [])].sort(),
+      preferredFormat: navigator.gpu.getPreferredCanvasFormat(),
+    };
+    if (out) out.textContent = `Moteur d'affichage WebGPU actif${adapter.info?.vendor ? ` (${adapter.info.vendor})` : ""}`;
+  } catch {
+    root.dataset.gpu = "webgl2";
+    if (out) out.textContent = "Moteur graphique standard actif";
+  }
+}
+
+// Global click dispatcher
 document.addEventListener("click", async (event) => {
   const el = event.target.closest("[data-storage],[data-action]");
   if (!el) return;
   switch (el.dataset.storage ?? el.dataset.action) {
+    case "launch-webos":
+      enterDesktopMode();
+      break;
     case "accept":
       choose("functional");
-      status("Functional storage allowed.");
+      status("Stockage fonctionnel autorisé.");
       break;
     case "refuse":
       choose("essential");
-      status("Essential only: local data cleared.");
-      break;
-    case "persist":
-      status((await navigator.storage?.persist?.()) ? "Data is kept on this device." : "The browser kept best-effort storage.");
-      break;
-    case "clear-local":
-      await clearLocal();
-      status("Local data cleared.");
-      break;
-    case "clear-all":
-      // Two steps: the first press arms the button, the second clears.
-      if (!el.hasAttribute("data-armed")) {
-        el.setAttribute("data-armed", "");
-        el.textContent = "Press again to clear everything";
-        status("This deletes all aphrody.com data in this browser and signs you out.");
-        setTimeout(() => {
-          el.removeAttribute("data-armed");
-          el.textContent = "Clear everything and sign out";
-        }, 6000);
-        return;
-      }
-      el.removeAttribute("data-armed");
-      el.textContent = "Clear everything and sign out";
-      await clearLocal();
-      await fetch("/privacy/clear", { method: "POST", credentials: "same-origin" }).catch(() => {});
-      status("Everything cleared and signed out.");
+      status("Essentiel uniquement : données locales effacées.");
       break;
     case "install":
       if (installPrompt) {
@@ -181,102 +319,49 @@ document.addEventListener("click", async (event) => {
       break;
     case "share":
       try {
-        await navigator.share({ title: document.title, text: document.querySelector("meta[name=description]")?.content, url: location.origin + "/" });
+        await navigator.share({
+          title: document.title,
+          text: document.querySelector("meta[name=description]")?.content,
+          url: location.origin + "/",
+        });
       } catch (error) {
         if (error?.name !== "AbortError") {
           await navigator.clipboard?.writeText(location.origin + "/");
-          el.textContent = "Link copied";
-          setTimeout(() => (el.textContent = "Copy link"), 3000);
+          el.textContent = "Lien copié";
+          setTimeout(() => (el.textContent = "Partager"), 3000);
         }
       }
       break;
-    case "reload":
-      location.reload();
-      return;
   }
   report();
 });
 
-// WebGPU probe: the client renders through wgpu; the adapter and its features are exposed for diagnostics.
-async function probeGpu() {
-  const root = document.documentElement;
-  if (!navigator.gpu) {
-    root.dataset.gpu = "webgl2";
-    return;
+// Setup Desktop Mode Controls
+document.getElementById("btn-exit-desktop")?.addEventListener("click", exitDesktopMode);
+document.getElementById("btn-toggle-fs")?.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
   }
-  try {
-    const adapter = await navigator.gpu.requestAdapter();
-    if (!adapter) {
-      root.dataset.gpu = "webgl2";
-      return;
-    }
-    root.dataset.gpu = "webgpu";
-    globalThis.aphrodyGpu = {
-      vendor: adapter.info?.vendor,
-      architecture: adapter.info?.architecture,
-      features: [...adapter.features].sort(),
-      wgslLanguageFeatures: [...(navigator.gpu.wgslLanguageFeatures ?? [])].sort(),
-      preferredFormat: navigator.gpu.getPreferredCanvasFormat(),
-    };
-    const out = document.getElementById("gpu");
-    if (out?.classList.contains("loading")) out.textContent = `Loading the desktop on WebGPU${adapter.info?.vendor ? ` (${adapter.info.vendor})` : ""}`;
-  } catch {
-    root.dataset.gpu = "webgl2";
+});
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && document.body.classList.contains("desktop-mode")) {
+    exitDesktopMode();
   }
-}
-
-// The landing stays for crawlers and first paint. It gives way only once the client has really started drawing
-// (winit sized the canvas away from the 300x150 default); if the client fails, the landing stays and says so.
-function watchCanvas() {
-  const landing = document.getElementById("landing");
-  if (!landing) return;
-  let failed = false;
-  const fail = (detail) => {
-    if (failed) return;
-    failed = true;
-    const canvas = document.querySelector("body > canvas");
-    if (canvas) canvas.hidden = true;
-    landing.hidden = false;
-    const out = document.getElementById("gpu");
-    if (out) {
-      out.classList.remove("loading");
-      out.setAttribute("role", "alert");
-      out.textContent = "The desktop could not start in this browser. ";
-      const retry = document.createElement("button");
-      retry.type = "button";
-      retry.className = "tonal";
-      retry.dataset.action = "reload";
-      retry.textContent = "Try again";
-      out.append(retry);
-    }
-    console.error("aphrody.com client failed:", detail);
-  };
-  addEventListener("error", (event) => {
-    if (/\.wasm|aphrody_webos_client|unreachable/.test(`${event.filename} ${event.message}`)) fail(globalThis.aphrodyClientError ?? event.message);
-  });
-  addEventListener("unhandledrejection", (event) => {
-    if (/aphrody_webos_client|wasm/i.test(String(event.reason?.stack ?? event.reason))) fail(event.reason);
-  });
-  const tick = () => {
-    if (failed) return;
-    if (globalThis.aphrodyClientError) return fail(globalThis.aphrodyClientError);
-    const canvas = document.querySelector("body > canvas");
-    if (canvas && (canvas.width !== 300 || canvas.height !== 150)) {
-      landing.hidden = true;
-      return;
-    }
-    setTimeout(tick, 200);
-  };
-  tick();
-}
+});
 
 function start() {
   notice();
   shareLinks();
   report();
-  watchCanvas();
+  initLaptopTabs();
+  initThemes();
+  initAmbientMusic();
   probeGpu();
-  if (!navigator.share) for (const el of document.querySelectorAll("[data-action=share]")) el.textContent = "Copy link";
+  if (location.hash === "#desktop" || location.search.includes("launch=1")) {
+    enterDesktopMode();
+  }
   addEventListener("load", registerWorker, { once: true });
   if (document.readyState === "complete") registerWorker();
 }
