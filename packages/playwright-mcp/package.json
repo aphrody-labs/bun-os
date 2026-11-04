@@ -1,0 +1,22 @@
+{
+  "name": "@aphrody/playwright-mcp",
+  "version": "1.4.7",
+  "description": "Playwright Browser MCP server for Bun OS: headless and visual web automation, snapshot, screenshot, evaluation and accessibility testing over MCP stdio and JSON-RPC.",
+  "license": "Apache-2.0",
+  "author": "aphrody-dev <contact@aphrody.com>",
+  "type": "module",
+  "bin": {
+    "playwright-mcp": "./src/mcp.ts",
+    "bunos-playwright-mcp": "./src/mcp.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./mcp": "./src/mcp.ts"
+  },
+  "scripts": {
+    "typecheck": "bun check --noEmit -p tsconfig.json"
+  },
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
+}

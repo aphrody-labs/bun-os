@@ -1,0 +1,24 @@
+{
+  "name": "@aphrody/registry",
+  "version": "1.4.7",
+  "description": "Unified canonical registry for Bun OS MCP servers, Agent Skills, Runtime Plugins, and CLIs.",
+  "license": "Apache-2.0",
+  "author": "aphrody-dev <contact@aphrody.com>",
+  "type": "module",
+  "bin": {
+    "aphrody-registry": "./src/cli.ts",
+    "bunos-registry": "./src/cli.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./types": "./src/types.ts",
+    "./data": "./src/data.ts"
+  },
+  "scripts": {
+    "typecheck": "bun check --noEmit -p tsconfig.json",
+    "test": "bun test"
+  },
+  "engines": {
+    "bun": "1.4.4-canary.20261028.1"
+  }
+}

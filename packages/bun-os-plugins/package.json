@@ -29,7 +29,6 @@
     "bunos-parse": "./src/bin/bunos-parse.ts",
     "bunos-bench": "./src/bin/bunos-bench.ts",
     "bunos-n2b": "./src/bin/bunos-n2b.ts",
-    "bunos-migrate": "./src/bin/bunos-migrate.ts",
     "bunos-mcp": "./src/bin/bunos-mcp.ts",
     "bunos-agent-plugin": "./src/bin/bunos-agent-plugin.ts",
     "bunos-workspace": "./src/bin/bunos-workspace.ts",
