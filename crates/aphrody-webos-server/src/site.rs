@@ -19,10 +19,10 @@ use crate::{API, AppState};
 pub const ORIGIN: &str = "https://aphrody.com";
 pub const NAME: &str = "Aphrody";
 pub const SHORT_NAME: &str = "Aphrody";
-pub const DESCRIPTION: &str = "The calm, divine operating system. Fluid creative canvas, ambient multimodal intelligence, and Byron Love.";
+pub const DESCRIPTION: &str = "The unified operating system: Android 17, console emulators, the COSMIC desktop, and ambient Gemini intelligence.";
 /// Subtitle of the site card: short enough for three lines.
 const TAGLINE: &str =
-    "The calm, divine operating system. Fluid creative canvas, ambient multimodal intelligence.";
+    "The unified operating system: Android 17, console emulators, and the COSMIC desktop.";
 const THEME: &str = "#0f141c"; // Gemini celestial dark surface
 const ACCENT: &str = "#8ab4f8"; // Gemini Light Blue
 /// Inter Bold (SIL Open Font License 1.1, assets/effectcraft/fonts), the only font the share images use.
