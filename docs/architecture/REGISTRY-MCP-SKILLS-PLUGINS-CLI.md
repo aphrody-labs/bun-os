@@ -17,7 +17,7 @@ Suite à la consolidation architecturale, les 17 serveurs et stubs fragmentés h
 | **`aphrody-mcp`** | Rust | `crates/aphrody-mcp` | Serveur maître MCP stdio/HTTP : navigateur Obscura, WebGPU, OCR/STT local, A2A agent mesh, moteur de décision JEV. | Subsume les clients stubs et helpers réseau. |
 | **`craft-suite-mcp`** | Rust | `crates/craft-suite-mcp` | **Suite créative unifiée** : CAD, vectoriel, slides, feuilles de calcul, documents riches, inspection de calques et retouche photo. | Subsume les 8 anciens MCPs : `cadcraft-mcp`, `deckcraft-mcp`, `designcraft-mcp`, `figcraft-mcp`, `gridcraft-mcp`, `lightcraft-mcp`, `vectorcraft-mcp`, `wordcraft-mcp`. |
 | **`playwright-mcp`** | Bun / TS | `packages/playwright-mcp` | Rapatrié et standardisé : navigation headless autonome, snapshots DOM, captures d'écran, formulaires et évaluation JS. | Rapatrié depuis `.playwright-mcp` isolé. |
-| **`m3-mcp`** | Bun / TS | `packages/m3-mcp` | Hub de design et 3D : tokens Material 3, contraste WCAG 2.2, parité Replica, outils 3Dviz Pro Max et automatisation de scènes Blender 4+. | Subsume `bun-blender-mcp` et les scripts 3D isolés. |
+| **`yolo-ui-mcp`** | Hybrid (Rust + Bun) | `src/yolo-ui` | **Hub UI dynamique, GPU & 3D** : moteur de design pure Rust + Bun OS, thèmes dynamiques personnalisables, shaders WebGPU (WGSL wgpu 30), composition 3D procédurale. Remplace le M3 legacy rigide. | Subsume `m3-mcp`, `bun-blender-mcp`, `3dviz-pro-max`, `m3-design`. |
 | **`bun-arch-mcp`** | Bun / TS | `packages/bun-arch-mcp` | Hub systèmes Linux & packaging : recherche Arch Wiki & Omarchy offline (SQLite FTS5), RPC AUR, pacman, systemd et linter PKGBUILD. | FTS5 unifié et requêtes directes. |
 | **`gws-mcp`** | Bun / TS | `packages/google` | Serveur officiel Google Workspace : Drive, Docs, Sheets, Gmail, Calendar, Vertex AI. | Outil intégré au CLI `gws`. |
 | **`aphrody-nie-mcp`** | Rust | `crates/aphrody-nie-mcp` | Hub de rétro-ingénierie jeu & formats propriétaires (Level-5, VFS, PE, shaders, modèles 3D). | Moteur spécialisé Level-5. |
@@ -29,6 +29,7 @@ Suite à la consolidation architecturale, les 17 serveurs et stubs fragmentés h
 Les 52 skills étendent les capacités des agents autonomes (Antigravity `agy`, Claude Code, Codex, Gemini CLI) via des instructions `SKILL.md` normalisées avec frontmatter YAML canonique (`name` + `description`).
 
 ### A. Skills Systèmes, Design et 3D
+- **`yolo-ui`** (`src/yolo-ui/skills/yolo-ui`) : **Nouveau système unifié** : design UI/UX adaptatif, théorie chromatique dynamique, audits de contraste WCAG 2.2 AAA / APCA, pipelines de shaders WebGPU et composition de scènes 3D.
 - **`arch-linux`** (`packages/bun-arch-mcp/skills/arch-linux`) : Administration Arch/CachyOS/Omarchy, packaging PKGBUILD, pacman, systemd.
 - **`ui-ux-pro-max`** (`packages/m3-design/skill/ui-ux-pro-max`) : Intelligence UI/UX complète : 79 styles, 192 palettes, 74 typographies, 123 règles UX, 25 stacks.
 - **`3dviz-pro-max`** (`packages/viz3d/plugin/skills/3dviz-pro-max`) : Conception de scènes 3D, kits WebGPU, validation géométrique et capture CDP.
@@ -75,6 +76,7 @@ Le nombre de binaires CLI indépendants a été consolidé autour de **5 CLIs Pr
 | **`buncc`** | `packages/buncc/src/cli.ts` | **Compilateur C/C++ et gestionnaire de toolchains** : builds multi-cibles (posix, mingw, msys2, wine), configuration d'architectures et cache distribué. | Pilote unifié de compilation système. |
 | **`yolo`** | `packages/yolo-cli/src/index.ts` | **Agent d'automatisation IA autonome** : refactorings transversaux, audit de code, vérification de conformité. | Agent de workspace. |
 | **`gws`** | `packages/google/src/gws-cli.ts` | **CLI Google Workspace & Cloud unifié** : gestion de documents, Drive, Sheets, Gmail, et serveur MCP intégré. | CLI de productivité cloud. |
+| **`yolo-ui`** | `src/yolo-ui/src/cli.ts` | **CLI Design dynamique, GPU & 3D** : génération de palettes adaptatives, calcul de contraste WCAG, shaders WebGPU et composition 3D. | Subsume l'ancien `m3-design` rigide. |
 
 ---
 

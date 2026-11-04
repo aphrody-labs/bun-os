@@ -1,0 +1,24 @@
+{
+  "name": "@aphrody/yolo-ui",
+  "version": "1.4.7",
+  "description": "Dynamic, fully customizable pure Rust + Bun OS UI, GPU & 3D design engine (replaces legacy M3)",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "bin": {
+    "yolo-ui": "./src/cli.ts",
+    "yolo-ui-mcp": "./src/mcp.ts"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./mcp": "./src/mcp.ts",
+    "./theme": "./src/theme.ts",
+    "./gpu": "./src/gpu.ts",
+    "./viz3d": "./src/viz3d.ts"
+  },
+  "scripts": {
+    "test": "bun test"
+  },
+  "author": "aphrody-dev <contact@aphrody.com>",
+  "license": "Apache-2.0"
+}

@@ -10,8 +10,11 @@ describe("@aphrody/registry", () => {
     expect(ids).toContain("craft-suite-mcp");
     expect(ids).toContain("playwright-mcp");
     expect(ids).toContain("bun-arch-mcp");
-    expect(ids).toContain("m3-mcp");
+    expect(ids).toContain("yolo-ui-mcp");
     expect(ids).toContain("gws-mcp");
+
+    const yoloUiMcp = servers.find(s => s.id === "yolo-ui-mcp");
+    expect(yoloUiMcp?.subsumes).toContain("m3-mcp");
 
     const craftSuite = servers.find(s => s.id === "craft-suite-mcp");
     expect(craftSuite?.subsumes).toContain("cadcraft-mcp");
@@ -22,8 +25,8 @@ describe("@aphrody/registry", () => {
     const skills = listSkills();
     expect(skills.length).toBeGreaterThanOrEqual(20);
     const names = skills.map(s => s.name);
+    expect(names).toContain("yolo-ui");
     expect(names).toContain("arch-linux");
-    expect(names).toContain("ui-ux-pro-max");
   });
 
   it("finds component by ID", () => {
@@ -43,8 +46,8 @@ describe("@aphrody/registry", () => {
     expect(bunosCli).not.toBeUndefined();
     expect(bunosCli?.subsumes).toContain("cli-wasm");
 
-    const aphrodyCli = reg.clis.find(c => c.command === "aphrody");
-    expect(aphrodyCli).not.toBeUndefined();
-    expect(aphrodyCli?.subsumes).toContain("cadcraft-cli");
+    const yoloUiCli = reg.clis.find(c => c.command === "yolo-ui");
+    expect(yoloUiCli).not.toBeUndefined();
+    expect(yoloUiCli?.subsumes).toContain("m3-design");
   });
 });
