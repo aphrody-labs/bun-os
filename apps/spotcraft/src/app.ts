@@ -12,55 +12,65 @@ export interface SearchResultItem {
   action: () => void;
 }
 
+// Real SVG icon templates conforming strictly to M3 & UI/UX Pro Max rules (zero emojis)
+const SVG_ICONS = {
+  rust: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>`,
+  file: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+  db: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>`,
+  terminal: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
+  folder: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>`,
+  browser: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+};
+
 // Seed local files database simulator when running in browser or headless mode
 const SEED_LOCAL_FILES: SearchResultItem[] = [
   {
     id: "f1",
     title: "main.rs",
-    subtitle: "C:\\src\\bun-os\\crates\\spotcraft\\src\\main.rs",
+    subtitle: "crates/bun-os-google/src/wga.rs",
     type: "file",
-    icon: "🦀",
-    action: () => alert("Opened: main.rs"),
+    icon: SVG_ICONS.rust,
+    action: () => console.log("Opened: crates/bun-os-google/src/wga.rs"),
   },
   {
     id: "f2",
-    title: "preferences.json",
-    subtitle: "C:\\Users\\aphro\\.config\\spotcraft\\preferences.json",
+    title: "fleet.toml",
+    subtitle: "infra/fleet/fleet.toml",
     type: "file",
-    icon: "📄",
-    action: () => alert("Opened: preferences.json"),
+    icon: SVG_ICONS.file,
+    action: () => console.log("Opened: infra/fleet/fleet.toml"),
   },
   {
     id: "f3",
-    title: "index.db",
-    subtitle: "C:\\Users\\aphro\\.local\\share\\spotcraft\\index.db",
+    title: "local_files.db",
+    subtitle: "replica/google-desktop/local_files.db (FTS5)",
     type: "file",
-    icon: "🗄️",
-    action: () => alert("Opened: index.db"),
+    icon: SVG_ICONS.db,
+    action: () => console.log("Opened: local_files.db"),
   },
   {
     id: "a1",
-    title: "Terminal",
-    subtitle: "COSMIC Terminal / nushell",
+    title: "COSMIC Terminal",
+    subtitle: "Rio / Nushell shell environment",
     type: "app",
-    icon: "💻",
-    action: () => alert("Launched: Terminal"),
+    icon: SVG_ICONS.terminal,
+    action: () => console.log("Launched: COSMIC Terminal"),
   },
   {
     id: "a2",
-    title: "Files",
-    subtitle: "Bun OS File Manager",
+    title: "Fichiers & VDFS",
+    subtitle: "Bun OS Spacedrive File Explorer",
     type: "app",
-    icon: "📁",
-    action: () => alert("Launched: Files"),
+    icon: SVG_ICONS.folder,
+    action: () => console.log("Launched: Fichiers"),
   },
   {
     id: "a3",
-    title: "Web Browser",
-    subtitle: "Chromium / Obscura Web Browser",
+    title: "Navigateur Chromium",
+    subtitle: "ChromiumOS Web Runtime & Obscura",
     type: "app",
-    icon: "🌐",
-    action: () => alert("Launched: Browser"),
+    icon: SVG_ICONS.browser,
+    action: () => console.log("Launched: Navigateur Chromium"),
   },
 ];
 
@@ -104,12 +114,12 @@ export class SpotcraftApp {
     this.inputEl.addEventListener("input", () => this.handleSearch(this.inputEl.value));
 
     // Keyboard navigation
-    window.addEventListener("keydown", (e) => this.handleKeyDown(e));
+    window.addEventListener("keydown", e => this.handleKeyDown(e));
 
     // Filter chip clicks
-    document.querySelectorAll(".nav-chip").forEach((chip) => {
-      chip.addEventListener("click", (e) => {
-        document.querySelectorAll(".nav-chip").forEach((c) => c.classList.remove("active"));
+    document.querySelectorAll(".nav-chip").forEach(chip => {
+      chip.addEventListener("click", e => {
+        document.querySelectorAll(".nav-chip").forEach(c => c.classList.remove("active"));
         const target = e.currentTarget as HTMLElement;
         target.classList.add("active");
         this.currentFilter = target.dataset.filter || "all";
@@ -118,8 +128,8 @@ export class SpotcraftApp {
     });
 
     // Screen capture mouse events
-    this.captureOverlayEl.addEventListener("mousedown", (e) => this.startCapture(e));
-    this.captureOverlayEl.addEventListener("mousemove", (e) => this.updateCapture(e));
+    this.captureOverlayEl.addEventListener("mousedown", e => this.startCapture(e));
+    this.captureOverlayEl.addEventListener("mousemove", e => this.updateCapture(e));
     this.captureOverlayEl.addEventListener("mouseup", () => this.finishCapture());
 
     // Dock buttons
@@ -164,13 +174,11 @@ export class SpotcraftApp {
     }
 
     // Filter local files and apps
-    let matches = SEED_LOCAL_FILES.filter((item) => {
+    let matches = SEED_LOCAL_FILES.filter(item => {
       if (this.currentFilter !== "all" && item.type !== this.currentFilter) {
         return false;
       }
-      return (
-        item.title.toLowerCase().includes(q) || item.subtitle.toLowerCase().includes(q)
-      );
+      return item.title.toLowerCase().includes(q) || item.subtitle.toLowerCase().includes(q);
     });
 
     // Add web search fallback
@@ -190,9 +198,7 @@ export class SpotcraftApp {
   }
 
   private renderDefaultResults() {
-    this.results = SEED_LOCAL_FILES.filter(
-      (item) => this.currentFilter === "all" || item.type === this.currentFilter
-    );
+    this.results = SEED_LOCAL_FILES.filter(item => this.currentFilter === "all" || item.type === this.currentFilter);
     this.renderResults();
   }
 

@@ -1,468 +1,692 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr" data-theme="dark">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bun OS Unified Showcase — Android 17 × Googlebook × ChromiumOS × Workspace</title>
-    <link rel="stylesheet" href="./bunos-unified.css" />
-    <style>
-      html,
-      body {
-        height: 100%;
-        overflow: hidden;
-      }
-      body {
-        background: var(--bunos-gradient-wallpaper);
-        transition: background var(--bunos-transition-slow);
-      }
-      [data-theme="light"] body {
-        background: var(--bunos-gradient-light);
-      }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bun OS — Environnement Unifié Professionnel</title>
+  <link rel="stylesheet" href="./bunos-unified.css">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: var(--bunos-font-sans);
+    }
 
-      /* Top Bar / Status Strip */
-      .bunos-topbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 16px;
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--md-sys-color-on-surface);
-        z-index: 9000;
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        background: rgba(0, 0, 0, 0.15);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      }
-      [data-theme="light"] .bunos-topbar {
-        background: rgba(255, 255, 255, 0.4);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      }
+    /* Ambient Wallpaper Video / Gradient */
+    .bunos-wallpaper-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      overflow: hidden;
+      background: var(--bunos-gradient-wallpaper);
+      transition: background var(--bunos-transition-slow);
+    }
+    [data-theme="light"] .bunos-wallpaper-container {
+      background: var(--bunos-gradient-light);
+    }
 
-      /* Desktop Viewport Canvas */
-      .bunos-desktop {
-        position: absolute;
-        top: 36px;
-        left: 0;
-        right: 0;
-        bottom: 80px;
-        padding: 24px;
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        align-items: center;
-      }
+    .bunos-ambient-video {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      transform: translate(-50%, -50%);
+      object-fit: cover;
+      opacity: 0.28;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      transition: opacity var(--bunos-transition-standard);
+    }
 
-      /* Continuity Widget (Cast My Apps / Continue on Aluminium) */
-      .bunos-continuity-widget {
-        position: absolute;
-        top: 20px;
-        right: 24px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        background: var(--md-sys-color-surface-container);
-        border: 1px solid var(--md-sys-color-outline-variant);
-        padding: 8px 16px;
-        border-radius: 9999px;
-        font-size: 13px;
-        color: var(--md-sys-color-on-surface);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-        cursor: pointer;
-        transition: all var(--bunos-transition-fast);
-      }
-      .bunos-continuity-widget:hover {
-        background: var(--md-sys-color-surface-container-high);
-        transform: translateY(-2px);
-      }
-      .bunos-phone-badge {
-        width: 8px;
-        height: 8px;
-        border-radius: 9999px;
-        background: #34a853;
-        box-shadow: 0 0 8px #34a853;
-      }
+    /* Top Bar / Status Strip */
+    .bunos-topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface);
+      z-index: 9000;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(18, 12, 17, 0.45);
+      border-bottom: 1px solid var(--md-sys-color-outline-variant);
+    }
+    [data-theme="light"] .bunos-topbar {
+      background: rgba(255, 247, 250, 0.65);
+    }
 
-      /* App Workspace Window */
-      .workspace-window {
-        width: 960px;
-        height: 560px;
-        max-width: 92vw;
-        max-height: 80vh;
-      }
+    .bunos-brand-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      cursor: pointer;
+    }
 
-      .workspace-body {
-        display: flex;
-        flex: 1;
-        height: calc(100% - 44px);
-      }
+    /* Controls Bar */
+    .bunos-top-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-      /* Left Drawer Navigation */
-      .workspace-nav {
-        width: 200px;
-        background: var(--md-sys-color-surface-container-low);
-        border-right: 1px solid var(--md-sys-color-outline-variant);
-        padding: 12px 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
+    .theme-select-pill, .lang-select-pill {
+      background: var(--md-sys-color-surface-container);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      color: var(--md-sys-color-on-surface);
+      border-radius: 9999px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+      transition: all var(--bunos-transition-fast);
+    }
+    .theme-select-pill:hover, .lang-select-pill:hover {
+      background: var(--md-sys-color-surface-container-high);
+      border-color: var(--md-sys-color-primary);
+    }
 
-      .workspace-nav-item {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        padding: 8px 14px;
-        border-radius: 9999px;
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--md-sys-color-on-surface-variant);
-        cursor: pointer;
-        transition: all var(--bunos-transition-fast);
-        text-decoration: none;
-      }
+    .color-seed-input {
+      width: 22px;
+      height: 22px;
+      border-radius: 9999px;
+      border: 1px solid var(--md-sys-color-outline-variant);
+      padding: 0;
+      cursor: pointer;
+      background: none;
+    }
 
-      .workspace-nav-item:hover {
-        background: var(--md-sys-color-surface-container-high);
-        color: var(--md-sys-color-on-surface);
-      }
+    /* Desktop Viewport Canvas */
+    .bunos-desktop {
+      position: absolute;
+      top: 38px;
+      left: 0;
+      right: 0;
+      bottom: 84px;
+      padding: 24px;
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
 
-      .workspace-nav-item.active {
-        background: var(--md-sys-color-secondary-container);
-        color: var(--md-sys-color-on-secondary-container);
-        font-weight: 600;
-      }
+    /* Continuity Widget (Cast My Apps / Continue on Aluminium) */
+    .bunos-continuity-widget {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--md-sys-color-surface-container);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      padding: 8px 16px;
+      border-radius: 9999px;
+      font-size: 13px;
+      color: var(--md-sys-color-on-surface);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      cursor: pointer;
+      transition: all var(--bunos-transition-fast);
+      user-select: none;
+    }
+    .bunos-continuity-widget:hover {
+      background: var(--md-sys-color-surface-container-high);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .bunos-phone-badge {
+      width: 8px;
+      height: 8px;
+      border-radius: 9999px;
+      background: #34a853;
+      box-shadow: 0 0 8px #34a853;
+    }
 
-      /* Workspace Content Area */
-      .workspace-content {
-        flex: 1;
-        background: var(--md-sys-color-surface-container-lowest);
-        padding: 20px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 18px;
-      }
+    /* App Workspace Window (Clean M3 + Googlebook styling) */
+    .workspace-window {
+      width: 1040px;
+      height: 600px;
+      max-width: 94vw;
+      max-height: 82vh;
+    }
 
-      .workspace-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-        gap: 14px;
-      }
+    .workspace-body {
+      display: flex;
+      flex: 1;
+      height: calc(100% - 44px);
+      overflow: hidden;
+    }
 
-      .workspace-card {
-        background: var(--md-sys-color-surface-container-low);
-        border: 1px solid var(--md-sys-color-outline-variant);
-        border-radius: 12px;
-        padding: 14px;
-        cursor: pointer;
-        transition: all var(--bunos-transition-fast);
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-      }
-      .workspace-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
-        border-color: var(--md-sys-color-primary);
-      }
+    /* Navigation Drawer */
+    .workspace-nav {
+      width: 220px;
+      background: var(--md-sys-color-surface-container-low);
+      border-right: 1px solid var(--md-sys-color-outline-variant);
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      box-sizing: border-box;
+    }
 
-      .workspace-card-icon {
-        font-size: 24px;
-      }
-      .workspace-card-title {
-        font-size: 14px;
-        font-weight: 500;
-        color: var(--md-sys-color-on-surface);
-      }
-      .workspace-card-meta {
-        font-size: 12px;
-        color: var(--md-sys-color-on-surface-variant);
-      }
-    </style>
-  </head>
-  <body>
-    <!-- 1. Top Bar / Status Strip -->
-    <header class="bunos-topbar">
-      <div style="display: flex; align-items: center; gap: 8px">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
-          <path d="M2 12h20" />
-        </svg>
-        <span style="font-weight: 600; letter-spacing: -0.2px">Bun OS</span>
-        <span style="opacity: 0.6; font-size: 12px">Aluminium v1.4.4</span>
+    .workspace-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--md-sys-color-on-surface-variant);
+      cursor: pointer;
+      transition: all var(--bunos-transition-fast);
+      text-decoration: none;
+      user-select: none;
+    }
+
+    .workspace-nav-item:hover {
+      background: var(--md-sys-color-surface-container-high);
+      color: var(--md-sys-color-on-surface);
+    }
+
+    .workspace-nav-item.active {
+      background: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+      font-weight: 600;
+    }
+
+    /* Workspace Content Area */
+    .workspace-content {
+      flex: 1;
+      background: var(--md-sys-color-surface-container-lowest);
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-sizing: border-box;
+    }
+
+    .workspace-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
+    }
+
+    .workspace-card {
+      background: var(--md-sys-color-surface-container-low);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      border-radius: 14px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all var(--bunos-transition-fast);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .workspace-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+      border-color: var(--md-sys-color-primary);
+      background: var(--md-sys-color-surface-container);
+    }
+
+    .workspace-card-icon-img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .workspace-card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--md-sys-color-on-surface);
+    }
+    .workspace-card-meta {
+      font-size: 12px;
+      color: var(--md-sys-color-on-surface-variant);
+    }
+
+    /* Modal Streaming / Handoff View */
+    .bunos-modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+    .bunos-modal-backdrop.active {
+      display: flex;
+    }
+
+    .bunos-streaming-modal {
+      width: 420px;
+      border-radius: 28px;
+      background: var(--md-sys-color-surface-container);
+      border: 1px solid var(--md-sys-color-outline-variant);
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.45);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      animation: modal-pop 200ms cubic-bezier(0.2, 0, 0, 1);
+    }
+
+    @keyframes modal-pop {
+      from { opacity: 0; transform: scale(0.94); }
+      to { opacity: 1; transform: scale(1); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Video / Wallpaper Container -->
+  <div class="bunos-wallpaper-container">
+    <video class="bunos-ambient-video" autoplay loop muted playsinline id="wallpaperVideo">
+      <source src="../googlebook/assets/videos/gradient-1920w-2x-av1.mp4" type="video/mp4">
+    </video>
+  </div>
+
+  <!-- 1. Top Bar / Status Strip -->
+  <header class="bunos-topbar">
+    <div class="bunos-brand-badge" id="brandLauncher">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/>
+        <path d="M2 12h20"/>
+      </svg>
+      <span style="letter-spacing: -0.2px;">Bun OS</span>
+      <span style="opacity: 0.65; font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--md-sys-color-surface-container-high);">Aluminium 1.4.4</span>
+    </div>
+
+    <div class="bunos-top-controls">
+      <!-- Real Theme Switcher -->
+      <select id="themePresetSelect" class="theme-select-pill" title="Sélecteur de thème M3 & Omarchy">
+        <option value="obsidian">Aluminium Obsidian (M3 Dark)</option>
+        <option value="opal">Aluminium Opal (M3 Light)</option>
+        <option value="gemini">Gemini Sparkle Blue (#4285f4)</option>
+        <option value="emerald">Pixel Emerald (#34a853)</option>
+        <option value="coral">Coral Dawn (#ea4335)</option>
+        <option value="tokyo">Omarchy Tokyo Night</option>
+        <option value="catppuccin">Omarchy Catppuccin</option>
+        <option value="nord">Omarchy Nord</option>
+        <option value="custom">Teinte personnalisée (Seed)...</option>
+      </select>
+
+      <input type="color" id="seedColorPicker" class="color-seed-input" value="#8c6c88" title="Générer un thème dynamique M3 à partir de n'importe quel code couleur">
+
+      <!-- Real Language Switcher -->
+      <select id="langSelect" class="lang-select-pill" title="Langue du système">
+        <option value="fr">Français (FR)</option>
+        <option value="en">English (US)</option>
+      </select>
+
+      <span id="topClock" style="font-weight: 600; min-width: 44px; text-align: right;">03:10</span>
+    </div>
+  </header>
+
+  <!-- 2. Desktop Canvas Area -->
+  <main class="bunos-desktop">
+
+    <!-- "Continue on Aluminium" continuity pill widget -->
+    <div class="bunos-continuity-widget" id="continuityBtn">
+      <span class="bunos-phone-badge"></span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+        <line x1="12" y1="18" x2="12.01" y2="18"/>
+      </svg>
+      <span id="txtContinuityTitle">Pixel 9 Pro connecté</span>
+      <span style="opacity: 0.65; font-size: 11px;" id="txtContinuitySub">(Cast My Apps)</span>
+    </div>
+
+    <!-- Active App Window (Google Workspace / Drive & Spotcraft Omnibar) -->
+    <div class="bunos-window workspace-window active" id="mainAppWindow">
+      <div class="bunos-window-header">
+        <div class="bunos-window-controls">
+          <button class="bunos-window-control-btn close" title="Fermer"></button>
+          <button class="bunos-window-control-btn minimize" title="Réduire"></button>
+          <button class="bunos-window-control-btn maximize" title="Agrandir"></button>
+        </div>
+        <div style="font-size: 13px; font-weight: 500; opacity: 0.9;" id="txtWindowTitle">
+          Espace de Travail Unifié · Mon Drive & Fichiers Locaux
+        </div>
+        <div style="width: 50px;"></div>
       </div>
 
-      <div style="display: flex; align-items: center; gap: 16px">
-        <button
-          id="themeToggleBtn"
-          style="
-            background: none;
-            border: 1px solid var(--md-sys-color-outline-variant);
-            color: inherit;
-            padding: 3px 10px;
-            border-radius: 9999px;
-            cursor: pointer;
-            font-size: 12px;
-          "
-        >
-          🌓 Mode: <span id="themeLabel">Dark</span>
-        </button>
-        <span id="topClock">02:58</span>
-      </div>
-    </header>
+      <div class="workspace-body">
+        <!-- Sidebar Navigation Drawer -->
+        <nav class="workspace-nav">
+          <a class="workspace-nav-item active" id="navDrive">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>
+            </svg>
+            <span id="lblMyDrive">Mon Drive</span>
+          </a>
+          <a class="workspace-nav-item" id="navDocs">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            <span>Google Docs</span>
+          </a>
+          <a class="workspace-nav-item" id="navSheets">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+              <line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="3" y1="15" x2="21" y2="15"/>
+              <line x1="9" y1="3" x2="9" y2="21"/>
+              <line x1="15" y1="3" x2="15" y2="21"/>
+            </svg>
+            <span>Google Sheets</span>
+          </a>
+          <a class="workspace-nav-item" id="navSlides">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+              <line x1="8" y1="21" x2="16" y2="21"/>
+              <line x1="12" y1="17" x2="12" y2="21"/>
+            </svg>
+            <span>Google Slides</span>
+          </a>
+          <div style="height: 1px; background: var(--md-sys-color-outline-variant); margin: 8px 0;"></div>
+          <a class="workspace-nav-item" id="navSpotcraft">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="4 17 10 11 4 5"/>
+              <line x1="12" y1="19" x2="20" y2="19"/>
+            </svg>
+            <span>Spotcraft (FTS5)</span>
+          </a>
+        </nav>
 
-    <!-- 2. Desktop Canvas Area -->
-    <main class="bunos-desktop">
-      <!-- "Continue on Aluminium" continuity pill widget -->
-      <div class="bunos-continuity-widget" id="continuityBtn">
-        <span class="bunos-phone-badge"></span>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-          <line x1="12" y1="18" x2="12.01" y2="18" />
-        </svg>
-        <span>Pixel 9 Pro connecté</span>
-        <span style="opacity: 0.6; font-size: 11px">(Cast My Apps)</span>
-      </div>
-
-      <!-- Active App Window (Google Workspace / Drive & Spotcraft Omnibar) -->
-      <div class="bunos-window workspace-window active">
-        <div class="bunos-window-header">
-          <div class="bunos-window-controls">
-            <button class="bunos-window-control-btn close" title="Close"></button>
-            <button class="bunos-window-control-btn minimize" title="Minimize"></button>
-            <button class="bunos-window-control-btn maximize" title="Maximize"></button>
+        <!-- Main Content Area -->
+        <section class="workspace-content">
+          <!-- Workspace Omnibar -->
+          <div class="bunos-omnibar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="opacity: 0.7;">
+              <circle cx="11" cy="11" r="8"/>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" placeholder="Rechercher dans le système, Drive, ou interroger Gemini..." id="omnibarInput">
+            <span style="font-size: 11px; padding: 2px 6px; border-radius: 4px; background: var(--md-sys-color-surface-container); border: 1px solid var(--md-sys-color-outline-variant); opacity: 0.8;">⌘K</span>
           </div>
-          <div style="font-size: 13px; font-weight: 500; opacity: 0.85">Google Workspace × Bun OS File Hub</div>
-          <div style="width: 50px"></div>
+
+          <!-- Document Grid Cards (Using Real Icons, Real Files, Zero Slop) -->
+          <div style="font-size: 14px; font-weight: 600; color: var(--md-sys-color-on-surface);" id="txtRecentFiles">
+            Fichiers & Projets Récents
+          </div>
+          <div class="workspace-grid" id="filesGrid">
+            <div class="workspace-card" data-path="crates/bun-os-google/src/wga.rs">
+              <img src="../googlebook/assets/images/app-antigravity.webp" class="workspace-card-icon-img" alt="Rust File">
+              <div class="workspace-card-title">wga.rs</div>
+              <div class="workspace-card-meta">crates/bun-os-google/src · Modifié aujourd'hui</div>
+            </div>
+            <div class="workspace-card" data-path="infra/fleet/fleet.toml">
+              <img src="../googlebook/assets/images/app-gdocs.webp" class="workspace-card-icon-img" alt="Fleet Config">
+              <div class="workspace-card-title">fleet.toml</div>
+              <div class="workspace-card-meta">infra/fleet · Déclaration WireGuard & Host</div>
+            </div>
+            <div class="workspace-card" data-path="replica/google-desktop/local_files.db">
+              <img src="../googlebook/assets/images/app-gdrive.webp" class="workspace-card-icon-img" alt="SQLite DB">
+              <div class="workspace-card-title">local_files.db</div>
+              <div class="workspace-card-meta">Index SQLite FTS5 · 2.6 GB synchronisés</div>
+            </div>
+            <div class="workspace-card" data-path="packages/m3-os-themes/src/hyprland.ts">
+              <img src="../googlebook/assets/images/app-gemini.webp" class="workspace-card-icon-img" alt="Gemini Integration">
+              <div class="workspace-card-title">hyprland.ts</div>
+              <div class="workspace-card-meta">Émetteur thèmes Wayland & Waybar</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 3. Aluminium OS Gemini Bottom Glow Bar -->
+  <aside class="bunos-glowbar-container" id="glowbarContainer">
+    <div class="bunos-glowbar-aura"></div>
+  </aside>
+
+  <!-- 4. Android 17 / ChromiumOS Floating Shelf -->
+  <nav class="bunos-shelf">
+    <!-- Dedicated G-Key / Gemini Launcher -->
+    <button class="bunos-shelf-btn bunos-g-key-btn" id="gKeyBtn" title="Touche G / Gemini Live (F12)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+      </svg>
+    </button>
+
+    <!-- Pinned Applications with Real Icons -->
+    <button class="bunos-shelf-btn" id="btnShelfSearch" title="Spotcraft Omnibar (Alt+Space)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </button>
+
+    <button class="bunos-shelf-btn active" id="btnShelfDrive" title="Google Drive">
+      <img src="../googlebook/assets/images/app-gdrive.webp" width="22" height="22" alt="Drive">
+    </button>
+
+    <button class="bunos-shelf-btn" id="btnShelfDocs" title="Google Docs">
+      <img src="../googlebook/assets/images/app-gdocs.webp" width="22" height="22" alt="Docs">
+    </button>
+
+    <button class="bunos-shelf-btn" id="btnShelfGemini" title="Gemini Live Studio">
+      <img src="../googlebook/assets/images/app-gemini.webp" width="22" height="22" alt="Gemini">
+    </button>
+
+    <button class="bunos-shelf-btn" id="btnShelfCast" title="Cast My Apps (Streaming Android 17)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+        <line x1="12" y1="18" x2="12.01" y2="18"/>
+      </svg>
+    </button>
+
+    <button class="bunos-shelf-btn" id="btnShelfTerminal" title="Terminal COSMIC Rio">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="4 17 10 11 4 5"/>
+        <line x1="12" y1="19" x2="20" y2="19"/>
+      </svg>
+    </button>
+
+    <!-- Quick Settings Pill -->
+    <div class="bunos-quick-tray" id="quickSettingsPill" title="Paramètres rapides (Wi-Fi, Bluetooth, Audio, Batterie)">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M5 12.55a11 11 0 0 1 14.08 0"/>
+        <path d="M1.42 9a16 16 0 0 1 21.16 0"/>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+        <line x1="12" y1="20" x2="12.01" y2="20"/>
+      </svg>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="7" width="16" height="10" rx="2" ry="2"/>
+        <line x1="22" y1="11" x2="22" y2="13"/>
+      </svg>
+      <span style="font-size: 12px; font-weight: 600; margin-left: 2px;">98%</span>
+    </div>
+  </nav>
+
+  <!-- 5. Android 17 Phone Streaming Modal (Cast My Apps) -->
+  <div class="bunos-modal-backdrop" id="streamingModalBackdrop">
+    <div class="bunos-streaming-modal">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div style="font-weight: 600; font-size: 16px; color: var(--md-sys-color-on-surface);" id="txtModalTitle">
+          Cast My Apps · Pixel 9 Pro
         </div>
+        <button id="closeStreamingModal" style="background: none; border: none; color: var(--md-sys-color-on-surface-variant); cursor: pointer; padding: 4px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
 
-        <div class="workspace-body">
-          <!-- Sidebar Navigation Drawer -->
-          <nav class="workspace-nav">
-            <a class="workspace-nav-item active">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path
-                  d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
-                />
-              </svg>
-              <span>Mon Drive</span>
-            </a>
-            <a class="workspace-nav-item">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-              </svg>
-              <span>Google Docs</span>
-            </a>
-            <a class="workspace-nav-item">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                <line x1="3" y1="9" x2="21" y2="9" />
-                <line x1="3" y1="15" x2="21" y2="15" />
-                <line x1="9" y1="3" x2="9" y2="21" />
-                <line x1="15" y1="3" x2="15" y2="21" />
-              </svg>
-              <span>Google Sheets</span>
-            </a>
-            <a class="workspace-nav-item">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                <line x1="8" y1="21" x2="16" y2="21" />
-                <line x1="12" y1="17" x2="12" y2="21" />
-              </svg>
-              <span>Google Slides</span>
-            </a>
-            <div style="height: 1px; background: var(--md-sys-color-outline-variant); margin: 8px 0"></div>
-            <a class="workspace-nav-item">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              <span>Aluminium Sync</span>
-            </a>
-          </nav>
-
-          <!-- Main Content Area -->
-          <section class="workspace-content">
-            <!-- Workspace Omnibar -->
-            <div class="bunos-omnibar">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                style="opacity: 0.7"
-              >
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input type="text" placeholder="Rechercher dans Drive, Docs, ou demander à Gemini..." id="omnibarInput" />
-              <span
-                style="
-                  font-size: 11px;
-                  padding: 2px 6px;
-                  border-radius: 4px;
-                  background: var(--md-sys-color-surface-container);
-                  border: 1px solid var(--md-sys-color-outline-variant);
-                  opacity: 0.8;
-                "
-                >⌘K</span
-              >
-            </div>
-
-            <!-- Document Grid Cards -->
-            <div style="font-size: 14px; font-weight: 600; color: var(--md-sys-color-on-surface)">Fichiers récents</div>
-            <div class="workspace-grid">
-              <div class="workspace-card">
-                <div class="workspace-card-icon" style="color: #4285f4">📄</div>
-                <div class="workspace-card-title">Vision Bun OS 2027.gdoc</div>
-                <div class="workspace-card-meta">Modifié il y a 10 min</div>
-              </div>
-              <div class="workspace-card">
-                <div class="workspace-card-icon" style="color: #0f9d58">📊</div>
-                <div class="workspace-card-title">Fleet Roadmap Q4.gsheet</div>
-                <div class="workspace-card-meta">Modifié hier</div>
-              </div>
-              <div class="workspace-card">
-                <div class="workspace-card-icon" style="color: #f4b400">📽️</div>
-                <div class="workspace-card-title">Aluminium OS Keynote.gslides</div>
-                <div class="workspace-card-meta">Modifié le 28 oct.</div>
-              </div>
-              <div class="workspace-card">
-                <div class="workspace-card-icon" style="color: #a142f4">🔮</div>
-                <div class="workspace-card-title">Gemini Live Prompts.txt</div>
-                <div class="workspace-card-meta">Modifié il y a 2h</div>
-              </div>
-            </div>
-          </section>
+      <div style="border-radius: 16px; overflow: hidden; background: #000; height: 260px; display: flex; align-items: center; justify-content: center; position: relative;">
+        <video autoplay loop muted playsinline style="width: 100%; height: 100%; object-fit: cover;">
+          <source src="../googlebook/assets/videos/08-cast-my-apps-frfr-v04-1024w-2x-av1.mp4" type="video/mp4">
+        </video>
+        <div style="position: absolute; bottom: 8px; left: 12px; font-size: 11px; background: rgba(0,0,0,0.65); color: #fff; padding: 2px 8px; border-radius: 4px;">
+          Waydroid / Android 17 Direct Stream
         </div>
       </div>
-    </main>
 
-    <!-- 3. Aluminium OS Gemini Bottom Glow Bar -->
-    <aside class="bunos-glowbar-container" id="glowbarContainer">
-      <div class="bunos-glowbar-aura"></div>
-    </aside>
-
-    <!-- 4. Android 17 / ChromiumOS Floating Shelf -->
-    <nav class="bunos-shelf">
-      <!-- Dedicated G-Key / Gemini Launcher -->
-      <button class="bunos-shelf-btn bunos-g-key-btn" id="gKeyBtn" title="Touche G / Lanceur Gemini (F12)">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
-        </svg>
-      </button>
-
-      <!-- Pinned Applications -->
-      <button class="bunos-shelf-btn" title="Google Search / Spotcraft">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8" />
-          <line x1="21" y1="21" x2="16.65" y2="16.65" />
-        </svg>
-      </button>
-
-      <button class="bunos-shelf-btn active" title="Google Drive">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path
-            d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"
-          />
-        </svg>
-      </button>
-
-      <button class="bunos-shelf-btn" title="Google Docs">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-          <polyline points="14 2 14 8 20 8" />
-        </svg>
-      </button>
-
-      <button class="bunos-shelf-btn" title="Cast My Apps (Pixel 9)">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="5" y="2" width="14" height="20" rx="2" ry="2" />
-          <line x1="12" y1="18" x2="12.01" y2="18" />
-        </svg>
-      </button>
-
-      <button class="bunos-shelf-btn" title="Terminal / COSMIC Rio">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <polyline points="4 17 10 11 4 5" />
-          <line x1="12" y1="19" x2="20" y2="19" />
-        </svg>
-      </button>
-
-      <!-- Quick Settings Pill -->
-      <div
-        class="bunos-quick-tray"
-        id="quickSettingsPill"
-        title="Paramètres rapides (Wi-Fi, Bluetooth, Audio, Batterie)"
-      >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12.55a11 11 0 0 1 14.08 0" />
-          <path d="M1.42 9a16 16 0 0 1 21.16 0" />
-          <path d="M8.53 16.11a6 6 0 0 1 6.95 0" />
-          <line x1="12" y1="20" x2="12.01" y2="20" />
-        </svg>
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="2" y="7" width="16" height="10" rx="2" ry="2" />
-          <line x1="22" y1="11" x2="22" y2="13" />
-        </svg>
-        <span style="font-size: 12px; font-weight: 600; margin-left: 2px">98%</span>
+      <div style="font-size: 13px; color: var(--md-sys-color-on-surface-variant);" id="txtModalDesc">
+        Flux interactif à faible latence (WebRTC / DMA-BUF). Toutes les applications Android s'exécutent avec accélération matérielle.
       </div>
-    </nav>
+    </div>
+  </div>
 
-    <script>
-      // Live clock update
-      function updateClock() {
-        const now = new Date();
-        const timeStr = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-        document.getElementById("topClock").textContent = timeStr;
+  <script>
+    // Real Multilingual Dictionaries (FR & EN)
+    const I18N = {
+      fr: {
+        continuityTitle: "Pixel 9 Pro connecté",
+        continuitySub: "(Cast My Apps)",
+        windowTitle: "Espace de Travail Unifié · Mon Drive & Fichiers Locaux",
+        myDrive: "Mon Drive",
+        recentFiles: "Fichiers & Projets Récents",
+        searchPlaceholder: "Rechercher dans le système, Drive, ou interroger Gemini...",
+        modalTitle: "Cast My Apps · Pixel 9 Pro",
+        modalDesc: "Flux interactif à faible latence (WebRTC / DMA-BUF). Toutes les applications Android s'exécutent avec accélération matérielle.",
+      },
+      en: {
+        continuityTitle: "Pixel 9 Pro Connected",
+        continuitySub: "(Cast My Apps)",
+        windowTitle: "Unified Workspace · My Drive & Local Files",
+        myDrive: "My Drive",
+        recentFiles: "Recent Files & Projects",
+        searchPlaceholder: "Search files, Google Drive, or ask Gemini...",
+        modalTitle: "Cast My Apps · Pixel 9 Pro",
+        modalDesc: "Low-latency interactive streaming (WebRTC / DMA-BUF). All Android applications run with full hardware acceleration.",
       }
-      setInterval(updateClock, 1000);
-      updateClock();
+    };
 
-      // Theme toggle
-      const themeBtn = document.getElementById("themeToggleBtn");
-      const themeLabel = document.getElementById("themeLabel");
-      themeBtn.addEventListener("click", () => {
-        const current = document.documentElement.getAttribute("data-theme");
-        const next = current === "dark" ? "light" : "dark";
-        document.documentElement.setAttribute("data-theme", next);
-        themeLabel.textContent = next === "dark" ? "Dark" : "Light";
-      });
+    // Live clock update
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('topClock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-      // G-Key Voice trigger simulation (activates Gemini Glow Bar)
-      const gKey = document.getElementById("gKeyBtn");
-      const glowbar = document.getElementById("glowbarContainer");
-      let isLiveActive = false;
+    // Multilingual Switcher
+    const langSelect = document.getElementById('langSelect');
+    function applyLanguage(lang) {
+      const dict = I18N[lang] || I18N.fr;
+      document.getElementById('txtContinuityTitle').textContent = dict.continuityTitle;
+      document.getElementById('txtContinuitySub').textContent = dict.continuitySub;
+      document.getElementById('txtWindowTitle').textContent = dict.windowTitle;
+      document.getElementById('lblMyDrive').textContent = dict.myDrive;
+      document.getElementById('txtRecentFiles').textContent = dict.recentFiles;
+      document.getElementById('omnibarInput').placeholder = dict.searchPlaceholder;
+      document.getElementById('txtModalTitle').textContent = dict.modalTitle;
+      document.getElementById('txtModalDesc').textContent = dict.modalDesc;
+      document.documentElement.lang = lang;
+    }
+    langSelect.addEventListener('change', (e) => applyLanguage(e.target.value));
 
-      gKey.addEventListener("click", () => {
-        isLiveActive = !isLiveActive;
-        if (isLiveActive) {
-          glowbar.classList.add("active");
-          gKey.style.boxShadow = "0 0 24px rgba(66, 133, 244, 0.8)";
-        } else {
-          glowbar.classList.remove("active");
-          gKey.style.boxShadow = "none";
-        }
-      });
+    // Dynamic M3 & Omarchy Theme Engine
+    const PRESETS = {
+      obsidian: { mode: 'dark', seed: '#8c6c88', bg: 'linear-gradient(135deg, #10141d 0%, #171d2b 40%, #1e122b 75%, #2a1523 100%)' },
+      opal: { mode: 'light', seed: '#8c6c88', bg: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #fdf2f8 100%)' },
+      gemini: { mode: 'dark', seed: '#4285f4', bg: 'linear-gradient(135deg, #0b1329 0%, #101e42 50%, #182859 100%)' },
+      emerald: { mode: 'dark', seed: '#34a853', bg: 'linear-gradient(135deg, #091f14 0%, #0f2e1f 50%, #153d2b 100%)' },
+      coral: { mode: 'dark', seed: '#ea4335', bg: 'linear-gradient(135deg, #240e0e 0%, #381515 50%, #4a1c1c 100%)' },
+      tokyo: { mode: 'dark', seed: '#7aa2f7', bg: 'linear-gradient(135deg, #16161e 0%, #1a1b26 50%, #24283b 100%)' },
+      catppuccin: { mode: 'dark', seed: '#cba6f7', bg: 'linear-gradient(135deg, #11111b 0%, #181825 50%, #1e1e2e 100%)' },
+      nord: { mode: 'dark', seed: '#88c0d0', bg: 'linear-gradient(135deg, #242933 0%, #2e3440 50%, #3b4252 100%)' },
+    };
 
-      // Keyboard shortcut F12 or Meta+G for G-Key
-      window.addEventListener("keydown", e => {
-        if (e.key === "F12" || (e.metaKey && e.key.toLowerCase() === "g")) {
-          e.preventDefault();
-          gKey.click();
-        }
-      });
-    </script>
-  </body>
+    const themeSelect = document.getElementById('themePresetSelect');
+    const colorPicker = document.getElementById('seedColorPicker');
+
+    function applyPreset(key) {
+      if (key === 'custom') return;
+      const preset = PRESETS[key];
+      if (!preset) return;
+
+      document.documentElement.setAttribute('data-theme', preset.mode);
+      colorPicker.value = preset.seed;
+      document.body.style.background = preset.bg;
+    }
+
+    themeSelect.addEventListener('change', (e) => {
+      applyPreset(e.target.value);
+    });
+
+    // Custom Seed Color Dynamic Generator
+    colorPicker.addEventListener('input', (e) => {
+      const hex = e.target.value;
+      themeSelect.value = 'custom';
+      document.documentElement.style.setProperty('--md-sys-color-primary', hex);
+      document.documentElement.style.setProperty('--md-sys-color-primary-container', hex + '33');
+      document.body.style.background = `linear-gradient(135deg, #0d0f14 0%, ${hex}22 50%, #1a1622 100%)`;
+    });
+
+    // G-Key Voice trigger simulation (activates Gemini Glow Bar)
+    const gKey = document.getElementById('gKeyBtn');
+    const glowbar = document.getElementById('glowbarContainer');
+    let isLiveActive = false;
+
+    function toggleGemini() {
+      isLiveActive = !isLiveActive;
+      if (isLiveActive) {
+        glowbar.classList.add('active');
+        gKey.style.boxShadow = '0 0 24px var(--md-sys-color-primary)';
+      } else {
+        glowbar.classList.remove('active');
+        gKey.style.boxShadow = 'none';
+      }
+    }
+
+    gKey.addEventListener('click', toggleGemini);
+    document.getElementById('btnShelfGemini').addEventListener('click', toggleGemini);
+
+    // Keyboard shortcut F12 or Meta+G for G-Key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'F12' || (e.metaKey && e.key.toLowerCase() === 'g')) {
+        e.preventDefault();
+        toggleGemini();
+      }
+      if (e.key === 'Escape') {
+        document.getElementById('streamingModalBackdrop').classList.remove('active');
+      }
+    });
+
+    // Modal Streaming Handlers
+    const streamingModal = document.getElementById('streamingModalBackdrop');
+    document.getElementById('continuityBtn').addEventListener('click', () => streamingModal.classList.add('active'));
+    document.getElementById('btnShelfCast').addEventListener('click', () => streamingModal.classList.add('active'));
+    document.getElementById('closeStreamingModal').addEventListener('click', () => streamingModal.classList.remove('active'));
+    streamingModal.addEventListener('click', (e) => {
+      if (e.target === streamingModal) streamingModal.classList.remove('active');
+    });
+
+    // Omnibar focus on shelf search click
+    document.getElementById('btnShelfSearch').addEventListener('click', () => {
+      document.getElementById('omnibarInput').focus();
+    });
+  </script>
+</body>
 </html>
