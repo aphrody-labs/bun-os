@@ -39,7 +39,6 @@
 @define-color shade_color alpha(#000000, 0.12);
 @define-color scrollbar_outline_color #171216;
 
-
 @define-color theme_bg_color #171216;
 @define-color theme_fg_color #ebdfe6;
 @define-color theme_base_color #120d11;
@@ -48,8 +47,24 @@
 @define-color theme_selected_fg_color #4b1f4b;
 @define-color borders #4e444b;
 
-button.suggested-action, .suggested-action { background-color: #efb4e9; color: #4b1f4b; }
-button.destructive-action, .destructive-action { background-color: #ffb4ab; color: #690005; }
-switch:checked { background-color: #efb4e9; }
-switch:checked slider { background-color: #4b1f4b; }
-selection, *:selected { background-color: #544151; color: #f6dbf0; }
+button.suggested-action,
+.suggested-action {
+  background-color: #efb4e9;
+  color: #4b1f4b;
+}
+button.destructive-action,
+.destructive-action {
+  background-color: #ffb4ab;
+  color: #690005;
+}
+switch:checked {
+  background-color: #efb4e9;
+}
+switch:checked slider {
+  background-color: #4b1f4b;
+}
+selection,
+*:selected {
+  background-color: #544151;
+  color: #f6dbf0;
+}

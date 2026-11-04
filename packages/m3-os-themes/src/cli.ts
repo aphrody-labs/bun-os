@@ -300,6 +300,19 @@ export function installCommand(
           ...(uninstall ? ["--uninstall"] : []),
         ],
       };
+    case "hyprland":
+      if (platform !== "linux")
+        return {
+          cmd: [],
+          reason: "needs a Linux host running Hyprland compositor",
+        };
+      return {
+        cmd: [
+          "bash",
+          "-c",
+          `mkdir -p ~/.config/hypr/themes ~/.config/waybar/themes ~/.config/fuzzel/themes && cp -r "${dir}"/* ~/.config/`,
+        ],
+      };
   }
 }
 

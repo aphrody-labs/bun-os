@@ -6,5 +6,6 @@ export { rolesFor, allModes, validate, rustThemeExport, productSeed } from "./co
 export { generateWindows, registryValues } from "./windows.ts";
 export { generateGnome, nearestGnomeAccent } from "./gnome.ts";
 export { generateCosmic } from "./cosmic.ts";
+export { generateHyprland, hyprlandColors, waybarCss, fuzzelIni } from "./hyprland.ts";
 export { generateChromium, themeManifest, BROWSERS } from "./chromium.ts";
 export { run as runCli } from "./cli.ts";

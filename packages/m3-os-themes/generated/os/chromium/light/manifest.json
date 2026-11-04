@@ -5,108 +5,28 @@
   "description": "Material 3 light theme generated from #8c6c88",
   "theme": {
     "colors": {
-      "frame": [
-        247,
-        235,
-        241
-      ],
-      "frame_inactive": [
-        255,
-        247,
-        250
-      ],
-      "frame_incognito": [
-        255,
-        255,
-        255
-      ],
-      "frame_incognito_inactive": [
-        255,
-        255,
-        255
-      ],
-      "toolbar": [
-        241,
-        229,
-        235
-      ],
-      "tab_text": [
-        32,
-        26,
-        30
-      ],
-      "tab_background_text": [
-        78,
-        68,
-        75
-      ],
-      "bookmark_text": [
-        32,
-        26,
-        30
-      ],
-      "ntp_background": [
-        255,
-        247,
-        250
-      ],
-      "ntp_text": [
-        32,
-        26,
-        30
-      ],
-      "ntp_link": [
-        126,
-        77,
-        124
-      ],
-      "button_background": [
-        255,
-        214,
-        248
-      ],
-      "omnibox_background": [
-        235,
-        223,
-        230
-      ],
-      "omnibox_text": [
-        32,
-        26,
-        30
-      ],
-      "toolbar_button_icon": [
-        78,
-        68,
-        75
-      ],
-      "toolbar_text": [
-        32,
-        26,
-        30
-      ]
+      "frame": [247, 235, 241],
+      "frame_inactive": [255, 247, 250],
+      "frame_incognito": [255, 255, 255],
+      "frame_incognito_inactive": [255, 255, 255],
+      "toolbar": [241, 229, 235],
+      "tab_text": [32, 26, 30],
+      "tab_background_text": [78, 68, 75],
+      "bookmark_text": [32, 26, 30],
+      "ntp_background": [255, 247, 250],
+      "ntp_text": [32, 26, 30],
+      "ntp_link": [126, 77, 124],
+      "button_background": [255, 214, 248],
+      "omnibox_background": [235, 223, 230],
+      "omnibox_text": [32, 26, 30],
+      "toolbar_button_icon": [78, 68, 75],
+      "toolbar_text": [32, 26, 30]
     },
     "tints": {
-      "buttons": [
-        -1,
-        -1,
-        -1
-      ],
-      "frame": [
-        -1,
-        -1,
-        -1
-      ],
-      "frame_inactive": [
-        -1,
-        -1,
-        -1
-      ],
-      "background_tab": [
-        -1,
-        -1,
-        -1
-      ]
+      "buttons": [-1, -1, -1],
+      "frame": [-1, -1, -1],
+      "frame_inactive": [-1, -1, -1],
+      "background_tab": [-1, -1, -1]
     },
     "images": {
       "theme_ntp_background": "images/ntp.png"

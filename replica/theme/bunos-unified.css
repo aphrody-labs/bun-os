@@ -1,0 +1,374 @@
+/* Bun OS Unified Design System (M3 Expressive × Aluminium OS × Android 17 × ChromiumOS × Google Workspace)
+ * Single Source of Truth for WebOS, Hyprland, COSMIC, and Desktop Apps.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  /* Typography */
+  --bunos-font-sans:
+    'Google Sans', 'Google Sans Text', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --bunos-font-display: 'Google Sans Display', 'Product Sans', var(--bunos-font-sans);
+  --bunos-font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* M3 Light Theme Roles (Seed #8c6c88) */
+  --md-sys-color-surface: #fff7fa;
+  --md-sys-color-surface-dim: #e3d7dd;
+  --md-sys-color-surface-bright: #fff7fa;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #fdf0f7;
+  --md-sys-color-surface-container: #f7ebf1;
+  --md-sys-color-surface-container-high: #f1e5eb;
+  --md-sys-color-surface-container-highest: #ebdfe6;
+  --md-sys-color-on-surface: #201a1e;
+  --md-sys-color-surface-variant: #eddee8;
+  --md-sys-color-on-surface-variant: #4e444b;
+  --md-sys-color-inverse-surface: #352e33;
+  --md-sys-color-inverse-on-surface: #faedf4;
+  --md-sys-color-outline: #7f747c;
+  --md-sys-color-outline-variant: #d1c3cc;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-surface-tint: #7e4d7c;
+  --md-sys-color-primary: #7e4d7c;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #ffd6f8;
+  --md-sys-color-on-primary-container: #643663;
+  --md-sys-color-inverse-primary: #efb4e9;
+  --md-sys-color-secondary: #6d586a;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #f6dbf0;
+  --md-sys-color-on-secondary-container: #544151;
+  --md-sys-color-tertiary: #825247;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #ffdad2;
+  --md-sys-color-on-tertiary-container: #663b31;
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #93000a;
+
+  /* Aluminium OS Signature Tokens */
+  --bunos-gradient-wallpaper: linear-gradient(135deg, #10141d 0%, #171d2b 40%, #1e122b 75%, #2a1523 100%);
+  --bunos-gradient-light: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #fdf2f8 100%);
+
+  /* Gemini 4-Color Bottom Glow Bar */
+  --bunos-glowbar-radial: radial-gradient(
+    ellipse 80% 100% at bottom center,
+    rgba(66, 133, 244, 0.45) 0%,
+    rgba(219, 68, 55, 0.35) 28%,
+    rgba(244, 180, 0, 0.30) 58%,
+    rgba(15, 157, 88, 0.35) 85%,
+    transparent 100%
+  );
+  --bunos-glowbar-active-pulse: 0 0 54px 14px rgba(66, 133, 244, 0.4);
+  --bunos-glowbar-height: 84px;
+
+  /* Dedicated G-Key Launcher */
+  --bunos-g-key-surface: #252a36;
+  --bunos-g-key-glow: 0 0 16px rgba(126, 77, 124, 0.5);
+
+  /* Android 17 / ChromiumOS Shelf Geometry */
+  --bunos-shelf-height: 56px;
+  --bunos-shelf-radius: 28px;
+  --bunos-shelf-gap: 8px;
+  --bunos-app-icon-size: 40px;
+  --bunos-window-radius: 16px;
+
+  /* Transitions */
+  --bunos-transition-fast: 150ms cubic-bezier(0.2, 0.0, 0, 1.0);
+  --bunos-transition-standard: 250ms cubic-bezier(0.2, 0.0, 0, 1.0);
+  --bunos-transition-slow: 350ms cubic-bezier(0.2, 0.0, 0, 1.0);
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"],
+:root.dark {
+  --md-sys-color-surface: #181116;
+  --md-sys-color-surface-dim: #181116;
+  --md-sys-color-surface-bright: #3f363c;
+  --md-sys-color-surface-container-lowest: #120c11;
+  --md-sys-color-surface-container-low: #20191f;
+  --md-sys-color-surface-container: #251d23;
+  --md-sys-color-surface-container-high: #2f272d;
+  --md-sys-color-surface-container-highest: #3b3238;
+  --md-sys-color-on-surface: #ebdfe6;
+  --md-sys-color-surface-variant: #4e444b;
+  --md-sys-color-on-surface-variant: #d1c3cc;
+  --md-sys-color-inverse-surface: #ebdfe6;
+  --md-sys-color-inverse-on-surface: #352e33;
+  --md-sys-color-outline: #9a8d96;
+  --md-sys-color-outline-variant: #4e444b;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-surface-tint: #efb4e9;
+  --md-sys-color-primary: #efb4e9;
+  --md-sys-color-on-primary: #4b1f4b;
+  --md-sys-color-primary-container: #643663;
+  --md-sys-color-on-primary-container: #ffd6f8;
+  --md-sys-color-inverse-primary: #7e4d7c;
+  --md-sys-color-secondary: #d9bfd3;
+  --md-sys-color-on-secondary: #3c2b3b;
+  --md-sys-color-secondary-container: #544151;
+  --md-sys-color-on-secondary-container: #f6dbf0;
+  --md-sys-color-tertiary: #f6b8a9;
+  --md-sys-color-on-tertiary: #4c251d;
+  --md-sys-color-tertiary-container: #663b31;
+  --md-sys-color-on-tertiary-container: #ffdad2;
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #93000a;
+  --md-sys-color-on-error-container: #ffdad6;
+}
+
+/* Base Body Setup */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--bunos-font-sans);
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   ALUMINIUM OS GEMINI GLOW BAR
+   ========================================================================== */
+.bunos-glowbar-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bunos-glowbar-height);
+  pointer-events: none;
+  z-index: 9998;
+  overflow: hidden;
+  transition: opacity var(--bunos-transition-standard);
+}
+
+.bunos-glowbar-aura {
+  position: absolute;
+  bottom: -20px;
+  left: 10%;
+  right: 10%;
+  height: 100%;
+  background: var(--bunos-glowbar-radial);
+  filter: blur(24px);
+  opacity: 0.85;
+  animation: bunos-glow-wave 4s ease-in-out infinite alternate;
+}
+
+.bunos-glowbar-container.active .bunos-glowbar-aura {
+  opacity: 1;
+  filter: blur(18px) brightness(1.25);
+  box-shadow: var(--bunos-glowbar-active-pulse);
+  animation: bunos-glow-pulse 1.8s ease-in-out infinite alternate;
+}
+
+@keyframes bunos-glow-wave {
+  0% {
+    transform: scaleX(0.92) scaleY(0.9);
+  }
+  50% {
+    transform: scaleX(1.05) scaleY(1.1);
+  }
+  100% {
+    transform: scaleX(0.96) scaleY(0.95);
+  }
+}
+
+@keyframes bunos-glow-pulse {
+  0% {
+    transform: scaleX(0.98) scaleY(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scaleX(1.08) scaleY(1.3);
+    opacity: 1;
+  }
+}
+
+/* ==========================================================================
+   ANDROID 17 / CHROMIUMOS FLOATING SHELF
+   ========================================================================== */
+.bunos-shelf {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: var(--bunos-shelf-height);
+  border-radius: var(--bunos-shelf-radius);
+  background: var(--md-sys-color-surface-container);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.28);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: var(--bunos-shelf-gap);
+  z-index: 9999;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.bunos-shelf-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--md-sys-color-on-surface);
+  transition: all var(--bunos-transition-fast);
+  position: relative;
+}
+
+.bunos-shelf-btn:hover {
+  background: var(--md-sys-color-surface-container-high);
+  transform: translateY(-2px);
+}
+
+.bunos-shelf-btn.active {
+  background: var(--md-sys-color-secondary-container);
+  color: var(--md-sys-color-on-secondary-container);
+}
+
+.bunos-shelf-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: 3px;
+  width: 14px;
+  height: 3px;
+  border-radius: 9999px;
+  background: var(--md-sys-color-primary);
+}
+
+.bunos-g-key-btn {
+  background: var(--md-sys-color-primary) !important;
+  color: var(--md-sys-color-on-primary) !important;
+}
+
+.bunos-g-key-btn:hover {
+  box-shadow: 0 0 18px var(--md-sys-color-primary);
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* Quick Settings Tray */
+.bunos-quick-tray {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: var(--md-sys-color-surface-container-high);
+  cursor: pointer;
+  transition: background var(--bunos-transition-fast);
+}
+
+.bunos-quick-tray:hover {
+  background: var(--md-sys-color-surface-container-highest);
+}
+
+/* ==========================================================================
+   WORKSPACE & WINDOW CANVAS (COSMIC & HYPRLAND COMPLIANT)
+   ========================================================================== */
+.bunos-window {
+  border-radius: var(--bunos-window-radius);
+  background: var(--md-sys-color-surface);
+  border: 1px solid var(--md-sys-color-outline-variant);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition:
+    box-shadow var(--bunos-transition-fast),
+    border-color var(--bunos-transition-fast);
+}
+
+.bunos-window.active {
+  border: 2px solid transparent;
+  background-image:
+    linear-gradient(var(--md-sys-color-surface), var(--md-sys-color-surface)),
+    linear-gradient(45deg, var(--md-sys-color-primary), var(--md-sys-color-tertiary));
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.32);
+}
+
+.bunos-window-header {
+  height: 44px;
+  background: var(--md-sys-color-surface-container);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  user-select: none;
+}
+
+.bunos-window-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bunos-window-control-btn {
+  width: 12px;
+  height: 12px;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.bunos-window-control-btn.close {
+  background: #ff5f56;
+}
+.bunos-window-control-btn.minimize {
+  background: #ffbd2e;
+}
+.bunos-window-control-btn.maximize {
+  background: #27c93f;
+}
+
+/* Workspace Omnibar */
+.bunos-omnibar {
+  height: 48px;
+  border-radius: 9999px;
+  background: var(--md-sys-color-surface-container-high);
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  color: var(--md-sys-color-on-surface);
+  transition: all var(--bunos-transition-fast);
+}
+
+.bunos-omnibar:focus-within {
+  background: var(--md-sys-color-surface-container-lowest);
+  border-color: var(--md-sys-color-primary);
+  box-shadow: 0 0 0 3px rgba(126, 77, 124, 0.25);
+}
+
+.bunos-omnibar input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 15px;
+  color: inherit;
+}
+
+/* Reduced Motion Override */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

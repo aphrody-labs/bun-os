@@ -80,8 +80,24 @@
   --scrollbar-outline-color: #fff7fa;
 }
 
-button.suggested-action, .suggested-action { background-color: #7e4d7c; color: #ffffff; }
-button.destructive-action, .destructive-action { background-color: #ba1a1a; color: #ffffff; }
-switch:checked { background-color: #7e4d7c; }
-switch:checked slider { background-color: #ffffff; }
-selection, *:selected { background-color: #f6dbf0; color: #544151; }
+button.suggested-action,
+.suggested-action {
+  background-color: #7e4d7c;
+  color: #ffffff;
+}
+button.destructive-action,
+.destructive-action {
+  background-color: #ba1a1a;
+  color: #ffffff;
+}
+switch:checked {
+  background-color: #7e4d7c;
+}
+switch:checked slider {
+  background-color: #ffffff;
+}
+selection,
+*:selected {
+  background-color: #f6dbf0;
+  color: #544151;
+}
