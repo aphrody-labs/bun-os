@@ -2,10 +2,10 @@
 /* Aphrody OS Design System — Pure, Calm, Consumer-Grade */
 
 :root {
-  --font-brand: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-  --font-mono: 'Fira Code', ui-monospace, monospace;
-  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-brand: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Google Sans Flex', 'Google Sans', system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'Fira Code', Menlo, Monaco, monospace;
+  --font-display: -apple-system, BlinkMacSystemFont, 'Space Grotesk', system-ui, sans-serif;
 
   /* Theme: Solitude (Default) */
   --md-sys-color-surface: #14151e;
@@ -1297,6 +1297,10 @@ body.desktop-mode > canvas {
   align-items: center;
   gap: 20px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+}
+
+.webos-topbar[hidden] {
+  display: none !important;
 }
 
 .topbar-status { display: flex; align-items: center; gap: 8px; }
