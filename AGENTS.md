@@ -40,7 +40,12 @@ Gemini at the centre), shipped as a bootable image and as the WebOS session on a
 
 - Rust first, iced/libcosmic for UI. Upstream projects (COSMIC, Redox, Rio, nushell, Obscura, Helium, Waydroid, ...)
   live in the repo as pinned, patched aphrody-labs forks and are built from source, never installed as binaries.
-- One canonical owner per capability, one direct child per member under `crates/`, `packages/` and `apps/`.
+- Strict directory boundaries:
+  - `apps/`: All user-facing frontends and applications (never in `packages/`, `crates/`, or `tools/`).
+  - `packages/`: Reusable TypeScript/Bun libraries, SDKs, and plugins.
+  - `crates/`: Rust crates and native binaries.
+- Real in-browser capabilities: Android 17 container streaming (Waydroid multi-window) and real vendor console emulators at 60 FPS (Dust NDS, StarPSX PS1, Zakuro Switch, RustBoy, TetaNES, v86 x86). Rendu WebGPU natif (`wgpu 30`) and Rust WASM. Zero raw HTML/CSS/JS slop.
+- Mascot & Brand: Byron Love (*Aphrodi*) is strictly the brand logo avatar, favicon, and OpenPets companion sprite (`/pet-idle.webp`), not a separate deity product. Zero unicode emojis or letter-badge avatars; strictly high-resolution SVG vectors.
 - Keep every upstream license and notice, and first-party attribution.
 - Product documentation in English. Resolve paths from the checkout or configuration, never hard-coded.
 

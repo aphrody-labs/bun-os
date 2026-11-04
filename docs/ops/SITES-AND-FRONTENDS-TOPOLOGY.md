@@ -14,7 +14,7 @@ This document is the exhaustive, authoritative inventory of all public websites,
    - Obsolete WebGL 1/2 fallbacks, slow CPU canvas rasterizers, and 2015-era canvas hacks are forbidden.
    - High-throughput rendering uses `OffscreenCanvas` in dedicated Web Workers, `SharedArrayBuffer` with Atomics, and local-first persistence via the Origin Private File System (OPFS).
 3. **Sovereign Brand & Mascot**:
-   - **Sole Mascot & Soul**: **Byron Love** (*Aphrodi* / 亜風炉 照美) — Divine grace, golden radiance (`#fce881`, `#f5c451`), *God Knows* and *Heaven's Time* perfection.
+   - **Mascot & Logo**: **Byron Love** (*Aphrodi*) — Brand logo avatar, favicon, and OpenPets companion sprite (`/pet-idle.webp`).
    - **Sovereign Color Spectrum**: **Gemini Light Blue** (`#8ab4f8` Primary, `#c2e7ff` Sky Luster, `#7cd8e8` Ambient Cyan, `#0f141c` Cosmic Surface).
    - **Tri-System Convergence**: Microsoft 365 Fluent UI 2 (dual-mode Ribbon, Backstage view, CommandBar) + Material 3 Expressive (Tonal Spot surfaces, Smart Canvas `@` chips) + Craft Pro Studio canvas.
 
