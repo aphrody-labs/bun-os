@@ -120,17 +120,14 @@ fn env_path(name: &str, default: &str) -> PathBuf {
 }
 
 async fn root(State(state): State<Arc<AppState>>) -> Response {
-    match tokio::fs::read(state.client.join("index.html")).await {
-        Ok(bytes) => (
-            [
-                (header::CONTENT_TYPE, "text/html; charset=utf-8"),
-                (header::CACHE_CONTROL, "no-cache"),
-            ],
-            bytes,
-        )
-            .into_response(),
-        Err(_) => page::placeholder(state.source_commit.as_deref()).into_response(),
-    }
+    (
+        [
+            (header::CONTENT_TYPE, "text/html; charset=utf-8"),
+            (header::CACHE_CONTROL, "no-cache"),
+        ],
+        page::landing(state.source_commit.as_deref()).0,
+    )
+        .into_response()
 }
 
 /// One JSON line per API request or error on stdout (journald).

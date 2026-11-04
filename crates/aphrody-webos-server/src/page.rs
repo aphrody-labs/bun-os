@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-//! The page served at `/` while the wasm client is not part of the release: rendered here, no JavaScript.
+//! Aphrody Bun OS HTML page renderer: the landing showcase served at `/` and error pages.
 
 use axum::response::Html;
 
@@ -17,6 +17,10 @@ ul{list-style:none;margin:0;padding:0;display:grid;gap:12px;grid-template-column
 li{display:grid;gap:4px;padding:16px;border-radius:16px;background:#1b1f23}li span{color:#9aa0a6;font-size:14px}\
 .build{font-size:12px;color:#6f757b}";
 
+const LANDING_HTML: &str = include_str!("landing.html");
+
+/// Placeholder served when the full client build is not mounted.
+#[allow(dead_code)]
 pub fn placeholder(commit: Option<&str>) -> Html<String> {
     let build = commit
         .map(|c| {
@@ -51,4 +55,23 @@ pub fn error(status: axum::http::StatusCode, detail: &str) -> Html<String> {
 <title>{code} {title} - Aphrody Bun OS</title>\n<style>{STYLE}a{{color:#a8c7fa}}</style>\n</head>\n<body>\n<main>\n\
 <h1>{code} {title}</h1>\n<p>{detail}</p>\n<p><a href=\"/\">Open Bun OS</a></p>\n</main>\n</body>\n</html>\n"
     ))
+}
+
+/// Full, immersive, pure Rust Axum landing page with Material 3 tokens, authentic Aphrody identity,
+/// real Craft Suite, Android 17 subsystem, and WebOS streaming.
+pub fn landing(commit: Option<&str>) -> Html<String> {
+    let build_meta = commit
+        .map(|c| {
+            format!(
+                r#"<meta name="aphrody-build" content="{}">"#,
+                escape(&c[..c.len().min(12)])
+            )
+        })
+        .unwrap_or_default();
+
+    if LANDING_HTML.contains("<!-- BUILD_META -->") {
+        Html(LANDING_HTML.replace("<!-- BUILD_META -->", &build_meta))
+    } else {
+        Html(LANDING_HTML.replace("</head>", &format!("{build_meta}\n</head>")))
+    }
 }

@@ -18,8 +18,9 @@ async function clearLocal() {
     sessionStorage.clear();
   } catch {}
   for (const name of await caches.keys().catch(() => [])) await caches.delete(name);
-  for (const db of (await indexedDB.databases?.().catch(() => [])) ?? []) if (db.name) indexedDB.deleteDatabase(db.name);
-  for (const reg of await navigator.serviceWorker?.getRegistrations().catch(() => []) ?? []) await reg.unregister();
+  for (const db of (await indexedDB.databases?.().catch(() => [])) ?? [])
+    if (db.name) indexedDB.deleteDatabase(db.name);
+  for (const reg of (await navigator.serviceWorker?.getRegistrations().catch(() => [])) ?? []) await reg.unregister();
 }
 
 function choose(value) {
@@ -41,47 +42,58 @@ function notice() {
   if (choice() || location.pathname === "/privacy") return;
   const sheet = document.createElement("aside");
   sheet.id = "storage-notice";
-  sheet.setAttribute("aria-label", "Confidentialité et stockage");
+  sheet.setAttribute("aria-label", "Privacy and storage");
   sheet.innerHTML =
-    "<p>Aucune publicité et aucun pistage. aphrody.com peut conserver vos préférences d'ambiance et une copie locale sur votre appareil. " +
-    '<a href="/privacy">Gérer les données</a></p>' +
-    '<div class="row"><button type="button" data-storage="refuse">Essentiel uniquement</button>' +
-    '<button type="button" class="button button-primary" data-storage="accept">Accepter</button></div>';
+    "<p>Zero advertising, zero tracking. aphrody.com only stores your ambiance preferences and an offline application cache on your device. " +
+    '<a href="/privacy">Manage data</a></p>' +
+    '<div class="row"><button type="button" data-storage="refuse">Essential only</button>' +
+    '<button type="button" class="button button-primary" data-storage="accept">Accept</button></div>';
   document.body.append(sheet);
   new ResizeObserver(([entry]) =>
-    document.documentElement.style.setProperty("--site-notice-height", `${Math.ceil(entry.borderBoxSize[0].blockSize) + 16}px`),
+    document.documentElement.style.setProperty(
+      "--site-notice-height",
+      `${Math.ceil(entry.borderBoxSize[0].blockSize) + 16}px`,
+    ),
   ).observe(sheet);
 }
 
-const format = (bytes) =>
-  bytes == null ? "?" : bytes < 1024 ? `${bytes} B` : bytes < 1048576 ? `${(bytes / 1024).toFixed(1)} KB` : bytes < 1073741824 ? `${(bytes / 1048576).toFixed(1)} MB` : `${(bytes / 1073741824).toFixed(1)} GB`;
+const format = bytes =>
+  bytes == null
+    ? "?"
+    : bytes < 1024
+      ? `${bytes} B`
+      : bytes < 1048576
+        ? `${(bytes / 1024).toFixed(1)} KB`
+        : bytes < 1073741824
+          ? `${(bytes / 1048576).toFixed(1)} MB`
+          : `${(bytes / 1073741824).toFixed(1)} GB`;
 
 async function report() {
   const table = document.getElementById("storage-report");
   if (!table) return;
   const rows = [];
-  const cookies = document.cookie ? document.cookie.split(";").map((c) => c.trim().split("=")[0]) : [];
-  rows.push(["Cookies de session", cookies.length ? cookies.join(", ") : "aucun (le cookie est HttpOnly et sécurisé)"]);
+  const cookies = document.cookie ? document.cookie.split(";").map(c => c.trim().split("=")[0]) : [];
+  rows.push(["Session cookies", cookies.length ? cookies.join(", ") : "none (cookies are HttpOnly and secure)"]);
   try {
     const keys = Object.keys(localStorage);
     const size = keys.reduce((n, k) => n + k.length + (localStorage.getItem(k)?.length ?? 0), 0) * 2;
-    rows.push(["Stockage local", keys.length ? `${keys.join(", ")} (${format(size)})` : "vide"]);
-    rows.push(["Stockage session", `${sessionStorage.length} élément(s)`]);
+    rows.push(["Local storage", keys.length ? `${keys.join(", ")} (${format(size)})` : "empty"]);
+    rows.push(["Session storage", `${sessionStorage.length} item(s)`]);
   } catch {
-    rows.push(["Stockage local", "bloqué par le navigateur"]);
+    rows.push(["Local storage", "blocked by browser"]);
   }
   const cacheNames = await caches.keys().catch(() => []);
-  rows.push(["Cache Storage", cacheNames.length ? cacheNames.join(", ") : "vide"]);
+  rows.push(["Cache Storage", cacheNames.length ? cacheNames.join(", ") : "empty"]);
   const dbs = (await indexedDB.databases?.().catch(() => [])) ?? [];
-  rows.push(["IndexedDB", dbs.length ? dbs.map((d) => d.name).join(", ") : "vide"]);
+  rows.push(["IndexedDB", dbs.length ? dbs.map(d => d.name).join(", ") : "empty"]);
   const workers = (await navigator.serviceWorker?.getRegistrations().catch(() => [])) ?? [];
-  rows.push(["Service Worker", workers.length ? "actif (mode hors-ligne)" : "inactif"]);
+  rows.push(["Service Worker", workers.length ? "active (offline mode)" : "inactive"]);
   if (navigator.storage?.estimate) {
     const { usage, quota } = await navigator.storage.estimate();
     const persisted = await navigator.storage.persisted?.();
-    rows.push(["Utilisation", `${format(usage)} sur ${format(quota)}${persisted ? ", persistant" : ", temporaire"}`]);
+    rows.push(["Usage", `${format(usage)} of ${format(quota)}${persisted ? ", persistent" : ", temporary"}`]);
   }
-  rows.push(["Votre choix", choice() ?? "en attente"]);
+  rows.push(["Your choice", choice() ?? "pending"]);
   const body = document.createElement("tbody");
   for (const [name, value] of rows) {
     const tr = body.insertRow();
@@ -91,13 +103,13 @@ async function report() {
   table.replaceChildren(body);
 }
 
-const status = (text) => {
+const status = text => {
   const out = document.getElementById("storage-status");
   if (out) out.textContent = text;
 };
 
 let installPrompt = null;
-addEventListener("beforeinstallprompt", (event) => {
+addEventListener("beforeinstallprompt", event => {
   event.preventDefault();
   installPrompt = event;
   for (const el of document.querySelectorAll("[data-action=install]")) el.hidden = false;
@@ -139,6 +151,10 @@ function enterDesktopMode() {
   if (topbar) topbar.hidden = false;
   const canvas = document.querySelector("body > canvas");
   if (canvas) canvas.style.display = "block";
+  if (!window._aphrodyBooted) {
+    window._aphrodyBooted = true;
+    import("/boot.js").catch(e => console.log("WebOS client boot:", e));
+  }
 }
 
 function exitDesktopMode() {
@@ -154,9 +170,9 @@ function initLaptopTabs() {
   const tabs = document.querySelectorAll(".laptop-tabs .tab-btn");
   const screen = document.getElementById("laptop-screen");
   if (!tabs.length || !screen) return;
-  tabs.forEach((tab) => {
+  tabs.forEach(tab => {
     tab.addEventListener("click", () => {
-      tabs.forEach((t) => {
+      tabs.forEach(t => {
         t.classList.remove("active");
         t.setAttribute("aria-selected", "false");
       });
@@ -165,7 +181,7 @@ function initLaptopTabs() {
       const targetView = tab.dataset.tab;
       screen.dataset.view = targetView;
       const views = screen.querySelectorAll(".screen-view");
-      views.forEach((v) => {
+      views.forEach(v => {
         v.classList.toggle("active", v.classList.contains(`view-${targetView}`));
       });
     });
@@ -175,9 +191,9 @@ function initLaptopTabs() {
 // Theme Switcher (Inspired by Omarchy 22 Themes)
 function initThemes() {
   const pills = document.querySelectorAll(".theme-picker-row .theme-pill");
-  pills.forEach((pill) => {
+  pills.forEach(pill => {
     pill.addEventListener("click", () => {
-      pills.forEach((p) => {
+      pills.forEach(p => {
         p.classList.remove("active");
         p.setAttribute("aria-checked", "false");
       });
@@ -196,7 +212,7 @@ function initThemes() {
       document.body.dataset.theme = saved;
       const target = document.querySelector(`.theme-picker-row [data-theme-name="${saved}"]`);
       if (target) {
-        pills.forEach((p) => {
+        pills.forEach(p => {
           p.classList.remove("active");
           p.setAttribute("aria-checked", "false");
         });
@@ -240,8 +256,8 @@ function initAmbientMusic() {
       } catch {}
       isPlaying = true;
       capsule.classList.add("playing");
-      toggle.innerHTML = '<span class="music-play-icon">❚❚</span>';
-      toggle.setAttribute("aria-label", "Mettre en pause l'ambiance sonore");
+      toggle.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+      toggle.setAttribute("aria-label", "Pause ambient soundscape");
     } else {
       if (gain && audioCtx) {
         try {
@@ -256,8 +272,8 @@ function initAmbientMusic() {
       }
       isPlaying = false;
       capsule.classList.remove("playing");
-      toggle.innerHTML = '<span class="music-play-icon">▶</span>';
-      toggle.setAttribute("aria-label", "Écouter l'ambiance sonore");
+      toggle.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      toggle.setAttribute("aria-label", "Listen to ambient soundscape");
     }
   });
 }
@@ -268,14 +284,14 @@ async function probeGpu() {
   const out = document.getElementById("gpu");
   if (!navigator.gpu) {
     root.dataset.gpu = "webgl2";
-    if (out) out.textContent = "Moteur graphique WebGL2 actif";
+    if (out) out.textContent = "WebGL2 raster engine active";
     return;
   }
   try {
     const adapter = await navigator.gpu.requestAdapter();
     if (!adapter) {
       root.dataset.gpu = "webgl2";
-      if (out) out.textContent = "Moteur graphique WebGL2 actif";
+      if (out) out.textContent = "WebGL2 raster engine active";
       return;
     }
     root.dataset.gpu = "webgpu";
@@ -286,15 +302,16 @@ async function probeGpu() {
       wgslLanguageFeatures: [...(navigator.gpu.wgslLanguageFeatures ?? [])].sort(),
       preferredFormat: navigator.gpu.getPreferredCanvasFormat(),
     };
-    if (out) out.textContent = `Moteur d'affichage WebGPU actif${adapter.info?.vendor ? ` (${adapter.info.vendor})` : ""}`;
+    if (out)
+      out.textContent = `WebGPU compute engine active${adapter.info?.vendor ? ` (${adapter.info.vendor})` : ""}`;
   } catch {
     root.dataset.gpu = "webgl2";
-    if (out) out.textContent = "Moteur graphique standard actif";
+    if (out) out.textContent = "Standard raster engine active";
   }
 }
 
 // Global click dispatcher
-document.addEventListener("click", async (event) => {
+document.addEventListener("click", async event => {
   const el = event.target.closest("[data-storage],[data-action]");
   if (!el) return;
   switch (el.dataset.storage ?? el.dataset.action) {
@@ -303,11 +320,11 @@ document.addEventListener("click", async (event) => {
       break;
     case "accept":
       choose("functional");
-      status("Stockage fonctionnel autorisé.");
+      status("Functional storage enabled.");
       break;
     case "refuse":
       choose("essential");
-      status("Essentiel uniquement : données locales effacées.");
+      status("Essential only: local data cleared.");
       break;
     case "install":
       if (installPrompt) {
@@ -327,8 +344,8 @@ document.addEventListener("click", async (event) => {
       } catch (error) {
         if (error?.name !== "AbortError") {
           await navigator.clipboard?.writeText(location.origin + "/");
-          el.textContent = "Lien copié";
-          setTimeout(() => (el.textContent = "Partager"), 3000);
+          el.textContent = "Link copied";
+          setTimeout(() => (el.textContent = "Share"), 3000);
         }
       }
       break;
@@ -345,7 +362,7 @@ document.getElementById("btn-toggle-fs")?.addEventListener("click", () => {
     document.exitFullscreen().catch(() => {});
   }
 });
-window.addEventListener("keydown", (e) => {
+window.addEventListener("keydown", e => {
   if (e.key === "Escape" && document.body.classList.contains("desktop-mode")) {
     exitDesktopMode();
   }

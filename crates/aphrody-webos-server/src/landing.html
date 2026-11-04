@@ -1,0 +1,867 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="app dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#13100a" />
+    <title>Aphrody &bull; The Calm, Intelligent Operating System</title>
+    <meta
+      name="description"
+      content="Aphrody is a unified operating system built on the Bun OS Rust base, COSMIC desktop, and Android 17. Experience native mobile and desktop apps side by side, pro creative tools, and an ambient intelligent companion."
+    />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://aphrody.com/" />
+    <link rel="describedby" type="text/markdown" href="/llms.txt" title="llms.txt" />
+
+    <!-- Brand Icons & Web App Manifest -->
+    <link rel="icon" href="/favicon.ico" sizes="48x48" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="application-name" content="Aphrody" />
+    <meta name="apple-mobile-web-app-title" content="Aphrody" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Open Graph & Social Cards -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Aphrody" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="https://aphrody.com/" />
+    <meta property="og:title" content="Aphrody &bull; The Calm, Intelligent Operating System" />
+    <meta
+      property="og:description"
+      content="A unified computing experience built on Bun OS, COSMIC desktop, and Android 17. Native Craft suite, mobile apps, and ambient companion intelligence."
+    />
+    <meta property="og:image" content="https://aphrody.com/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Aphrody: The Calm, Intelligent Operating System" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Aphrody &bull; The Calm, Intelligent Operating System" />
+    <meta
+      name="twitter:description"
+      content="A unified computing experience built on Bun OS, COSMIC desktop, and Android 17. Native Craft suite, mobile apps, and ambient companion intelligence."
+    />
+    <meta name="twitter:image" content="https://aphrody.com/og.png" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "Organization",
+            "@id": "https://aphrody.com/#org",
+            "name": "Aphrody Labs",
+            "url": "https://aphrody.com/",
+            "logo": "https://aphrody.com/icons/icon-512.png",
+            "email": "contact@aphrody.com",
+            "sameAs": ["https://github.com/aphrody-labs"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://aphrody.com/#site",
+            "name": "Aphrody",
+            "url": "https://aphrody.com/",
+            "inLanguage": "en",
+            "publisher": { "@id": "https://aphrody.com/#org" }
+          },
+          {
+            "@type": "WebApplication",
+            "name": "Aphrody Bun OS",
+            "url": "https://aphrody.com/",
+            "applicationCategory": "OperatingSystem",
+            "operatingSystem": "Linux, Android 17, WebOS",
+            "browserRequirements": "Modern WebAssembly and WebGPU browser",
+            "image": "https://aphrody.com/og.png",
+            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+            "publisher": { "@id": "https://aphrody.com/#org" }
+          }
+        ]
+      }
+    </script>
+
+    <link rel="preload" href="/aphrody_webos_client_bg.wasm" as="fetch" type="application/wasm" crossorigin fetchpriority="high" />
+    <link rel="modulepreload" href="/aphrody_webos_client.js" />
+    <link rel="stylesheet" href="/site.css" />
+  </head>
+  <body data-theme="obsidian-gold">
+    <!-- Top Navigation Header -->
+    <header class="site-header" id="header">
+      <div class="header-inner">
+        <a href="#hero" class="brand-link" aria-label="Aphrody Home">
+          <div class="brand-badge">
+            <img src="/favicon.svg" width="24" height="24" alt="Aphrody Logo" class="brand-icon" />
+            <span class="brand-title">Aphrody</span>
+          </div>
+          <span class="brand-pill">Bun OS 1.4</span>
+        </a>
+
+        <nav class="nav-menu" aria-label="Primary Navigation">
+          <a href="#hero" class="nav-item">Overview</a>
+          <a href="#architecture" class="nav-item">Architecture</a>
+          <a href="#craft-suite" class="nav-item">Craft Suite</a>
+          <a href="#android" class="nav-item">Android 17</a>
+          <a href="#companion" class="nav-item">Companion</a>
+          <a href="#themes" class="nav-item">Themes</a>
+        </nav>
+
+        <div class="header-actions">
+          <button type="button" class="button button-primary" data-action="launch-webos">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <span>Launch WebOS</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Landing Showcase -->
+    <main id="landing">
+      <!-- Hero Section -->
+      <section class="section-hero" id="hero">
+        <div class="hero-badge">
+          <span class="badge-dot"></span>
+          <span class="badge-text">Unified Operating System &bull; Linux, COSMIC &amp; Android 17</span>
+        </div>
+
+        <h1 class="hero-headline">
+          The calm, intelligent<br />
+          <span class="hero-gradient">operating system.</span>
+        </h1>
+
+        <p class="hero-subhead">
+          Aphrody unites the high-performance Bun OS Rust runtime, the refined COSMIC desktop environment, and the vast application catalog of Android 17 into a single, cohesive operating system. Create with the built-in Craft Pro suite, explore files spatially with Spacedrive, and work alongside an ambient intelligent companion.
+        </p>
+
+        <div class="hero-actions">
+          <button type="button" class="button button-primary button-large" data-action="launch-webos">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            <span>Try in Browser (WebOS)</span>
+          </button>
+          <a href="#craft-suite" class="button button-tonal button-large">
+            <span>Explore Craft Suite</span>
+          </a>
+          <a href="/status" class="button button-tonal button-large">
+            <span>System Status</span>
+          </a>
+        </div>
+
+        <!-- Metrics Strip -->
+        <div class="metrics-strip">
+          <div class="metric-item">
+            <span class="metric-value">Instant WebOS</span>
+            <span class="metric-label">Zero install stream via WebGPU &amp; WASM</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-value">Android 17 Native</span>
+            <span class="metric-label">Direct Wayland multi-window container</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-value">Craft Pro Suite</span>
+            <span class="metric-label">Built-in RAW photo, vector, CAD &amp; audio</span>
+          </div>
+          <div class="metric-divider"></div>
+          <div class="metric-item">
+            <span class="metric-value">Gemini Core</span>
+            <span class="metric-label">System-wide context-aware intelligence</span>
+          </div>
+        </div>
+
+        <!-- Interactive Device Viewport (Laptop Stage) -->
+        <div class="showcase-laptop-wrap">
+          <div class="laptop-tabs" role="tablist" aria-label="Desktop Workspace Views">
+            <button type="button" class="tab-btn active" data-tab="desktop" role="tab" aria-selected="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+              <span>COSMIC Desktop</span>
+            </button>
+            <button type="button" class="tab-btn" data-tab="craft" role="tab" aria-selected="false">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.586 7.586"></path><circle cx="11" cy="11" r="2"></circle></svg>
+              <span>Craft Creative Suite</span>
+            </button>
+            <button type="button" class="tab-btn" data-tab="android" role="tab" aria-selected="false">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+              <span>Android 17 Subsystem</span>
+            </button>
+            <button type="button" class="tab-btn" data-tab="agent" role="tab" aria-selected="false">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+              <span>Agentic Core</span>
+            </button>
+          </div>
+
+          <!-- Hardware Device Chassis -->
+          <div class="laptop-chassis">
+            <div class="laptop-lid">
+              <div class="laptop-webcam"></div>
+              <div class="laptop-screen" id="laptop-screen" data-view="desktop">
+                <!-- Top Desktop Status Bar -->
+                <div class="screen-topbar">
+                  <div class="topbar-left">
+                    <img src="/favicon.svg" width="14" height="14" alt="" class="os-brand-icon" />
+                    <span class="desktop-time">09:41</span>
+                    <span class="desktop-app-title">Spacedrive &bull; Projects</span>
+                  </div>
+                  <div class="topbar-right">
+                    <span class="topbar-badge">Wayland 120Hz</span>
+                    <span class="topbar-badge">M3 Gold</span>
+                    <span class="topbar-badge">Pet Idle</span>
+                  </div>
+                </div>
+
+                <!-- View 1: Desktop Workspace -->
+                <div class="screen-view view-desktop active">
+                  <div class="window-mock window-spacedrive">
+                    <div class="window-header">
+                      <div class="window-dots">
+                        <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+                      </div>
+                      <span class="window-title">Spacedrive — Virtual Distributed Explorer</span>
+                    </div>
+                    <div class="window-body spacedrive-layout">
+                      <div class="spacedrive-sidebar">
+                        <div class="sidebar-group-title">Spaces</div>
+                        <div class="sidebar-item active">Personal Vault</div>
+                        <div class="sidebar-item">Local Disks (NVMe)</div>
+                        <div class="sidebar-item">Android 17 Storage</div>
+                        <div class="sidebar-item">Cloud Datasets</div>
+                      </div>
+                      <div class="spacedrive-content">
+                        <div class="vmm-strip">
+                          <div class="vmm-node active">
+                            <span class="node-title">Workspace</span>
+                            <span class="node-meta">1.4 TB index &bull; Deduplicated</span>
+                          </div>
+                          <div class="vmm-node">
+                            <span class="node-title">Craft Projects</span>
+                            <span class="node-meta">PhotoRAW, CAD &amp; Audio</span>
+                          </div>
+                          <div class="vmm-node">
+                            <span class="node-title">Android Shared</span>
+                            <span class="node-meta">Media, Downloads, APKs</span>
+                          </div>
+                        </div>
+                        <div class="spacedrive-files-grid">
+                          <div class="file-card">
+                            <div class="file-icon-box">RAW</div>
+                            <span class="file-name">portrait_session.cr3</span>
+                            <span class="file-size">48.2 MB &bull; PhotoCraft</span>
+                          </div>
+                          <div class="file-card">
+                            <div class="file-icon-box">CAD</div>
+                            <span class="file-name">chassis_assembly.step</span>
+                            <span class="file-size">14.6 MB &bull; CADCraft</span>
+                          </div>
+                          <div class="file-card">
+                            <div class="file-icon-box">AUD</div>
+                            <span class="file-name">ambient_harmonics.daw</span>
+                            <span class="file-size">182 MB &bull; SoundCraft</span>
+                          </div>
+                          <div class="file-card">
+                            <div class="file-icon-box">PDF</div>
+                            <span class="file-name">bun_os_specification.pdf</span>
+                            <span class="file-size">3.8 MB &bull; PDFCraft</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Rio Terminal Window Floating -->
+                  <div class="window-mock window-terminal">
+                    <div class="window-header">
+                      <div class="window-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                      <span class="window-title">Rio Terminal — nushell</span>
+                    </div>
+                    <div class="terminal-body">
+                      <div class="term-line"><span class="term-prompt">aphrody@bunos</span>:<span class="term-dir">~/projects</span>$ bun status</div>
+                      <div class="term-out">Bun OS 1.4 &bull; COSMIC Shell (Rust) &bull; Wayland 120Hz &bull; Android 17 OK</div>
+                      <div class="term-line"><span class="term-prompt">aphrody@bunos</span>:<span class="term-dir">~/projects</span>$ bunos doctor</div>
+                      <div class="term-out green-text">&check; All systems nominal. WebGPU stream ready at :8790.</div>
+                    </div>
+                  </div>
+
+                  <!-- Desktop Companion Widget -->
+                  <div class="desktop-companion-capsule">
+                    <img src="/pet-idle.webp" width="48" height="52" alt="Aphrody Pet" class="companion-sprite" />
+                    <div class="companion-speech">
+                      <span class="speech-name">Aphrody Pet</span>
+                      <span class="speech-desc">All systems calm. 4 Craft apps active.</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- View 2: Craft Creative Suite -->
+                <div class="screen-view view-craft">
+                  <div class="window-mock window-photocraft">
+                    <div class="window-header">
+                      <div class="window-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                      <span class="window-title">PhotoCraft Pro — Non-Destructive GPU Grading</span>
+                    </div>
+                    <div class="craft-studio-body">
+                      <div class="craft-toolbar">
+                        <button type="button" class="tool-btn active">Selection</button>
+                        <button type="button" class="tool-btn">Curve HSL</button>
+                        <button type="button" class="tool-btn">RAW Pipeline</button>
+                        <button type="button" class="tool-btn">Masks</button>
+                        <button type="button" class="tool-btn">Shaders</button>
+                      </div>
+                      <div class="craft-canvas-area">
+                        <div class="canvas-art-preview">
+                          <div class="art-grading-box">
+                            <span class="grading-tag">16-bit float RAW &bull; Linear sRGB</span>
+                          </div>
+                        </div>
+                        <div class="craft-inspector">
+                          <div class="inspector-title">Histogram &amp; Color Tones</div>
+                          <div class="histogram-bars">
+                            <span class="hist-col h-1"></span>
+                            <span class="hist-col h-2"></span>
+                            <span class="hist-col h-3"></span>
+                            <span class="hist-col h-4"></span>
+                            <span class="hist-col h-5"></span>
+                            <span class="hist-col h-6"></span>
+                          </div>
+                          <div class="inspector-row"><span>Exposure</span><span>+0.35 EV</span></div>
+                          <div class="inspector-row"><span>Temperature</span><span>5200 K</span></div>
+                          <div class="inspector-row"><span>Clarity</span><span>+14</span></div>
+                          <div class="inspector-row"><span>Tone Curve</span><span>S-Curve Subtle</span></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- View 3: Android 17 Subsystem -->
+                <div class="screen-view view-android">
+                  <div class="android-desktop-layout">
+                    <!-- Android Window 1 -->
+                    <div class="window-mock window-android-app">
+                      <div class="window-header">
+                        <div class="window-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                        <span class="window-title">Play Store &bull; Android 17 Container</span>
+                      </div>
+                      <div class="android-app-body">
+                        <div class="android-search-bar">Search apps &amp; games</div>
+                        <div class="android-apps-row">
+                          <div class="apk-tile">
+                            <div class="apk-icon-box apk-1"></div>
+                            <span class="apk-title">Telegram</span>
+                            <span class="apk-cat">Communication</span>
+                          </div>
+                          <div class="apk-tile">
+                            <div class="apk-icon-box apk-2"></div>
+                            <span class="apk-title">Spotify</span>
+                            <span class="apk-cat">Audio &amp; Music</span>
+                          </div>
+                          <div class="apk-tile">
+                            <div class="apk-icon-box apk-3"></div>
+                            <span class="apk-title">Notion</span>
+                            <span class="apk-cat">Productivity</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Android Window 2: Mobile Messenger -->
+                    <div class="window-mock window-android-chat">
+                      <div class="window-header">
+                        <div class="window-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                        <span class="window-title">F-Droid &bull; Open Source APKs</span>
+                      </div>
+                      <div class="fdroid-body">
+                        <div class="fdroid-item">
+                          <span class="fdroid-name">VLC for Android</span>
+                          <span class="fdroid-status">Installed &bull; Multi-window enabled</span>
+                        </div>
+                        <div class="fdroid-item">
+                          <span class="fdroid-name">Syncthing-Fork</span>
+                          <span class="fdroid-status">Running &bull; Syncing with Linux home</span>
+                        </div>
+                        <div class="fdroid-item">
+                          <span class="fdroid-name">K-9 Mail</span>
+                          <span class="fdroid-status">Active &bull; COSMIC notifications bridged</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- View 4: Agentic Core -->
+                <div class="screen-view view-agent">
+                  <div class="window-mock window-agentic">
+                    <div class="window-header">
+                      <div class="window-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+                      <span class="window-title">Aphrody Agentic Workspace &bull; Gemini Core</span>
+                    </div>
+                    <div class="agent-body">
+                      <div class="agent-command-bar">
+                        <span class="agent-indicator">&bull;</span>
+                        <span class="agent-placeholder">Inspect repository changes, optimize 3D model in CADCraft, and export PDF report</span>
+                      </div>
+                      <div class="agent-trajectory-tree">
+                        <div class="traj-step completed">
+                          <span class="traj-icon">&check;</span>
+                          <span class="traj-desc">Indexed 12 CADCraft assemblies and extracted mechanical tolerance matrix.</span>
+                        </div>
+                        <div class="traj-step completed">
+                          <span class="traj-icon">&check;</span>
+                          <span class="traj-desc">Generated non-destructive HSL adjustment profile in PhotoCraft.</span>
+                        </div>
+                        <div class="traj-step running">
+                          <span class="traj-spinner"></span>
+                          <span class="traj-desc">Synthesizing engineering PDF summary in PDFCraft with digital signature.</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Bottom Desktop Dock -->
+                <div class="screen-dock">
+                  <div class="dock-item active" title="Spacedrive Files"><img src="/favicon.svg" width="20" height="20" alt="App" /></div>
+                  <div class="dock-item" title="PhotoCraft"><span class="dock-label">Ph</span></div>
+                  <div class="dock-item" title="VectorCraft"><span class="dock-label">Vc</span></div>
+                  <div class="dock-item" title="PDFCraft"><span class="dock-label">Pd</span></div>
+                  <div class="dock-item" title="CADCraft"><span class="dock-label">Cd</span></div>
+                  <div class="dock-item" title="SoundCraft"><span class="dock-label">Sd</span></div>
+                  <div class="dock-item" title="Rio Terminal"><span class="dock-label">>_</span></div>
+                  <div class="dock-item" title="Android Subsystem"><span class="dock-label">A17</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="laptop-base">
+              <div class="laptop-trackpad"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Companion -->
+      <section class="section-container" id="companion">
+        <div class="feature-split">
+          <div class="feature-content">
+            <div class="section-eyebrow">Ambient Intelligence</div>
+            <h2 class="section-title">An ambient companion at your side.</h2>
+            <p class="section-text">
+              Aphrody Pet is an interactive desktop companion embedded directly into the OS shell. Built from an 8&times;11 pixel-perfect sprite atlas, it lives gracefully in the corner of your workspace, responding subtly to audio playback, system compilation jobs, and agent reasoning.
+            </p>
+            <div class="feature-bullets">
+              <div class="bullet-item">
+                <div class="bullet-icon-box">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                </div>
+                <div class="bullet-text">
+                  <strong>Soundscape Reactive</strong>
+                  <span>Gently pulses and dances to background music and harmonic frequencies.</span>
+                </div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon-box">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                </div>
+                <div class="bullet-text">
+                  <strong>Task &amp; Build Awareness</strong>
+                  <span>Communicates system build progress, test runs, and background tasks without intrusive notifications.</span>
+                </div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon-box">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                </div>
+                <div class="bullet-text">
+                  <strong>Zero Distraction</strong>
+                  <span>Designed to bring calm, quiet companionship and artistic focus to long work sessions.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="feature-visual pet-visual-card">
+            <div class="pet-idle-stage">
+              <img src="/pet-idle.webp" width="128" height="138" alt="Aphrody Pet Idle Animation" class="pet-large-sprite" />
+              <div class="pet-sound-rings">
+                <span class="ring r-1"></span>
+                <span class="ring r-2"></span>
+                <span class="ring r-3"></span>
+              </div>
+            </div>
+            <div class="pet-meta-card">
+              <div class="pet-state-row">
+                <span class="state-dot live"></span>
+                <span class="state-label">Companion Status: Harmonized</span>
+              </div>
+              <span class="state-detail">Listening to 174Hz calm ambient soundscape</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Craft Creative Suite -->
+      <section class="section-container" id="craft-suite">
+        <div class="section-header-center">
+          <div class="section-eyebrow">Creative Workstations</div>
+          <h2 class="section-title">The Craft Creative Suite. Pro tools, built in.</h2>
+          <p class="section-subtitle">
+            A comprehensive, native creative workstation ecosystem built directly into the operating system. GPU-accelerated, zero subscription lock-in, and fully integrated with the spatial file system.
+          </p>
+        </div>
+
+        <div class="craft-grid">
+          <!-- PhotoCraft -->
+          <div class="craft-card">
+            <div class="craft-card-header">
+              <div class="app-icon-badge">Ph</div>
+              <div class="app-header-meta">
+                <h3 class="craft-app-name">PhotoCraft</h3>
+                <span class="craft-app-role">RAW Imaging &amp; Grading</span>
+              </div>
+            </div>
+            <p class="craft-app-desc">
+              Non-destructive layer compositor with Camera RAW decoding, GPU shader pipelines, 32-bit floating point color precision, Curves, and selective HSL grading.
+            </p>
+            <div class="craft-specs">
+              <span class="spec-pill">Linear sRGB</span>
+              <span class="spec-pill">GPU Curves</span>
+              <span class="spec-pill">RAW Engine</span>
+            </div>
+          </div>
+
+          <!-- VectorCraft -->
+          <div class="craft-card">
+            <div class="craft-card-header">
+              <div class="app-icon-badge">Vc</div>
+              <div class="app-header-meta">
+                <h3 class="craft-app-name">VectorCraft</h3>
+                <span class="craft-app-role">Vector Illustration &amp; Typography</span>
+              </div>
+            </div>
+            <p class="craft-app-desc">
+              Node-level precision vector illustration engine with boolean path operations, OpenType font features, infinite zoom canvas, and production-ready SVG export.
+            </p>
+            <div class="craft-specs">
+              <span class="spec-pill">Boolean Ops</span>
+              <span class="spec-pill">Bezier Curves</span>
+              <span class="spec-pill">SVG Engine</span>
+            </div>
+          </div>
+
+          <!-- PDFCraft -->
+          <div class="craft-card">
+            <div class="craft-card-header">
+              <div class="app-icon-badge">Pd</div>
+              <div class="app-header-meta">
+                <h3 class="craft-app-name">PDFCraft</h3>
+                <span class="craft-app-role">Document &amp; Form Architecture</span>
+              </div>
+            </div>
+            <p class="craft-app-desc">
+              Full-fidelity PDF manipulation engine. Merge, sign, annotate, redact, and generate standards-compliant PDF/A documents with high-fidelity vector rendering.
+            </p>
+            <div class="craft-specs">
+              <span class="spec-pill">PDF/A-2b</span>
+              <span class="spec-pill">Digital Sign</span>
+              <span class="spec-pill">Form Fields</span>
+            </div>
+          </div>
+
+          <!-- CADCraft -->
+          <div class="craft-card">
+            <div class="craft-card-header">
+              <div class="app-icon-badge">Cd</div>
+              <div class="app-header-meta">
+                <h3 class="craft-app-name">CADCraft</h3>
+                <span class="craft-app-role">Parametric Mechanical 3D CAD</span>
+              </div>
+            </div>
+            <p class="craft-app-desc">
+              Parametric 3D solid modeling and mechanical assembly environment. Import and export STEP, IGES, and STL files with precise tolerance verification.
+            </p>
+            <div class="craft-specs">
+              <span class="spec-pill">STEP / IGES</span>
+              <span class="spec-pill">Parametric</span>
+              <span class="spec-pill">Assemblies</span>
+            </div>
+          </div>
+
+          <!-- SoundCraft -->
+          <div class="craft-card">
+            <div class="craft-card-header">
+              <div class="app-icon-badge">Sd</div>
+              <div class="app-header-meta">
+                <h3 class="craft-app-name">SoundCraft</h3>
+                <span class="craft-app-role">Multitrack Audio Workstation</span>
+              </div>
+            </div>
+            <p class="craft-app-desc">
+              Low-latency multitrack digital audio workstation with real-time software synthesizers, spatial mixing, parametric EQ, and master recording tracks.
+            </p>
+            <div class="craft-specs">
+              <span class="spec-pill">32-bit Float Audio</span>
+              <span class="spec-pill">Low Latency</span>
+              <span class="spec-pill">Synthesizers</span>
+            </div>
+          </div>
+
+          <!-- ArtCraft & Storyteller -->
+          <div class="craft-card">
+            <div class="craft-card-header">
+              <div class="app-icon-badge">Ar</div>
+              <div class="app-header-meta">
+                <h3 class="craft-app-name">ArtCraft</h3>
+                <span class="craft-app-role">Generative Canvas &amp; 3D Scenes</span>
+              </div>
+            </div>
+            <p class="craft-app-desc">
+              Spatial storytelling studio, interactive 3D scene creation, moodboard staging, and visual narrative composition with real-time WebGPU shaders.
+            </p>
+            <div class="craft-specs">
+              <span class="spec-pill">3D Canvas</span>
+              <span class="spec-pill">Moodboards</span>
+              <span class="spec-pill">Shaders</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Android 17 Subsystem -->
+      <section class="section-container" id="android">
+        <div class="feature-split reverse">
+          <div class="feature-content">
+            <div class="section-eyebrow">Ecosystem Freedom</div>
+            <h2 class="section-title">Your mobile apps, native on the desktop.</h2>
+            <p class="section-text">
+              Android 17 runs as a first-class citizen inside the COSMIC Wayland compositor using private binderfs and containerized cgroups. There are no heavy virtual machines: Android APKs launch instantly into floating or tiled windows with shared clipboard, audio, and notification bridges.
+            </p>
+            <div class="feature-bullets">
+              <div class="bullet-item">
+                <div class="bullet-icon-box">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="3" x2="9" y2="21"></line></svg>
+                </div>
+                <div class="bullet-text">
+                  <strong>Multi-Window Wayland Tiling</strong>
+                  <span>Drag and snap mobile applications alongside your desktop terminal and code editor.</span>
+                </div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon-box">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 16v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1"></path><polyline points="12 15 17 10 12 5"></polyline><line x1="17" y1="10" x2="6" y2="10"></line></svg>
+                </div>
+                <div class="bullet-text">
+                  <strong>Play Store &amp; F-Droid Integration</strong>
+                  <span>Install your everyday communication tools, banking apps, and games directly from verified repositories.</span>
+                </div>
+              </div>
+              <div class="bullet-item">
+                <div class="bullet-icon-box">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                </div>
+                <div class="bullet-text">
+                  <strong>Unified Storage Bridge</strong>
+                  <span>Access mobile photos, downloads, and documents seamlessly inside Spacedrive.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="feature-visual android-visual-card">
+            <div class="android-window-stack">
+              <div class="stack-card card-top">
+                <div class="stack-card-bar">
+                  <span class="card-dot"></span>
+                  <span class="card-title">Telegram &bull; Android 17</span>
+                </div>
+                <div class="stack-card-content">
+                  <div class="msg-bubble incoming">Build 956ea94811 passed qualification.</div>
+                  <div class="msg-bubble outgoing">Desktop stream active on aphrody.com.</div>
+                </div>
+              </div>
+              <div class="stack-card card-back">
+                <div class="stack-card-bar">
+                  <span class="card-dot"></span>
+                  <span class="card-title">Spotify &bull; Android 17</span>
+                </div>
+                <div class="stack-card-content">
+                  <div class="audio-track-info">Playing: We Can Fix Everything (Ambient)</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: System Architecture -->
+      <section class="section-container" id="architecture">
+        <div class="section-header-center">
+          <div class="section-eyebrow">Engineering Foundation</div>
+          <h2 class="section-title">Built from source. Engineered for sovereignty.</h2>
+          <p class="section-subtitle">
+            Aphrody rejects bloated layers and fragile wrappers. Every component is audited, built from source, and coordinated under a unified Rust and Bun architecture.
+          </p>
+        </div>
+
+        <div class="arch-pillars-grid">
+          <div class="arch-card">
+            <h3 class="arch-title">Bun OS Base &amp; Rust Kernel</h3>
+            <p class="arch-desc">
+              Linux 7.4-rc1 mainline with Rust module support, binderfs, memfd, and KVM acceleration. Native system services written in Rust with memory safety by default.
+            </p>
+          </div>
+          <div class="arch-card">
+            <h3 class="arch-title">COSMIC Shell &amp; libcosmic</h3>
+            <p class="arch-desc">
+              Hardware-accelerated Wayland desktop shell written in Rust using iced. Butter-smooth 120Hz frame pacing with adaptive window tiling and workspace segregation.
+            </p>
+          </div>
+          <div class="arch-card">
+            <h3 class="arch-title">WebOS Streaming Gateway</h3>
+            <p class="arch-desc">
+              Zero-install instant streaming protocol. Direct WebSocket binary frame bridge with WebCodecs hardware decoding and low-latency input event transport.
+            </p>
+          </div>
+          <div class="arch-card">
+            <h3 class="arch-title">Gemini Agentic Subsystem</h3>
+            <p class="arch-desc">
+              Context-aware intelligence wired into Spacedrive files, Rio terminal commands, and system search without telemetry or cloud tracking.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Themes & Ambience (Inspired by Omarchy) -->
+      <section class="section-container" id="themes">
+        <div class="section-header-center">
+          <div class="section-eyebrow">Material 3 Color Harmony</div>
+          <h2 class="section-title">Harmonized themes. Calm by design.</h2>
+          <p class="section-subtitle">
+            Derived directly from Material 3 tonal spot palettes. Switch themes to see your workspace adapt instantly with optimal contrast and deep OLED focus.
+          </p>
+        </div>
+
+        <div class="theme-picker-row" role="radiogroup" aria-label="Desktop Color Themes">
+          <button type="button" class="theme-pill active" data-theme-name="obsidian-gold" role="radio" aria-checked="true">
+            <span class="theme-swatch swatch-gold"></span>
+            <span>Obsidian Gold</span>
+          </button>
+          <button type="button" class="theme-pill" data-theme-name="solitude" role="radio" aria-checked="false">
+            <span class="theme-swatch swatch-solitude"></span>
+            <span>Solitude</span>
+          </button>
+          <button type="button" class="theme-pill" data-theme-name="nordic-fog" role="radio" aria-checked="false">
+            <span class="theme-swatch swatch-nordic"></span>
+            <span>Nordic Fog</span>
+          </button>
+          <button type="button" class="theme-pill" data-theme-name="tokyo-dusk" role="radio" aria-checked="false">
+            <span class="theme-swatch swatch-tokyo"></span>
+            <span>Tokyo Dusk</span>
+          </button>
+          <button type="button" class="theme-pill" data-theme-name="sakura" role="radio" aria-checked="false">
+            <span class="theme-swatch swatch-sakura"></span>
+            <span>Sakura</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Final Call To Action -->
+      <section class="section-cta" id="stream">
+        <div class="cta-inner">
+          <h2 class="cta-headline">Experience Aphrody in your browser now.</h2>
+          <p class="cta-subhead">
+            No installation required. Launch the live interactive WebOS desktop powered by WebGPU and WebAssembly with a single click.
+          </p>
+          <div class="cta-buttons">
+            <button type="button" class="button button-primary button-large" data-action="launch-webos">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              <span>Launch Live WebOS</span>
+            </button>
+            <a href="/privacy" class="button button-tonal button-large">
+              <span>Privacy &amp; Storage</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Site Footer -->
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <div class="footer-brand">
+            <div class="brand-badge">
+              <img src="/favicon.svg" width="20" height="20" alt="Aphrody" class="brand-icon" />
+              <span class="brand-title">Aphrody Labs</span>
+            </div>
+            <p class="footer-desc">
+              The sovereign, unified operating system for creators and builders. Built on Bun OS, COSMIC, and Android 17.
+            </p>
+          </div>
+
+          <div class="footer-links-group">
+            <div class="footer-col">
+              <div class="col-title">Product</div>
+              <a href="#hero">Overview</a>
+              <a href="#craft-suite">Craft Suite</a>
+              <a href="#android">Android 17</a>
+              <a href="#companion">Companion</a>
+            </div>
+            <div class="footer-col">
+              <div class="col-title">Resources</div>
+              <a href="/privacy">Privacy &amp; Storage</a>
+              <a href="/status">System Status</a>
+              <a href="/llms.txt">llms.txt</a>
+              <a href="/manifest.webmanifest">Manifest</a>
+            </div>
+            <div class="footer-col">
+              <div class="col-title">Source</div>
+              <a href="https://github.com/aphrody-labs" target="_blank" rel="noopener noreferrer">GitHub</a>
+              <a href="https://api.aphrody.com/v1/health" target="_blank" rel="noopener noreferrer">API Health</a>
+              <a href="mailto:contact@aphrody.com">Contact</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <span>&copy; 2026 Aphrody Labs. Open source under Apache-2.0 and MIT licenses.</span>
+          <div class="gpu-diagnostic-row">
+            <span id="gpu" class="loading" role="status">Graphics pipeline initialized</span>
+          </div>
+        </div>
+      </footer>
+    </main>
+
+    <!-- Ambient Soundscape Capsule (Synthesized Relaxing Audio) -->
+    <aside class="ambient-music-capsule" id="music-capsule" aria-label="Ambient Soundscape Player">
+      <button type="button" class="music-play-btn" id="music-toggle" aria-label="Play ambient soundscape" title="Play ambient soundscape">
+        <span class="music-play-icon">▶</span>
+      </button>
+      <div class="music-meta">
+        <span class="music-track-title">We Can Fix Everything</span>
+        <span class="music-track-artist">Aphrody Ambient &bull; 174Hz Harmonic</span>
+      </div>
+      <div class="music-bars" aria-hidden="true">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </div>
+    </aside>
+
+    <!-- WebOS Desktop Mode Floating Bar (Shown when active) -->
+    <div id="webos-topbar" class="webos-topbar" hidden>
+      <div class="topbar-status">
+        <span class="status-indicator"></span>
+        <span class="status-title">Aphrody WebOS &bull; Live Session</span>
+      </div>
+      <div class="topbar-controls">
+        <button type="button" class="topbar-btn" id="btn-toggle-fs" title="Toggle Fullscreen">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+          <span>Fullscreen</span>
+        </button>
+        <button type="button" class="topbar-btn exit-btn" id="btn-exit-desktop" title="Return to Overview">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <span>Exit (Esc)</span>
+        </button>
+      </div>
+    </div>
+
+    <noscript>aphrody.com requires WebAssembly and JavaScript to initialize the WebOS experience.</noscript>
+    <script type="module" src="/site.js"></script>
+    <script type="module" src="/boot.js"></script>
+  </body>
+</html>
