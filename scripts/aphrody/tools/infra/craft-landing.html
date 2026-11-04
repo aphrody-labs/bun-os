@@ -1,72 +1,488 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
-  <meta name="theme-color" content="{{THEME_COLOR}}">
-  <title>Craft by Aphrody: creative and productivity studios in your browser</title>
-  <meta name="description" content="{{DESCRIPTION}}">
-  <link rel="canonical" href="{{BASE_URL}}/">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="Craft by Aphrody">
-  <meta property="og:locale" content="en_US">
-  <meta property="og:url" content="{{BASE_URL}}/">
-  <meta property="og:title" content="Craft: a space for your next idea">
-  <meta property="og:description" content="{{DESCRIPTION}}">
-  <meta property="og:image" content="{{BASE_URL}}/og.png">
-  <meta property="og:image:type" content="image/png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Craft by Aphrody, with previews of the PhotoCraft, FilmCraft and WordCraft studios">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Craft: a space for your next idea">
-  <meta name="twitter:description" content="{{DESCRIPTION}}">
-  <meta name="twitter:image" content="{{BASE_URL}}/og.png">
-  <meta name="twitter:image:alt" content="Craft by Aphrody, with previews of the PhotoCraft, FilmCraft and WordCraft studios">
-  <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48">
-  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="manifest" href="/site.webmanifest">
-  <link rel="describedby" type="text/markdown" href="/llms.txt">
-  <link rel="sitemap" type="application/xml" href="/sitemap.xml">
-  <link rel="stylesheet" href="/craft.css">
-  <script src="/craft.js" defer></script>
-  <script type="application/ld+json">{{JSON_LD}}</script>
-</head>
-<body>
-  <a class="skip" href="#studios">Skip to studios</a>
-  <header class="topbar wrap">
-    <a class="brand" href="/" aria-label="Craft home"><img src="/aphrody-icon.png" alt="" width="32" height="32">craft<span class="brand-by">by Aphrody</span></a>
-    <nav aria-label="Main navigation"><a href="#studios">The studios <span aria-hidden="true">↗</span></a><a href="#about">Made for making</a></nav>
-    <span class="edition">THE CREATIVE WORKSPACE</span>
-  </header>
-  <main>
-    <section class="hero wrap" aria-labelledby="hero-title">
-      <div class="hero-copy"><p class="eyebrow"><span class="spark" aria-hidden="true"></span> LESS FRICTION. MORE CREATION.</p>
-        <h1 id="hero-title">A space for<br>your <em>next idea.</em></h1>
-        <p class="intro">From the first sketch to the final frame.<br>A collection of focused studios for the things you make.</p>
-        <a class="primary" href="#studios">Find your studio <span aria-hidden="true">↗</span></a>
-        <p class="hero-note">Open a studio. Start creating. Right in your browser.</p>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="{{THEME_COLOR}}" />
+    <title>Craft by Aphrody: Sovereign Creative &amp; Office Suite in Your Browser</title>
+    <meta name="description" content="{{DESCRIPTION}}" />
+    <link rel="canonical" href="{{BASE_URL}}/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Craft by Aphrody" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:url" content="{{BASE_URL}}/" />
+    <meta property="og:title" content="Craft by Aphrody: Sovereign Creative &amp; Office Powerhouse" />
+    <meta property="og:description" content="{{DESCRIPTION}}" />
+    <meta property="og:image" content="{{BASE_URL}}/og.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Craft by Aphrody, sovereign creative &amp; office suite fusing Google Workspace, Microsoft 365, and Adobe Creative Cloud"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Craft by Aphrody: Sovereign Creative &amp; Office Powerhouse" />
+    <meta name="twitter:description" content="{{DESCRIPTION}}" />
+    <meta name="twitter:image" content="{{BASE_URL}}/og.png" />
+    <meta
+      name="twitter:image:alt"
+      content="Craft by Aphrody, sovereign creative &amp; office suite fusing Google Workspace, Microsoft 365, and Adobe Creative Cloud"
+    />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="describedby" type="text/markdown" href="/llms.txt" />
+    <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
+    <link rel="stylesheet" href="/craft.css" />
+    <script src="/craft.js" defer></script>
+    <script type="application/ld+json">
+      {{JSON_LD}}
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#studios">Skip to studios</a>
+
+    <!-- TOPBAR -->
+    <header class="topbar wrap">
+      <div class="brand-group">
+        <a class="brand" href="/" aria-label="Craft home">
+          <img class="brand-icon" src="/aphrody-icon.png" alt="Aphrody Crest" width="32" height="32" />
+          <span>craft</span>
+          <span class="brand-by">by Aphrody</span>
+        </a>
+        <button type="button" class="mascot-pill" title="Byron Love (Aphrodi) — Official Sovereign AI Mascot">
+          <img class="mascot-avatar" src="/byron-avatar.png" alt="Byron Love mascot portrait" width="22" height="22" />
+          <span class="mascot-text">Byron Love · Sovereign</span>
+        </button>
       </div>
-      <a class="feature" href="/photo/" aria-label="Open PhotoCraft, image editing studio">
-        <div class="feature-heading"><span>IN FOCUS / PHOTOCRAFT</span><span aria-hidden="true">↗</span></div>
-        <div class="feature-image"><img src="/previews/photo.jpg" width="1280" height="800" fetchpriority="high" alt="PhotoCraft image editing workspace"></div>
-        <div class="feature-caption"><span>Make room for a new perspective.</span><span class="feature-pill">Image editing</span></div>
-      </a>
-    </section>
-    <section class="studios wrap" id="studios" aria-labelledby="studio-title">
-      <div class="section-heading"><div><p class="eyebrow">YOUR TOOLKIT, REIMAGINED</p><h2 id="studio-title">One idea. Endless possibilities.</h2></div><p>Choose a craft.<br>Make it your own.</p></div>
-      <div class="tools">
-        <div class="filters" role="group" aria-label="Filter studios"><button type="button" data-filter="all" aria-pressed="true">All studios <span>{{COUNT}}</span></button><button type="button" data-filter="visual" aria-pressed="false">Design &amp; image</button><button type="button" data-filter="motion" aria-pressed="false">Video &amp; audio</button><button type="button" data-filter="work" aria-pressed="false">Documents &amp; data</button></div>
-        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg><span class="sr-only">Search studios</span><input type="search" placeholder="Find a studio…" autocomplete="off" id="studio-search"></label>
+
+      <nav aria-label="Main navigation">
+        <a href="#studios">The 14 Studios</a>
+        <a href="#simulator">WebGPU Simulator</a>
+        <a href="#parity-matrix">Ecosystem Parity</a>
+        <a href="#architecture">Architecture &amp; Privacy</a>
+      </nav>
+
+      <div class="topbar-actions">
+        <div class="telemetry-badge" title="No telemetry, no tracking, local-first storage">
+          <span class="telemetry-dot" aria-hidden="true"></span>
+          <span>Zero Telemetry · Pure WebGPU</span>
+        </div>
       </div>
-      <p class="sr-only" id="result-count" role="status" aria-live="polite" aria-atomic="true">{{COUNT}} studios available</p>
-      <div class="grid">{{CARDS}}</div>
-      <div class="empty" hidden><h3>No studios found</h3><p>Try another name or choose a different category.</p><button type="button" id="reset">Show all studios</button></div>
-    </section>
-    <section class="about wrap" id="about" aria-labelledby="about-title"><div><p class="eyebrow">MADE FOR MAKING</p><h2 id="about-title">Stay in your flow.</h2><p>Your tools should make space for your work.<br>Craft brings focused editors together, one studio at a time.</p></div><dl><div><dt>01 / A focused workspace</dt><dd>A dedicated studio for each kind of work. Nothing between you and your next step.</dd></div><div><dt>02 / Ready in your browser</dt><dd>Open the editor you need, without installing a desktop application.</dd></div><div><dt>03 / Room to explore</dt><dd>Move between image, motion, sound and documents as your ideas take shape.</dd></div></dl></section>
-  </main>
-  <footer class="wrap"><a class="brand" href="/">craft<span class="brand-by">by Aphrody</span></a><p>A little space. A lot of possibility.</p><a href="#hero-title">Back to top <span aria-hidden="true">↑</span></a></footer>
-</body>
+    </header>
+
+    <main>
+      <!-- HERO SECTION -->
+      <section class="hero wrap" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="eyebrow"><span class="eyebrow-spark" aria-hidden="true"></span> SOVEREIGN CREATIVE POWERHOUSE</p>
+          <h1 id="hero-title">
+            One Sovereign Suite.<br />
+            Google, Microsoft &amp; Adobe<br />
+            <em>United in Your Browser.</em>
+          </h1>
+          <p class="intro">
+            Fourteen precision creative and productivity studios powered by pure Rust WebAssembly and native WebGPU.
+            Zero cloud subscriptions, zero telemetry, zero friction. All your documents, media, and designs persist
+            locally in your browser's private vault.
+          </p>
+
+          <div class="hero-cta-row">
+            <a class="primary" href="#studios"> Explore the 14 Studios <span aria-hidden="true">↓</span> </a>
+            <a class="secondary-pill" href="#simulator">
+              Interactive WebGPU Simulator <span aria-hidden="true">⚡</span>
+            </a>
+          </div>
+
+          <div class="hero-stats-grid">
+            <div class="stat-pill">
+              <svg
+                class="stat-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <rect width="7" height="9" x="3" y="3" rx="1" />
+                <rect width="7" height="5" x="14" y="3" rx="1" />
+                <rect width="7" height="9" x="14" y="12" rx="1" />
+                <rect width="7" height="5" x="3" y="16" rx="1" />
+              </svg>
+              <span><strong>14 Studios</strong> (Office + Creative Parity)</span>
+            </div>
+            <div class="stat-pill">
+              <svg
+                class="stat-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="m13 2-2 10h8L7 22l2-10H1z" />
+              </svg>
+              <span><strong>Native WebGPU</strong> · 60/120 FPS Compute</span>
+            </div>
+            <div class="stat-pill">
+              <svg
+                class="stat-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4" />
+                <path d="M14 2v4a2 2 0 0 0 2 2h4" />
+                <path d="m3 15 2 2 4-4" />
+              </svg>
+              <span><strong>100% Local-First</strong> (Origin Private FS)</span>
+            </div>
+            <div class="stat-pill">
+              <svg
+                class="stat-icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                aria-hidden="true"
+              >
+                <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              <span><strong>0 Telemetry</strong> (Absolute Privacy)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIVE WEBGPU STUDIO SIMULATOR -->
+        <div class="simulator-window" id="simulator" aria-label="Interactive WebGPU Studio Simulator">
+          <div class="simulator-titlebar">
+            <div class="simulator-dots" aria-hidden="true">
+              <span class="dot-red"></span>
+              <span class="dot-yellow"></span>
+              <span class="dot-green"></span>
+            </div>
+            <div class="simulator-title" id="simulator-active-title">PhotoCraft · WebGPU Compute RAW Grading</div>
+            <div class="simulator-gpu-indicator">
+              <span>WebGPU WGSL</span>
+            </div>
+          </div>
+
+          <div class="simulator-canvas-container">
+            <canvas id="webgpu-hero-canvas" width="1280" height="720" aria-label="WebGPU Live Studio Preview"></canvas>
+            <div class="simulator-hud" aria-hidden="true">
+              <span class="hud-pill hud-fps" id="hud-fps">120 FPS · WGSL</span>
+              <span class="hud-pill" id="hud-pipeline">WebGPU Native (Hardware GPU)</span>
+            </div>
+          </div>
+
+          <div class="simulator-controls">
+            <div class="simulator-pill-group" role="group" aria-label="Simulator Studio Mode">
+              <button type="button" class="sim-btn" data-sim="photo" aria-pressed="true">PhotoCraft</button>
+              <button type="button" class="sim-btn" data-sim="word" aria-pressed="false">WordCraft</button>
+              <button type="button" class="sim-btn" data-sim="film" aria-pressed="false">FilmCraft</button>
+              <button type="button" class="sim-btn" data-sim="cad" aria-pressed="false">CADCraft</button>
+              <button type="button" class="sim-btn" data-sim="grid" aria-pressed="false">GridCraft</button>
+              <button type="button" class="sim-btn" data-sim="art" aria-pressed="false">ArtCraft</button>
+            </div>
+            <a class="simulator-launch-link" href="/photo/" target="_blank" rel="noopener">
+              Open Full Studio <span aria-hidden="true">↗</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- STUDIOS CATALOG -->
+      <section class="studios wrap" id="studios" aria-labelledby="studio-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-spark" aria-hidden="true"></span> THE SOVEREIGN TOOLKIT</p>
+            <h2 id="studio-title">Fourteen Studios. Total Ecosystem Parity.</h2>
+          </div>
+          <p class="section-desc">
+            Direct, open sovereign replacements for Google Workspace, Microsoft 365, and Adobe Creative Cloud. Click any
+            studio to inspect specifications or launch directly.
+          </p>
+        </div>
+
+        <!-- FLUENT RIBBON TOOLBAR -->
+        <div class="fluent-ribbon" role="toolbar" aria-label="Studio Filter &amp; Search Ribbon">
+          <div class="ribbon-top-row">
+            <div class="filters" role="group" aria-label="Filter studios by category">
+              <button type="button" class="filter-tab" data-filter="all" aria-pressed="true">
+                <span>All Studios</span>
+                <span class="tab-badge">{{COUNT}}</span>
+              </button>
+              <button type="button" class="filter-tab" data-filter="work" aria-pressed="false">
+                <span>Document &amp; Office</span>
+                <span class="tab-badge">4</span>
+              </button>
+              <button type="button" class="filter-tab" data-filter="visual" aria-pressed="false">
+                <span>Visual &amp; Graphic</span>
+                <span class="tab-badge">5</span>
+              </button>
+              <button type="button" class="filter-tab" data-filter="motion" aria-pressed="false">
+                <span>Motion, Audio &amp; 3D</span>
+                <span class="tab-badge">5</span>
+              </button>
+            </div>
+
+            <label class="ribbon-search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.3-4.3" />
+              </svg>
+              <span class="sr-only">Search studios</span>
+              <input
+                type="search"
+                placeholder="Search studios, tools, or parity tiers…"
+                autocomplete="off"
+                id="studio-search"
+              />
+              <kbd class="search-shortcut">/</kbd>
+            </label>
+          </div>
+
+          <div class="ribbon-command-pills">
+            <span class="command-pill command-pill-highlight">⚡ Native WebGPU Acceleration</span>
+            <span class="command-pill">🔒 100% Offline Local-First</span>
+            <span class="command-pill">🦀 Pure Rust WASM Engines</span>
+            <span class="command-pill">📁 Origin Private File System</span>
+            <span class="command-pill">🛡️ Zero Cloud Tracking</span>
+          </div>
+        </div>
+
+        <p class="sr-only" id="result-count" role="status" aria-live="polite" aria-atomic="true">
+          {{COUNT}} studios available
+        </p>
+
+        <!-- CARDS GRID -->
+        <div class="grid">{{CARDS}}</div>
+
+        <div class="empty" hidden>
+          <h3>No studios match your search</h3>
+          <p>Try searching for a different studio name, category, or parity tier.</p>
+          <button type="button" id="reset">Show all {{COUNT}} studios</button>
+        </div>
+      </section>
+
+      <!-- ECOSYSTEM PARITY COMPARISON MATRIX -->
+      <section class="parity-section wrap" id="parity-matrix" aria-labelledby="parity-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow"><span class="eyebrow-spark" aria-hidden="true"></span> SOVEREIGN PARITY MATRIX</p>
+            <h2 id="parity-title">The Suite That Replaces Them All.</h2>
+          </div>
+          <p class="section-desc">
+            Compare Craft against the three dominant cloud subscription ecosystems. Freedom from recurring costs,
+            invasive analytics, and cloud lock-in.
+          </p>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="parity-table" aria-label="Ecosystem Parity Comparison Matrix">
+            <thead>
+              <tr>
+                <th scope="col">Capability &amp; Scope</th>
+                <th scope="col" class="craft-col-head">Craft Sovereign Suite (Aphrody)</th>
+                <th scope="col">Google Workspace</th>
+                <th scope="col">Microsoft 365</th>
+                <th scope="col">Adobe Creative Cloud</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">
+                  <span class="feature-title">Ecosystem Coverage</span>
+                  <span class="feature-sub">Office, Design, Audio, Video &amp; CAD</span>
+                </th>
+                <td class="craft-col">
+                  <span class="badge-win">✓ All 14 Studios in 1 Suite</span>
+                </td>
+                <td>Docs, Sheets &amp; Slides only</td>
+                <td>Office Apps &amp; Basic Cloud</td>
+                <td>Creative Apps only (No Office)</td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <span class="feature-title">Monthly Subscription</span>
+                  <span class="feature-sub">Recurring cost per user</span>
+                </th>
+                <td class="craft-col">
+                  <span class="badge-win">$0 / Forever Free &amp; Sovereign</span>
+                </td>
+                <td class="badge-cloud">$6 – $18 / user / mo</td>
+                <td class="badge-cloud">$6 – $22 / user / mo</td>
+                <td class="badge-cloud">$60 – $90 / user / mo</td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <span class="feature-title">Telemetry &amp; Tracking</span>
+                  <span class="feature-sub">Data sent to corporate servers</span>
+                </th>
+                <td class="craft-col">
+                  <span class="badge-win">0 Bytes (Absolute Privacy)</span>
+                </td>
+                <td class="badge-warn">Pervasive Activity Analytics</td>
+                <td class="badge-warn">Diagnostic &amp; Usage Telemetry</td>
+                <td class="badge-warn">Continuous Analytics &amp; Training</td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <span class="feature-title">Runtime Architecture</span>
+                  <span class="feature-sub">Underlying execution engine</span>
+                </th>
+                <td class="craft-col">
+                  <span class="badge-win">Native WebGPU + Pure Rust WASM</span>
+                </td>
+                <td>JavaScript DOM &amp; Web Workers</td>
+                <td>Legacy Desktop / JS Web Apps</td>
+                <td>Heavy 20GB C++ Desktop Binaries</td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <span class="feature-title">Storage &amp; Data Lock-In</span>
+                  <span class="feature-sub">Where documents &amp; assets live</span>
+                </th>
+                <td class="craft-col">
+                  <span class="badge-win">Local OPFS &amp; Native File System</span>
+                </td>
+                <td class="badge-cloud">Google Drive Cloud Lock-In</td>
+                <td class="badge-cloud">OneDrive Cloud Lock-In</td>
+                <td class="badge-cloud">Creative Cloud Lock-In</td>
+              </tr>
+              <tr>
+                <th scope="row">
+                  <span class="feature-title">Sovereign Mascot &amp; AI</span>
+                  <span class="feature-sub">Intelligence layer</span>
+                </th>
+                <td class="craft-col">
+                  <span class="badge-win">Byron Love (Aphrodi) Sovereign</span>
+                </td>
+                <td>Gemini for Workspace</td>
+                <td>Microsoft Copilot 365</td>
+                <td>Adobe Firefly &amp; Sensei</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ARCHITECTURE PILLARS -->
+      <section class="about wrap" id="architecture" aria-labelledby="architecture-title">
+        <div class="about-header">
+          <p class="eyebrow"><span class="eyebrow-spark" aria-hidden="true"></span> SOVEREIGN ARCHITECTURE</p>
+          <h2 id="architecture-title">Engineered for Sovereign Performance.</h2>
+          <p class="section-desc">
+            No compromises on speed, privacy, or depth. Four foundational engineering pillars power every craft studio.
+          </p>
+        </div>
+
+        <div class="pillars-grid">
+          <div class="pillar-card">
+            <div class="pillar-num">01 / HARDWARE GPU</div>
+            <h3>Native WebGPU Compute</h3>
+            <p>
+              Direct hardware acceleration through WGSL compute and render pipelines. 60 and 120 FPS timeline playback,
+              real-time RAW grading, and sub-millisecond particle simulations.
+            </p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-num">02 / SYSTEMS CODE</div>
+            <h3>Pure Rust WebAssembly</h3>
+            <p>
+              Every studio's core kernel is written in memory-safe Rust and compiled straight to WebAssembly (.wasm).
+              Zero garbage collection pauses, instant calculation, and full deterministic speed.
+            </p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-num">03 / PRIVATE VAULT</div>
+            <h3>Origin Private File System</h3>
+            <p>
+              Your documents and gigapixel assets persist in your browser's private local storage (OPFS). Confidential
+              files never touch third-party cloud servers or leave your machine.
+            </p>
+          </div>
+
+          <div class="pillar-card">
+            <div class="pillar-num">04 / SOVEREIGN SPIRIT</div>
+            <h3>Byron Love (Aphrodi)</h3>
+            <p>
+              Guided by Byron Love, the sovereign AI mascot of Aphrody. A resolute commitment to beauty, uncompromising
+              craftsmanship, and true ownership over the tools you create with.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- STORYTELLER MODAL INSPECTOR DIALOG -->
+    <div
+      class="modal-backdrop"
+      id="storyteller-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="modal-title"
+    >
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <h2 id="modal-title">Studio Name</h2>
+            <span class="parity-badge" id="modal-parity-badge">Parity Tier</span>
+          </div>
+          <button type="button" class="modal-close-btn" id="modal-close-btn" aria-label="Close dialog">×</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="modal-preview-box">
+            <img id="modal-preview-img" src="/previews/photo.jpg" alt="Studio Preview" />
+          </div>
+
+          <div>
+            <p class="category-tag" id="modal-category">Category</p>
+            <p id="modal-summary" style="font-size: 14px; color: var(--muted); margin: 6px 0 0; line-height: 1.6">
+              Studio description.
+            </p>
+          </div>
+
+          <div class="modal-specs-grid" id="modal-specs-grid">
+            <!-- Populated dynamically via craft.js -->
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="secondary-pill" onclick="document.querySelector('#modal-close-btn').click()">
+            Close
+          </button>
+          <a class="primary" id="modal-launch-btn" href="#" target="_blank" rel="noopener">
+            Launch Studio <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="wrap">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="/aphrody-icon.png" alt="Aphrody Crest" width="28" height="28" />
+          <span>craft</span>
+          <span class="brand-by">by Aphrody</span>
+        </div>
+        <p class="footer-text">
+          Craft by Aphrody · Sovereign Creative &amp; Office Suite · Guided by Byron Love · Zero Telemetry · Pure WebGPU
+          &amp; Rust WASM.
+        </p>
+        <a class="footer-top-link" href="#hero-title">Back to top <span aria-hidden="true">↑</span></a>
+      </div>
+    </footer>
+  </body>
 </html>

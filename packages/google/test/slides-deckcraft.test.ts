@@ -50,9 +50,15 @@ describe("Google Slides export for DeckCraft", () => {
 
   test("does not export when there is no same-origin browser host", async () => {
     let exported = false;
-    const drive = { exportFile: async () => { exported = true; return new Response("x"); } };
-    await expect(openGoogleSlidesInDeckCraftFrame(drive, "id", { postMessage() {} }))
-      .rejects.toThrow("same-origin browser host");
+    const drive = {
+      exportFile: async () => {
+        exported = true;
+        return new Response("x");
+      },
+    };
+    await expect(openGoogleSlidesInDeckCraftFrame(drive, "id", { postMessage() {} })).rejects.toThrow(
+      "same-origin browser host",
+    );
     expect(exported).toBe(false);
   });
 
@@ -62,7 +68,11 @@ describe("Google Slides export for DeckCraft", () => {
     try {
       const drive = { exportFile: async () => new Response(new Uint8Array([0x50, 0x4b, 3, 4])) };
       let received: unknown;
-      const frame = { postMessage(message: unknown, origin: string) { received = { message, origin }; } };
+      const frame = {
+        postMessage(message: unknown, origin: string) {
+          received = { message, origin };
+        },
+      };
       await openGoogleSlidesInDeckCraftFrame(drive, "id", frame);
       expect(received).toEqual({
         origin: "https://example.test",
@@ -79,7 +89,9 @@ describe("Google Slides export for DeckCraft", () => {
     const frame = {} as Window;
     let ready = false;
     const waiting = waitForDeckCraftReady(frame, { host: host as unknown as Window, timeoutMs: 200 });
-    void waiting.then(() => { ready = true; });
+    void waiting.then(() => {
+      ready = true;
+    });
     const send = (origin: string, source: unknown) => {
       const event = Object.assign(new Event("message"), { origin, source, data: { type: "deckcraft:ready" } });
       host.dispatchEvent(event);
@@ -95,7 +107,8 @@ describe("Google Slides export for DeckCraft", () => {
 
   test("times out waiting for a silent editor", async () => {
     const host = Object.assign(new EventTarget(), { location: { origin: "https://example.test" } });
-    await expect(waitForDeckCraftReady({} as Window, { host: host as unknown as Window, timeoutMs: 5 }))
-      .rejects.toThrow("Timed out");
+    await expect(
+      waitForDeckCraftReady({} as Window, { host: host as unknown as Window, timeoutMs: 5 }),
+    ).rejects.toThrow("Timed out");
   });
 });

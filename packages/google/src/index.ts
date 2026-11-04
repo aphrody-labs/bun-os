@@ -40,3 +40,6 @@ export {
 } from "./credentials.ts";
 export { createAntigravityServices, type AntigravityServicesOptions, type AntigravityModel } from "./antigravity.ts";
 export * from "./gws.ts";
+export * from "./docs-wordcraft.ts";
+export * from "./slides-deckcraft.ts";
+

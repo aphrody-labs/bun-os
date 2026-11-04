@@ -4,8 +4,7 @@
  * subsequent editing is local and does not update the Google presentation. */
 import type { createGoogleServices } from "./services.ts";
 
-export const GOOGLE_SLIDES_PPTX =
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+export const GOOGLE_SLIDES_PPTX = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
 const MAX_EXPORT_BYTES = 10 * 1024 * 1024;
 
 export interface DeckCraftOpenBytes {
@@ -46,8 +45,14 @@ export function waitForDeckCraftReady(
         reject(new Error("DeckCraft failed to start"));
       }
     };
-    const onAbort = () => { cleanup(); reject(options.signal?.reason); };
-    const timer = setTimeout(() => { cleanup(); reject(new Error("Timed out waiting for DeckCraft")); }, timeoutMs);
+    const onAbort = () => {
+      cleanup();
+      reject(options.signal?.reason);
+    };
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("Timed out waiting for DeckCraft"));
+    }, timeoutMs);
     host.addEventListener("message", onMessage);
     options.signal?.addEventListener("abort", onAbort, { once: true });
   });

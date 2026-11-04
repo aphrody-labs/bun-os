@@ -4,15 +4,18 @@ import { generateChromium } from "./chromium.ts";
 import { generateCosmic } from "./cosmic.ts";
 import { generateGnome } from "./gnome.ts";
 import { generateHyprland } from "./hyprland.ts";
+import { generateIced } from "./iced.ts";
 import { generateWindows } from "./windows.ts";
 import { TARGETS, type GeneratedFile, type Target, type ThemeInput } from "./types.ts";
 
 const GENERATORS: Record<Target, (input: ThemeInput) => GeneratedFile[]> = {
   windows: generateWindows,
   gnome: generateGnome,
+  gtk: input => generateGnome(input).map(f => ({ ...f, target: "gtk" as Target })),
   cosmic: generateCosmic,
   chromium: generateChromium,
   hyprland: generateHyprland,
+  iced: generateIced,
 };
 
 /** Pure: build every file for the targets. Nothing is written. */

@@ -16,8 +16,7 @@ import { runGoogle } from "../src/cli.ts";
 
 const directories: string[] = [];
 afterEach(async () => {
-  for (const directory of directories.splice(0))
-    await rm(directory, { recursive: true, force: true });
+  for (const directory of directories.splice(0)) await rm(directory, { recursive: true, force: true });
 });
 
 async function destination() {
@@ -26,10 +25,7 @@ async function destination() {
   return join(directory, "document.docx");
 }
 
-function fakeDrive(
-  source: () => Readable,
-  called?: (params: { fileId: string; mimeType: string }) => void,
-) {
+function fakeDrive(source: () => Readable, called?: (params: { fileId: string; mimeType: string }) => void) {
   return {
     files: {
       export: async (params: { fileId: string; mimeType: string }) => {
@@ -68,9 +64,7 @@ describe("Google Docs export for WordCraft", () => {
     });
     expect(await Bun.file(path).json()).toEqual(snapshot);
     expect(result.bytes).toBe((await Bun.file(path).arrayBuffer()).byteLength);
-    await expect(
-      saveGoogleDocSnapshot(docs, "document-1", path),
-    ).rejects.toThrow();
+    await expect(saveGoogleDocSnapshot(docs, "document-1", path)).rejects.toThrow();
     expect(await Bun.file(path).json()).toEqual(snapshot);
   });
 
@@ -83,9 +77,7 @@ describe("Google Docs export for WordCraft", () => {
         },
       },
     } as unknown as docs_v1.Docs;
-    await expect(
-      saveGoogleDocSnapshot(docs, "document-1", path),
-    ).rejects.toThrow("offline");
+    await expect(saveGoogleDocSnapshot(docs, "document-1", path)).rejects.toThrow("offline");
     expect(await Bun.file(path).exists()).toBe(false);
   });
 
@@ -101,9 +93,7 @@ describe("Google Docs export for WordCraft", () => {
         ],
       },
     };
-    expect(googleDocSnapshotToWordCraftMarkdown(snapshot)).toBe(
-      "Local document\n",
-    );
+    expect(googleDocSnapshotToWordCraftMarkdown(snapshot)).toBe("Local document\n");
   });
 
   test("the Google CLI projects a saved snapshot offline and protects an existing output", async () => {
@@ -124,9 +114,7 @@ describe("Google Docs export for WordCraft", () => {
     );
     expect(await runGoogle(["docs", "project", snapshot, markdown])).toBe(0);
     expect(await Bun.file(markdown).text()).toBe("Offline\n");
-    await expect(
-      runGoogle(["docs", "project", snapshot, markdown]),
-    ).rejects.toThrow();
+    await expect(runGoogle(["docs", "project", snapshot, markdown])).rejects.toThrow();
     expect(await Bun.file(markdown).text()).toBe("Offline\n");
   });
 
@@ -140,9 +128,7 @@ describe("Google Docs export for WordCraft", () => {
       return { pid: 123, unref() {} };
     }) as typeof Bun.spawn);
     try {
-      expect(await runGoogle(["docs", "open", path, "--binary", binary])).toBe(
-        0,
-      );
+      expect(await runGoogle(["docs", "open", path, "--binary", binary])).toBe(0);
       expect(command).toEqual([binary, path]);
     } finally {
       spawn.mockRestore();
@@ -201,13 +187,8 @@ describe("Google Docs export for WordCraft", () => {
     const path = await destination();
     let request: { fileId: string; mimeType: string } | undefined;
     const drive = fakeDrive(
-      () =>
-        Readable.from([
-          Buffer.from([0x50]),
-          Buffer.from([0x4b, 0x03]),
-          Buffer.from([0x04, 0x61, 0x62]),
-        ]),
-      (value) => {
+      () => Readable.from([Buffer.from([0x50]), Buffer.from([0x4b, 0x03]), Buffer.from([0x04, 0x61, 0x62])]),
+      value => {
         request = value;
       },
     );
@@ -219,9 +200,7 @@ describe("Google Docs export for WordCraft", () => {
       fileId: "doc-123",
       mimeType: WORDCRAFT_DOCX_MIME,
     });
-    expect(await readFile(path)).toEqual(
-      Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x61, 0x62]),
-    );
+    expect(await readFile(path)).toEqual(Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x61, 0x62]));
   });
 
   test("rejects non-ZIP exports and removes the partial file", async () => {
@@ -261,9 +240,7 @@ describe("Google Docs export for WordCraft", () => {
       () => Readable.from([Buffer.alloc(32 * 1024 * 1024 + 1)]),
     ]) {
       const path = await destination();
-      await expect(
-        exportGoogleDocForWordCraft(fakeDrive(source), "id", path),
-      ).rejects.toThrow();
+      await expect(exportGoogleDocForWordCraft(fakeDrive(source), "id", path)).rejects.toThrow();
       expect(await Bun.file(path).exists()).toBe(false);
     }
   });

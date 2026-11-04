@@ -2,9 +2,9 @@
 import type { NativeThemeExport, NativeSchemeVariant } from "@aphrody/m3-tokens/native-theme";
 
 export type Mode = "light" | "dark";
-export type Target = "windows" | "gnome" | "cosmic" | "chromium" | "hyprland";
+export type Target = "windows" | "gnome" | "cosmic" | "chromium" | "hyprland" | "iced" | "gtk";
 export const TARGETS: readonly Target[] = ["windows", "gnome", "cosmic", "chromium"];
-export const ALL_TARGETS: readonly Target[] = ["windows", "gnome", "cosmic", "chromium", "hyprland"];
+export const ALL_TARGETS: readonly Target[] = ["windows", "gnome", "cosmic", "chromium", "hyprland", "iced", "gtk"];
 
 /** What the installer activates: a fixed mode, or follow the system (`auto`). */
 export type ActiveMode = Mode | "auto";

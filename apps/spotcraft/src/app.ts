@@ -20,6 +20,8 @@ const SVG_ICONS = {
   terminal: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>`,
   folder: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>`,
   browser: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
+  calc: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>`,
+  search: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y2="16.65"/></svg>`,
 };
 
 // Seed local files database simulator when running in browser or headless mode
@@ -73,6 +75,19 @@ const SEED_LOCAL_FILES: SearchResultItem[] = [
     action: () => console.log("Launched: Navigateur Chromium"),
   },
 ];
+
+async function dispatchWgaAction(uri: string) {
+  console.log(`[Spotcraft WGA] Dispatching action: ${uri}`);
+  try {
+    await fetch("/api/action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uri }),
+    });
+  } catch (e) {
+    console.warn("WGA action dispatch fallback:", e);
+  }
+}
 
 export class SpotcraftApp {
   private activeIndex: number = 0;
@@ -138,12 +153,12 @@ export class SpotcraftApp {
     document.getElementById("btn-spotlight")?.addEventListener("click", () => this.openSpotlight());
   }
 
-  public handleSearch(query: string) {
+  public async handleSearch(query: string) {
     const q = query.trim().toLowerCase();
     this.activeIndex = 0;
 
     if (!q) {
-      this.renderDefaultResults();
+      await this.renderDefaultResults();
       return;
     }
 
@@ -158,7 +173,7 @@ export class SpotcraftApp {
               title: `= ${val}`,
               subtitle: `Expression result for "${query}" (Press Enter to copy)`,
               type: "calc",
-              icon: "🧮",
+              icon: SVG_ICONS.calc,
               action: () => {
                 navigator.clipboard.writeText(String(val));
                 alert(`Copied ${val} to clipboard`);
@@ -173,7 +188,58 @@ export class SpotcraftApp {
       }
     }
 
-    // Filter local files and apps
+    // Try clean-room WGA suggestions endpoint first
+    try {
+      const resp = await fetch(`/api/suggestions?q=${encodeURIComponent(query)}`);
+      if (resp.ok) {
+        const suggestions: Array<{
+          title: string;
+          subtitle: string;
+          suggestion_type: string;
+          action_target: string;
+          score: number;
+        }> = await resp.json();
+
+        if (suggestions && suggestions.length > 0) {
+          this.results = suggestions.map((s, idx) => {
+            let icon = SVG_ICONS.file;
+            let type: "file" | "app" | "calc" | "web" | "action" = "file";
+            if (s.suggestion_type === "local_app") {
+              type = "app";
+              icon = SVG_ICONS.terminal;
+            } else if (s.suggestion_type === "web_search") {
+              type = "web";
+              icon = SVG_ICONS.search;
+            } else if (s.title.endsWith(".rs")) {
+              icon = SVG_ICONS.rust;
+            } else if (s.title.endsWith(".db")) {
+              icon = SVG_ICONS.db;
+            }
+
+            return {
+              id: `wga-${idx}`,
+              title: s.title,
+              subtitle: s.subtitle,
+              type,
+              icon,
+              action: () => {
+                if (type === "web") {
+                  window.open(`https://aphrody.com/search?q=${encodeURIComponent(query)}`, "_blank");
+                } else {
+                  dispatchWgaAction(s.action_target);
+                }
+              },
+            };
+          });
+          this.renderResults();
+          return;
+        }
+      }
+    } catch {
+      // Fall through to local fallback
+    }
+
+    // Filter local files and apps fallback
     let matches = SEED_LOCAL_FILES.filter(item => {
       if (this.currentFilter !== "all" && item.type !== this.currentFilter) {
         return false;
@@ -187,7 +253,7 @@ export class SpotcraftApp {
       title: `Search "${query}"`,
       subtitle: "Search web in browser",
       type: "web",
-      icon: "🔍",
+      icon: SVG_ICONS.search,
       action: () => {
         window.open(`https://aphrody.com/search?q=${encodeURIComponent(query)}`, "_blank");
       },
@@ -197,7 +263,27 @@ export class SpotcraftApp {
     this.renderResults();
   }
 
-  private renderDefaultResults() {
+  private async renderDefaultResults() {
+    try {
+      const resp = await fetch("/api/suggestions");
+      if (resp.ok) {
+        const apps = await resp.json();
+        if (Array.isArray(apps) && apps.length > 0) {
+          this.results = apps.map((s, idx) => ({
+            id: `app-${idx}`,
+            title: s.title,
+            subtitle: s.subtitle,
+            type: "app",
+            icon: SVG_ICONS.terminal,
+            action: () => dispatchWgaAction(s.action_target),
+          }));
+          this.renderResults();
+          return;
+        }
+      }
+    } catch {
+      // Ignore
+    }
     this.results = SEED_LOCAL_FILES.filter(item => this.currentFilter === "all" || item.type === this.currentFilter);
     this.renderResults();
   }

@@ -313,6 +313,23 @@ export function installCommand(
           `mkdir -p ~/.config/hypr/themes ~/.config/waybar/themes ~/.config/fuzzel/themes && cp -r "${dir}"/* ~/.config/`,
         ],
       };
+    case "gtk":
+      if (platform !== "linux") return { cmd: [], reason: "needs a Linux GTK session" };
+      return {
+        cmd: [
+          "bash",
+          join(dir, "install-gnome.sh"),
+          "--mode",
+          mode,
+          ...(icons && !uninstall ? ["--icons", icons] : []),
+          ...(uninstall ? ["--uninstall"] : []),
+        ],
+      };
+    case "iced":
+      return {
+        cmd: [],
+        reason: "copy iced/themes/*.ron into your Iced application directory or COSMIC config",
+      };
   }
 }
 

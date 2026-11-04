@@ -14,45 +14,27 @@ const usage = `Usage: yolo google docs <command>
   export <document-id> <new-file.docx> Export a selected Google Doc to WordCraft via Drive
   open <document> [--binary <wordcraft>] Open a local document in the WordCraft desktop editor`;
 
-export async function runDocsWordCraftCli(
-  args: readonly string[],
-): Promise<number> {
+export async function runDocsWordCraftCli(args: readonly string[]): Promise<number> {
   const [action, input, output] = args;
-  if (
-    args.length === 0 ||
-    action === "--help" ||
-    action === "-h" ||
-    action === "help"
-  ) {
+  if (args.length === 0 || action === "--help" || action === "-h" || action === "help") {
     console.log(usage);
     return args.length ? 0 : 2;
   }
   if (action === "open") {
-    if (
-      !input ||
-      (args.length !== 2 &&
-        (args.length !== 4 || output !== "--binary" || !args[3]))
-    ) {
+    if (!input || (args.length !== 2 && (args.length !== 4 || output !== "--binary" || !args[3]))) {
       console.error(usage);
       return 2;
     }
     const document = resolve(input);
-    if (!(await Bun.file(document).exists()))
-      throw new Error("Local document does not exist");
-    const binary =
-      args.length === 4 ? resolve(args[3]!) : Bun.which("wordcraft");
-    if (!binary)
-      throw new Error(
-        "WordCraft is not installed or not in PATH; provide --binary",
-      );
+    if (!(await Bun.file(document).exists())) throw new Error("Local document does not exist");
+    const binary = args.length === 4 ? resolve(args[3]!) : Bun.which("wordcraft");
+    if (!binary) throw new Error("WordCraft is not installed or not in PATH; provide --binary");
     const child = Bun.spawn([binary, document], {
       stdout: "ignore",
       stderr: "ignore",
     });
     child.unref();
-    console.log(
-      `Started WordCraft for ${document} (PID ${child.pid}); check the editor for open errors.`,
-    );
+    console.log(`Started WordCraft for ${document} (PID ${child.pid}); check the editor for open errors.`);
     return 0;
   }
   if (
@@ -79,20 +61,16 @@ export async function runDocsWordCraftCli(
     console.log(`Saved ${result.bytes} bytes to ${result.path}`);
     return 0;
   }
-  if (!path.toLowerCase().endsWith(".md"))
-    throw new Error("Projection destination must end in .md");
+  if (!path.toLowerCase().endsWith(".md")) throw new Error("Projection destination must end in .md");
   const source = Bun.file(resolve(input));
-  if (!(await source.exists()) || source.size > 32 * 1024 * 1024)
-    throw new Error("Snapshot missing or exceeds 32 MiB");
+  if (!(await source.exists()) || source.size > 32 * 1024 * 1024) throw new Error("Snapshot missing or exceeds 32 MiB");
   const snapshot: unknown = await source.json();
   if (!snapshot || typeof snapshot !== "object" || Array.isArray(snapshot))
     throw new Error("Snapshot must contain a Docs API body or tabs");
   const document = snapshot as { body?: { content?: unknown }; tabs?: unknown };
   if (!Array.isArray(document.body?.content) && !Array.isArray(document.tabs))
     throw new Error("Snapshot must contain a Docs API body or tabs");
-  const markdown = googleDocSnapshotToWordCraftMarkdown(
-    snapshot as NativeDocument,
-  );
+  const markdown = googleDocSnapshotToWordCraftMarkdown(snapshot as NativeDocument);
   const file = await open(path, "wx", 0o600);
   try {
     await file.writeFile(markdown, "utf8");

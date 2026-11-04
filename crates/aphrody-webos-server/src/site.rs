@@ -19,13 +19,12 @@ use crate::{API, AppState};
 pub const ORIGIN: &str = "https://aphrody.com";
 pub const NAME: &str = "Aphrody";
 pub const SHORT_NAME: &str = "Aphrody";
-pub const DESCRIPTION: &str = "Bun OS in your browser: the COSMIC desktop with Android apps, Redox, Wine and Proton, \
-streamed from Bun OS and drawn by a Rust WebAssembly client on WebGPU.";
+pub const DESCRIPTION: &str = "The calm, divine operating system. Fluid creative canvas, ambient multimodal intelligence, and Byron Love.";
 /// Subtitle of the site card: short enough for three lines.
 const TAGLINE: &str =
-    "COSMIC with Android apps, Redox, Wine and Proton, streamed from Bun OS to any tab.";
-const THEME: &str = "#17130b"; // M3 dark surface of SEED
-const ACCENT: &str = "#f5c451";
+    "The calm, divine operating system. Fluid creative canvas, ambient multimodal intelligence.";
+const THEME: &str = "#0f141c"; // Gemini celestial dark surface
+const ACCENT: &str = "#8ab4f8"; // Gemini Light Blue
 /// Inter Bold (SIL Open Font License 1.1, assets/effectcraft/fonts), the only font the share images use.
 const FONT: &[u8] = include_bytes!("../../../assets/effectcraft/fonts/Inter-Bold.ttf");
 /// Public pages listed in the sitemap: (path, change frequency, priority).
@@ -47,6 +46,10 @@ const ICONS: &[(&str, &[u8])] = &[
 ];
 /// Portrait drawn on the share card.
 const CARD_ICON: &[u8] = include_bytes!("../../aphrody-identity/assets/brand/icon-256.png");
+/// Fullbody artwork of Byron Love (Aphrodi), sovereign mascot and logo of Aphrody.
+const BYRON_FULLBODY: &[u8] = include_bytes!("../../aphrody-identity/assets/logo/source/byron_r0_fullbody.png");
+/// Canonical portrait in lossless WebP.
+const BYRON_PORTRAIT: &[u8] = include_bytes!("../../aphrody-identity/assets/logo/aphrody.webp");
 /// Idle track of the pet (atlas row 0: six 192x208 cells), extracted from assets/aphrody/sprites/spritesheet.png.
 const PET_IDLE: &[u8] = include_bytes!("../../aphrody-identity/assets/aphrody/sprites/idle.webp");
 
@@ -104,7 +107,7 @@ fn card(title: &str, subtitle: &str) -> String {
     let icon = base64::engine::general_purpose::STANDARD.encode(CARD_ICON);
     format!(
         r##"<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-<defs><radialGradient id="bg" cx="0.85" cy="0.1" r="1"><stop offset="0" stop-color="#2b2416"/><stop offset="0.6" stop-color="{THEME}"/></radialGradient></defs>
+<defs><radialGradient id="bg" cx="0.85" cy="0.1" r="1"><stop offset="0" stop-color="#142034"/><stop offset="0.6" stop-color="{THEME}"/></radialGradient></defs>
 <rect width="1200" height="630" fill="url(#bg)"/>
 <rect x="0" y="618" width="1200" height="12" fill="{ACCENT}"/>
 <image x="80" y="80" width="128" height="128" href="data:image/png;base64,{icon}"/>
@@ -313,6 +316,14 @@ async fn apple_touch_icon() -> Response {
     icon(Path("apple-touch-icon.png".into())).await
 }
 
+async fn byron_png() -> Response {
+    bytes("image/png", DAY, BYRON_FULLBODY.to_vec())
+}
+
+async fn byron_webp() -> Response {
+    bytes("image/webp", DAY, BYRON_PORTRAIT.to_vec())
+}
+
 #[derive(Deserialize)]
 struct CardQuery {
     title: Option<String>,
@@ -403,8 +414,8 @@ self.addEventListener("message", (event) => {{
         .into_response()
 }
 
-/// Source colour of the aphrody.com scheme (the bun of the mark); every colour on the pages is an M3 role of it.
-const SEED: u32 = 0xFFF5_C451;
+/// Source colour of the aphrody.com scheme (Gemini brand blue #3186ff); every colour on the pages is an M3 role of it.
+const SEED: u32 = aphrody_m3_tokens::gemini_brand::GEMINI_BLUE;
 const SITE_CSS: &str = include_str!("site.css");
 
 /// M3 light and dark schemes generated from `SEED` by aphrody-m3-tokens, its static tokens (shape, type, motion,
@@ -574,6 +585,8 @@ pub fn router(state: Arc<AppState>) -> Router {
         .route("/apple-touch-icon.png", get(apple_touch_icon))
         .route("/icons/{name}", get(icon))
         .route("/pet-idle.webp", get(pet_idle))
+        .route("/byron.png", get(byron_png))
+        .route("/byron.webp", get(byron_webp))
         .route("/og.png", get(og))
         .route("/sw.js", get(service_worker))
         .route("/site.js", get(site_js))
@@ -602,6 +615,8 @@ mod tests {
         assert_eq!(&FAVICON_ICO[..4], &[0, 0, 1, 0]);
         assert!(ICON_SVG.starts_with(b"<svg") || ICON_SVG.starts_with(b"<?xml"));
         assert_eq!(&PET_IDLE[8..12], b"WEBP");
+        assert_eq!(&BYRON_FULLBODY[1..4], b"PNG");
+        assert_eq!(&BYRON_PORTRAIT[8..12], b"WEBP");
     }
 
     #[test]

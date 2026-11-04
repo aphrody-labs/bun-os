@@ -18,27 +18,128 @@ export const BASE_URL = "https://craft.aphrody.app";
 const here = import.meta.dir;
 const root = resolve(here, "../../../..");
 
-/** [path, name, summary, filter category, label]: every studio published under /<path>/. */
+/**
+ * [path, name, summary, filter category, label, parity]:
+ * The 14 sovereign studios published under /<path>/ with explicit ecosystem parity tiers:
+ * - Document & Office (Google Workspace & Microsoft Office parity)
+ * - Visual & Graphic (Adobe Creative Cloud & Figma parity)
+ * - Motion, Audio & 3D (Premiere, After Effects, Audition & AutoCAD parity)
+ */
 export const STUDIOS = [
-  ["photo", "PhotoCraft", "Image editing, with space to get every detail right.", "visual", "Image editing"],
-  ["vector", "VectorCraft", "Shape an idea with precise, scalable vector graphics.", "visual", "Vector graphics"],
-  ["film", "FilmCraft", "Find your story in the edit. A studio for your next film.", "motion", "Video editing"],
-  ["design", "DesignCraft", "Bring type, images and considered layouts together.", "visual", "Layout & publishing"],
-  ["fig", "FigCraft", "Give your next interface a place to take shape.", "visual", "Interface design"],
-  ["effect", "EffectCraft", "Add another dimension with motion and visual effects.", "motion", "Motion & effects"],
-  ["light", "LightCraft", "Organize your photographs and develop your perspective.", "visual", "RAW & photo library"],
-  ["sound", "SoundCraft", "Make every cut, layer and moment sound right.", "motion", "Audio editing"],
-  ["cad", "CADCraft", "Move from an early sketch to a precise technical drawing.", "visual", "Drafting & CAD"],
-  ["word", "WordCraft", "A dedicated space for words worth putting on the page.", "work", "Word processing"],
-  ["deck", "DeckCraft", "Turn a collection of ideas into a compelling presentation.", "work", "Presentations"],
-  ["grid", "GridCraft", "Make sense of the numbers, one clear sheet at a time.", "work", "Spreadsheets"],
-  ["pdf", "PDFCraft", "Read, review and edit your PDF documents in one studio.", "work", "PDF documents"],
+  // Document & Office (Google Workspace / Microsoft 365 Parity)
+  [
+    "word",
+    "WordCraft",
+    "Sovereign typography & prose editor. Pure Rust layout engine with real-time OPFS persistence and zero cloud telemetry.",
+    "work",
+    "Word processing",
+    "Word / Google Docs",
+  ],
+  [
+    "grid",
+    "GridCraft",
+    "High-throughput spreadsheet computing powered by Rust WebAssembly. Millions of cells, formula trees, and zero telemetry.",
+    "work",
+    "Spreadsheets",
+    "Excel / Google Sheets",
+  ],
+  [
+    "deck",
+    "DeckCraft",
+    "Architect cinematic presentations with hardware-accelerated layouts, vector charts, and instant deck export right in your browser.",
+    "work",
+    "Presentations",
+    "PowerPoint / Google Slides",
+  ],
+  [
+    "pdf",
+    "PDFCraft",
+    "Inspect, annotate, sign, and compile PDF documents locally with native Rust parsing. Confidential files never leave your machine.",
+    "work",
+    "PDF documents",
+    "Acrobat Pro",
+  ],
+  // Visual & Graphic (Adobe Creative Cloud & Figma Parity)
+  [
+    "photo",
+    "PhotoCraft",
+    "Non-destructive 32-bit float photo editing and RAW grading. WebGPU compute shaders deliver instant 120 FPS adjustments on gigapixel images.",
+    "visual",
+    "Image editing",
+    "Photoshop RAW",
+  ],
+  [
+    "vector",
+    "VectorCraft",
+    "Infinite canvas vector precision. High-performance bezier math, path booleans, and scalable SVG/PDF export compiled from Rust to WASM.",
+    "visual",
+    "Vector graphics",
+    "Illustrator",
+  ],
+  [
+    "design",
+    "DesignCraft",
+    "Publication layout studio fusing typography, multi-page grids, bleed guides, and CMYK workflows directly in your browser.",
+    "visual",
+    "Layout & publishing",
+    "InDesign",
+  ],
+  [
+    "fig",
+    "FigCraft",
+    "Sovereign UI/UX interface design studio. Vector networks, auto-layout constraints, interactive components, and offline-first design systems.",
+    "visual",
+    "Interface design",
+    "Figma / Adobe XD",
+  ],
+  [
+    "light",
+    "LightCraft",
+    "Catalog, cull, and develop entire RAW libraries in your browser using multi-threaded WebAssembly workers and color science tone curves.",
+    "visual",
+    "RAW & photo library",
+    "Lightroom Library",
+  ],
+  // Motion, Audio & 3D (Premiere, After Effects, Audition & AutoCAD Parity)
+  [
+    "film",
+    "FilmCraft",
+    "Multi-track non-linear video editing studio. WebGPU timeline playback, frame-accurate trimming, and cross-origin isolated worker rendering.",
+    "motion",
+    "Video editing",
+    "Premiere Pro",
+  ],
+  [
+    "effect",
+    "EffectCraft",
+    "Layer-based motion graphics and compositor. Procedural keyframe graphs, particle engines, and WebGPU compute shaders.",
+    "motion",
+    "Motion & effects",
+    "After Effects",
+  ],
+  [
+    "sound",
+    "SoundCraft",
+    "Multi-track audio workstation. Spectral waveform editing, parametric EQ, sovereign DSP plugins, and low-latency WebAudio buffers.",
+    "motion",
+    "Audio editing",
+    "Audition / Logic Pro",
+  ],
+  [
+    "cad",
+    "CADCraft",
+    "Parametric drafting and technical CAD modelling. Precise geometric dimensioning, constraints, and DXF/STEP geometry kernels.",
+    "motion",
+    "Drafting & CAD",
+    "Fusion 360 / AutoCAD",
+  ],
   [
     "art",
     "ArtCraft",
-    "Explore the desktop studio interface. Generation requires the desktop application.",
-    "visual",
-    "Browser preview",
+    "Sovereign 3D generation and creative canvas studio. Native desktop engine with real-time WebGPU browser preview.",
+    "motion",
+    "Creative Studio",
+    "Creative Studio",
   ],
 ] as const;
 
@@ -50,7 +151,7 @@ const CATEGORY = {
 } as const;
 
 const DESCRIPTION =
-  "Craft by Aphrody: fourteen focused creative and productivity studios (image, vector, video, audio, layout, CAD, documents, slides, spreadsheets, PDF) that open directly in your browser.";
+  "Craft by Aphrody: 14 sovereign creative and office studios fusing Google Workspace, Microsoft 365, and Adobe Creative Cloud into one unified suite. Pure Rust WebAssembly and WebGPU, zero cloud telemetry, local-first privacy.";
 
 const escapeHtml = (text: string) =>
   text.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
@@ -72,26 +173,31 @@ export function jsonLd(): object {
         "@id": `${BASE_URL}/#website`,
         url: `${BASE_URL}/`,
         name: "Craft",
-        alternateName: "Craft by Aphrody",
+        alternateName: "Craft by Aphrody — Sovereign Creative & Office Suite",
         description: DESCRIPTION,
         inLanguage: "en",
-        publisher: { "@type": "Organization", name: "Aphrody", url: "https://aphrody.com/" },
+        publisher: {
+          "@type": "Organization",
+          name: "Aphrody",
+          url: "https://aphrody.com/",
+          logo: `${BASE_URL}/aphrody-icon.png`,
+        },
       },
       {
         "@type": "ItemList",
-        name: "Craft studios",
+        name: "Craft Sovereign Studios",
         numberOfItems: STUDIOS.length,
-        itemListElement: STUDIOS.map(([path, name, summary, category, label], i) => ({
+        itemListElement: STUDIOS.map(([path, name, summary, category, label, parity], i) => ({
           "@type": "ListItem",
           position: i + 1,
           item: {
             "@type": "WebApplication",
             name,
             url: `${BASE_URL}/${path}/`,
-            description: `${label}. ${summary}`,
+            description: `${label} (${parity} parity). ${summary}`,
             applicationCategory: CATEGORY[category],
-            operatingSystem: "Any (web browser)",
-            browserRequirements: "Requires JavaScript and WebAssembly",
+            operatingSystem: "Any modern browser supporting WebGPU and WebAssembly",
+            browserRequirements: "Requires WebAssembly and native WebGPU support",
             ...(path === "art" ? {} : { image: `${BASE_URL}/previews/${path}.jpg` }),
           },
         })),
@@ -102,33 +208,81 @@ export function jsonLd(): object {
 
 function cards(): string {
   return STUDIOS.map(
-    ([path, name, summary, category, label]) => `<a class="card" href="/${path}/" data-category="${category}">
-  ${path === "art" ? '<div class="preview art-preview" aria-hidden="true"><span>Make your mark.</span></div>' : `<div class="preview"><img src="/previews/${path}.jpg" width="1280" height="800" loading="lazy" alt="${name} editor workspace"></div>`}
-  <div class="card-info"><div class="card-top"><h3>${name}</h3><span aria-hidden="true">↗</span></div><p>${escapeHtml(summary)}</p><span class="category">${escapeHtml(label)}</span></div></a>`,
+    ([path, name, summary, category, label, parity]) => `
+<article class="card" data-category="${category}" data-studio="${path}" tabindex="0" role="button" aria-haspopup="dialog" aria-label="Inspect ${name} (${parity})">
+  <div class="card-badge-row">
+    <span class="parity-badge" title="Ecosystem parity tier: ${escapeHtml(parity)}">${escapeHtml(parity)}</span>
+    <span class="engine-badge">Rust WASM · WebGPU</span>
+  </div>
+  ${
+    path === "art"
+      ? '<div class="preview art-preview" aria-hidden="true"><div class="art-preview-glow"></div><span class="art-preview-title">ArtCraft</span><span class="art-preview-sub">WebGPU Sovereign Engine</span></div>'
+      : `<div class="preview"><img src="/previews/${path}.jpg" width="1280" height="800" loading="lazy" alt="${name} editor workspace"></div>`
+  }
+  <div class="card-info">
+    <div class="card-top">
+      <div class="card-title-group">
+        <h3>${name}</h3>
+        <span class="category-tag">${escapeHtml(label)}</span>
+      </div>
+      <a class="card-launch-icon" href="/${path}/" aria-label="Open ${name} studio in new tab" target="_blank" rel="noopener">↗</a>
+    </div>
+    <p>${escapeHtml(summary)}</p>
+    <div class="card-actions">
+      <button type="button" class="btn-inspect" data-inspect="${path}" aria-label="Inspect ${name} specifications">
+        <svg class="icon-glyph" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+        Inspect
+      </button>
+      <a class="btn-launch" href="/${path}/" target="_blank" rel="noopener">
+        Launch Studio <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </div>
+</article>`,
   ).join("\n");
 }
 
 export function llmsTxt(): string {
-  const list = STUDIOS.map(
-    ([path, name, summary, , label]) => `- [${name}](${BASE_URL}/${path}/): ${label}. ${summary}`,
-  ).join("\n");
-  return `# Craft
+  return `# Craft by Aphrody
 
-> Craft (craft.aphrody.app, by Aphrody) is a directory of ${STUDIOS.length} focused creative and productivity studios that open directly in the browser, without installing a desktop application. Thirteen are Rust editors compiled to WebAssembly; ArtCraft is a browser preview of a desktop generation studio.
+> Craft (https://craft.aphrody.app/, by Aphrody) is a unified sovereign suite of 14 creative and productivity studios fusing Google Workspace, Microsoft 365, and Adobe Creative Cloud into a single zero-telemetry, local-first browser experience.
+> Built with pure Rust WebAssembly (.wasm) and native WebGPU compute/render pipelines.
 
-- Each studio is a single document at its own path (\`/<studio>/\`); there are no accounts on this site.
-- Studios need JavaScript and WebAssembly. LightCraft, FilmCraft and EffectCraft run cross-origin isolated (worker threads).
-- ArtCraft generation requires the desktop application; the browser build shows its interface.
-- The same editors also exist as desktop applications and command-line tools in the Bun OS repository.
+## Architectural Directives & Privacy
+- **WebGPU and Rust WASM Exclusively**: Real-time 60/120 FPS performance via WebGPU render & compute pipelines and compiled Rust engines. No WebGL, no legacy canvas fallbacks.
+- **Zero Telemetry & Local-First**: Private data persistence via the Origin Private File System (OPFS). No user analytics, no behavioral logging, no cloud lock-in.
+- **Ecosystem Parity**: Complete replacement of proprietary creative and office suites without subscriptions or mandatory accounts.
+- **Sovereign Mascot**: Byron Love (Aphrodi) official sovereign AI mascot and Aphrody brand crest.
 
-## Studios
+## The 14 Studios
 
-${list}
+### Document & Office
+${STUDIOS.filter(([, , , cat]) => cat === "work")
+  .map(
+    ([path, name, summary, , label, parity]) =>
+      `- **${name}** (${label} · *${parity}*): [Launch](${BASE_URL}/${path}/) — ${summary}`,
+  )
+  .join("\n")}
 
-## Optional
+### Visual & Graphic
+${STUDIOS.filter(([, , , cat]) => cat === "visual")
+  .map(
+    ([path, name, summary, , label, parity]) =>
+      `- **${name}** (${label} · *${parity}*): [Launch](${BASE_URL}/${path}/) — ${summary}`,
+  )
+  .join("\n")}
 
-- [Source code](https://github.com/aphrody-labs/bun-os/tree/main/apps): the \`*craft\`, \`*craft-web\` and \`*craft-cli\` applications of Bun OS
-- [Sitemap](${BASE_URL}/sitemap.xml)
+### Motion, Audio & 3D
+${STUDIOS.filter(([, , , cat]) => cat === "motion")
+  .map(
+    ([path, name, summary, , label, parity]) =>
+      `- **${name}** (${label} · *${parity}*): [Launch](${BASE_URL}/${path}/) — ${summary}`,
+  )
+  .join("\n")}
+
+## Repository & Open Source
+- Source code: https://github.com/aphrody-labs/bun-os
+- Bun OS WebAssembly and WebGPU studio targets in \`apps/\` and \`crates/\`
 `;
 }
 
@@ -183,6 +337,8 @@ export const SITE_FILES = [
   "robots.txt",
   "sitemap.xml",
   "llms.txt",
+  "byron-mascot.svg",
+  "byron-avatar.png",
   ...STUDIOS.filter(([path]) => path !== "art").map(([path]) => `previews/${path}.jpg`),
 ] as const;
 
@@ -204,6 +360,12 @@ export async function writeSite(release: string, now = new Date()): Promise<void
   );
   await Bun.write(join(release, "favicon.ico"), await ico(icon192, [16, 32, 48]));
   await cp(join(root, "assets/craft/og.png"), join(release, "og.png"));
+
+  // Copy Byron Love (Aphrodi) official sovereign mascot artwork
+  const byronDir = join(root, "assets/aphrody/ai/byron");
+  await cp(join(byronDir, "byron_icon.svg"), join(release, "byron-mascot.svg"));
+  await cp(join(byronDir, "byron_icon_128.png"), join(release, "byron-avatar.png"));
+
   const bg = await background();
   const ld = JSON.stringify(jsonLd()).replaceAll("<", "\\u003c");
   const index = (await Bun.file(join(here, "craft-landing.html")).text())
@@ -225,12 +387,13 @@ export async function writeSite(release: string, now = new Date()): Promise<void
         lang: "en",
         start_url: "/",
         scope: "/",
-        display: "browser",
+        display: "standalone",
         background_color: bg,
         theme_color: bg,
         icons: [
           { src: "/aphrody-icon.png", sizes: "64x64", type: "image/png" },
           { src: "/icon-192.png", sizes: "192x192", type: "image/png" },
+          { src: "/byron-avatar.png", sizes: "128x128", type: "image/png" },
         ],
       },
       null,

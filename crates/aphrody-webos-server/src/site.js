@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 // aphrody.com page services (served at /site.js by crates/aphrody-webos-server/src/site.rs):
 // storage notice, service worker, install prompt, share dialogs, WebGPU probe, theme switcher,
-// ambient soundscape player, and WebOS desktop mode launcher.
+// ambient soundscape player, interactive celestial canvas, video showcase player, and WebOS launcher.
 
 const KEY = "aphrody.storage"; // "functional" | "essential"
 const choice = () => {
@@ -165,30 +165,411 @@ function exitDesktopMode() {
   if (canvas) canvas.style.display = "none";
 }
 
-// Interactive Laptop Viewport Switcher
-function initLaptopTabs() {
-  const tabs = document.querySelectorAll(".laptop-tabs .tab-btn");
-  const screen = document.getElementById("laptop-screen");
-  if (!tabs.length || !screen) return;
-  tabs.forEach(tab => {
-    tab.addEventListener("click", () => {
-      tabs.forEach(t => {
-        t.classList.remove("active");
-        t.setAttribute("aria-selected", "false");
-      });
-      tab.classList.add("active");
-      tab.setAttribute("aria-selected", "true");
-      const targetView = tab.dataset.tab;
-      screen.dataset.view = targetView;
-      const views = screen.querySelectorAll(".screen-view");
-      views.forEach(v => {
-        v.classList.toggle("active", v.classList.contains(`view-${targetView}`));
-      });
-    });
+// Interactive Celestial Canvas with responsive particles, cursor attraction, and radiant light blue glow
+function initCelestialCanvas() {
+  const canvas = document.getElementById("celestial-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let width = (canvas.width = (canvas.parentElement?.offsetWidth || window.innerWidth) * dpr);
+  let height = (canvas.height = (canvas.parentElement?.offsetHeight || 800) * dpr);
+
+  const particles = [];
+  const particleCount = Math.min(Math.floor((width * height) / (12000 * dpr)), 150);
+  const mouse = { x: -1000, y: -1000, radius: 180 * dpr };
+
+  // Palette: Gemini Light Blue, Sky Luster, Celestial Cyan, Byron Gold
+  const colors = ["#8ab4f8", "#c2e7ff", "#7cd8e8", "#fce881"];
+
+  class Particle {
+    constructor() {
+      this.reset(true);
+    }
+    reset(initial = false) {
+      this.x = Math.random() * width;
+      this.y = initial ? Math.random() * height : height + 10;
+      this.size = (Math.random() * 2.2 + 0.8) * dpr;
+      this.color = colors[Math.floor(Math.random() * colors.length)];
+      this.alpha = Math.random() * 0.65 + 0.2;
+      this.vx = (Math.random() - 0.5) * 0.35 * dpr;
+      this.vy = -(Math.random() * 0.45 + 0.15) * dpr;
+      this.twinkleSpeed = Math.random() * 0.02 + 0.006;
+      this.twinklePhase = Math.random() * Math.PI * 2;
+    }
+    update() {
+      this.twinklePhase += this.twinkleSpeed;
+      this.y += this.vy;
+      this.x += this.vx;
+
+      // Cursor attraction
+      const dx = mouse.x - this.x;
+      const dy = mouse.y - this.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < mouse.radius && dist > 1) {
+        const force = (mouse.radius - dist) / mouse.radius;
+        const angle = Math.atan2(dy, dx);
+        this.x += Math.cos(angle) * force * 1.6 * dpr;
+        this.y += Math.sin(angle) * force * 1.6 * dpr;
+      }
+
+      if (this.y < -15 || this.x < -15 || this.x > width + 15) {
+        this.reset();
+      }
+    }
+    draw() {
+      const currentAlpha = Math.max(0.1, this.alpha + Math.sin(this.twinklePhase) * 0.25);
+      ctx.save();
+      ctx.globalAlpha = currentAlpha;
+      ctx.fillStyle = this.color;
+      ctx.shadowBlur = this.size * 3;
+      ctx.shadowColor = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push(new Particle());
+  }
+
+  function resize() {
+    width = canvas.width = (canvas.parentElement?.offsetWidth || window.innerWidth) * dpr;
+    height = canvas.height = (canvas.parentElement?.offsetHeight || 800) * dpr;
+  }
+  window.addEventListener("resize", resize);
+
+  window.addEventListener("mousemove", e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = (e.clientX - rect.left) * dpr;
+    mouse.y = (e.clientY - rect.top) * dpr;
   });
+
+  window.addEventListener("mouseleave", () => {
+    mouse.x = -1000;
+    mouse.y = -1000;
+  });
+
+  function animate() {
+    ctx.clearRect(0, 0, width, height);
+
+    // Subtle celestial constellation lines
+    const maxDist = 95 * dpr;
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < maxDist) {
+          ctx.save();
+          ctx.globalAlpha = (1 - dist / maxDist) * 0.14;
+          ctx.strokeStyle = "#8ab4f8";
+          ctx.lineWidth = 0.8 * dpr;
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    }
+
+    particles.forEach(p => {
+      p.update();
+      p.draw();
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
 }
 
-// Theme Switcher (Inspired by Omarchy 22 Themes)
+// Interactive Video Showcase Player & Feature Switcher
+function initShowcasePlayer() {
+  const showcase = document.getElementById("showcase");
+  if (!showcase) return;
+
+  const motionCanvas = document.getElementById("showcase-motion-canvas");
+  const ctx = motionCanvas?.getContext("2d");
+  const tabs = document.querySelectorAll(".showcase-tabs .tab-btn");
+  const overlays = document.querySelectorAll(".video-scene-overlay");
+  const playBtn = document.getElementById("btn-showcase-play");
+  const iconPlay = playBtn?.querySelector(".icon-play");
+  const iconPause = playBtn?.querySelector(".icon-pause");
+  const progressBar = document.getElementById("showcase-progress");
+  const timeDisplay = document.getElementById("showcase-time");
+  const timelineTrack = document.getElementById("showcase-timeline");
+  const fsBtn = document.getElementById("btn-showcase-fs");
+
+  const badgeEl = document.getElementById("detail-badge");
+  const titleEl = document.getElementById("detail-title");
+  const textEl = document.getElementById("detail-text");
+  const tagsEl = document.getElementById("detail-tags");
+
+  const featureData = {
+    calm: {
+      badge: "Feature 1 • Core Sanctuary",
+      title: "Celestial Calm — Zero Distraction, Pure Focus",
+      text: "Every pixel of Aphrody is deliberately arranged to preserve mental serenity. No intrusive notifications, no unsolicited updates, no telemetry trackers. Just a restorative, velvety canvas where your best ideas flow uninhibited.",
+      tags: ["Distraction-Free Workspace", "174Hz Harmonic Soundscape", "OLED Pure Surface"],
+    },
+    canvas: {
+      badge: "Feature 2 • Creative Suite",
+      title: "Fluid Creative Canvas — WordCraft, DeckCraft, GridCraft, VectorCraft",
+      text: "Four signature creative environments working in seamless harmony. Seamlessly compose prose, design cinematic kinetic slide decks, build reactive spatial spreadsheet models, and sculpt precision vector curves without ever leaving the flow.",
+      tags: ["WordCraft Prose", "DeckCraft Keynotes", "GridCraft Spatial", "VectorCraft Curves"],
+    },
+    intelligence: {
+      badge: "Feature 3 • Ambient Mind",
+      title: "Ambient Multimodal Intelligence — Gemini Light Blue Radiant Aura",
+      text: "A radiant ambient intelligence woven into the shell with a tranquil light blue aura. Experience instant whispered natural voice reasoning, spatial screen comprehension, and zero latency assistance that never interrupts your creative flow.",
+      tags: ["Gemini Light Blue Aura", "Instant Spoken Voice", "Spatial Document Vision"],
+    },
+    continuum: {
+      badge: "Feature 4 • Unified Flow",
+      title: "Unified Continuum — Instant Phone to Desktop Casting",
+      text: "Effortless continuity across devices. Cast documents and workspaces from your mobile pocket companion to your ultra-wide workstation canvas with zero latency, shared clipboard, and instant sensory state synchronization.",
+      tags: ["Zero-Latency Casting", "Unified Clipboard", "Aphrody Pocket Sync"],
+    },
+    byron: {
+      badge: "Feature 5 • Sovereign Mascot",
+      title: "Byron Love (Aphrodi) — The Sovereign Soul of Aphrody",
+      text: "The sole mascot and divine guardian of Aphrody. Byron Love embodies divine grace, radiant golden composure, and God Knows precision. A reminder that technology can be noble, beautiful, and completely sovereign.",
+      tags: ["Divine Grace", "Golden Radiance", "God Knows Precision", "Sovereign Soul"],
+    },
+  };
+
+  const featureKeys = ["calm", "canvas", "intelligence", "continuum", "byron"];
+  let activeFeature = "calm";
+  let isPlaying = true;
+  let progress = 12; // in seconds (0 to 45)
+  const totalDuration = 45;
+
+  function switchFeature(featureKey) {
+    if (!featureData[featureKey]) return;
+    activeFeature = featureKey;
+
+    tabs.forEach(t => {
+      const isMatch = t.dataset.feature === featureKey;
+      t.classList.toggle("active", isMatch);
+      t.setAttribute("aria-selected", isMatch ? "true" : "false");
+    });
+
+    overlays.forEach(ov => {
+      ov.classList.toggle("active", ov.dataset.scene === featureKey);
+    });
+
+    const info = featureData[featureKey];
+    if (badgeEl) badgeEl.textContent = info.badge;
+    if (titleEl) titleEl.textContent = info.title;
+    if (textEl) textEl.textContent = info.text;
+    if (tagsEl) {
+      tagsEl.innerHTML = info.tags.map(tag => `<span class="d-tag">${tag}</span>`).join("");
+    }
+  }
+
+  tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+      switchFeature(tab.dataset.feature);
+    });
+  });
+
+  // Play / Pause toggle
+  playBtn?.addEventListener("click", () => {
+    isPlaying = !isPlaying;
+    if (iconPlay && iconPause) {
+      iconPlay.hidden = isPlaying;
+      iconPause.hidden = !isPlaying;
+    }
+  });
+
+  // Timeline click scrubber
+  timelineTrack?.addEventListener("click", e => {
+    const rect = timelineTrack.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    progress = ratio * totalDuration;
+  });
+
+  // Fullscreen toggle
+  fsBtn?.addEventListener("click", () => {
+    const frame = showcase.querySelector(".video-player-frame");
+    if (!document.fullscreenElement) {
+      frame?.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  });
+
+  // Generative Motion Canvas Renderer for Simulated High-FPS Video
+  let frameCount = 0;
+  function renderMotionFrame() {
+    if (ctx && motionCanvas) {
+      const w = motionCanvas.width;
+      const h = motionCanvas.height;
+      frameCount++;
+
+      ctx.fillStyle = "#0c1119";
+      ctx.fillRect(0, 0, w, h);
+
+      const t = frameCount * 0.02;
+
+      if (activeFeature === "calm") {
+        // Celestial Calm: breathing light-blue radial nebula
+        const grad = ctx.createRadialGradient(
+          w * 0.5,
+          h * 0.5,
+          20,
+          w * 0.5,
+          h * 0.5,
+          Math.sin(t) * 80 + 340,
+        );
+        grad.addColorStop(0, "rgba(138, 180, 248, 0.28)");
+        grad.addColorStop(0.5, "rgba(194, 231, 255, 0.12)");
+        grad.addColorStop(1, "transparent");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Gentle floating particles
+        ctx.fillStyle = "#c2e7ff";
+        for (let i = 0; i < 24; i++) {
+          const px = (Math.sin(t + i) * 0.4 + 0.5) * w;
+          const py = (Math.cos(t * 0.8 + i * 1.5) * 0.4 + 0.5) * h;
+          ctx.beginPath();
+          ctx.arc(px, py, (Math.sin(t + i) * 1.5 + 2.5), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      } else if (activeFeature === "canvas") {
+        // Fluid Creative Canvas: animated geometric grid & curve paths
+        ctx.strokeStyle = "rgba(138, 180, 248, 0.15)";
+        ctx.lineWidth = 1.5;
+        const gridSize = 48;
+        for (let x = 0; x < w; x += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+          ctx.stroke();
+        }
+        for (let y = 0; y < h; y += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+        }
+
+        // Elegant flowing curve
+        ctx.strokeStyle = "#8ab4f8";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(100, h * 0.5);
+        ctx.bezierCurveTo(
+          w * 0.3,
+          h * 0.5 + Math.sin(t) * 120,
+          w * 0.7,
+          h * 0.5 - Math.sin(t) * 120,
+          w - 100,
+          h * 0.5,
+        );
+        ctx.stroke();
+      } else if (activeFeature === "intelligence") {
+        // Ambient Intelligence: Gemini neural frequency orbits
+        ctx.save();
+        ctx.translate(w * 0.5, h * 0.5);
+        ctx.rotate(t * 0.3);
+        ctx.strokeStyle = "rgba(138, 180, 248, 0.4)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 220, 110, t * 0.5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(w * 0.5, h * 0.5);
+        ctx.rotate(-t * 0.2);
+        ctx.strokeStyle = "rgba(124, 216, 232, 0.35)";
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 180, 90, -t * 0.4, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      } else if (activeFeature === "continuum") {
+        // Continuum: glowing data streams between mobile & desktop
+        const grad = ctx.createLinearGradient(w * 0.2, h * 0.5, w * 0.8, h * 0.5);
+        grad.addColorStop(0, "#8ab4f8");
+        grad.addColorStop(0.5, "#c2e7ff");
+        grad.addColorStop(1, "#7cd8e8");
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.moveTo(w * 0.25, h * 0.5);
+        ctx.lineTo(w * 0.75, h * 0.5);
+        ctx.stroke();
+
+        const packetX = w * 0.25 + ((Math.sin(t * 2) + 1) * 0.5) * (w * 0.5);
+        ctx.fillStyle = "#ffffff";
+        ctx.shadowColor = "#8ab4f8";
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.arc(packetX, h * 0.5, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      } else if (activeFeature === "byron") {
+        // Byron Love: Golden rays and divine radiance
+        const grad = ctx.createRadialGradient(
+          w * 0.5,
+          h * 0.45,
+          10,
+          w * 0.5,
+          h * 0.45,
+          300,
+        );
+        grad.addColorStop(0, "rgba(252, 232, 129, 0.35)");
+        grad.addColorStop(0.5, "rgba(245, 196, 81, 0.12)");
+        grad.addColorStop(1, "transparent");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+
+        // Golden feather sparks
+        ctx.fillStyle = "#fce881";
+        for (let i = 0; i < 30; i++) {
+          const fx = (Math.sin(t * 0.7 + i * 0.8) * 0.35 + 0.5) * w;
+          const fy = (Math.cos(t * 0.9 + i * 0.6) * 0.35 + 0.45) * h;
+          ctx.beginPath();
+          ctx.arc(fx, fy, Math.sin(t + i) * 1.5 + 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    // Advance timeline simulation
+    if (isPlaying) {
+      progress += 0.016; // approx 60fps delta
+      if (progress >= totalDuration) {
+        progress = 0;
+        // Cycle to next feature
+        const nextIndex = (featureKeys.indexOf(activeFeature) + 1) % featureKeys.length;
+        switchFeature(featureKeys[nextIndex]);
+      }
+      const pct = (progress / totalDuration) * 100;
+      if (progressBar) progressBar.style.width = `${pct}%`;
+      if (timeDisplay) {
+        const curSec = Math.floor(progress);
+        const curMin = Math.floor(curSec / 60);
+        const remSec = curSec % 60;
+        timeDisplay.textContent = `${String(curMin).padStart(2, "0")}:${String(remSec).padStart(2, "0")} / 00:45`;
+      }
+    }
+
+    requestAnimationFrame(renderMotionFrame);
+  }
+
+  renderMotionFrame();
+}
+
+// Theme Switcher (Derived from Material 3 Tonal Spot Schemes)
 function initThemes() {
   const pills = document.querySelectorAll(".theme-picker-row .theme-pill");
   pills.forEach(pill => {
@@ -223,7 +604,7 @@ function initThemes() {
   } catch {}
 }
 
-// Ambient Soundscape Player (Synthesized Relaxing Audio)
+// Ambient Soundscape Player (Synthesized 174Hz Relaxing Audio)
 function initAmbientMusic() {
   const capsule = document.getElementById("music-capsule");
   const toggle = document.getElementById("music-toggle");
@@ -256,7 +637,8 @@ function initAmbientMusic() {
       } catch {}
       isPlaying = true;
       capsule.classList.add("playing");
-      toggle.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
+      toggle.innerHTML =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/></svg>';
       toggle.setAttribute("aria-label", "Pause ambient soundscape");
     } else {
       if (gain && audioCtx) {
@@ -272,7 +654,8 @@ function initAmbientMusic() {
       }
       isPlaying = false;
       capsule.classList.remove("playing");
-      toggle.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+      toggle.innerHTML =
+        '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
       toggle.setAttribute("aria-label", "Listen to ambient soundscape");
     }
   });
@@ -303,7 +686,7 @@ async function probeGpu() {
       preferredFormat: navigator.gpu.getPreferredCanvasFormat(),
     };
     if (out)
-      out.textContent = `WebGPU compute engine active${adapter.info?.vendor ? ` (${adapter.info.vendor})` : ""}`;
+      out.textContent = `WebGPU celestial compute active${adapter.info?.vendor ? ` (${adapter.info.vendor})` : ""}`;
   } catch {
     root.dataset.gpu = "webgl2";
     if (out) out.textContent = "Standard raster engine active";
@@ -372,7 +755,8 @@ function start() {
   notice();
   shareLinks();
   report();
-  initLaptopTabs();
+  initCelestialCanvas();
+  initShowcasePlayer();
   initThemes();
   initAmbientMusic();
   probeGpu();

@@ -19,6 +19,9 @@ export async function runGoogle(argv: readonly string[]): Promise<number> {
     await (await import("./drive-cli.ts")).runDriveCli(rest);
     return 0;
   }
+  if (command === "docs") {
+    return (await import("./docs-wordcraft-cli.ts")).runDocsWordCraftCli(rest);
+  }
   if (command === "fonts") {
     const [action, ...options] = rest;
     if (action !== "serve") {

@@ -6,8 +6,7 @@ import type { drive_v3 } from "@googleapis/drive";
 import { nativeMarkdown, type NativeDocument } from "./drive-markdown.ts";
 
 /** DOCX is a native WordCraft input; the Google document remains untouched. */
-export const WORDCRAFT_DOCX_MIME =
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+export const WORDCRAFT_DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 const MAX_EXPORT_BYTES = 32 * 1024 * 1024;
 
 /** Save a selected Docs API snapshot, including its tabs, for later offline projection. */
@@ -27,8 +26,7 @@ export async function saveGoogleDocSnapshot(
     });
     const contents = `${JSON.stringify(response.data)}\n`;
     const bytes = Buffer.byteLength(contents, "utf8");
-    if (bytes > MAX_EXPORT_BYTES)
-      throw new Error("Google Docs snapshot exceeds 32 MiB");
+    if (bytes > MAX_EXPORT_BYTES) throw new Error("Google Docs snapshot exceeds 32 MiB");
     await file.writeFile(contents, "utf8");
     await file.close();
     return { path: destination, bytes };
@@ -43,9 +41,7 @@ export async function saveGoogleDocSnapshot(
  * Convert an already downloaded Docs API snapshot to WordCraft-readable Markdown offline.
  * This is a projection, not a lossless conversion; unsupported elements can raise an error.
  */
-export function googleDocSnapshotToWordCraftMarkdown(
-  snapshot: NativeDocument,
-): string {
+export function googleDocSnapshotToWordCraftMarkdown(snapshot: NativeDocument): string {
   return nativeMarkdown(snapshot);
 }
 
@@ -75,27 +71,18 @@ export async function exportGoogleDocForWordCraft(
     );
     stream = response.data;
     for await (const chunk of response.data) {
-      if (!(chunk instanceof Uint8Array))
-        throw new Error("Google returned invalid DOCX bytes");
-      for (let i = 0; i < chunk.length && signature.length < 4; i++)
-        signature.push(chunk[i]!);
+      if (!(chunk instanceof Uint8Array)) throw new Error("Google returned invalid DOCX bytes");
+      for (let i = 0; i < chunk.length && signature.length < 4; i++) signature.push(chunk[i]!);
       bytes += chunk.byteLength;
-      if (bytes > MAX_EXPORT_BYTES)
-        throw new Error("Google DOCX export exceeds 32 MiB");
+      if (bytes > MAX_EXPORT_BYTES) throw new Error("Google DOCX export exceeds 32 MiB");
       await file.writeFile(chunk);
     }
-    if (
-      signature.length !== 4 ||
-      signature.some(
-        (value, index) => value !== [0x50, 0x4b, 0x03, 0x04][index],
-      )
-    )
+    if (signature.length !== 4 || signature.some((value, index) => value !== [0x50, 0x4b, 0x03, 0x04][index]))
       throw new Error("Google DOCX export is not a ZIP package");
     await file.close();
     return { path: destination, bytes };
   } catch (error) {
-    if (stream && "destroy" in stream && typeof stream.destroy === "function")
-      stream.destroy();
+    if (stream && "destroy" in stream && typeof stream.destroy === "function") stream.destroy();
     await file.close().catch(() => {});
     await unlink(destination).catch(() => {});
     throw error;
