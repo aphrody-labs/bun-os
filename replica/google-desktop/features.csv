@@ -1,0 +1,16 @@
+id,area,feature,priority,state,clone,notes
+F01,spotlight,Floating Centered Search Bar,must,done,yes,Centered HUD with keyboard navigation
+F02,spotlight,SQLite FTS5 Local Files Search,must,done,yes,Sub-millisecond query over local_files.db
+F03,spotlight,Calculation & Unit Conversion,should,done,yes,Instant mathematical expression evaluation
+F04,spotlight,Local App Launching,must,done,yes,Windows Start Menu & Bun OS apps index
+F05,spotlight,Web Search Suggestions,must,done,yes,Real-time search suggestion fetcher
+F06,capture,Transparent Fullscreen Overlay,must,done,yes,Window covers 100vw x 100vh with transparent background
+F07,capture,Marquee Drag Region Selector,must,done,yes,Cyber Cyan selection reticle with dimension readout
+F08,capture,Visual Inspection Action Pill,must,done,yes,Buttons to Search, Copy, or Ask AI
+F09,tools,Quick Launcher Dock,should,done,yes,Floating utility bar with quick shortcuts
+F10,settings,Indexed Directories Config,must,done,yes,Add/remove folders for FTS5 indexing
+F11,settings,Copilot Key Provider Handler,must,done,yes,Native protocol handler for hardware key
+F12,settings,Theme Selector (Dark/Light),should,done,yes,Obsidian dark mode & crisp light mode
+F13,history,Local Inquiry History,could,done,yes,Persisted local queries in SQLite
+F14,shell,File Explorer Context Menu,must,done,yes,Integration for image and PDF right-clicks
+F15,shell,Global Hotkey Listener,must,done,yes,Alt+Space and Ctrl+Shift+S triggers

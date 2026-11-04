@@ -1,0 +1,12 @@
+{
+  "name": "@aphrody/spotcraft",
+  "version": "1.0.0",
+  "description": "Sovereign local-first desktop spotlight search, region screen capture, and assistant for Bun OS and Windows 11.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "bun run ./src/server.ts",
+    "build": "bun build ./src/app.ts --outdir ./dist --minify",
+    "check": "bun check"
+  }
+}
