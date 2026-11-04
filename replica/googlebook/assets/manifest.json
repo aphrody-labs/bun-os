@@ -1,0 +1,506 @@
+{
+  "source": "https://googlebook.google/intl/fr_fr/",
+  "fetchedAt": "2026-11-04T01:46:44.071Z",
+  "videos": [
+    {
+      "name": "googlebook-hero-v2-frfr-1920w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/0a/62/4015b91d42de9e0a19bec6cd3961/googlebook-hero-v2-frfr-1920w-2x-av1.mp4",
+      "sizeBytes": 1852707,
+      "localPath": "replica/googlebook/assets/videos/googlebook-hero-v2-frfr-1920w-2x-av1.mp4"
+    },
+    {
+      "name": "googlebook-hero-v2-frfr-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/a8/91/fe9be39f4f37b7f4afdd6eb1ad5a/googlebook-hero-v2-frfr-600w-2x-av1.mp4",
+      "sizeBytes": 912098,
+      "localPath": "replica/googlebook/assets/videos/googlebook-hero-v2-frfr-600w-2x-av1.mp4"
+    },
+    {
+      "name": "body-16-9-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/c1/a9/eae70c6948bf9bdd3d1280f828d1/body-16-9-1024w-2x-av1.mp4",
+      "sizeBytes": 868121,
+      "localPath": "replica/googlebook/assets/videos/body-16-9-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "body-1-1-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/34/dc/5092a7524e088c143fa2b7d1ffc0/body-1-1-600w-2x-av1.mp4",
+      "sizeBytes": 251753,
+      "localPath": "replica/googlebook/assets/videos/body-1-1-600w-2x-av1.mp4"
+    },
+    {
+      "name": "glowbar-16-9-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/4d/60/2ea0ad0d4ebca845f9617fad4e0f/glowbar-16-9-1024w-2x-av1.mp4",
+      "sizeBytes": 753532,
+      "localPath": "replica/googlebook/assets/videos/glowbar-16-9-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "glowbar-1-1-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/da/04/cc87dcbd42e786839300811ba43e/glowbar-1-1-600w-2x-av1.mp4",
+      "sizeBytes": 317822,
+      "localPath": "replica/googlebook/assets/videos/glowbar-1-1-600w-2x-av1.mp4"
+    },
+    {
+      "name": "g-key-16-9-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/ec/e0/7c23c342422ca1c3ee0bd50cbb49/g-key-16-9-1024w-2x-av1.mp4",
+      "sizeBytes": 341631,
+      "localPath": "replica/googlebook/assets/videos/g-key-16-9-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "g-key-1-1-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/be/50/619e82a44e3680ff5e4545b3f15c/g-key-1-1-600w-2x-av1.mp4",
+      "sizeBytes": 184597,
+      "localPath": "replica/googlebook/assets/videos/g-key-1-1-600w-2x-av1.mp4"
+    },
+    {
+      "name": "biometric-1-1-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/11/97/3aed7d0e43198b50b3c4c12d2adf/biometric-1-1-600w-2x-av1.mp4",
+      "sizeBytes": 195954,
+      "localPath": "replica/googlebook/assets/videos/biometric-1-1-600w-2x-av1.mp4"
+    },
+    {
+      "name": "biometrics-16-9-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/de/f2/5a9bff5046319c932408e399c71a/biometrics-16-9-1024w-2x-av1.mp4",
+      "sizeBytes": 231875,
+      "localPath": "replica/googlebook/assets/videos/biometrics-16-9-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "gradient-1920w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/cf/17/44806f56417e956da40b1d2cbb94/gradient-1920w-2x-av1.mp4",
+      "sizeBytes": 667593,
+      "localPath": "replica/googlebook/assets/videos/gradient-1920w-2x-av1.mp4"
+    },
+    {
+      "name": "gradient-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/d4/be/e6269a6640baab331d7e61064336/gradient-600w-2x-av1.mp4",
+      "sizeBytes": 359265,
+      "localPath": "replica/googlebook/assets/videos/gradient-600w-2x-av1.mp4"
+    },
+    {
+      "name": "magic-pointer-fr-fr-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/98/72/053b3bc94248b60bbe20460d01eb/magic-pointer-fr-fr-1024w-2x-av1.mp4",
+      "sizeBytes": 1676375,
+      "localPath": "replica/googlebook/assets/videos/magic-pointer-fr-fr-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "magic-pointer-fr-fr-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/05/78/08ba14a04fb787b11ab90fc1d03c/magic-pointer-fr-fr-600w-2x-av1.mp4",
+      "sizeBytes": 851170,
+      "localPath": "replica/googlebook/assets/videos/magic-pointer-fr-fr-600w-2x-av1.mp4"
+    },
+    {
+      "name": "rambler-fr-fr-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/a0/be/67b1ba35444da62d0dedda662e72/rambler-fr-fr-1024w-2x-av1.mp4",
+      "sizeBytes": 1401556,
+      "localPath": "replica/googlebook/assets/videos/rambler-fr-fr-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "rambler-fr-fr-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/bd/07/e3c72622467b9efa234d5ed0415d/rambler-fr-fr-600w-2x-av1.mp4",
+      "sizeBytes": 740248,
+      "localPath": "replica/googlebook/assets/videos/rambler-fr-fr-600w-2x-av1.mp4"
+    },
+    {
+      "name": "09-gemini-live-frfr-v04-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/b8/c8/e011958f4c6c90c16592fabd77a2/09-gemini-live-frfr-v04-1024w-2x-av1.mp4",
+      "sizeBytes": 1316551,
+      "localPath": "replica/googlebook/assets/videos/09-gemini-live-frfr-v04-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "09-gemini-live-frfr-v04-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/a4/2b/4d274c3e47e88afa9304df2f7e98/09-gemini-live-frfr-v04-600w-2x-av1.mp4",
+      "sizeBytes": 770806,
+      "localPath": "replica/googlebook/assets/videos/09-gemini-live-frfr-v04-600w-2x-av1.mp4"
+    },
+    {
+      "name": "05-smartfilesearch-frfr-v04-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/af/c3/60e5e4cc469cb5afb9758569dd53/05-smartfilesearch-frfr-v04-1024w-2x-av1.mp4",
+      "sizeBytes": 759191,
+      "localPath": "replica/googlebook/assets/videos/05-smartfilesearch-frfr-v04-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "05-smartfilesearch-frfr-v04-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/71/a5/a47e63064fa5809dafe0c6e04d02/05-smartfilesearch-frfr-v04-600w-2x-av1.mp4",
+      "sizeBytes": 390911,
+      "localPath": "replica/googlebook/assets/videos/05-smartfilesearch-frfr-v04-600w-2x-av1.mp4"
+    },
+    {
+      "name": "08-cast-my-apps-frfr-v04-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/4a/5b/57590a6f4c4db5a311a21f5635f5/08-cast-my-apps-frfr-v04-1024w-2x-av1.mp4",
+      "sizeBytes": 974073,
+      "localPath": "replica/googlebook/assets/videos/08-cast-my-apps-frfr-v04-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "08-cast-my-apps-frfr-v04-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/3e/31/24f6e6124351842692f9cc2c1545/08-cast-my-apps-frfr-v04-600w-2x-av1.mp4",
+      "sizeBytes": 545368,
+      "localPath": "replica/googlebook/assets/videos/08-cast-my-apps-frfr-v04-600w-2x-av1.mp4"
+    },
+    {
+      "name": "07-continue-on-aluminum-fr-fr-v05-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/4e/a8/441a690c4bde925baeb3d2378fd7/07-continue-on-aluminum-fr-fr-v05-1024w-2x-av1.mp4",
+      "sizeBytes": 512196,
+      "localPath": "replica/googlebook/assets/videos/07-continue-on-aluminum-fr-fr-v05-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "07-continue-on-aluminum-fr-fr-v05-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/54/e1/d2ce73764c9fa2e5e1598c8fbeda/07-continue-on-aluminum-fr-fr-v05-600w-2x-av1.mp4",
+      "sizeBytes": 306769,
+      "localPath": "replica/googlebook/assets/videos/07-continue-on-aluminum-fr-fr-v05-600w-2x-av1.mp4"
+    },
+    {
+      "name": "06-quickaccess-frfr-v03-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/e3/9c/48a0fb934507b79128c8acb50b62/06-quickaccess-frfr-v03-1024w-2x-av1.mp4",
+      "sizeBytes": 442200,
+      "localPath": "replica/googlebook/assets/videos/06-quickaccess-frfr-v03-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "06-quickaccess-frfr-v03-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/43/a0/a4e5682a4b888b06a2efd18b9614/06-quickaccess-frfr-v03-600w-2x-av1.mp4",
+      "sizeBytes": 262960,
+      "localPath": "replica/googlebook/assets/videos/06-quickaccess-frfr-v03-600w-2x-av1.mp4"
+    },
+    {
+      "name": "apps-sep23-us-16-9-1920w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/21/b4/169fac5349b8949435a3b263437d/apps-sep23-us-16-9-1920w-2x-av1.mp4",
+      "sizeBytes": 334683,
+      "localPath": "replica/googlebook/assets/videos/apps-sep23-us-16-9-1920w-2x-av1.mp4"
+    },
+    {
+      "name": "apps-sep23-us-1-1-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/e6/44/819d96cb4f62973ecf16540423c7/apps-sep23-us-1-1-600w-2x-av1.mp4",
+      "sizeBytes": 98166,
+      "localPath": "replica/googlebook/assets/videos/apps-sep23-us-1-1-600w-2x-av1.mp4"
+    },
+    {
+      "name": "apps-tabs-creativity-1-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/2a/39/aaa4dfe843ff8aa9dc81cb4fbdb9/apps-tabs-creativity-1-1024w-2x-av1.mp4",
+      "sizeBytes": 729885,
+      "localPath": "replica/googlebook/assets/videos/apps-tabs-creativity-1-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "apps-tabs-creativity-1-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/9b/48/0bc6bcc945e09ff4d43e55201ce5/apps-tabs-creativity-1-600w-2x-av1.mp4",
+      "sizeBytes": 459789,
+      "localPath": "replica/googlebook/assets/videos/apps-tabs-creativity-1-600w-2x-av1.mp4"
+    },
+    {
+      "name": "apps-tabs-productivity-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/f6/71/10716f9849cdac3ba7a67a2e6281/apps-tabs-productivity-1024w-2x-av1.mp4",
+      "sizeBytes": 391873,
+      "localPath": "replica/googlebook/assets/videos/apps-tabs-productivity-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "apps-tabs-productivity-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/78/d5/9767dab3479da1863e0f0423c1c3/apps-tabs-productivity-600w-2x-av1.mp4",
+      "sizeBytes": 200230,
+      "localPath": "replica/googlebook/assets/videos/apps-tabs-productivity-600w-2x-av1.mp4"
+    },
+    {
+      "name": "apps-tabs-streaming-1024w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/95/4e/e9081601461e881b4a1c297771f4/apps-tabs-streaming-1024w-2x-av1.mp4",
+      "sizeBytes": 1339352,
+      "localPath": "replica/googlebook/assets/videos/apps-tabs-streaming-1024w-2x-av1.mp4"
+    },
+    {
+      "name": "apps-tabs-streaming-600w-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/60/fe/af00302a469491fdcfc5591e8ffa/apps-tabs-streaming-600w-2x-av1.mp4",
+      "sizeBytes": 792895,
+      "localPath": "replica/googlebook/assets/videos/apps-tabs-streaming-600w-2x-av1.mp4"
+    },
+    {
+      "name": "games-16-9-2x-1920w-edges-1x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/40/f7/1251e22c42acbf6fc0bcf91ad06e/games-16-9-2x-1920w-edges-1x-av1.mp4",
+      "sizeBytes": 10325151,
+      "localPath": "replica/googlebook/assets/videos/games-16-9-2x-1920w-edges-1x-av1.mp4"
+    },
+    {
+      "name": "games-1-1-600w-edges-2x-av1.mp4",
+      "url": "https://www.gstatic.com/marketing-cms/85/fd/eb25e78044c387c5b46484aaa26a/games-1-1-600w-edges-2x-av1.mp4",
+      "sizeBytes": 5992562,
+      "localPath": "replica/googlebook/assets/videos/games-1-1-600w-edges-2x-av1.mp4"
+    }
+  ],
+  "images": [
+    {
+      "name": "seosocialimage.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/c0/6a/8fed35dd4d35b613723e646386c8/seosocialimage.webp=n-w1440-h756-fcrop64=1,0000098dfffff6a7-rw",
+      "sizeBytes": 25974,
+      "localPath": "replica/googlebook/assets/images/seosocialimage.webp"
+    },
+    {
+      "name": "favicon.ico",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/d3/70/0058d2a84742adf8f9b8fc6c4f93/favicon.ico",
+      "sizeBytes": 5617,
+      "localPath": "replica/googlebook/assets/images/favicon.ico"
+    },
+    {
+      "name": "googlebook-logo.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/46/c7/9ddc76524625b49deca22091dfed/googlebook-logo.webp=n-w600-h120-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 18228,
+      "localPath": "replica/googlebook/assets/images/googlebook-logo.webp"
+    },
+    {
+      "name": "googlebook.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/72/96/2864ac4f4b05a9d42ed28929bacd/googlebook.webp=n-w804-h142-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 9432,
+      "localPath": "replica/googlebook/assets/images/googlebook.webp"
+    },
+    {
+      "name": "hardware-1.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/3a/bf/e7eca58b40ccb6649a753f3e736b/hardware-1.webp=n-w1410-h940-fcrop64=1,00290000ffc9ffff-rw",
+      "sizeBytes": 30012,
+      "localPath": "replica/googlebook/assets/images/hardware-1.webp"
+    },
+    {
+      "name": "intelligence-2.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/1b/0b/57b040714f4bb64f4f686d7bbaac/intelligence-2.webp=n-w1410-h940-fcrop64=1,00290000ffc9ffff-rw",
+      "sizeBytes": 27684,
+      "localPath": "replica/googlebook/assets/images/intelligence-2.webp"
+    },
+    {
+      "name": "better-together-3.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/33/ca/91a0b5864bfb83e86d6e3fbd07fe/better-together-3.webp=n-w1410-h940-fcrop64=1,00290000ffc9ffff-rw",
+      "sizeBytes": 27652,
+      "localPath": "replica/googlebook/assets/images/better-together-3.webp"
+    },
+    {
+      "name": "google-app-suite-icons-eyebrow.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/c7/66/f59a002c4dc9bbc1fe21d1d66ee0/google-app-suite-icons-eyebrow.webp=n-w834-h96-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 14774,
+      "localPath": "replica/googlebook/assets/images/google-app-suite-icons-eyebrow.webp"
+    },
+    {
+      "name": "transparent-1440x600.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/cb/a9/2d758111412c8b47376769f7b323/transparent-1440x600.webp=n-w4096-h1707-fcrop64=1,5c720000a38effff-rw",
+      "sizeBytes": 3692,
+      "localPath": "replica/googlebook/assets/images/transparent-1440x600.webp"
+    },
+    {
+      "name": "oem-brands-2-4x.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/64/a9/641f0c004df1ae593a3826f9d882/oem-brands-2-4x.webp=n-w800-h96-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 3596,
+      "localPath": "replica/googlebook/assets/images/oem-brands-2-4x.webp"
+    },
+    {
+      "name": "oem-brands-mobile-2-4x.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/2a/d6/7bd7be454942a375f7204cd52dbd/oem-brands-mobile-2-4x.webp=n-w538-h64-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 2574,
+      "localPath": "replica/googlebook/assets/images/oem-brands-mobile-2-4x.webp"
+    },
+    {
+      "name": "designed-for-gemini-intelligence-translation-fr-horizontal-white.svg",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/7c/6a/348b15214ba8b5c47255b00cfcd2/designed-for-gemini-intelligence-translation-fr-horizontal-white.svg",
+      "sizeBytes": 33263,
+      "localPath": "replica/googlebook/assets/images/designed-for-gemini-intelligence-translation-fr-horizontal-white.svg"
+    },
+    {
+      "name": "gradient-1920w-2x.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/86/b0/63ee7a3c4143b8d04e9c9c780761/gradient-1920w-2x.webp",
+      "sizeBytes": 3776,
+      "localPath": "replica/googlebook/assets/images/gradient-1920w-2x.webp"
+    },
+    {
+      "name": "16-9.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/49/2d/96485dda4c7bb61e5d0fa6a62357/16-9.webp=n-w3840-h2160-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 483296,
+      "localPath": "replica/googlebook/assets/images/16-9.webp"
+    },
+    {
+      "name": "better-together-1-1.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/43/3c/c7708a0a4ebaa2e61fe68bffe499/better-together-1-1.webp=s1024-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 89476,
+      "localPath": "replica/googlebook/assets/images/better-together-1-1.webp"
+    },
+    {
+      "name": "apps-sep23-us-16-9-1920w-2x.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/e4/26/5103cd89467d814864b2e71159bf/apps-sep23-us-16-9-1920w-2x.webp",
+      "sizeBytes": 132274,
+      "localPath": "replica/googlebook/assets/images/apps-sep23-us-16-9-1920w-2x.webp"
+    },
+    {
+      "name": "antigravity-screen.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/cb/d2/9d6659e44a00a49ae95561ad9327/antigravity-screen.webp=n-w3842-h2560-fcrop64=1,00250000ffffffff-rw",
+      "sizeBytes": 68490,
+      "localPath": "replica/googlebook/assets/images/antigravity-screen.webp"
+    },
+    {
+      "name": "app-antigravity.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/51/c8/f178e4254bef8f9d9a657caa98d5/app-antigravity.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 516,
+      "localPath": "replica/googlebook/assets/images/app-antigravity.webp"
+    },
+    {
+      "name": "app-gemini.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/22/1a/0899ea9143958281c52b68f28371/app-gemini.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1390,
+      "localPath": "replica/googlebook/assets/images/app-gemini.webp"
+    },
+    {
+      "name": "app.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/dd/32/7e046abb4c188e39abb2a90aae2b/app.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1048,
+      "localPath": "replica/googlebook/assets/images/app.webp"
+    },
+    {
+      "name": "app-gdrive.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/b1/97/323ec52f46f7a6b1fb5a1338736e/app-gdrive.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1520,
+      "localPath": "replica/googlebook/assets/images/app-gdrive.webp"
+    },
+    {
+      "name": "gmail.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/98/19/00d9a883436682a62a351bd341cc/gmail.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1128,
+      "localPath": "replica/googlebook/assets/images/gmail.webp"
+    },
+    {
+      "name": "app-gdocs.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/5a/e0/65cfd7174bc4b4f7a2eb3f1f5338/app-gdocs.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1326,
+      "localPath": "replica/googlebook/assets/images/app-gdocs.webp"
+    },
+    {
+      "name": "app-photoshop.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/a5/c9/d46d016c4086a8f76b733ae90247/app-photoshop.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1198,
+      "localPath": "replica/googlebook/assets/images/app-photoshop.webp"
+    },
+    {
+      "name": "app-lightroom.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/83/19/78a5ddb34039b707dc0950991044/app-lightroom.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 948,
+      "localPath": "replica/googlebook/assets/images/app-lightroom.webp"
+    },
+    {
+      "name": "app-bandlab.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/98/38/5855a39f46859bcd066d9a3bbe64/app-bandlab.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1662,
+      "localPath": "replica/googlebook/assets/images/app-bandlab.webp"
+    },
+    {
+      "name": "app-canva.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/15/af/60ab499544e0b5998613a0cd3aa3/app-canva.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1590,
+      "localPath": "replica/googlebook/assets/images/app-canva.webp"
+    },
+    {
+      "name": "app-capcut.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/95/cf/cbf4218d4bc4ac984b0c9a41bf57/app-capcut.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1094,
+      "localPath": "replica/googlebook/assets/images/app-capcut.webp"
+    },
+    {
+      "name": "app-luminar.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/c6/04/36bb8e4f45c9a77c65193de8a399/app-luminar.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 928,
+      "localPath": "replica/googlebook/assets/images/app-luminar.webp"
+    },
+    {
+      "name": "app-notion.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/40/7b/9782d340484e968daf3050dca7c7/app-notion.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 862,
+      "localPath": "replica/googlebook/assets/images/app-notion.webp"
+    },
+    {
+      "name": "app-notability.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/b5/9a/ab4141be4ee583ffe7d372be278e/app-notability.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1154,
+      "localPath": "replica/googlebook/assets/images/app-notability.webp"
+    },
+    {
+      "name": "app-acrobat.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/91/eb/0883eef64d3299361e50153f5f87/app-acrobat.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1148,
+      "localPath": "replica/googlebook/assets/images/app-acrobat.webp"
+    },
+    {
+      "name": "app-dropbox.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/54/2c/31d83c0146d58fd67ce91caed123/app-dropbox.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 940,
+      "localPath": "replica/googlebook/assets/images/app-dropbox.webp"
+    },
+    {
+      "name": "fantastical.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/f3/07/2b088b24432e83c51ad8ab8ce618/fantastical.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1368,
+      "localPath": "replica/googlebook/assets/images/fantastical.webp"
+    },
+    {
+      "name": "app-youtube.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/1e/66/b899514844cd9c18b495c7fedc43/app-youtube.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 634,
+      "localPath": "replica/googlebook/assets/images/app-youtube.webp"
+    },
+    {
+      "name": "youtube-music-4x.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/97/c5/edccceab41ca8a45e1ef064d7e5c/youtube-music-4x.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1734,
+      "localPath": "replica/googlebook/assets/images/youtube-music-4x.webp"
+    },
+    {
+      "name": "app-spotify.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/4e/27/354615874f4eb3cc688b35eb35b4/app-spotify.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1672,
+      "localPath": "replica/googlebook/assets/images/app-spotify.webp"
+    },
+    {
+      "name": "app-netflix.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/4d/a3/787d805e4aee895dd79db1eb3637/app-netflix.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 400,
+      "localPath": "replica/googlebook/assets/images/app-netflix.webp"
+    },
+    {
+      "name": "app-hbo-max.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/2e/e4/d0a16ed94abc9582fb977491737b/app-hbo-max.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1514,
+      "localPath": "replica/googlebook/assets/images/app-hbo-max.webp"
+    },
+    {
+      "name": "app-disney.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/02/0b/f22860374b31a82c7f460c9115fa/app-disney.webp=s72-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1136,
+      "localPath": "replica/googlebook/assets/images/app-disney.webp"
+    },
+    {
+      "name": "titan-chip-security-fr-fr.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/01/14/6f1bae82483b8ce7e0a664ef9d22/titan-chip-security-fr-fr.webp=n-w1390-h870-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 23932,
+      "localPath": "replica/googlebook/assets/images/titan-chip-security-fr-fr.webp"
+    },
+    {
+      "name": "biometrics-16-10-1024w-2x.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/eb/c5/90356d4248bb9ad7b4106a39e19d/biometrics-16-10-1024w-2x.webp",
+      "sizeBytes": 34328,
+      "localPath": "replica/googlebook/assets/images/biometrics-16-10-1024w-2x.webp"
+    },
+    {
+      "name": "extra-perks-app-image-2.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/a5/c4/0c33b1a14a94b325e9f01b0c020b/extra-perks-app-image-2.webp=n-w1680-h1050-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 23684,
+      "localPath": "replica/googlebook/assets/images/extra-perks-app-image-2.webp"
+    },
+    {
+      "name": "promo-shop.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/dd/2a/1b20634247c88c26278b303a53bc/promo-shop.webp=n-w4096-h2304-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 710936,
+      "localPath": "replica/googlebook/assets/images/promo-shop.webp"
+    },
+    {
+      "name": "promo-shop-mobile.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/00/67/6fdd2b9144e1989b03586e1d35b9/promo-shop-mobile.webp=s4096-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 1094964,
+      "localPath": "replica/googlebook/assets/images/promo-shop-mobile.webp"
+    },
+    {
+      "name": "check-mark.webp",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/74/f7/568daa1c4e83bf560592ef384737/check-mark.webp=s64-fcrop64=1,00000000ffffffff-rw",
+      "sizeBytes": 822,
+      "localPath": "replica/googlebook/assets/images/check-mark.webp"
+    },
+    {
+      "name": "logo.svg",
+      "url": "https://www.gstatic.com/marketing-cms/assets/images/88/43/e2e0064148bea193de023e62167f/logo.svg",
+      "sizeBytes": 3001,
+      "localPath": "replica/googlebook/assets/images/logo.svg"
+    }
+  ]
+}

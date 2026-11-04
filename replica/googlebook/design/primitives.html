@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Googlebook / Aluminium OS — Design Primitives Check</title>
+  <link rel="stylesheet" href="./tokens.css">
+  <style>
+    body {
+      font-family: var(--gb-font-sans);
+      background: var(--gb-bg);
+      color: var(--gb-text);
+      padding: 40px;
+      line-height: var(--gb-leading-normal);
+    }
+
+    h1 {
+      font-size: var(--gb-text-2xl);
+      font-weight: var(--gb-weight-bold);
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--gb-text-muted);
+      margin-bottom: 32px;
+      font-size: var(--gb-text-base);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .primitive-box {
+      background: var(--gb-surface);
+      border: 1px solid var(--gb-border);
+      border-radius: var(--gb-radius-md);
+      padding: 24px;
+      box-shadow: var(--gb-shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .primitive-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--gb-border);
+      padding-bottom: 12px;
+    }
+
+    .primitive-title {
+      font-size: var(--gb-text-sm);
+      font-weight: var(--gb-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--gb-text-muted);
+    }
+
+    /* 1. Pointer Assistant Cursor */
+    .pointer-demo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--gb-bg);
+      border-radius: var(--gb-radius-sm);
+    }
+
+    .pointer-cursor {
+      width: 24px;
+      height: 24px;
+      border: 2px solid var(--gb-glow-bar);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: var(--gb-glow-ambient);
+      animation: pulseGlow 1.4s infinite ease-in-out;
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 10px rgba(56, 189, 248, 0.4); }
+      50% { transform: scale(1.25); box-shadow: 0 0 24px rgba(56, 189, 248, 0.8); }
+    }
+
+    /* 2. Dictation Pill */
+    .dictation-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--gb-surface-elevated);
+      border: 1px solid var(--gb-accent);
+      padding: 8px 16px;
+      border-radius: var(--gb-radius-pill);
+      box-shadow: var(--gb-shadow-sm);
+      width: fit-content;
+    }
+
+    .audio-waves {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+      height: 16px;
+    }
+
+    .wave-bar {
+      width: 3px;
+      background: var(--gb-accent);
+      border-radius: 2px;
+      animation: waveMove 0.8s infinite ease-in-out;
+    }
+    .wave-bar:nth-child(1) { height: 8px; animation-delay: 0.1s; }
+    .wave-bar:nth-child(2) { height: 16px; animation-delay: 0.2s; }
+    .wave-bar:nth-child(3) { height: 12px; animation-delay: 0.3s; }
+    .wave-bar:nth-child(4) { height: 6px; animation-delay: 0.4s; }
+
+    @keyframes waveMove {
+      0%, 100% { transform: scaleY(0.5); }
+      50% { transform: scaleY(1); }
+    }
+
+    /* 3. Hardware Glow Bar */
+    .glow-bar-container {
+      width: 100%;
+      height: 8px;
+      background: var(--gb-surface);
+      position: relative;
+      overflow: hidden;
+      border-radius: 4px;
+    }
+
+    .glow-bar-line {
+      width: 100%;
+      height: 4px;
+      background: var(--gb-glow-bar);
+      box-shadow: var(--gb-glow-hardware);
+    }
+
+    /* 4. AI Files Card */
+    .ai-file-card {
+      border: 1px solid var(--gb-border);
+      border-radius: var(--gb-radius-sm);
+      padding: 14px;
+      background: var(--gb-surface);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: transform 120ms ease;
+    }
+
+    .ai-file-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--gb-shadow-md);
+    }
+
+    .ai-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .ai-tag {
+      font-size: var(--gb-text-xs);
+      background: rgba(79, 70, 229, 0.1);
+      color: var(--gb-accent);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: var(--gb-weight-medium);
+    }
+
+    /* 5. Hardware Spec Badges */
+    .spec-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      text-align: center;
+    }
+
+    .spec-item {
+      background: var(--gb-bg);
+      padding: 12px;
+      border-radius: var(--gb-radius-sm);
+      border: 1px solid var(--gb-border);
+    }
+
+    .spec-value {
+      font-size: var(--gb-text-lg);
+      font-weight: var(--gb-weight-bold);
+      color: var(--gb-accent);
+    }
+
+    .spec-label {
+      font-size: var(--gb-text-xs);
+      color: var(--gb-text-muted);
+    }
+
+    /* 6. Hero Buy CTA */
+    .btn-hero-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gb-accent);
+      color: var(--gb-on-accent);
+      font-size: var(--gb-text-base);
+      font-weight: var(--gb-weight-semibold);
+      padding: 12px 28px;
+      border-radius: var(--gb-radius-pill);
+      border: none;
+      cursor: pointer;
+      box-shadow: var(--gb-shadow-md);
+      transition: all 150ms ease;
+      width: fit-content;
+    }
+
+    .btn-hero-cta:hover {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: var(--gb-shadow-lg);
+    }
+  </style>
+</head>
+<body>
+  <h1>Googlebook / Aluminium OS — Design Primitives</h1>
+  <div class="subtitle">Clean-room component verification, design tokens & accessibility checks.</div>
+
+  <div class="grid">
+    <!-- Primitive 1 -->
+    <div class="primitive-box">
+      <div class="primitive-header">
+        <span class="primitive-title">Pointer Assistant (Shake Invoke)</span>
+        <span class="ai-tag">S03</span>
+      </div>
+      <div class="pointer-demo">
+        <div class="pointer-cursor"></div>
+        <div>Wiggle pointer to summon Gemini contextual aura</div>
+      </div>
+    </div>
+
+    <!-- Primitive 2 -->
+    <div class="primitive-box">
+      <div class="primitive-header">
+        <span class="primitive-title">Dictation Pill</span>
+        <span class="ai-tag">S04</span>
+      </div>
+      <div class="dictation-pill">
+        <div class="audio-waves">
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+          <div class="wave-bar"></div>
+        </div>
+        <span style="font-size: 13px; font-weight: 500;">Listening & formatting speech...</span>
+      </div>
+    </div>
+
+    <!-- Primitive 3 -->
+    <div class="primitive-box">
+      <div class="primitive-header">
+        <span class="primitive-title">Hardware Glow Bar</span>
+        <span class="ai-tag">S02 / S05</span>
+      </div>
+      <div class="glow-bar-container">
+        <div class="glow-bar-line"></div>
+      </div>
+      <div style="font-size: 12px; color: var(--gb-text-muted);">Ambient cyan LED indicator at display bottom edge</div>
+    </div>
+
+    <!-- Primitive 4 -->
+    <div class="primitive-box">
+      <div class="primitive-header">
+        <span class="primitive-title">AI Semantic File Card</span>
+        <span class="ai-tag">S06</span>
+      </div>
+      <div class="ai-file-card">
+        <div style="font-weight: 600;">Q3_Financial_Briefing.pdf</div>
+        <div style="font-size: 12px; color: var(--gb-text-muted);">Auto-generated: Contains balance sheets, revenue growth charts, and operating expenses.</div>
+        <div class="ai-tags">
+          <span class="ai-tag">Finance</span>
+          <span class="ai-tag">Revenue</span>
+          <span class="ai-tag">Q3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Primitive 5 -->
+    <div class="primitive-box">
+      <div class="primitive-header">
+        <span class="primitive-title">Hardware Specs</span>
+        <span class="ai-tag">S02</span>
+      </div>
+      <div class="spec-row">
+        <div class="spec-item">
+          <div class="spec-value">16 GB</div>
+          <div class="spec-label">Unified RAM</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-value">14 h</div>
+          <div class="spec-label">Battery Life</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-value">&lt; 1.29 kg</div>
+          <div class="spec-label">Alloy Chassis</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Primitive 6 -->
+    <div class="primitive-box">
+      <div class="primitive-header">
+        <span class="primitive-title">Hero Purchase & CTA</span>
+        <span class="ai-tag">S01 / S10</span>
+      </div>
+      <div style="font-size: 20px; font-weight: 700;">Dès 1 099 €</div>
+      <button class="btn-hero-cta">Découvrir Googlebook ›</button>
+    </div>
+  </div>
+</body>
+</html>
