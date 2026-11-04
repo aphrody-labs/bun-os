@@ -4024,7 +4024,6 @@ version = "1.4.7"
 dependencies = [
  "anyhow",
  "aphrody-webos-protocol",
- "axum",
  "bollard",
  "getrandom 0.4.3",
  "serde",
