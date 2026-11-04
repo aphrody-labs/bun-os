@@ -48,6 +48,12 @@
       "path": "assets/aphrody/ai",
       "owns": "Aphrody agent brand (Byron), product captures and renders.",
       "exclude": ["**/*.psd"]
+    },
+    {
+      "scope": "ecosystem",
+      "path": "packages/assets/svgs/ecosystem",
+      "owns": "Sovereign vector icons for Bun OS core pillars: Aphrody, Bun, COSMIC, Google, Android, Waydroid, and Gemini.",
+      "exclude": []
     }
   ],
   "releases": [

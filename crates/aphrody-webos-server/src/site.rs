@@ -53,6 +53,23 @@ const BYRON_PORTRAIT: &[u8] = include_bytes!("../../aphrody-identity/assets/logo
 /// Idle track of the pet (atlas row 0: six 192x208 cells), extracted from assets/aphrody/sprites/spritesheet.png.
 const PET_IDLE: &[u8] = include_bytes!("../../aphrody-identity/assets/aphrody/sprites/idle.webp");
 
+/// Canonical ecosystem brand vectors (packages/assets/svgs/ecosystem).
+const SVG_BUN: &[u8] = include_bytes!("../../../packages/assets/svgs/ecosystem/bun.svg");
+const SVG_COSMIC: &[u8] = include_bytes!("../../../packages/assets/svgs/ecosystem/cosmic.svg");
+const SVG_GOOGLE: &[u8] = include_bytes!("../../../packages/assets/svgs/ecosystem/google.svg");
+const SVG_ANDROID: &[u8] = include_bytes!("../../../packages/assets/svgs/ecosystem/android.svg");
+const SVG_WAYDROID: &[u8] = include_bytes!("../../../packages/assets/svgs/ecosystem/waydroid.svg");
+const SVG_GEMINI: &[u8] = include_bytes!("../../../packages/assets/svgs/ecosystem/gemini.svg");
+
+pub const ECOSYSTEM_SVGS: &[(&str, &[u8])] = &[
+    ("bun.svg", SVG_BUN),
+    ("cosmic.svg", SVG_COSMIC),
+    ("google.svg", SVG_GOOGLE),
+    ("android.svg", SVG_ANDROID),
+    ("waydroid.svg", SVG_WAYDROID),
+    ("gemini.svg", SVG_GEMINI),
+];
+
 fn escape(text: &str) -> String {
     text.replace('&', "&amp;")
         .replace('<', "&lt;")
@@ -302,8 +319,18 @@ async fn favicon_ico() -> Response {
 }
 
 async fn icon(Path(name): Path<String>) -> Response {
-    match ICONS.iter().find(|(file, _)| *file == name) {
-        Some((_, png)) => bytes("image/png", DAY, png.to_vec()),
+    if let Some((_, png)) = ICONS.iter().find(|(file, _)| *file == name) {
+        return bytes("image/png", DAY, png.to_vec());
+    }
+    if let Some((_, svg)) = ECOSYSTEM_SVGS.iter().find(|(file, _)| *file == name) {
+        return bytes("image/svg+xml", DAY, svg.to_vec());
+    }
+    StatusCode::NOT_FOUND.into_response()
+}
+
+async fn ecosystem_svg(Path(name): Path<String>) -> Response {
+    match ECOSYSTEM_SVGS.iter().find(|(file, _)| *file == name) {
+        Some((_, svg)) => bytes("image/svg+xml", DAY, svg.to_vec()),
         None => StatusCode::NOT_FOUND.into_response(),
     }
 }
@@ -584,6 +611,7 @@ pub fn router(state: Arc<AppState>) -> Router {
         .route("/favicon.ico", get(favicon_ico))
         .route("/apple-touch-icon.png", get(apple_touch_icon))
         .route("/icons/{name}", get(icon))
+        .route("/assets/ecosystem/{name}", get(ecosystem_svg))
         .route("/pet-idle.webp", get(pet_idle))
         .route("/byron.png", get(byron_png))
         .route("/byron.webp", get(byron_webp))
@@ -617,6 +645,7 @@ mod tests {
         assert_eq!(&PET_IDLE[8..12], b"WEBP");
         assert_eq!(&BYRON_FULLBODY[1..4], b"PNG");
         assert_eq!(&BYRON_PORTRAIT[8..12], b"WEBP");
+        assert!(ECOSYSTEM_SVGS.iter().all(|(_, svg)| svg.starts_with(b"<svg")));
     }
 
     #[test]

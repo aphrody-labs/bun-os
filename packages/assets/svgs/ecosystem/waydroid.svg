@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <!-- Waydroid Android on Wayland emblem -->
+  <rect x="2" y="3" width="20" height="18" rx="3" stroke="#3DDC84" stroke-width="1.8"/>
+  <path fill="#3DDC84" d="M7 14a5 5 0 0 1 10 0H7z"/>
+  <circle cx="9.5" cy="12" r="0.75" fill="#1e1e1e"/>
+  <circle cx="14.5" cy="12" r="0.75" fill="#1e1e1e"/>
+  <line x1="9" y1="9.5" x2="7.5" y2="7.5" stroke="#3DDC84" stroke-width="1" stroke-linecap="round"/>
+  <line x1="15" y1="9.5" x2="16.5" y2="7.5" stroke="#3DDC84" stroke-width="1" stroke-linecap="round"/>
+</svg>

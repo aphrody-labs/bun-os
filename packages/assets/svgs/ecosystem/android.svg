@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <!-- Android Head -->
+  <path fill="#3DDC84" d="M6 13a6 6 0 0 1 12 0H6z"/>
+  <!-- Eyes -->
+  <circle cx="9" cy="10.5" r="0.75" fill="#FFFFFF"/>
+  <circle cx="15" cy="10.5" r="0.75" fill="#FFFFFF"/>
+  <!-- Antennas -->
+  <line x1="8.5" y1="7.5" x2="6.5" y2="4.5" stroke="#3DDC84" stroke-width="1" stroke-linecap="round"/>
+  <line x1="15.5" y1="7.5" x2="17.5" y2="4.5" stroke="#3DDC84" stroke-width="1" stroke-linecap="round"/>
+  <!-- Torso -->
+  <rect x="6" y="14" width="12" height="7" rx="1" fill="#3DDC84"/>
+  <!-- Arms -->
+  <rect x="3.5" y="14" width="1.5" height="5.5" rx="0.75" fill="#3DDC84"/>
+  <rect x="19" y="14" width="1.5" height="5.5" rx="0.75" fill="#3DDC84"/>
+  <!-- Legs -->
+  <rect x="8.5" y="21" width="1.5" height="3" rx="0.75" fill="#3DDC84"/>
+  <rect x="14" y="21" width="1.5" height="3" rx="0.75" fill="#3DDC84"/>
+</svg>

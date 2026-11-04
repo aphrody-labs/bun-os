@@ -244,7 +244,8 @@ async function publish(catalog: Catalog, out: string, vps: string, dryRun: boole
   const root = safe(catalog.cdn.releaseRoot);
   const target = `${root}/releases/${safe(release)}`;
   const local = vps === "local";
-  const ssh = local ? ["sh", "-c"] : ["ssh", "-o", "BatchMode=yes", "-o", "ConnectTimeout=15", safe(vps)];
+  const sshBin = process.platform === "win32" ? (Bun.which("ssh.exe") ?? "ssh") : "ssh";
+  const ssh = local ? ["sh", "-c"] : [sshBin, "-o", "BatchMode=yes", "-o", "ConnectTimeout=15", safe(vps)];
   // On Windows rsync reads `C:/...` as a remote host `C`: a tar stream over ssh instead, with the
   // modes reset on the host.
   const copy: string[][] =

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <!-- COSMIC Desktop Shell Emblem -->
+  <circle cx="12" cy="12" r="9" stroke="#48b9c7" stroke-width="1.8"/>
+  <ellipse cx="12" cy="12" rx="9" ry="3.5" stroke="#f68b33" stroke-width="1.6" transform="rotate(-30 12 12)"/>
+  <circle cx="12" cy="12" r="3" fill="#ffffff"/>
+  <circle cx="16.5" cy="9.5" r="1.2" fill="#f68b33"/>
+</svg>
