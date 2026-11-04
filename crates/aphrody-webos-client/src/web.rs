@@ -82,6 +82,10 @@ pub fn write_clipboard(text: &str) {
     let _ = window().navigator().clipboard().write_text(text);
 }
 
+pub fn redirect(url: &str) {
+    let _ = window().location().assign(url);
+}
+
 fn decode(bytes: &[u8]) -> Option<StreamEvent> {
     let frame = ::image::load_from_memory(bytes).ok()?.into_rgba8();
     let (width, height) = frame.dimensions();

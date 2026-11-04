@@ -205,7 +205,7 @@ async function probeGpu() {
     return;
   }
   try {
-    const adapter = await navigator.gpu.requestAdapter({ powerPreference: "high-performance" });
+    const adapter = await navigator.gpu.requestAdapter();
     if (!adapter) {
       root.dataset.gpu = "webgl2";
       return;

@@ -285,7 +285,7 @@ async fn finish_owner(s: &GoogleService, q: CallbackQuery) -> Response {
                     );
                 }
             };
-            let mut response = Redirect::to("/api/android/").into_response();
+            let mut response = Redirect::to("/").into_response();
             response.headers_mut().insert(
                 header::SET_COOKIE,
                 format!(

@@ -37,6 +37,7 @@ pub enum Message {
     Input(Input),
     WindowResized(Size),
     Back,
+    SignIn,
 }
 
 enum Screen {
@@ -63,11 +64,14 @@ impl App {
     }
 
     fn message_screen(&self, text: String, back: bool) -> Element<'_, Message> {
+        let is_auth = text.contains("Sign in with the Bun OS owner");
         let mut column = widget::column::with_capacity(2)
             .spacing(16)
             .align_x(Alignment::Center)
             .push(widget::text::body(text));
-        if back {
+        if is_auth {
+            column = column.push(widget::button::standard("Sign in with Google").on_press(Message::SignIn));
+        } else if back {
             column = column.push(widget::button::standard("Reconnect").on_press(Message::Back));
         }
         widget::container(column)
@@ -199,6 +203,10 @@ impl cosmic::Application for App {
                 return Task::perform(web::availability(), |r| {
                     cosmic::Action::App(Message::Availability(r))
                 });
+            }
+            Message::SignIn => {
+                #[cfg(target_arch = "wasm32")]
+                web::redirect("/api/google/session/login");
             }
         }
         Task::none()

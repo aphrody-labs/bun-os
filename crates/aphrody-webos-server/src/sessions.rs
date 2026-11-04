@@ -45,12 +45,21 @@ struct OwnerClaims {
 }
 
 fn owner_authenticated(headers: &HeaderMap) -> bool {
-    if !headers
+    if let Some(origin) = headers
         .get(axum::http::header::ORIGIN)
         .and_then(|origin| origin.to_str().ok())
-        .is_some_and(|origin| origin == "https://aphrody.com")
     {
-        return false;
+        if origin != "https://aphrody.com" {
+            return false;
+        }
+    }
+    if let Some(sec_site) = headers
+        .get("sec-fetch-site")
+        .and_then(|s| s.to_str().ok())
+    {
+        if sec_site == "cross-site" {
+            return false;
+        }
     }
     let Some(secret) = std::env::var("APHRODY_WEBOS_SESSION_KEY")
         .ok()
@@ -193,7 +202,16 @@ fn error(status: StatusCode, message: &str) -> Response {
     aphrody_http_error::api::problem_with(status, message, legacy)
 }
 
-async fn availability(State(sessions): State<Sessions>) -> Json<SessionAvailability> {
+async fn availability(
+    State(sessions): State<Sessions>,
+    headers: HeaderMap,
+) -> Json<SessionAvailability> {
+    if !owner_authenticated(&headers) {
+        return Json(SessionAvailability {
+            available: false,
+            reason: Some("Sign in with the Bun OS owner Google account first.".into()),
+        });
+    }
     Json(sessions.availability())
 }
 
