@@ -54,6 +54,18 @@
       "path": "packages/assets/svgs/ecosystem",
       "owns": "Sovereign vector icons for Bun OS core pillars: Aphrody, Bun, COSMIC, Google, Android, Waydroid, and Gemini.",
       "exclude": []
+    },
+    {
+      "scope": "wallpapers",
+      "path": "packages/assets/wallpapers",
+      "owns": "4K QHD vector wallpapers: Dark Obsidian, Tokyo Night, English Opal, Cosmic Dusk, and Celestial Gemini.",
+      "exclude": []
+    },
+    {
+      "scope": "screens",
+      "path": "packages/assets/screenshots",
+      "owns": "Authentic production screenshots of Bun OS, WebOS desktop, Craft Pro studios, Googlebook and system themes.",
+      "exclude": []
     }
   ],
   "releases": [

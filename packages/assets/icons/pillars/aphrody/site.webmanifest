@@ -1,0 +1,41 @@
+{
+  "background_color": "#fef9eb",
+  "description": "Aphrody, an operating system shipped as a distribution.",
+  "display": "standalone",
+  "icons": [
+    {
+      "purpose": "any",
+      "sizes": "192x192",
+      "src": "icon-192.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any",
+      "sizes": "512x512",
+      "src": "icon-512.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any",
+      "sizes": "any",
+      "src": "icon.svg",
+      "type": "image/svg+xml"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "192x192",
+      "src": "maskable-192.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "maskable",
+      "sizes": "512x512",
+      "src": "maskable-512.png",
+      "type": "image/png"
+    }
+  ],
+  "name": "Aphrody",
+  "short_name": "Aphrody",
+  "start_url": "/",
+  "theme_color": "#676013"
+}
