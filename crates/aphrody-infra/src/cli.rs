@@ -2617,9 +2617,20 @@ async fn run_cli(cli: Cli) -> Result<()> {
     // The default root is the enclosing work tree, so a call from a subdirectory neither misses
     // `config/` nor drops run manifests under that subdirectory.
     let root = if cli.root == Path::new(".") {
-        root.ancestors()
+        let git_root = root
+            .ancestors()
             .find(|dir| dir.join(".git").exists())
-            .map_or(root.clone(), Path::to_path_buf)
+            .map_or(root.clone(), Path::to_path_buf);
+        if git_root.join("infra/config").exists() {
+            git_root
+        } else {
+            let fallback = crate::validate::default_infra_root();
+            if fallback.join("infra/config").exists() {
+                fallback
+            } else {
+                git_root
+            }
+        }
     } else {
         root
     };

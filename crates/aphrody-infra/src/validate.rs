@@ -42,15 +42,37 @@ pub fn host_systemd_root() -> PathBuf {
     host_config_root().join("systemd")
 }
 
+/// Default infrastructure root when neither `--root` nor `$APHRODY_ROOT` is set.
+pub fn default_infra_root() -> PathBuf {
+    for var in ["APHRODY_INFRA_ROOT", "APHRODY_ROOT"] {
+        if let Some(val) = std::env::var_os(var) {
+            let p = PathBuf::from(val);
+            if p.join("infra/config").exists() {
+                return p;
+            }
+        }
+    }
+    for candidate in [
+        r"C:\src\bun-os-archive",
+        r"C:\src\yolo-os",
+        "/home/ubuntu/src/yolo-current/yolo-os",
+        "/home/ubuntu/src/aphrody",
+    ] {
+        let p = PathBuf::from(candidate);
+        if p.join("infra/config").exists() {
+            return p;
+        }
+    }
+    let home = std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE"));
+    PathBuf::from(home.unwrap_or_default()).join("src/aphrody")
+}
+
 /// `$APHRODY_ROOT/infra/config/host` (default `$HOME/src/aphrody`): systemd units, nginx sites and routes.
 pub fn host_config_root() -> PathBuf {
-    let root = std::env::var_os("APHRODY_ROOT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            let home = std::env::var_os("HOME").or_else(|| std::env::var_os("USERPROFILE"));
-            PathBuf::from(home.unwrap_or_default()).join("src/aphrody")
-        });
-    root.join("infra/config/host")
+    if let Some(val) = std::env::var_os("APHRODY_ROOT") {
+        return PathBuf::from(val).join("infra/config/host");
+    }
+    default_infra_root().join("infra/config/host")
 }
 
 fn unit_template_exists(systemd_root: &Path, unit: &str) -> bool {
