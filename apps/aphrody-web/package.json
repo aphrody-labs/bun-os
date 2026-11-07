@@ -1,0 +1,19 @@
+{
+  "name": "@aphrody/aphrody-web",
+  "version": "1.4.7",
+  "description": "Flagship web portal for Aphrody & Bun OS (aphrody.com)",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/index.ts",
+    "build": "bun build ./src/index.ts --outdir ./dist --minify",
+    "typecheck": "bun check"
+  },
+  "dependencies": {
+    "@aphrody/craft-ui": "workspace:*",
+    "@aphrody/m3-os-themes": "workspace:*"
+  },
+  "devDependencies": {
+    "bun-types": "catalog:"
+  }
+}

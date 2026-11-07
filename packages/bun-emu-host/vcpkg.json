@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "$comment": "Emulator-host dependencies; kept independent from yolo-re's IECODE native toolchain.",
+  "name": "bun-emu-host",
+  "version-string": "2026-11-04",
+  "builtin-baseline": "58845ed63eb19aff55e896ea1f5d51f2a0df5b66",
+  "dependencies": [],
+  "features": {
+    "emu-host": {
+      "description": "Qt 6 Core/Gui with the offscreen platform for headless C++ emulator cores.",
+      "dependencies": [
+        {
+          "name": "qtbase",
+          "default-features": false,
+          "features": ["gui", "thread", "concurrent"]
+        },
+        {
+          "name": "dirent",
+          "platform": "windows"
+        }
+      ]
+    }
+  }
+}

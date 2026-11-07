@@ -1,0 +1,36 @@
+{
+  "name": "@aphrody/craft-ui",
+  "version": "1.4.7",
+  "description": "Elite 2026 UI/UX design tokens, OKLCH dynamics, WebGPU glass shaders, and luxury component primitives for Bun OS and Craft Pro studios",
+  "license": "Apache-2.0",
+  "author": "aphrody-dev <contact@aphrody.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aphrody-labs/bun-os.git",
+    "directory": "packages/craft-ui"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens": "./src/tokens/oklch.ts",
+    "./shaders": "./src/shaders/glass-pipeline.ts",
+    "./elevation.css": "./src/tokens/elevation.css"
+  },
+  "files": [
+    "src",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "typecheck": "bun check --noEmit"
+  },
+  "devDependencies": {
+    "bun-types": "catalog:"
+  },
+  "engines": {
+    "bun": ">=1.4.4"
+  }
+}

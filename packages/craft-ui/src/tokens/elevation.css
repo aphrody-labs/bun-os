@@ -1,0 +1,77 @@
+/**
+ * Aphrody Luxury Elevation & Optical Depth System
+ * 4-layer depth hierarchy, specular hairline bevels, and spring transitions.
+ */
+
+:root {
+  /* Hairline Specular Borders */
+  --craft-hairline-specular: inset 0 1px 0 0 rgba(255, 255, 255, 0.09), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --craft-hairline-shadow: inset 0 -1px 0 0 rgba(0, 0, 0, 0.35);
+
+  /* Multi-Layered Elevation Depth (Ambient + Direct + Penumbra) */
+  --craft-elevation-0: none;
+  
+  --craft-elevation-1: 
+    0 1px 2px 0 rgba(0, 0, 0, 0.05),
+    0 1px 3px 1px rgba(0, 0, 0, 0.1),
+    var(--craft-hairline-specular);
+
+  --craft-elevation-2:
+    0 2px 6px -1px rgba(0, 0, 0, 0.12),
+    0 6px 16px -2px rgba(0, 0, 0, 0.18),
+    var(--craft-hairline-specular);
+
+  --craft-elevation-3:
+    0 4px 12px -2px rgba(0, 0, 0, 0.18),
+    0 16px 36px -4px rgba(0, 0, 0, 0.28),
+    var(--craft-hairline-specular);
+
+  --craft-elevation-4:
+    0 8px 24px -4px rgba(0, 0, 0, 0.24),
+    0 28px 64px -8px rgba(0, 0, 0, 0.42),
+    var(--craft-hairline-specular);
+
+  /* Spring Physics Timing Curves */
+  --craft-spring-snappy: cubic-bezier(0.19, 1, 0.22, 1);
+  --craft-spring-gentle: cubic-bezier(0.25, 1, 0.5, 1);
+  --craft-spring-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Optical Font Axis Defaults */
+  --craft-font-display: "Google Sans Flex", "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --craft-font-code: "JetBrains Mono", "Cascadia Code", "Fira Code", monospace;
+  --craft-font-opsz-headline: 48;
+  --craft-font-opsz-body: 14;
+}
+
+/* Glass Surface Classes */
+.craft-glass {
+  background: var(--craft-glass-surface, rgba(15, 20, 28, 0.72));
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--craft-glass-border, rgba(255, 255, 255, 0.1));
+  box-shadow: var(--craft-elevation-2);
+}
+
+.craft-glass-floating {
+  background: var(--craft-glass-surface, rgba(18, 24, 34, 0.82));
+  backdrop-filter: blur(28px) saturate(190%);
+  -webkit-backdrop-filter: blur(28px) saturate(190%);
+  border: 1px solid var(--craft-glass-border, rgba(255, 255, 255, 0.15));
+  box-shadow: var(--craft-elevation-3);
+}
+
+.craft-specular-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.craft-specular-glow::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28) 40%, rgba(255, 255, 255, 0.28) 60%, transparent);
+  pointer-events: none;
+}

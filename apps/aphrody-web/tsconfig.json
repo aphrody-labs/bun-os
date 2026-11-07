@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["bun-types"],
+    "strict": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "paths": {
+      "@aphrody/craft-ui": ["../../packages/craft-ui/src/index.ts"],
+      "@aphrody/craft-ui/tokens": ["../../packages/craft-ui/src/tokens/oklch.ts"],
+      "@aphrody/craft-ui/shaders": ["../../packages/craft-ui/src/shaders/glass-pipeline.ts"],
+      "@aphrody/craft-ui/*": ["../../packages/craft-ui/src/*"]
+    }
+  },
+  "include": ["src/**/*"]
+}
