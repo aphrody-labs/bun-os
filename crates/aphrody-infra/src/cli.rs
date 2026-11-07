@@ -2583,6 +2583,16 @@ async fn execute_drive(cmd: &DriveCommand, run: &mut Run) -> Result<()> {
 /// Entry point of the former `aphrody-infra` binary, now reached through the `aphrody` multi-call binary.
 /// `args[0]` is the program name (argv convention). Returns the process exit code.
 pub fn cli_main(args: Vec<std::ffi::OsString>) -> i32 {
+    std::thread::Builder::new()
+        .name("aphrody-infra-main".to_owned())
+        .stack_size(16 * 1024 * 1024)
+        .spawn(move || cli_main_inner(args))
+        .expect("spawn aphrody-infra-main")
+        .join()
+        .unwrap_or(1)
+}
+
+fn cli_main_inner(args: Vec<std::ffi::OsString>) -> i32 {
     let cli = match Cli::try_parse_from(args) {
         Ok(cli) => cli,
         Err(error) => {
@@ -2591,6 +2601,7 @@ pub fn cli_main(args: Vec<std::ffi::OsString>) -> i32 {
         }
     };
     let runtime = match tokio::runtime::Builder::new_multi_thread()
+        .thread_stack_size(8 * 1024 * 1024)
         .enable_all()
         .build()
     {
