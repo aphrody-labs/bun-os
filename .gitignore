@@ -82,3 +82,10 @@ Thumbs.db
 legacy-excluded/
 migration-archives/
 local_files.db
+
+
+# Standard YOLO cache patterns
+.tmp/
+.wrangler/
+.zig-cache/
+
